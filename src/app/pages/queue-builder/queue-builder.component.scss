@@ -820,9 +820,13 @@
     }
   }
 
+  // Constrain panels on mobile so they don't force full-page scroll.
+  // Internal results already scroll via overflow-y: auto.
   .search-panel,
   .queue-panel {
     padding: 16px;
+    max-height: 60vh;
+    overflow: hidden; // panel box itself clips; inner .search-results / .queue-list scroll
   }
 
   .result-item {

@@ -475,17 +475,50 @@
 
 // Mobile
 @media (max-width: 480px) {
+  .modal-backdrop {
+    padding: 12px 8px;
+    align-items: flex-end;
+  }
+
   .modal-content {
     padding: 20px 16px;
+    // Switch to flex so we can constrain height without the whole modal scrolling
+    display: flex;
+    flex-direction: column;
+    max-height: 92dvh; // dvh accounts for mobile browser chrome/address bar
+    overflow-y: hidden; // modal itself does NOT scroll
+    border-radius: 20px 20px 16px 16px;
+  }
+
+  // Tab content takes available space and scrolls internally if needed
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; // override the 200px min-height
+  }
+
+  // Remove inner max-height on search results — flex parent now controls height
+  .search-results {
+    max-height: none;
   }
 
   .modal-title {
     font-size: 1.1rem;
+    flex-shrink: 0;
   }
 
-  .tab-toggle .tab-btn {
-    padding: 8px 10px;
-    font-size: 0.8rem;
+  .tab-toggle {
+    flex-shrink: 0;
+
+    .tab-btn {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+    }
+  }
+
+  .add-btn {
+    flex-shrink: 0;
+    margin-top: 12px;
   }
 
   .track-preview {
