@@ -49,7 +49,7 @@ A Spotify-powered music analytics and discovery application built with Angular.
 
 ## Tech Stack
 
-- **Framework**: Angular 16
+- **Framework**: Angular 18 + TypeScript
 - **Styling**: SCSS with custom theming
 - **API Integration**: Spotify Web API
 - **Playback**: Spotify Web Playback SDK
@@ -75,7 +75,7 @@ cp src/environments/environment.example.ts src/environments/environment.ts
 # Edit environment.ts with your Spotify API credentials
 
 # Start development server
-ng serve
+npm start
 ```
 
 ### Environment Configuration
