@@ -1075,6 +1075,10 @@
   .page-container {
     padding: 80px 12px 80px;
     overflow-x: hidden;
+    // min-height: 100vh causes a small scroll on mobile because the toolbar
+    // and footer are outside this element. Reset to auto so the page height
+    // is driven by content, not the viewport height shortcut.
+    min-height: auto;
   }
 
   .page-header .page-title {
@@ -1367,6 +1371,7 @@
   .page-container {
     padding: 80px 8px 70px;
     overflow-x: hidden;
+    min-height: auto; // prevent tiny scroll caused by min-height: 100vh
   }
 
   .stats-bar {
