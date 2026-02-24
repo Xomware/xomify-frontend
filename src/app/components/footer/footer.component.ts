@@ -3,9 +3,8 @@ import { Router } from '@angular/router';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { SongService } from 'src/app/services/song.service';
 import { UserService } from 'src/app/services/user.service';
-import { Observable, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ToastService } from 'src/app/services/toast.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-footer',
@@ -40,28 +39,6 @@ export class FooterComponent implements OnInit {
       } else {
         this.showDynamicButton = false;
       }
-    });
-  }
-
-  private uploadImage$(
-    playlistId: string,
-    base64Image: string,
-  ): Observable<any> {
-    return new Observable((observer) => {
-      const base64String = base64Image.replace(/\n/g, '');
-
-      this.PlaylistService.uploadPlaylistImage(
-        playlistId,
-        base64String,
-      ).subscribe({
-        next: (data) => {
-          observer.next(data);
-          observer.complete();
-        },
-        error: (err) => {
-          observer.error(err);
-        },
-      });
     });
   }
 
@@ -109,10 +86,7 @@ export class FooterComponent implements OnInit {
               .subscribe({
                 next: (data) => {
                   console.log(data);
-                  this.uploadImage$(
-                    playlist.id,
-                    environment.logoBase64,
-                  ).subscribe({
+                  this.PlaylistService.uploadXomifyLogo(playlist.id).subscribe({
                     next: (imageData) => {
                       console.log('Image uploaded successfully:', imageData);
                     },

@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap, expand, reduce, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
+import { LogoService } from './logo.service';
 import { EMPTY } from 'rxjs';
 
 @Injectable({
@@ -12,7 +12,11 @@ import { EMPTY } from 'rxjs';
 export class PlaylistService {
   private apiUrl = 'https://api.spotify.com/v1';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private logoService: LogoService,
+  ) {}
 
   private getHeaders(): HttpHeaders {
     const token = this.authService.getAccessToken();
@@ -202,15 +206,13 @@ export class PlaylistService {
   }
 
   /**
-   * Upload the Xomify logo to a playlist
-   * Uses the logo from environment config
+   * Upload the Xomify logo to a playlist.
+   * Loads the logo from a static asset at runtime.
    */
   uploadXomifyLogo(playlistId: string): Observable<any> {
-    if (!environment.logoBase64) {
-      console.warn('No logo configured in environment');
-      return of(null);
-    }
-    return this.uploadPlaylistImage(playlistId, environment.logoBase64);
+    return this.logoService.getLogoBase64().pipe(
+      switchMap((base64) => this.uploadPlaylistImage(playlistId, base64)),
+    );
   }
 
   /**
@@ -233,7 +235,7 @@ export class PlaylistService {
       switchMap((playlist) => {
         return this.addTracksToPlaylist(playlist.id, trackUris).pipe(
           switchMap(() => {
-            if (addXomifyLogo && environment.logoBase64) {
+            if (addXomifyLogo) {
               return this.uploadXomifyLogo(playlist.id).pipe(
                 // Don't fail if image upload fails
                 catchError((err) => {
