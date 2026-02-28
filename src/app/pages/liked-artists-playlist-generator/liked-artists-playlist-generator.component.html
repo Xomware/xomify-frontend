@@ -116,7 +116,7 @@
                 (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateFrom">
-                {{ formatDate(new Date(releaseDateFrom)) }}
+                {{ formatDateFromString(releaseDateFrom) }}
               </span>
             </div>
             <div class="date-input-group">
@@ -129,7 +129,7 @@
                 (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateTo">
-                {{ formatDate(new Date(releaseDateTo)) }}
+                {{ formatDateFromString(releaseDateTo) }}
               </span>
             </div>
           </div>

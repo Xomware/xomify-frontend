@@ -218,6 +218,14 @@ export class LikedArtistsPlaylistGeneratorComponent implements OnInit {
   }
 
   /**
+   * Format a date string for display (template-safe wrapper — avoids `new Date()` in templates)
+   */
+  formatDateFromString(dateStr: string): string {
+    if (!dateStr) return '';
+    return this.formatDate(new Date(dateStr));
+  }
+
+  /**
    * Get display count for album type
    */
   getAlbumTypeCount(type: 'album' | 'single' | 'appearsOn'): number {
