@@ -9,6 +9,42 @@
   margin: 0 auto;
 }
 
+// View Tabs
+.view-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #8a8a9a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .tab-icon {
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    color: #fff;
+  }
+
+  &.active {
+    color: #1bdc6f;
+    border-bottom-color: #1bdc6f;
+  }
+}
+
 // Page Header
 .page-header {
   margin-bottom: 32px;

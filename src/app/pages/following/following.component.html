@@ -24,8 +24,30 @@
       <p class="page-subtitle">Artists you follow on Spotify</p>
     </header>
 
-    <!-- Search & Filter -->
-    <div class="controls-bar">
+    <!-- View Mode Tabs -->
+    <div class="view-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="viewMode === 'artists'"
+        (click)="setViewMode('artists')"
+      >
+        <span class="tab-icon">👥</span>
+        Artists ({{ allArtists.length }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="viewMode === 'activity'"
+        (click)="setViewMode('activity')"
+      >
+        <span class="tab-icon">📅</span>
+        Recent Activity
+      </button>
+    </div>
+
+    <!-- Artists View -->
+    <div *ngIf="viewMode === 'artists'">
+      <!-- Search & Filter -->
+      <div class="controls-bar">
       <div class="search-box">
         <svg
           width="18"
@@ -149,27 +171,33 @@
       </div>
     </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="filteredArtists.length === 0 && !loading">
-      <div class="empty-icon">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredArtists.length === 0 && !loading">
+        <div class="empty-icon">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3 *ngIf="searchQuery">No artists found</h3>
+        <h3 *ngIf="!searchQuery">You're not following any artists</h3>
+        <p *ngIf="searchQuery">Try a different search term</p>
+        <p *ngIf="!searchQuery">Follow artists on Spotify to see them here</p>
       </div>
-      <h3 *ngIf="searchQuery">No artists found</h3>
-      <h3 *ngIf="!searchQuery">You're not following any artists</h3>
-      <p *ngIf="searchQuery">Try a different search term</p>
-      <p *ngIf="!searchQuery">Follow artists on Spotify to see them here</p>
+    </div>
+
+    <!-- Activity Timeline View -->
+    <div *ngIf="viewMode === 'activity'" class="activity-view">
+      <app-activity-timeline></app-activity-timeline>
     </div>
   </div>
 </div>

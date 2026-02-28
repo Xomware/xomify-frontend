@@ -1,0 +1,224 @@
+<div class="activity-timeline-container">
+  <!-- Header -->
+  <div class="timeline-header">
+    <div class="header-top">
+      <h1>Liked Artists Activity</h1>
+      <button
+        class="refresh-btn"
+        (click)="refresh()"
+        [disabled]="refreshing"
+        title="Refresh timeline"
+      >
+        <span class="icon">🔄</span>
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="timeline-stats" *ngIf="timeline">
+      <div class="stat">
+        <span class="stat-label">Total Activity</span>
+        <span class="stat-value">{{ timeline.stats.totalActivities }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Artists</span>
+        <span class="stat-value">{{ timeline.stats.totalArtists }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Albums</span>
+        <span class="stat-value">{{ timeline.stats.albumCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Singles</span>
+        <span class="stat-value">{{ timeline.stats.singleCount }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Features</span>
+        <span class="stat-value">{{ timeline.stats.appearsOnCount }}</span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="timeline-filters">
+      <div class="filter-group">
+        <label class="filter-label">Activity Type:</label>
+        <button
+          class="filter-btn"
+          [class.active]="filterType === 'all'"
+          (click)="setFilterType('all')"
+        >
+          All
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="filterType === 'album'"
+          (click)="setFilterType('album')"
+        >
+          Albums
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="filterType === 'single'"
+          (click)="setFilterType('single')"
+        >
+          Singles
+        </button>
+        <button
+          class="filter-btn"
+          [class.active]="filterType === 'appears_on'"
+          (click)="setFilterType('appears_on')"
+        >
+          Features
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-group">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by artist or release..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange(searchQuery)"
+        />
+        <button
+          class="clear-btn"
+          *ngIf="searchQuery"
+          (click)="clearSearch()"
+          title="Clear search"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Timeline Controls -->
+      <div class="timeline-controls">
+        <button
+          class="control-btn"
+          (click)="expandAll()"
+          title="Expand all dates"
+        >
+          Expand All
+        </button>
+        <button
+          class="control-btn"
+          (click)="collapseAll()"
+          title="Collapse all dates"
+        >
+          Collapse All
+        </button>
+      </div>
+    </div>
+
+    <!-- Link to Release Radar -->
+    <div class="release-radar-link">
+      <p>
+        <strong>📻 Tip:</strong> Check out
+        <a routerLink="/release-radar" class="link">Release Radar</a>
+        for curated weekly releases from your followed artists.
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading activity timeline...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <p class="error-message">{{ error }}</p>
+    <button class="retry-btn" (click)="loadTimeline(true)">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !error && timeline && timeline.activities.length === 0"
+    class="empty-state"
+  >
+    <p>No activity found for your liked artists in the last 30 days.</p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline" *ngIf="!loading && !error && timeline">
+    <div
+      *ngIf="filteredEntries.length === 0 && (filterType !== 'all' || searchQuery)"
+      class="no-results"
+    >
+      <p>No activities match your filters.</p>
+    </div>
+
+    <div *ngFor="let entry of filteredEntries" class="timeline-entry">
+      <!-- Date Header -->
+      <div
+        class="date-header"
+        (click)="toggleDate(entry.date)"
+        [class.expanded]="isDateExpanded(entry.date)"
+      >
+        <div class="date-info">
+          <span class="date-day">{{ entry.dayName }}</span>
+          <span class="activity-count">{{ entry.count }} activity</span>
+        </div>
+        <span class="expand-icon">{{ isDateExpanded(entry.date) ? '▼' : '▶' }}</span>
+      </div>
+
+      <!-- Activities for this date -->
+      <div class="activities" *ngIf="isDateExpanded(entry.date)">
+        <div
+          *ngFor="let activity of entry.activities"
+          class="activity-item"
+          (click)="goToAlbum(activity.albumId)"
+        >
+          <!-- Album Image -->
+          <div class="activity-image">
+            <img
+              *ngIf="activity.imageUrl"
+              [src]="activity.imageUrl"
+              [alt]="activity.title"
+              class="album-cover"
+            />
+            <div *ngIf="!activity.imageUrl" class="no-image">🎵</div>
+
+            <!-- Activity Badge -->
+            <span class="activity-badge" [style.backgroundColor]="getActivityColor(activity.type)">
+              {{ getActivityLabel(activity.type) }}
+            </span>
+          </div>
+
+          <!-- Activity Details -->
+          <div class="activity-details">
+            <div class="activity-main">
+              <h3 class="activity-title">{{ activity.title }}</h3>
+              <p class="activity-artist">
+                <a
+                  class="artist-link"
+                  (click)="goToArtist(activity.artistId, $event)"
+                >
+                  {{ activity.artistName }}
+                </a>
+              </p>
+            </div>
+
+            <!-- Activity Meta -->
+            <div class="activity-meta">
+              <span class="release-date">{{ getRelativeTime(activity.releaseDate) }}</span>
+              <span class="track-count" *ngIf="activity.totalTracks">
+                {{ activity.totalTracks }} track{{ activity.totalTracks !== 1 ? 's' : '' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Activity Actions -->
+          <div class="activity-actions" (click)="$event.stopPropagation()">
+            <button
+              class="action-btn spotify-btn"
+              (click)="openInSpotify(activity.uri, $event)"
+              title="Open in Spotify"
+            >
+              🎵
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
