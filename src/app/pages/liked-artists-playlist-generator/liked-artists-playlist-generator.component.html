@@ -110,26 +110,26 @@
               <label>From</label>
               <input
                 type="date"
-                [(ngModel)]="releaseDateFrom"
+                [value]="releaseDateFrom"
+                (input)="releaseDateFrom = $any($event.target).value; applyFilters()"
                 [min]="dateRange?.min | date: 'yyyy-MM-dd'"
                 [max]="dateRange?.max | date: 'yyyy-MM-dd'"
-                (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateFrom">
-                {{ formatDate(new Date(releaseDateFrom)) }}
+                {{ formatDate(releaseDateFrom) }}
               </span>
             </div>
             <div class="date-input-group">
               <label>To</label>
               <input
                 type="date"
-                [(ngModel)]="releaseDateTo"
+                [value]="releaseDateTo"
+                (input)="releaseDateTo = $any($event.target).value; applyFilters()"
                 [min]="dateRange?.min | date: 'yyyy-MM-dd'"
                 [max]="dateRange?.max | date: 'yyyy-MM-dd'"
-                (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateTo">
-                {{ formatDate(new Date(releaseDateTo)) }}
+                {{ formatDate(releaseDateTo) }}
               </span>
             </div>
           </div>
@@ -155,10 +155,10 @@
           <h3>Search</h3>
           <input
             type="text"
-            [(ngModel)]="searchQuery"
+            [value]="searchQuery"
+            (input)="searchQuery = $any($event.target).value; applyFilters()"
             placeholder="Search by album or artist name..."
             class="search-input"
-            (input)="applyFilters()"
           />
         </div>
 
@@ -200,7 +200,8 @@
         <label>Playlist Name</label>
         <input
           type="text"
-          [(ngModel)]="playlistName"
+          [value]="playlistName"
+          (input)="playlistName = $any($event.target).value"
           placeholder="My Liked Artists Releases"
           class="config-input"
         />
@@ -209,7 +210,8 @@
       <div class="config-group">
         <label>Description</label>
         <textarea
-          [(ngModel)]="playlistDescription"
+          [value]="playlistDescription"
+          (input)="playlistDescription = $any($event.target).value"
           placeholder="Add a description for your playlist..."
           class="config-textarea"
         ></textarea>
@@ -219,7 +221,8 @@
         <label>Track Limit</label>
         <input
           type="number"
-          [(ngModel)]="limitTracksInput"
+          [value]="limitTracksInput"
+          (input)="limitTracksInput = +$any($event.target).value"
           [max]="filteredReleases.length"
           min="1"
           class="config-input"
@@ -229,11 +232,11 @@
 
       <div class="config-checkboxes">
         <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="isPlaylistPublic" />
+          <input type="checkbox" [checked]="isPlaylistPublic" (change)="isPlaylistPublic = !isPlaylistPublic" />
           <span class="checkbox-text">Make playlist public</span>
         </label>
         <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="addXomifyLogo" />
+          <input type="checkbox" [checked]="addXomifyLogo" (change)="addXomifyLogo = !addXomifyLogo" />
           <span class="checkbox-text">Add Xomify logo to playlist</span>
         </label>
       </div>

@@ -208,9 +208,10 @@ export class LikedArtistsPlaylistGeneratorComponent implements OnInit {
   /**
    * Format date for display
    */
-  formatDate(date: Date | null): string {
-    if (!date) return '';
-    return new Date(date).toLocaleDateString('en-US', {
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
