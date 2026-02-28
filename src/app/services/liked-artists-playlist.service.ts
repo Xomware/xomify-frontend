@@ -264,25 +264,46 @@ export class LikedArtistsPlaylistService {
   }
 
   /**
-   * Generate a playlist from liked artists' latest releases
+   * Generate a playlist from liked artists' latest releases.
+   *
+   * IMPORTANT: `releases` contains album-level data (release.uri = spotify:album:...).
+   * Spotify's add-tracks API requires TRACK URIs, so we must first fetch all tracks
+   * from the selected albums, then build the playlist from those track URIs.
    */
   generatePlaylist(releases: ArtistRelease[], options: GeneratePlaylistOptions): Observable<any> {
     const userId = this.userService.getUserId();
-    
-    // Limit tracks if needed
-    const trackUris = releases
-      .slice(0, options.limitTracks || releases.length)
-      .map((release) => release.uri);
+    const limitTracks = options.limitTracks ?? 50;
 
-    return this.playlistService.createPlaylistWithTracks(
-      userId,
-      options.name,
-      options.description,
-      trackUris,
-      {
-        isPublic: options.isPublic,
-        addXomifyLogo: options.addXomifyLogo,
-      }
+    // Extract unique album IDs from the filtered releases (preserve order)
+    const albumIds = [...new Set(releases.map((r) => r.albumId))];
+
+    // Fetch all tracks from each album, then flatten + limit + create playlist
+    return this.getTracksFromAlbums(albumIds).pipe(
+      map((tracks: any[]) => {
+        // Build track URIs — prefer uri field, fall back to building from id
+        const trackUris: string[] = tracks
+          .filter((t) => t && (t.uri || t.id))
+          .map((t) => t.uri ?? `spotify:track:${t.id}`)
+          .slice(0, limitTracks);
+
+        if (trackUris.length === 0) {
+          throw new Error('No tracks found in the selected releases. Try different filters.');
+        }
+
+        return trackUris;
+      }),
+      switchMap((trackUris: string[]) =>
+        this.playlistService.createPlaylistWithTracks(
+          userId,
+          options.name,
+          options.description,
+          trackUris,
+          {
+            isPublic: options.isPublic,
+            addXomifyLogo: options.addXomifyLogo,
+          }
+        )
+      )
     );
   }
 
