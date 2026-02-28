@@ -22,6 +22,9 @@ import { FriendProfileComponent } from './pages/friend-profile/friend-profile.co
 import { RatingsComponent } from './pages/ratings/ratings.component';
 import { GroupsComponent } from './pages/groups/groups.component';
 import { GroupDetailComponent } from './pages/group-detail/group-detail.component';
+import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
+import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
+import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -109,6 +112,21 @@ const routes: Routes = [
   {
     path: 'group/:id',
     component: GroupDetailComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'recently-played',
+    component: RecentlyPlayedComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'new-releases',
+    component: NewReleasesComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'discover-artists',
+    component: ArtistDiscoveryComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect

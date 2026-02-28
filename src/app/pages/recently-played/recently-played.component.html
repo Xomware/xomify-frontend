@@ -1,0 +1,111 @@
+<div class="recently-played-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadHistory()">Try Again</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Recently Played</h1>
+        <p class="page-subtitle">Your listening history from the past 24 hours</p>
+      </div>
+      <button class="btn-refresh" (click)="refresh()" title="Refresh">
+        <span>↻</span> Refresh
+      </button>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="stats-strip" *ngIf="allItems.length > 0">
+      <div class="stat-item">
+        <span class="stat-value">{{ uniqueTracks }}</span>
+        <span class="stat-label">Unique Tracks</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ uniqueArtists }}</span>
+        <span class="stat-label">Unique Artists</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ timeSpan }}</span>
+        <span class="stat-label">Time Span</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ allItems.length }}</span>
+        <span class="stat-label">Total Plays</span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="sessions.length === 0">
+      <p>No listening history found. Start playing music on Spotify!</p>
+    </div>
+
+    <!-- Sessions Timeline -->
+    <div class="sessions-timeline" *ngIf="sessions.length > 0">
+      <div class="session" *ngFor="let session of sessions">
+        <!-- Session Header -->
+        <div class="session-header">
+          <div class="session-dot"></div>
+          <span class="session-label">{{ session.label }}</span>
+          <span class="session-count">{{ session.items.length }} track{{ session.items.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Track List -->
+        <div class="track-list">
+          <div class="track-item" *ngFor="let item of session.items">
+            <!-- Album Art -->
+            <a
+              [href]="item.track.external_urls.spotify"
+              target="_blank"
+              rel="noopener"
+              class="track-art-link"
+              (click)="openSpotify(item.track.external_urls.spotify, $event)"
+            >
+              <img
+                class="track-art"
+                [src]="getAlbumArt(item)"
+                [alt]="item.track.album.name"
+              />
+            </a>
+
+            <!-- Track Info -->
+            <div class="track-info">
+              <a
+                [href]="item.track.external_urls.spotify"
+                target="_blank"
+                rel="noopener"
+                class="track-name"
+                (click)="openSpotify(item.track.external_urls.spotify, $event)"
+              >
+                {{ item.track.name }}
+              </a>
+              <span class="track-artist">{{ getArtistNames(item) }}</span>
+              <span class="track-album">{{ item.track.album.name }}</span>
+            </div>
+
+            <!-- Track Meta -->
+            <div class="track-meta">
+              <span class="played-at">{{ getRelativeTime(item.played_at) }}</span>
+              <button
+                class="btn-queue"
+                (click)="addToQueue(item, $event)"
+                title="Add to queue"
+              >
+                + Queue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

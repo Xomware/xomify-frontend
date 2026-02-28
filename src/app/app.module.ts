@@ -38,6 +38,9 @@ import { GroupsComponent } from './pages/groups/groups.component';
 import { GroupDetailComponent } from './pages/group-detail/group-detail.component';
 import { AddSongModalComponent } from './components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from './components/add-member-modal/add-member-modal.component';
+import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
+import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
+import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -70,6 +73,9 @@ import { AddMemberModalComponent } from './components/add-member-modal/add-membe
         GroupDetailComponent,
         AddSongModalComponent,
         AddMemberModalComponent,
+        RecentlyPlayedComponent,
+        NewReleasesComponent,
+        ArtistDiscoveryComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
