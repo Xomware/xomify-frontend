@@ -1,0 +1,261 @@
+<div class="container">
+  <div class="header">
+    <h1>Liked Artists Playlist Generator</h1>
+    <p class="subtitle">Create a playlist from your liked artists' latest releases</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loadingReleases" class="loading-container">
+    <app-loader></app-loader>
+    <p>Loading releases from your liked artists...</p>
+  </div>
+
+  <!-- No Releases State -->
+  <div *ngIf="!loadingReleases && allReleases.length === 0" class="empty-state">
+    <p>You don't have any liked artists yet. Follow artists to get started!</p>
+    <a routerLink="/following">Follow Artists</a>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loadingReleases && allReleases.length > 0" class="content">
+    <!-- Step Indicator -->
+    <div class="steps">
+      <div class="step" [class.active]="currentStep === 'load'" [class.complete]="allReleases.length > 0">
+        <span class="step-number">1</span>
+        <span class="step-label">Load</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 'filter'" [class.complete]="filteredReleases.length > 0">
+        <span class="step-number">2</span>
+        <span class="step-label">Filter</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" [class.active]="currentStep === 'generate'">
+        <span class="step-number">3</span>
+        <span class="step-label">Generate</span>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats">
+      <div class="stat">
+        <span class="label">Total Releases</span>
+        <span class="value">{{ allReleases.length }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Filtered Releases</span>
+        <span class="value">{{ filteredReleases.length }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Genres</span>
+        <span class="value">{{ availableGenres.length }}</span>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h2>Filters & Options</h2>
+        <button class="toggle-btn" (click)="showFilters = !showFilters">
+          {{ showFilters ? '▼' : '▶' }} {{ showFilters ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+
+      <div *ngIf="showFilters" class="filters-content">
+        <!-- Album Type Filter -->
+        <div class="filter-group">
+          <h3>Album Type</h3>
+          <div class="filter-options">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [checked]="selectedAlbumTypes.album"
+                (change)="toggleAlbumType('album')"
+              />
+              <span class="checkbox-text">
+                Albums
+                <span class="count">({{ getAlbumTypeCount('album') }})</span>
+              </span>
+            </label>
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [checked]="selectedAlbumTypes.single"
+                (change)="toggleAlbumType('single')"
+              />
+              <span class="checkbox-text">
+                Singles
+                <span class="count">({{ getAlbumTypeCount('single') }})</span>
+              </span>
+            </label>
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [checked]="selectedAlbumTypes.appearsOn"
+                (change)="toggleAlbumType('appearsOn')"
+              />
+              <span class="checkbox-text">
+                Appears On
+                <span class="count">({{ getAlbumTypeCount('appearsOn') }})</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Release Date Filter -->
+        <div class="filter-group">
+          <h3>Release Date Range</h3>
+          <div class="date-inputs">
+            <div class="date-input-group">
+              <label>From</label>
+              <input
+                type="date"
+                [(ngModel)]="releaseDateFrom"
+                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
+                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                (change)="applyFilters()"
+              />
+              <span class="date-display" *ngIf="releaseDateFrom">
+                {{ formatDate(new Date(releaseDateFrom)) }}
+              </span>
+            </div>
+            <div class="date-input-group">
+              <label>To</label>
+              <input
+                type="date"
+                [(ngModel)]="releaseDateTo"
+                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
+                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                (change)="applyFilters()"
+              />
+              <span class="date-display" *ngIf="releaseDateTo">
+                {{ formatDate(new Date(releaseDateTo)) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Genre Filter -->
+        <div class="filter-group" *ngIf="availableGenres.length > 0">
+          <h3>Genres</h3>
+          <div class="genre-tags">
+            <button
+              *ngFor="let genre of availableGenres"
+              class="genre-tag"
+              [class.selected]="isGenreSelected(genre)"
+              (click)="toggleGenre(genre)"
+            >
+              {{ genre }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Filter -->
+        <div class="filter-group">
+          <h3>Search</h3>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search by album or artist name..."
+            class="search-input"
+            (input)="applyFilters()"
+          />
+        </div>
+
+        <!-- Reset Filters -->
+        <button class="reset-btn" (click)="resetFilters()">Reset All Filters</button>
+      </div>
+    </div>
+
+    <!-- Releases Preview -->
+    <div class="releases-section">
+      <h2>Releases ({{ filteredReleases.length }})</h2>
+      <div class="releases-list">
+        <div *ngFor="let release of filteredReleases.slice(0, 10)" class="release-item">
+          <div class="release-image" *ngIf="release.imageUrl">
+            <img [src]="release.imageUrl" [alt]="release.albumName" />
+          </div>
+          <div class="release-info">
+            <div class="album-name">{{ release.albumName }}</div>
+            <div class="artist-name">{{ release.artistName }}</div>
+            <div class="release-meta">
+              <span class="album-type" [class]="'type-' + release.albumType">
+                {{ release.albumType }}
+              </span>
+              <span class="release-date">{{ release.releaseDate }}</span>
+              <span class="track-count">{{ release.totalTracks }} tracks</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p *ngIf="filteredReleases.length > 10" class="more-releases">
+        + {{ filteredReleases.length - 10 }} more releases
+      </p>
+    </div>
+
+    <!-- Playlist Configuration -->
+    <div class="playlist-config">
+      <h2>Playlist Configuration</h2>
+      <div class="config-group">
+        <label>Playlist Name</label>
+        <input
+          type="text"
+          [(ngModel)]="playlistName"
+          placeholder="My Liked Artists Releases"
+          class="config-input"
+        />
+      </div>
+
+      <div class="config-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="playlistDescription"
+          placeholder="Add a description for your playlist..."
+          class="config-textarea"
+        ></textarea>
+      </div>
+
+      <div class="config-group">
+        <label>Track Limit</label>
+        <input
+          type="number"
+          [(ngModel)]="limitTracksInput"
+          [max]="filteredReleases.length"
+          min="1"
+          class="config-input"
+        />
+        <span class="input-hint">Max: {{ filteredReleases.length }} tracks</span>
+      </div>
+
+      <div class="config-checkboxes">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="isPlaylistPublic" />
+          <span class="checkbox-text">Make playlist public</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="addXomifyLogo" />
+          <span class="checkbox-text">Add Xomify logo to playlist</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button
+        class="btn-secondary"
+        (click)="reloadReleases()"
+        [disabled]="isReloadDisabled()"
+      >
+        Reload Releases
+      </button>
+      <button
+        class="btn-primary"
+        (click)="generatePlaylist()"
+        [disabled]="isGenerateDisabled()"
+      >
+        <span *ngIf="!generatingPlaylist">Generate Playlist</span>
+        <span *ngIf="generatingPlaylist">Creating Playlist...</span>
+      </button>
+    </div>
+  </div>
+</div>

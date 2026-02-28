@@ -22,6 +22,7 @@ import { FriendProfileComponent } from './pages/friend-profile/friend-profile.co
 import { RatingsComponent } from './pages/ratings/ratings.component';
 import { GroupsComponent } from './pages/groups/groups.component';
 import { GroupDetailComponent } from './pages/group-detail/group-detail.component';
+import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -109,6 +110,11 @@ const routes: Routes = [
   {
     path: 'group/:id',
     component: GroupDetailComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'liked-artists-playlist',
+    component: LikedArtistsPlaylistGeneratorComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect
