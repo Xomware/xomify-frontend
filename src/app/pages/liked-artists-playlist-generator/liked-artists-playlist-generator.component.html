@@ -6,7 +6,7 @@
 
   <!-- Loading State -->
   <div *ngIf="loadingReleases" class="loading-container">
-    <app-loader></app-loader>
+    <div class="spinner"></div>
     <p>Loading releases from your liked artists...</p>
   </div>
 
@@ -112,8 +112,8 @@
                 type="date"
                 [value]="releaseDateFrom"
                 (input)="releaseDateFrom = $any($event.target).value; applyFilters()"
-                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
-                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                [min]="formatDateForInput(dateRange?.min)"
+                [max]="formatDateForInput(dateRange?.max)"
               />
               <span class="date-display" *ngIf="releaseDateFrom">
                 {{ formatDate(releaseDateFrom) }}
@@ -125,8 +125,8 @@
                 type="date"
                 [value]="releaseDateTo"
                 (input)="releaseDateTo = $any($event.target).value; applyFilters()"
-                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
-                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                [min]="formatDateForInput(dateRange?.min)"
+                [max]="formatDateForInput(dateRange?.max)"
               />
               <span class="date-display" *ngIf="releaseDateTo">
                 {{ formatDate(releaseDateTo) }}
