@@ -64,7 +64,7 @@ export class RecentlyPlayedComponent implements OnInit {
   private calculateStats(items: RecentlyPlayedItem[]): void {
     const trackIds = new Set(items.map((i) => i.track.id));
     const artistIds = new Set(
-      items.flatMap((i) => i.track.artists.map((a) => a.id))
+      items.reduce((acc: string[], i) => acc.concat(i.track.artists.map((a) => a.id)), [])
     );
     this.uniqueTracks = trackIds.size;
     this.uniqueArtists = artistIds.size;
