@@ -6,7 +6,7 @@
 
   <!-- Loading State -->
   <div *ngIf="loadingReleases" class="loading-container">
-    <div class="spinner"></div>
+    <app-loader></app-loader>
     <p>Loading releases from your liked artists...</p>
   </div>
 
@@ -110,26 +110,26 @@
               <label>From</label>
               <input
                 type="date"
-                [value]="releaseDateFrom"
-                (input)="releaseDateFrom = $any($event.target).value; applyFilters()"
-                [min]="formatDateForInput(dateRange?.min)"
-                [max]="formatDateForInput(dateRange?.max)"
+                [(ngModel)]="releaseDateFrom"
+                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
+                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateFrom">
-                {{ formatDate(releaseDateFrom) }}
+                {{ formatDateFromString(releaseDateFrom) }}
               </span>
             </div>
             <div class="date-input-group">
               <label>To</label>
               <input
                 type="date"
-                [value]="releaseDateTo"
-                (input)="releaseDateTo = $any($event.target).value; applyFilters()"
-                [min]="formatDateForInput(dateRange?.min)"
-                [max]="formatDateForInput(dateRange?.max)"
+                [(ngModel)]="releaseDateTo"
+                [min]="dateRange?.min | date: 'yyyy-MM-dd'"
+                [max]="dateRange?.max | date: 'yyyy-MM-dd'"
+                (change)="applyFilters()"
               />
               <span class="date-display" *ngIf="releaseDateTo">
-                {{ formatDate(releaseDateTo) }}
+                {{ formatDateFromString(releaseDateTo) }}
               </span>
             </div>
           </div>
@@ -155,10 +155,10 @@
           <h3>Search</h3>
           <input
             type="text"
-            [value]="searchQuery"
-            (input)="searchQuery = $any($event.target).value; applyFilters()"
+            [(ngModel)]="searchQuery"
             placeholder="Search by album or artist name..."
             class="search-input"
+            (input)="applyFilters()"
           />
         </div>
 
@@ -200,8 +200,7 @@
         <label>Playlist Name</label>
         <input
           type="text"
-          [value]="playlistName"
-          (input)="playlistName = $any($event.target).value"
+          [(ngModel)]="playlistName"
           placeholder="My Liked Artists Releases"
           class="config-input"
         />
@@ -210,8 +209,7 @@
       <div class="config-group">
         <label>Description</label>
         <textarea
-          [value]="playlistDescription"
-          (input)="playlistDescription = $any($event.target).value"
+          [(ngModel)]="playlistDescription"
           placeholder="Add a description for your playlist..."
           class="config-textarea"
         ></textarea>
@@ -221,8 +219,7 @@
         <label>Track Limit</label>
         <input
           type="number"
-          [value]="limitTracksInput"
-          (input)="limitTracksInput = +$any($event.target).value"
+          [(ngModel)]="limitTracksInput"
           [max]="filteredReleases.length"
           min="1"
           class="config-input"
@@ -232,11 +229,11 @@
 
       <div class="config-checkboxes">
         <label class="checkbox-label">
-          <input type="checkbox" [checked]="isPlaylistPublic" (change)="isPlaylistPublic = !isPlaylistPublic" />
+          <input type="checkbox" [(ngModel)]="isPlaylistPublic" />
           <span class="checkbox-text">Make playlist public</span>
         </label>
         <label class="checkbox-label">
-          <input type="checkbox" [checked]="addXomifyLogo" (change)="addXomifyLogo = !addXomifyLogo" />
+          <input type="checkbox" [(ngModel)]="addXomifyLogo" />
           <span class="checkbox-text">Add Xomify logo to playlist</span>
         </label>
       </div>

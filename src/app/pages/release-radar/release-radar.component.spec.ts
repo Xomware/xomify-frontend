@@ -186,36 +186,53 @@ describe('ReleaseRadarComponent', () => {
   describe('Loading Releases', () => {
     beforeEach(() => {
       releaseRadarService.loadReleaseRadar.and.returnValue(of(mockHistoryResponse));
+    });
+
+    it('should load and process releases', (done) => {
+      component.loadReleases();
+
+      setTimeout(() => {
+        expect(component.history).toEqual(mockHistoryResponse);
+        expect(component.releases.length).toBe(1);
+        expect(component.loading).toBe(false);
+        done();
+      }, 100);
+    });
+
+    it('should set current week as default', (done) => {
+      component.loadReleases();
+
+      setTimeout(() => {
+        expect(component.selectedWeekKey).toBe('2026-08');
+        done();
+      }, 100);
+    });
+
+    it('should handle loading errors', (done) => {
+      releaseRadarService.loadReleaseRadar.and.returnValue(
+        throwError(() => new Error('Load failed'))
+      );
+
+      component.loadReleases();
+
+      setTimeout(() => {
+        expect(component.error).toContain('Failed to load releases');
+        expect(component.loading).toBe(false);
+        done();
+      }, 100);
+    });
+
+    it('should support force refresh', (done) => {
       releaseRadarService.forceRefresh.and.returnValue(of(mockHistoryResponse));
-    });
 
-    it('should load releases using user email', () => {
-      fixture.detectChanges(); // Triggers ngOnInit
-      component.loadReleases();
-
-      expect(releaseRadarService.loadReleaseRadar).toHaveBeenCalledWith('test@example.com');
-    });
-
-    it('should update history and releases after loading', () => {
-      component.loadReleases();
-
-      expect(component.releases).toBeDefined();
-      expect(component.loading).toBe(false);
-    });
-
-    it('should handle missing user email gracefully', () => {
-      userService.getEmail.and.returnValue('');
-      component.loadReleases();
-
-      expect(component.error).toContain('User email not available');
-      expect(component.loading).toBe(false);
-    });
-
-    it('should support force refresh', () => {
-      fixture.detectChanges();
       component.loadReleases(true);
 
-      expect(releaseRadarService.clearCache).toHaveBeenCalled();
+      setTimeout(() => {
+        expect(releaseRadarService.clearCache).toHaveBeenCalled();
+        expect(releaseRadarService.forceRefresh).toHaveBeenCalledWith('test@example.com');
+        expect(toastService.showPositiveToast).toHaveBeenCalledWith('Releases refreshed');
+        done();
+      }, 100);
     });
   });
 
@@ -576,9 +593,9 @@ describe('ReleaseRadarComponent', () => {
     });
 
     it('should format full date correctly', () => {
-      const testDate = new Date('2026-02-27T00:00:00Z');
+      const testDate = new Date('2026-02-27');
       const formatted = component.formatDate(testDate);
-      expect(formatted.length).toBeGreaterThan(0);
+      expect(formatted).toContain('2026');
     });
 
     it('should format release date in short format', () => {

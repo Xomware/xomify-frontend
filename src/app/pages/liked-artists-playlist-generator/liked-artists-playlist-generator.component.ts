@@ -208,14 +208,21 @@ export class LikedArtistsPlaylistGeneratorComponent implements OnInit {
   /**
    * Format date for display
    */
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+  formatDate(date: Date | null): string {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
+  }
+
+  /**
+   * Format a date string for display (template-safe wrapper — avoids `new Date()` in templates)
+   */
+  formatDateFromString(dateStr: string): string {
+    if (!dateStr) return '';
+    return this.formatDate(new Date(dateStr));
   }
 
   /**
@@ -244,17 +251,5 @@ export class LikedArtistsPlaylistGeneratorComponent implements OnInit {
    */
   isReloadDisabled(): boolean {
     return this.loadingReleases || this.generatingPlaylist;
-  }
-
-  /**
-   * Format date for input[type="date"] min/max attributes
-   */
-  formatDateForInput(date: Date | null): string {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 }
