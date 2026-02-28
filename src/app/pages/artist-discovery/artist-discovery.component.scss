@@ -1,0 +1,309 @@
+.artist-discovery-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  padding: 24px 16px 80px;
+  color: #fff;
+
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  // ─── Loading ──────────────────────────────────
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+  }
+
+  .loading-message {
+    color: #a0a0b8;
+    font-size: 1rem;
+    margin-top: 16px;
+  }
+
+  // ─── Header ───────────────────────────────────
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    background: linear-gradient(135deg, #9c0abf, #1bdc6f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  .btn-refresh {
+    background: rgba(156, 10, 191, 0.15);
+    border: 1px solid rgba(156, 10, 191, 0.4);
+    color: #9c0abf;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(156, 10, 191, 0.25);
+    }
+  }
+
+  // ─── Seed Artists Strip ───────────────────────
+  .seeds-section {
+    margin-bottom: 28px;
+  }
+
+  .seeds-label {
+    font-size: 0.8rem;
+    color: #606080;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px;
+  }
+
+  .seeds-strip {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .seed-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #121225;
+    border: 1px solid rgba(156, 10, 191, 0.3);
+    border-radius: 20px;
+    padding: 6px 14px 6px 6px;
+  }
+
+  .seed-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .seed-name {
+    font-size: 0.8rem;
+    color: #c0c0d8;
+    white-space: nowrap;
+  }
+
+  // ─── Empty / Error ────────────────────────────
+  .empty-state,
+  .error-state {
+    text-align: center;
+    padding: 60px 16px;
+    color: #a0a0b8;
+  }
+
+  .error-message {
+    color: #e05b5b;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    background: #9c0abf;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+
+    &:hover {
+      background: #b40ddb;
+    }
+  }
+
+  // ─── Discovery Grid ───────────────────────────
+  .discovery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .artist-card {
+    background: #121225;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-4px);
+      border-color: rgba(156, 10, 191, 0.35);
+      box-shadow: 0 8px 28px rgba(156, 10, 191, 0.15);
+    }
+  }
+
+  .artist-img-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 50%;
+    margin: 20px auto 0;
+    width: 80%;
+  }
+
+  .artist-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .artist-info {
+    padding: 14px;
+  }
+
+  .artist-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .genre-tags {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .genre-tag {
+    font-size: 0.68rem;
+    background: rgba(27, 220, 111, 0.1);
+    color: #1bdc6f;
+    border: 1px solid rgba(27, 220, 111, 0.25);
+    border-radius: 10px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100px;
+  }
+
+  // ─── Popularity Bar ───────────────────────────
+  .popularity-row {
+    margin-bottom: 12px;
+  }
+
+  .popularity-bar-bg {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .popularity-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #9c0abf, #1bdc6f);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .popularity-label {
+    font-size: 0.7rem;
+    color: #606080;
+  }
+
+  // ─── Follow Row ───────────────────────────────
+  .follow-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .badge-following {
+    font-size: 0.75rem;
+    color: #1bdc6f;
+    background: rgba(27, 220, 111, 0.1);
+    border: 1px solid rgba(27, 220, 111, 0.3);
+    border-radius: 12px;
+    padding: 4px 10px;
+  }
+
+  .btn-follow {
+    background: #9c0abf;
+    color: #fff;
+    border: none;
+    padding: 6px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #b40ddb;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-unfollow {
+    background: transparent;
+    color: #a0a0b8;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 5px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 60, 60, 0.1);
+      color: #ff5c5c;
+      border-color: rgba(255, 60, 60, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // ─── Responsive ───────────────────────────────
+  @media (max-width: 480px) {
+    .discovery-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+    }
+  }
+}

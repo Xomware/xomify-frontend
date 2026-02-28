@@ -90,6 +90,27 @@
         Playlist Builder
         <span class="queue-badge" *ngIf="queueCount > 0">{{ queueCount }}</span>
       </a>
+      <a
+        routerLink="/recently-played"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/recently-played') }"
+      >
+        History
+      </a>
+      <a
+        routerLink="/new-releases"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/new-releases') }"
+      >
+        New Releases
+      </a>
+      <a
+        routerLink="/discover-artists"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/discover-artists') }"
+      >
+        Discover
+      </a>
     </div>
   </div>
 
@@ -176,6 +197,24 @@
       Playlist Builder
       <span class="queue-badge" *ngIf="queueCount > 0">{{ queueCount }}</span>
     </a>
+    <a
+      routerLink="/recently-played"
+      routerLinkActive="active"
+      (click)="selectItem('/recently-played')"
+      >History</a
+    >
+    <a
+      routerLink="/new-releases"
+      routerLinkActive="active"
+      (click)="selectItem('/new-releases')"
+      >New Releases</a
+    >
+    <a
+      routerLink="/discover-artists"
+      routerLinkActive="active"
+      (click)="selectItem('/discover-artists')"
+      >Discover</a
+    >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>
 </div>

@@ -40,6 +40,9 @@ import { AddSongModalComponent } from './components/add-song-modal/add-song-moda
 import { AddMemberModalComponent } from './components/add-member-modal/add-member-modal.component';
 import { ActivityTimelineComponent } from './components/activity-timeline/activity-timeline.component';
 import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
+import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
+import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
+import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +78,9 @@ import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-pl
     AddMemberModalComponent,
     ActivityTimelineComponent,
     LikedArtistsPlaylistGeneratorComponent,
+    RecentlyPlayedComponent,
+    NewReleasesComponent,
+    ArtistDiscoveryComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

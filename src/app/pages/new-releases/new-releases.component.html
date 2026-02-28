@@ -1,0 +1,99 @@
+<div class="new-releases-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadNewReleases()">Try Again</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">New Releases</h1>
+        <p class="page-subtitle">Fresh drops from around the world</p>
+      </div>
+      <button class="btn-refresh" (click)="refresh()">↻ Refresh</button>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <span class="stat-chip">
+        <span class="stat-chip-value">{{ totalCount }}</span> Total Albums
+      </span>
+      <span class="stat-chip">
+        <span class="stat-chip-value">{{ filteredAlbums.length }}</span> Showing
+      </span>
+      <span class="stat-chip date-chip" *ngIf="dateLoaded">
+        Loaded {{ dateLoaded }}
+      </span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by album or artist..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <!-- Empty filtered state -->
+    <div class="empty-state" *ngIf="filteredAlbums.length === 0 && !loading">
+      <p>No albums found matching "{{ searchQuery }}"</p>
+      <button class="btn-primary" (click)="searchQuery = ''; applyFilter()">Clear Search</button>
+    </div>
+
+    <!-- Albums Grid -->
+    <div class="albums-grid" *ngIf="filteredAlbums.length > 0">
+      <div
+        class="album-card"
+        *ngFor="let album of filteredAlbums"
+        (click)="goToAlbum(album)"
+      >
+        <div class="album-art-wrapper">
+          <img
+            class="album-art"
+            [src]="getAlbumArt(album)"
+            [alt]="album.name"
+          />
+          <div class="album-overlay">
+            <button
+              class="btn-spotify"
+              (click)="openInSpotify(album, $event)"
+              title="Open in Spotify"
+            >
+              ↗ Spotify
+            </button>
+          </div>
+        </div>
+
+        <div class="album-info">
+          <div class="badge-row">
+            <span class="badge badge-date">{{ formatReleaseDate(album) }}</span>
+            <span class="badge badge-type">{{ formatAlbumType(album) }}</span>
+          </div>
+          <p class="album-name">{{ album.name }}</p>
+          <p class="album-artists">{{ getArtistNames(album) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More -->
+    <div class="load-more-container" *ngIf="nextPageUrl && filteredAlbums.length > 0">
+      <button
+        class="btn-load-more"
+        (click)="loadMore()"
+        [disabled]="loadingMore"
+      >
+        <span *ngIf="!loadingMore">Load More</span>
+        <span *ngIf="loadingMore">Loading...</span>
+      </button>
+    </div>
+  </div>
+</div>

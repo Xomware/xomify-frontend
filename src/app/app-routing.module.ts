@@ -23,6 +23,9 @@ import { RatingsComponent } from './pages/ratings/ratings.component';
 import { GroupsComponent } from './pages/groups/groups.component';
 import { GroupDetailComponent } from './pages/group-detail/group-detail.component';
 import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
+import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
+import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
+import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -115,6 +118,21 @@ const routes: Routes = [
   {
     path: 'liked-artists-playlist',
     component: LikedArtistsPlaylistGeneratorComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'recently-played',
+    component: RecentlyPlayedComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'new-releases',
+    component: NewReleasesComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'discover-artists',
+    component: ArtistDiscoveryComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect
