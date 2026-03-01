@@ -139,6 +139,13 @@
       >
         Share
       </a>
+      <a
+        routerLink="/streaming-stats"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/streaming-stats') }"
+      >
+        Stats
+      </a>
     </div>
   </div>
 
@@ -266,6 +273,12 @@
       routerLinkActive="active"
       (click)="selectItem('/share')"
       >Share</a
+    >
+    <a
+      routerLink="/streaming-stats"
+      routerLinkActive="active"
+      (click)="selectItem('/streaming-stats')"
+      >Stats</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

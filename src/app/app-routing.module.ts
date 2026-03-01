@@ -30,6 +30,7 @@ import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-an
 import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
 import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
 import { ShareComponent } from './pages/share/share.component';
+import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -157,6 +158,11 @@ const routes: Routes = [
   {
     path: 'share',
     component: ShareComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'streaming-stats',
+    component: StreamingStatsComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect
