@@ -132,6 +132,13 @@
       >
         Collab
       </a>
+      <a
+        routerLink="/share"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/share') }"
+      >
+        Share
+      </a>
     </div>
   </div>
 
@@ -253,6 +260,12 @@
       routerLinkActive="active"
       (click)="selectItem('/collaborative-playlists')"
       >Collab</a
+    >
+    <a
+      routerLink="/share"
+      routerLinkActive="active"
+      (click)="selectItem('/share')"
+      >Share</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

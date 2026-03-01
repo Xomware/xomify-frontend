@@ -1,0 +1,429 @@
+.share-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  padding: 24px 16px 80px;
+  color: #fff;
+
+  .content {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  // ─── Header ───────────────────────────────────
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    background: linear-gradient(135deg, #7c3aed, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  // ─── States ───────────────────────────────────
+  .error-state {
+    text-align: center;
+    padding: 60px 16px;
+    color: #a0a0b8;
+  }
+
+  .error-message {
+    color: #e05b5b;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #6d28d9;
+    }
+  }
+
+  // ─── Section ──────────────────────────────────
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e0e0f0;
+    margin: 0;
+  }
+
+  .section-desc {
+    font-size: 0.88rem;
+    color: #a0a0b8;
+    margin: 4px 0 16px;
+  }
+
+  // ─── Stats Card ───────────────────────────────
+  .stats-card {
+    background: #121225;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .stats-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .btn-copy {
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    color: #a78bfa;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.22);
+    }
+  }
+
+  .btn-copy-small {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    color: #a78bfa;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.2);
+    }
+  }
+
+  // ─── Stats Grid ───────────────────────────────
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .stats-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stats-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .stats-section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #d0d0e8;
+    margin: 0;
+  }
+
+  .empty-section {
+    color: #606080;
+    font-size: 0.85rem;
+    padding: 16px 0;
+  }
+
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .item-rank {
+    font-size: 0.78rem;
+    color: #606080;
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .item-art {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0;
+
+    &.item-art-round {
+      border-radius: 50%;
+    }
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .item-name {
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-sub {
+    font-size: 0.77rem;
+    color: #a0a0b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // ─── Share Preview ────────────────────────────
+  .share-preview {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 20px;
+  }
+
+  .preview-title {
+    font-size: 0.88rem;
+    color: #a0a0b8;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .preview-text {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    color: #c0c0d8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .preview-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  // ─── Playlist Share ───────────────────────────
+  .playlist-share-card {
+    background: #121225;
+    border: 1px solid rgba(27, 220, 111, 0.12);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .playlist-search-row {
+    margin-bottom: 14px;
+  }
+
+  .playlist-search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: rgba(27, 220, 111, 0.5);
+    }
+
+    &::placeholder {
+      color: #505070;
+    }
+  }
+
+  .search-loading {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .playlist-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 14px;
+  }
+
+  .playlist-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(27, 220, 111, 0.08);
+    }
+  }
+
+  .pl-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .pl-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pl-name {
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pl-meta {
+    font-size: 0.75rem;
+    color: #a0a0b8;
+  }
+
+  // ─── Selected Playlist ─────────────────────────
+  .selected-playlist {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(27, 220, 111, 0.07);
+    border: 1px solid rgba(27, 220, 111, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+
+  .selected-art {
+    width: 50px;
+    height: 50px;
+    border-radius: 7px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .selected-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .selected-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .selected-url {
+    font-size: 0.75rem;
+    color: #a0a0b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .selected-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-share {
+    background: rgba(27, 220, 111, 0.12);
+    border: 1px solid rgba(27, 220, 111, 0.35);
+    color: #1bdc6f;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(27, 220, 111, 0.22);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .stats-card,
+    .playlist-share-card {
+      padding: 16px;
+    }
+  }
+}

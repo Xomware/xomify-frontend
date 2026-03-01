@@ -29,6 +29,7 @@ import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discov
 import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
 import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
 import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
+import { ShareComponent } from './pages/share/share.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -151,6 +152,11 @@ const routes: Routes = [
   {
     path: 'collaborative-playlists',
     component: CollaborativePlaylistsComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'share',
+    component: ShareComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect
