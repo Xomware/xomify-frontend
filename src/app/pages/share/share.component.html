@@ -1,0 +1,133 @@
+<div class="share-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadStats()">Try Again</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Share Your Music</h1>
+        <p class="page-subtitle">Share your top tracks, artists, and playlists</p>
+      </div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="stats-card">
+      <div class="stats-card-header">
+        <h2 class="section-title">📊 Your Stats</h2>
+        <button class="btn-copy" (click)="copyStats()" title="Copy all stats">
+          📋 Copy All
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <!-- Top Songs -->
+        <div class="stats-section">
+          <div class="stats-section-header">
+            <h3 class="stats-section-title">🎵 Top Songs</h3>
+            <button class="btn-copy-small" (click)="copySongsSection()">Copy</button>
+          </div>
+          <div class="empty-section" *ngIf="stats.topSongs.length === 0">
+            <p>No top songs data</p>
+          </div>
+          <div class="item-list" *ngIf="stats.topSongs.length > 0">
+            <div class="stat-item" *ngFor="let track of stats.topSongs; let i = index">
+              <span class="item-rank">{{ i + 1 }}</span>
+              <img class="item-art" [src]="getAlbumArt(track)" [alt]="track.name" />
+              <div class="item-info">
+                <span class="item-name">{{ track.name }}</span>
+                <span class="item-sub">{{ getArtistNames(track) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Artists -->
+        <div class="stats-section">
+          <div class="stats-section-header">
+            <h3 class="stats-section-title">🎤 Top Artists</h3>
+            <button class="btn-copy-small" (click)="copyArtistsSection()">Copy</button>
+          </div>
+          <div class="empty-section" *ngIf="stats.topArtists.length === 0">
+            <p>No top artists data</p>
+          </div>
+          <div class="item-list" *ngIf="stats.topArtists.length > 0">
+            <div class="stat-item" *ngFor="let artist of stats.topArtists; let i = index">
+              <span class="item-rank">{{ i + 1 }}</span>
+              <img class="item-art item-art-round" [src]="getArtistImage(artist)" [alt]="artist.name" />
+              <div class="item-info">
+                <span class="item-name">{{ artist.name }}</span>
+                <span class="item-sub" *ngIf="artist.genres?.length > 0">{{ artist.genres[0] }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shareable Text Preview -->
+      <div class="share-preview">
+        <h3 class="preview-title">Share Text Preview</h3>
+        <pre class="preview-text">{{ statsText }}</pre>
+        <div class="preview-actions">
+          <button class="btn-primary" (click)="copyStats()">📋 Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Playlist Share -->
+    <div class="playlist-share-card">
+      <h2 class="section-title">🎧 Share a Playlist</h2>
+      <p class="section-desc">Search for one of your playlists and copy its link</p>
+
+      <div class="playlist-search-row">
+        <input
+          type="text"
+          class="playlist-search-input"
+          placeholder="Search your playlists..."
+          [(ngModel)]="playlistSearchQuery"
+          (input)="onPlaylistSearch()"
+        />
+      </div>
+
+      <div class="search-loading" *ngIf="playlistSearchLoading">
+        <app-loader></app-loader>
+      </div>
+
+      <div class="playlist-results" *ngIf="!playlistSearchLoading && playlistSearchResults.length > 0">
+        <div
+          class="playlist-result-item"
+          *ngFor="let pl of playlistSearchResults"
+          (click)="selectPlaylist(pl)"
+        >
+          <img class="pl-art" [src]="getPlaylistArt(pl)" [alt]="pl.name" />
+          <div class="pl-info">
+            <span class="pl-name">{{ pl.name }}</span>
+            <span class="pl-meta">{{ pl.tracks?.total || 0 }} tracks</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Playlist -->
+      <div class="selected-playlist" *ngIf="selectedPlaylist">
+        <img class="selected-art" [src]="getPlaylistArt(selectedPlaylist)" [alt]="selectedPlaylist.name" />
+        <div class="selected-info">
+          <span class="selected-name">{{ selectedPlaylist.name }}</span>
+          <span class="selected-url">{{ selectedPlaylist.external_urls?.spotify }}</span>
+        </div>
+        <div class="selected-actions">
+          <button class="btn-copy" (click)="copyPlaylistLink()">📋 Copy Link</button>
+          <button class="btn-share" (click)="sharePlaylist()" *ngIf="hasWebShare()">
+            ↗ Share
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

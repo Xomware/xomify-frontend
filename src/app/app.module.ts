@@ -46,6 +46,7 @@ import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discov
 import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
 import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
 import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
+import { ShareComponent } from './pages/share/share.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +88,7 @@ import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists
     PlaylistAnalysisComponent,
     MoodRecommendationsComponent,
     CollaborativePlaylistsComponent,
+    ShareComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
