@@ -111,6 +111,13 @@
       >
         Discover
       </a>
+      <a
+        routerLink="/playlist-analysis"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/playlist-analysis') }"
+      >
+        Playlist Analysis
+      </a>
     </div>
   </div>
 
@@ -214,6 +221,12 @@
       routerLinkActive="active"
       (click)="selectItem('/discover-artists')"
       >Discover</a
+    >
+    <a
+      routerLink="/playlist-analysis"
+      routerLinkActive="active"
+      (click)="selectItem('/playlist-analysis')"
+      >Playlist Analysis</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

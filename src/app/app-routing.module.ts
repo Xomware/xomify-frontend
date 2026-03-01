@@ -26,6 +26,7 @@ import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-pl
 import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
 import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
 import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
+import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -133,6 +134,11 @@ const routes: Routes = [
   {
     path: 'discover-artists',
     component: ArtistDiscoveryComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'playlist-analysis',
+    component: PlaylistAnalysisComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect
