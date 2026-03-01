@@ -28,6 +28,7 @@ import { NewReleasesComponent } from './pages/new-releases/new-releases.componen
 import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
 import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
+import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -145,6 +146,11 @@ const routes: Routes = [
   {
     path: 'mood-recommendations',
     component: MoodRecommendationsComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'collaborative-playlists',
+    component: CollaborativePlaylistsComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect

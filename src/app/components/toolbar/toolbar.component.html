@@ -125,6 +125,13 @@
       >
         Mood Picks
       </a>
+      <a
+        routerLink="/collaborative-playlists"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/collaborative-playlists') }"
+      >
+        Collab
+      </a>
     </div>
   </div>
 
@@ -240,6 +247,12 @@
       routerLinkActive="active"
       (click)="selectItem('/mood-recommendations')"
       >Mood Picks</a
+    >
+    <a
+      routerLink="/collaborative-playlists"
+      routerLinkActive="active"
+      (click)="selectItem('/collaborative-playlists')"
+      >Collab</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

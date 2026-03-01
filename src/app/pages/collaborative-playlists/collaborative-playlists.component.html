@@ -1,0 +1,150 @@
+<div class="collaborative-playlists-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadPlaylists()">Try Again</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Collaborative Playlists</h1>
+        <p class="page-subtitle">Playlists you're building together with others</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="playlists.length === 0">
+      <div class="empty-icon">🎵</div>
+      <h2 class="empty-title">No Collaborative Playlists Yet</h2>
+      <p class="empty-desc">
+        You don't have any collaborative playlists. Create one on Spotify by:
+      </p>
+      <ol class="empty-steps">
+        <li>Opening a playlist on Spotify</li>
+        <li>Clicking the ··· menu</li>
+        <li>Selecting "Invite Collaborators"</li>
+      </ol>
+      <button class="btn-primary" (click)="loadPlaylists()">Refresh</button>
+    </div>
+
+    <!-- Playlist List -->
+    <div class="playlists-list" *ngIf="playlists.length > 0">
+      <div class="playlist-item" *ngFor="let playlist of playlists">
+        <!-- Playlist Header (clickable) -->
+        <div class="playlist-header" (click)="togglePlaylist(playlist)">
+          <img class="playlist-art" [src]="getPlaylistArt(playlist)" [alt]="playlist.name" />
+          <div class="playlist-info">
+            <span class="playlist-name">{{ playlist.name }}</span>
+            <span class="playlist-meta">
+              {{ playlist.tracks.total }} tracks
+              <span class="collab-badge">👥 Collaborative</span>
+            </span>
+          </div>
+          <div class="playlist-actions">
+            <button
+              class="btn-add-track"
+              (click)="openAddModal(playlist.id, $event)"
+              title="Add Track"
+            >
+              + Add Track
+            </button>
+            <span class="expand-icon">{{ expandedPlaylistId === playlist.id ? '▲' : '▼' }}</span>
+          </div>
+        </div>
+
+        <!-- Expanded Track Panel -->
+        <div class="track-panel" *ngIf="expandedPlaylistId === playlist.id">
+          <!-- Loading tracks -->
+          <div class="tracks-loading" *ngIf="loadingTracks">
+            <app-loader></app-loader>
+          </div>
+
+          <!-- Empty tracks -->
+          <div class="tracks-empty" *ngIf="!loadingTracks && expandedTracks.length === 0">
+            <p>No tracks in this playlist yet. Add some!</p>
+          </div>
+
+          <!-- Track List -->
+          <div class="track-list" *ngIf="!loadingTracks && expandedTracks.length > 0">
+            <div class="track-row" *ngFor="let item of expandedTracks">
+              <img class="track-art" [src]="getAlbumArt(item)" [alt]="item.track.name" />
+              <div class="track-info">
+                <a
+                  [href]="item.track.external_urls?.spotify"
+                  target="_blank"
+                  rel="noopener"
+                  class="track-name"
+                >
+                  {{ item.track.name }}
+                </a>
+                <span class="track-artist">{{ getArtistNames(item) }}</span>
+              </div>
+              <div class="track-meta">
+                <span class="added-by">Added by: <strong>{{ item.added_by?.id || 'Unknown' }}</strong></span>
+                <span class="added-at">{{ formatDate(item.added_at) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Track Modal -->
+  <div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Track</h3>
+        <button class="modal-close" (click)="closeAddModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search for a track..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          autofocus
+        />
+
+        <div class="search-loading" *ngIf="searchLoading">
+          <app-loader></app-loader>
+        </div>
+
+        <div class="search-results" *ngIf="!searchLoading && searchResults.length > 0">
+          <div
+            class="search-result-item"
+            *ngFor="let track of searchResults"
+            (click)="addTrack(track)"
+          >
+            <img
+              class="result-art"
+              [src]="getSearchAlbumArt(track)"
+              [alt]="track.name"
+            />
+            <div class="result-info">
+              <span class="result-name">{{ track.name }}</span>
+              <span class="result-artist">{{ getSearchArtists(track) }}</span>
+            </div>
+            <button class="btn-add" [disabled]="addingTrack">+</button>
+          </div>
+        </div>
+
+        <div class="search-empty" *ngIf="!searchLoading && searchQuery.length >= 2 && searchResults.length === 0">
+          <p>No tracks found for "{{ searchQuery }}"</p>
+        </div>
+
+        <div class="search-hint" *ngIf="searchQuery.length < 2 && !searchLoading">
+          <p>Type at least 2 characters to search</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
