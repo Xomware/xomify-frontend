@@ -1,0 +1,483 @@
+.collaborative-playlists-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  padding: 24px 16px 80px;
+  color: #fff;
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  // ─── Header ───────────────────────────────────
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    background: linear-gradient(135deg, #7c3aed, #1bdc6f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  // ─── States ───────────────────────────────────
+  .error-state {
+    text-align: center;
+    padding: 60px 16px;
+    color: #a0a0b8;
+  }
+
+  .error-message {
+    color: #e05b5b;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+
+    &:hover {
+      background: #6d28d9;
+    }
+  }
+
+  // ─── Empty State ──────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background: #121225;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #e0e0f0;
+  }
+
+  .empty-desc {
+    font-size: 0.9rem;
+    color: #a0a0b8;
+    margin-bottom: 16px;
+  }
+
+  .empty-steps {
+    text-align: left;
+    display: inline-block;
+    font-size: 0.9rem;
+    color: #a0a0b8;
+    margin-bottom: 24px;
+    padding-left: 24px;
+    line-height: 1.8;
+  }
+
+  // ─── Playlist List ────────────────────────────
+  .playlists-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .playlist-item {
+    background: #121225;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: rgba(124, 58, 237, 0.3);
+    }
+  }
+
+  .playlist-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+  }
+
+  .playlist-art {
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .playlist-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .playlist-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .playlist-meta {
+    font-size: 0.78rem;
+    color: #a0a0b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .collab-badge {
+    font-size: 0.72rem;
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    color: #a78bfa;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .playlist-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-add-track {
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    color: #a78bfa;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.25);
+    }
+  }
+
+  .expand-icon {
+    font-size: 0.75rem;
+    color: #606080;
+  }
+
+  // ─── Track Panel ──────────────────────────────
+  .track-panel {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 12px 16px;
+  }
+
+  .tracks-loading {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tracks-empty {
+    text-align: center;
+    padding: 20px;
+    color: #a0a0b8;
+    font-size: 0.9rem;
+  }
+
+  .track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .track-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  .track-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .track-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .track-name {
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      color: #7c3aed;
+    }
+  }
+
+  .track-artist {
+    font-size: 0.77rem;
+    color: #a0a0b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .added-by {
+    font-size: 0.72rem;
+    color: #606080;
+
+    strong {
+      color: #a0a0b8;
+    }
+  }
+
+  .added-at {
+    font-size: 0.7rem;
+    color: #505070;
+  }
+
+  // ─── Modal ────────────────────────────────────
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .modal-panel {
+    background: #1a1a2e;
+    border-radius: 16px;
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: #a0a0b8;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 0.15s;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+
+    &:focus {
+      border-color: #7c3aed;
+    }
+
+    &::placeholder {
+      color: #606080;
+    }
+  }
+
+  .search-loading {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.1);
+    }
+  }
+
+  .result-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .result-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .result-name {
+    font-size: 0.87rem;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .result-artist {
+    font-size: 0.77rem;
+    color: #a0a0b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-add {
+    background: #7c3aed;
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #6d28d9;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .search-empty,
+  .search-hint {
+    text-align: center;
+    padding: 20px;
+    color: #a0a0b8;
+    font-size: 0.88rem;
+  }
+
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .playlist-header {
+      flex-wrap: wrap;
+    }
+
+    .track-meta {
+      display: none;
+    }
+  }
+}
