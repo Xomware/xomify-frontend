@@ -31,6 +31,7 @@ import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-
 import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
 import { ShareComponent } from './pages/share/share.component';
 import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
+import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -163,6 +164,11 @@ const routes: Routes = [
   {
     path: 'streaming-stats',
     component: StreamingStatsComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'concerts',
+    component: ConcertDiscoveryComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect

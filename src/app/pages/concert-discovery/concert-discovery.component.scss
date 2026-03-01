@@ -1,0 +1,377 @@
+.concert-discovery-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  padding: 24px 16px 80px;
+  color: #fff;
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  // ─── Header ───────────────────────────────────
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    background: linear-gradient(135deg, #ec4899, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  .btn-refresh {
+    background: rgba(236, 72, 153, 0.12);
+    border: 1px solid rgba(236, 72, 153, 0.35);
+    color: #f472b6;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+      background: rgba(236, 72, 153, 0.25);
+    }
+  }
+
+  // ─── Stat Cards ───────────────────────────────
+  .stat-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 120px;
+    flex: 1;
+
+    .card-emoji {
+      font-size: 1.5rem;
+    }
+    .card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .card-label {
+      font-size: 0.8rem;
+      color: #a0a0b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  // ─── Filter Bar ───────────────────────────────
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: 0.9rem;
+    color: #a0a0b8;
+  }
+
+  .filter-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a0a0b8;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(236, 72, 153, 0.15);
+      color: #f472b6;
+    }
+
+    &.active {
+      background: rgba(236, 72, 153, 0.2);
+      border-color: rgba(236, 72, 153, 0.5);
+      color: #f472b6;
+    }
+  }
+
+  // ─── Empty State ──────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+
+  .empty-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .empty-subtitle {
+    font-size: 0.9rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  // ─── Artist Badges ────────────────────────────
+  .artist-badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+    }
+  }
+
+  .artist-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 6px 14px 6px 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: all 0.2s;
+
+    &.has-shows {
+      opacity: 1;
+      border-color: rgba(236, 72, 153, 0.3);
+      background: rgba(236, 72, 153, 0.08);
+    }
+  }
+
+  .badge-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .badge-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .badge-count {
+    background: #ec4899;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // ─── Event Cards ──────────────────────────────
+  .events-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .event-card {
+    display: flex;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    transition: border-color 0.2s;
+    align-items: flex-start;
+
+    &:hover {
+      border-color: rgba(236, 72, 153, 0.3);
+    }
+  }
+
+  .event-artist-img {
+    flex-shrink: 0;
+
+    img {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+  }
+
+  .event-artist-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .event-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .event-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .event-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #a0a0b8;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .event-date {
+    font-size: 0.85rem;
+    color: #d4d4e0;
+  }
+
+  .event-time {
+    color: #a0a0b8;
+  }
+
+  .event-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-tickets {
+    background: linear-gradient(135deg, #ec4899, #f59e0b);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .btn-notify {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #a0a0b8;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+  }
+
+  // ─── Error State ──────────────────────────────
+  .error-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .error-message {
+    color: #ef4444;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    background: #ec4899;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  // ─── Responsive ───────────────────────────────
+  @media (max-width: 600px) {
+    .event-card {
+      flex-direction: column;
+    }
+
+    .event-actions {
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .btn-tickets,
+    .btn-notify {
+      flex: 1;
+    }
+  }
+}
