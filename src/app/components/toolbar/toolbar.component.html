@@ -118,6 +118,13 @@
       >
         Playlist Analysis
       </a>
+      <a
+        routerLink="/mood-recommendations"
+        routerLinkActive="active"
+        [ngClass]="{ selected: isSelected('/mood-recommendations') }"
+      >
+        Mood Picks
+      </a>
     </div>
   </div>
 
@@ -227,6 +234,12 @@
       routerLinkActive="active"
       (click)="selectItem('/playlist-analysis')"
       >Playlist Analysis</a
+    >
+    <a
+      routerLink="/mood-recommendations"
+      routerLinkActive="active"
+      (click)="selectItem('/mood-recommendations')"
+      >Mood Picks</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>
