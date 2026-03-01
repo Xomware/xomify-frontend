@@ -43,6 +43,7 @@ import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-pl
 import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
 import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
 import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
+import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discov
     RecentlyPlayedComponent,
     NewReleasesComponent,
     ArtistDiscoveryComponent,
+    PlaylistAnalysisComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
