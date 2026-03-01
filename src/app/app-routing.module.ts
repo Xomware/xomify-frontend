@@ -27,6 +27,7 @@ import { RecentlyPlayedComponent } from './pages/recently-played/recently-played
 import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
 import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
+import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -139,6 +140,11 @@ const routes: Routes = [
   {
     path: 'playlist-analysis',
     component: PlaylistAnalysisComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'mood-recommendations',
+    component: MoodRecommendationsComponent,
     canActivate: [AuthGuard],
   },
   // Catch-all redirect

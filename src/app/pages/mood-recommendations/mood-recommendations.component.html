@@ -1,0 +1,110 @@
+<div class="mood-recommendations-page">
+  <div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Mood Picks</h1>
+        <p class="page-subtitle">Get personalized recommendations based on your mood</p>
+      </div>
+    </div>
+
+    <!-- Mood Picker -->
+    <div class="mood-section">
+      <h2 class="section-title">How are you feeling?</h2>
+      <div class="mood-grid">
+        <div
+          class="mood-card"
+          *ngFor="let mood of moodPresets"
+          [class.selected]="selectedMood?.name === mood.name"
+          (click)="selectMood(mood)"
+        >
+          <span class="mood-emoji">{{ mood.emoji }}</span>
+          <span class="mood-name">{{ mood.name }}</span>
+          <span class="mood-desc">{{ mood.description }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Get Recommendations Button -->
+    <div class="action-row" *ngIf="selectedMood">
+      <button
+        class="btn-get-recs"
+        (click)="getRecommendations()"
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">✨ Get {{ selectedMood.name }} Recommendations</span>
+        <span *ngIf="loading">Loading...</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <app-loader></app-loader>
+      <p class="loading-text">Finding {{ selectedMood?.name }} tracks for you...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-state" *ngIf="error && !loading">
+      <p class="error-message">{{ error }}</p>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" *ngIf="tracks.length > 0 && !loading">
+      <div class="results-header">
+        <h2 class="section-title">
+          {{ selectedMood?.emoji }} {{ selectedMood?.name }} Tracks
+          <span class="track-count">({{ tracks.length }})</span>
+        </h2>
+        <button
+          class="btn-save"
+          (click)="saveAsPlaylist()"
+          [disabled]="savingPlaylist"
+        >
+          <span *ngIf="!savingPlaylist">💾 Save as Playlist</span>
+          <span *ngIf="savingPlaylist">Saving...</span>
+        </button>
+      </div>
+
+      <div class="track-list">
+        <div class="track-item" *ngFor="let track of tracks; let i = index">
+          <!-- Album Art -->
+          <span class="track-index">{{ i + 1 }}</span>
+          <img
+            class="track-art"
+            [src]="getAlbumArt(track)"
+            [alt]="track.album.name"
+          />
+
+          <!-- Track Info -->
+          <div class="track-info">
+            <a
+              [href]="track.external_urls.spotify"
+              target="_blank"
+              rel="noopener"
+              class="track-name"
+              (click)="openSpotify(track.external_urls.spotify, $event)"
+            >
+              {{ track.name }}
+            </a>
+            <span class="track-artist">{{ getArtistNames(track) }}</span>
+          </div>
+
+          <!-- Duration -->
+          <span class="track-duration">{{ getDuration(track) }}</span>
+
+          <!-- Play -->
+          <a
+            class="btn-play"
+            [href]="track.external_urls.spotify"
+            target="_blank"
+            rel="noopener"
+            title="Open in Spotify"
+            (click)="openSpotify(track.external_urls.spotify, $event)"
+          >
+            ▶
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -44,6 +44,7 @@ import { RecentlyPlayedComponent } from './pages/recently-played/recently-played
 import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
 import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
 import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
+import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-an
     NewReleasesComponent,
     ArtistDiscoveryComponent,
     PlaylistAnalysisComponent,
+    MoodRecommendationsComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
