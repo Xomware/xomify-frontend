@@ -270,6 +270,150 @@
     }
   }
 
+  // ─── Filter Bar ───────────────────────────────
+  .filter-bar {
+    background: #121225;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    @media (max-width: 700px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 420px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: 0.72rem;
+    color: #a0a0b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .filter-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: rgba(156, 10, 191, 0.6);
+    }
+
+    &::placeholder {
+      color: #505070;
+    }
+
+    &.filter-date {
+      color-scheme: dark;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-apply {
+    background: #9c0abf;
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #b40ddb;
+    }
+  }
+
+  .filter-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  .btn-clear {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #a0a0b8;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: border-color 0.15s, color 0.15s;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+  }
+
+  // ─── Filter Chips ─────────────────────────────
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(156, 10, 191, 0.12);
+    border: 1px solid rgba(156, 10, 191, 0.3);
+    color: #d090e0;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(156, 10, 191, 0.22);
+    }
+
+    .chip-remove {
+      font-size: 0.7rem;
+      color: rgba(208, 144, 224, 0.7);
+    }
+  }
+
   // ─── Responsive ───────────────────────────────
   @media (max-width: 600px) {
     .track-item {

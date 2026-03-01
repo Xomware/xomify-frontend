@@ -44,14 +44,81 @@
       </div>
     </div>
 
-    <!-- Empty State -->
+    <!-- Filter Bar -->
+    <div class="filter-bar" *ngIf="sessions.length > 0">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">Artist</label>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Filter by artist..."
+            [(ngModel)]="filterArtist"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">Track</label>
+          <input
+            type="text"
+            class="filter-input"
+            placeholder="Filter by track..."
+            [(ngModel)]="filterTrack"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">From</label>
+          <input
+            type="date"
+            class="filter-input filter-date"
+            [(ngModel)]="filterDateFrom"
+          />
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">To</label>
+          <input
+            type="date"
+            class="filter-input filter-date"
+            [(ngModel)]="filterDateTo"
+          />
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-apply" (click)="applyFilters()">
+          Apply Filters
+          <span class="filter-badge" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+        </button>
+        <button class="btn-clear" (click)="clearFilters()" *ngIf="activeFilterCount > 0">
+          Clear All
+        </button>
+      </div>
+
+      <!-- Active Filter Chips -->
+      <div class="filter-chips" *ngIf="activeFilterChips.length > 0">
+        <div
+          class="filter-chip"
+          *ngFor="let chip of activeFilterChips"
+          (click)="removeChip(chip.key)"
+        >
+          {{ chip.label }} <span class="chip-remove">✕</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State (after filter) -->
+    <div class="empty-state" *ngIf="sessions.length > 0 && filteredSessions.length === 0">
+      <p>No tracks match your filters. <a href="#" (click)="clearFilters(); $event.preventDefault()">Clear filters</a> to see all.</p>
+    </div>
+
+    <!-- Empty State (no history) -->
     <div class="empty-state" *ngIf="sessions.length === 0">
       <p>No listening history found. Start playing music on Spotify!</p>
     </div>
 
     <!-- Sessions Timeline -->
-    <div class="sessions-timeline" *ngIf="sessions.length > 0">
-      <div class="session" *ngFor="let session of sessions">
+    <div class="sessions-timeline" *ngIf="filteredSessions.length > 0">
+      <div class="session" *ngFor="let session of filteredSessions">
         <!-- Session Header -->
         <div class="session-header">
           <div class="session-dot"></div>
