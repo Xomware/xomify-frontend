@@ -34,6 +34,7 @@ import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats
 import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
 import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.component';
 import { NewsComponent } from './pages/news/news.component';
+import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
