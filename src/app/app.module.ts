@@ -57,6 +57,8 @@ import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.compo
 import { GoalsComponent } from './pages/goals/goals.component';
 import { GoalProgressRingComponent } from './components/goal-progress-ring/goal-progress-ring.component';
 import { CreateGoalSheetComponent } from './components/create-goal-sheet/create-goal-sheet.component';
+import { CompareComponent } from './pages/compare/compare.component';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @NgModule({
   declarations: [
