@@ -50,6 +50,9 @@ import { ShareComponent } from './pages/share/share.component';
 import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
 import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
 import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.component';
+import { NewsComponent } from './pages/news/news.component';
+import { NewsCardComponent } from './components/news-card/news-card.component';
+import { RelativeTimePipe } from './pipes/relative-time.pipe';
 
 @NgModule({
   declarations: [

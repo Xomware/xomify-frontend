@@ -1,0 +1,63 @@
+<div class="news-page">
+  <h1 class="news-page__title">Artist News</h1>
+  <p class="news-page__subtitle">Latest news about your top artists</p>
+
+  <!-- Artist Filter Tabs -->
+  <div class="news-page__tabs">
+    <button
+      class="news-page__tab"
+      [class.active]="activeTab === 'all'"
+      (click)="selectTab('all')"
+    >
+      All
+    </button>
+    <button
+      *ngFor="let artist of artists"
+      class="news-page__tab"
+      [class.active]="activeTab === artist.name"
+      (click)="selectTab(artist.name)"
+    >
+      <img
+        *ngIf="artist.imageUrl"
+        [src]="artist.imageUrl"
+        [alt]="artist.name"
+        class="news-page__tab-avatar"
+        loading="lazy"
+      />
+      {{ artist.name }}
+    </button>
+  </div>
+
+  <!-- Loading Skeleton -->
+  <div class="news-page__grid" *ngIf="loading">
+    <div class="news-card-skeleton" *ngFor="let item of skeletonItems">
+      <div class="news-card-skeleton__image"></div>
+      <div class="news-card-skeleton__content">
+        <div class="news-card-skeleton__line news-card-skeleton__line--title"></div>
+        <div class="news-card-skeleton__line news-card-skeleton__line--meta"></div>
+        <div class="news-card-skeleton__line news-card-skeleton__line--desc"></div>
+        <div class="news-card-skeleton__line news-card-skeleton__line--desc short"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- News Cards Grid -->
+  <div class="news-page__grid" *ngIf="!loading && articles.length > 0">
+    <app-news-card
+      *ngFor="let article of articles"
+      [article]="article"
+      [fallbackImage]="activeArtistImage"
+    ></app-news-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="news-page__empty" *ngIf="!loading && articles.length === 0">
+    <img
+      *ngIf="activeArtistImage"
+      [src]="activeArtistImage"
+      alt="No news"
+      class="news-page__empty-image"
+    />
+    <p>No recent news found for {{ activeTab === 'all' ? 'your top artists' : activeTab }}</p>
+  </div>
+</div>

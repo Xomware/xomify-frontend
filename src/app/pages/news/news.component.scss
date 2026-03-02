@@ -1,0 +1,160 @@
+.news-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+  }
+
+  &__subtitle {
+    color: #9ca3af;
+    font-size: 1rem;
+    margin: 0 0 24px;
+  }
+
+  // Artist Filter Tabs
+  &__tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 2px;
+    }
+  }
+
+  &__tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    background: transparent;
+    color: #d1d5db;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #1db954;
+      color: #fff;
+    }
+
+    &.active {
+      background: #1db954;
+      border-color: #1db954;
+      color: #000;
+      font-weight: 600;
+    }
+  }
+
+  &__tab-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  // News Cards Grid
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Empty State
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 16px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 1.1rem;
+  }
+
+  &__empty-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+}
+
+// Skeleton Cards
+.news-card-skeleton {
+  background: #1a1a2e;
+  border-radius: 12px;
+  overflow: hidden;
+
+  &__image {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(90deg, #1a1a2e 25%, #252542 50%, #1a1a2e 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__line {
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #1a1a2e 25%, #252542 50%, #1a1a2e 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+
+    &--title {
+      width: 85%;
+      height: 18px;
+    }
+
+    &--meta {
+      width: 40%;
+      height: 12px;
+    }
+
+    &--desc {
+      width: 100%;
+
+      &.short {
+        width: 60%;
+      }
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
