@@ -1,0 +1,24 @@
+<a
+  class="news-card"
+  [href]="article.url"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <div class="news-card__image">
+    <img
+      [src]="thumbnailUrl"
+      [alt]="article.title"
+      loading="lazy"
+      (error)="onImageError($event)"
+    />
+  </div>
+  <div class="news-card__content">
+    <h3 class="news-card__title">{{ article.title }}</h3>
+    <div class="news-card__meta">
+      <span class="news-card__source">{{ article.source.name }}</span>
+      <span class="news-card__separator">·</span>
+      <span class="news-card__time">{{ article.publishedAt | relativeTime }}</span>
+    </div>
+    <p class="news-card__description">{{ article.description }}</p>
+  </div>
+</a>
