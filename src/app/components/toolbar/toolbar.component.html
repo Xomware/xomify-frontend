@@ -147,11 +147,11 @@
         Stats
       </a>
       <a
-        routerLink="/mood"
+        routerLink="/goals"
         routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/mood') }"
+        [ngClass]="{ selected: isSelected('/goals') }"
       >
-        Mood
+        Goals
       </a>
     </div>
   </div>
@@ -286,6 +286,12 @@
       routerLinkActive="active"
       (click)="selectItem('/streaming-stats')"
       >Stats</a
+    >
+    <a
+      routerLink="/goals"
+      routerLinkActive="active"
+      (click)="selectItem('/goals')"
+      >Goals</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

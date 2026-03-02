@@ -1,0 +1,30 @@
+<div class="sheet-overlay" (click)="close()">
+  <div class="sheet" (click)="$event.stopPropagation()">
+    <div class="sheet-header">
+      <h3>Create Goal</h3>
+      <button class="close-btn" (click)="close()">✕</button>
+    </div>
+
+    <div class="sheet-body">
+      <label class="field-label">Goal Type</label>
+      <select [(ngModel)]="selectedMetric" class="field-input">
+        <option *ngFor="let m of metrics" [value]="m.value">{{ m.label }}</option>
+      </select>
+
+      <label class="field-label">Target</label>
+      <input
+        type="number"
+        [(ngModel)]="target"
+        min="1"
+        class="field-input"
+      />
+
+      <div class="preview">
+        <span class="preview-icon">{{ icon }}</span>
+        <span class="preview-text">{{ preview }}</span>
+      </div>
+    </div>
+
+    <button class="add-btn" (click)="addGoal()">Add Goal</button>
+  </div>
+</div>

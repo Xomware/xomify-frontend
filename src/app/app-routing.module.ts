@@ -35,6 +35,7 @@ import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-dis
 import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.component';
 import { NewsComponent } from './pages/news/news.component';
 import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
+import { GoalsComponent } from './pages/goals/goals.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
