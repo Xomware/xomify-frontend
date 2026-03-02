@@ -48,6 +48,7 @@ import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-
 import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
 import { ShareComponent } from './pages/share/share.component';
 import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
+import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats
     CollaborativePlaylistsComponent,
     ShareComponent,
     StreamingStatsComponent,
+    ConcertDiscoveryComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

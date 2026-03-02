@@ -1,0 +1,119 @@
+<div class="concert-discovery-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadConcerts()">Try Again</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">🎤 Concert Discovery</h1>
+        <p class="page-subtitle">Upcoming shows for your top artists</p>
+      </div>
+      <button class="btn-refresh" (click)="refresh()">↻ Refresh</button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <span class="card-emoji">🎫</span>
+        <span class="card-value">{{ totalShows }}</span>
+        <span class="card-label">Upcoming Shows</span>
+      </div>
+      <div class="stat-card">
+        <span class="card-emoji">🎤</span>
+        <span class="card-value">{{ artistsWithShows }}</span>
+        <span class="card-label">Artists Touring</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <span class="filter-label">Show events in next:</span>
+      <div class="filter-options">
+        <button
+          *ngFor="let d of dayOptions"
+          class="filter-btn"
+          [class.active]="selectedDays === d"
+          (click)="onFilterChange(d)"
+        >
+          {{ d }} days
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="allEvents.length === 0">
+      <div class="empty-icon">🎵</div>
+      <p class="empty-title">No upcoming shows found for your top artists</p>
+      <p class="empty-subtitle">Try expanding the date range or check back later</p>
+    </div>
+
+    <!-- Artist Badges -->
+    <div class="artist-badges" *ngIf="allEvents.length > 0">
+      <div
+        class="artist-badge"
+        *ngFor="let ac of filteredConcerts"
+        [class.has-shows]="ac.hasShows"
+      >
+        <img
+          class="badge-img"
+          [src]="ac.artist.images?.[2]?.url || ac.artist.images?.[0]?.url"
+          [alt]="ac.artist.name"
+          loading="lazy"
+        />
+        <span class="badge-name">{{ ac.artist.name }}</span>
+        <span class="badge-count" *ngIf="ac.hasShows">{{ ac.events.length }}</span>
+      </div>
+    </div>
+
+    <!-- Event Cards -->
+    <div class="events-grid" *ngIf="allEvents.length > 0">
+      <div class="event-card" *ngFor="let event of allEvents">
+        <div class="event-artist-img">
+          <img
+            [src]="event.artistImage"
+            [alt]="event.artistName"
+            loading="lazy"
+            *ngIf="event.artistImage"
+          />
+          <div class="event-artist-placeholder" *ngIf="!event.artistImage">🎤</div>
+        </div>
+        <div class="event-details">
+          <h3 class="event-name">{{ event.eventName }}</h3>
+          <div class="event-meta">
+            <span class="event-venue">📍 {{ event.venue }}</span>
+            <span class="event-city">{{ event.city }}</span>
+          </div>
+          <div class="event-date">
+            📅 {{ formatDate(event.date) }}
+            <span class="event-time" *ngIf="event.time">· {{ formatTime(event.time) }}</span>
+          </div>
+        </div>
+        <div class="event-actions">
+          <a
+            class="btn-tickets"
+            [href]="event.ticketUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            🎫 Get Tickets
+          </a>
+          <button
+            class="btn-notify"
+            [class.active]="event.notifyMe"
+            (click)="toggleNotify(event)"
+          >
+            {{ event.notifyMe ? '🔔' : '🔕' }} {{ event.notifyMe ? 'Notifying' : 'Notify Me' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
