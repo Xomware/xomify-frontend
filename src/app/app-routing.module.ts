@@ -32,6 +32,7 @@ import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists
 import { ShareComponent } from './pages/share/share.component';
 import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
 import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
+import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },

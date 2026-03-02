@@ -1,0 +1,398 @@
+.weekly-wrapped-page {
+  min-height: 100vh;
+  background: #0a0a14;
+  padding: 24px 16px 80px;
+  color: #fff;
+
+  .content {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  // ─── Header ───────────────────────────────────
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    background: linear-gradient(135deg, #1db954, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+    color: #a0a0b8;
+    margin: 0;
+  }
+
+  .btn-download {
+    background: rgba(29, 185, 84, 0.12);
+    border: 1px solid rgba(29, 185, 84, 0.35);
+    color: #1db954;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background: rgba(29, 185, 84, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // ─── Comparison ───────────────────────────────
+  .comparison-badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    color: #a78bfa;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  // ─── Card ─────────────────────────────────────
+  .card-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .wrapped-card {
+    width: 400px;
+    height: 700px;
+    background: linear-gradient(160deg, #1a0a2e 0%, #0d1b2a 40%, #0a2e1a 100%);
+    border-radius: 20px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        ellipse at 30% 20%,
+        rgba(124, 58, 237, 0.15) 0%,
+        transparent 50%
+      );
+      pointer-events: none;
+    }
+  }
+
+  .card-brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-logo {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+  }
+
+  .brand-week {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  // ─── Hero Stat ────────────────────────────────
+  .stat-hero {
+    text-align: center;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-value {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1db954, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .hero-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+  }
+
+  // ─── Top Artist ───────────────────────────────
+  .top-artist, .top-songs {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.35);
+    margin-bottom: 8px;
+  }
+
+  .artist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .artist-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .artist-plays {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  // ─── Top Songs ────────────────────────────────
+  .song-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+
+    & + .song-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  .song-rank {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.3);
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .song-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .song-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .song-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .song-artist {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .song-plays {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.35);
+    flex-shrink: 0;
+  }
+
+  // ─── Mini Stats ───────────────────────────────
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mini-stat {
+    text-align: center;
+  }
+
+  .mini-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .mini-label {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  // ─── Empty State ──────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+
+    p {
+      color: #a0a0b8;
+      font-size: 0.95rem;
+    }
+  }
+
+  // ─── Error State ──────────────────────────────
+  .error-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .error-message {
+    color: #ef4444;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+
+    &:hover {
+      background: #6d28d9;
+    }
+  }
+
+  // ─── Past Weeks ───────────────────────────────
+  .past-weeks {
+    margin-top: 8px;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: #a0a0b8;
+  }
+
+  .past-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .past-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .past-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .past-minutes {
+    color: #1db954;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .past-songs {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .past-song {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .past-artist {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 6px;
+  }
+}
+
+// ─── Mobile ───────────────────────────────────
+@media (max-width: 440px) {
+  .weekly-wrapped-page .wrapped-card {
+    width: 100%;
+    height: auto;
+    min-height: 600px;
+  }
+}
