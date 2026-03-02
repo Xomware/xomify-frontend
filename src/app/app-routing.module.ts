@@ -36,6 +36,7 @@ import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.co
 import { NewsComponent } from './pages/news/news.component';
 import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
 import { GoalsComponent } from './pages/goals/goals.component';
+import { CompareComponent } from './pages/compare/compare.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },

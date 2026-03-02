@@ -147,11 +147,11 @@
         Stats
       </a>
       <a
-        routerLink="/goals"
+        routerLink="/compare"
         routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/goals') }"
+        [ngClass]="{ selected: isSelected('/compare') }"
       >
-        Goals
+        🤝 Compare
       </a>
     </div>
   </div>
@@ -288,10 +288,10 @@
       >Stats</a
     >
     <a
-      routerLink="/goals"
+      routerLink="/compare"
       routerLinkActive="active"
-      (click)="selectItem('/goals')"
-      >Goals</a
+      (click)="selectItem('/compare')"
+      >🤝 Compare</a
     >
     <a class="logout-link" (click)="logout()">Logout</a>
   </div>

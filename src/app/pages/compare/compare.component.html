@@ -1,0 +1,203 @@
+<div class="compare-page">
+  <div class="page-header">
+    <h1>🤝 Compare Listening Stats</h1>
+    <button class="share-btn" (click)="shareStats()" [disabled]="shareLoading">
+      {{ shareLoading ? 'Generating...' : '🔗 Share Your Stats' }}
+    </button>
+  </div>
+
+  <div class="loader-container" *ngIf="loading">
+    <app-loader></app-loader>
+  </div>
+
+  <div class="comparison-grid" *ngIf="!loading">
+    <!-- Your Stats Column -->
+    <div class="stats-column your-stats">
+      <h2>{{ mySnapshot?.username || 'Your Stats' }}</h2>
+
+      <div class="section" *ngIf="mySnapshot">
+        <h3>🎵 Top Artists</h3>
+        <div class="artist-bars">
+          <div
+            class="artist-bar-row"
+            *ngFor="let artist of mySnapshot.topArtists | slice : 0 : 5"
+          >
+            <span class="artist-name">{{ artist.name | truncate : 20 }}</span>
+            <div class="bar-container">
+              <div
+                class="bar"
+                @barGrow
+                [style.width.%]="
+                  getBarWidth(artist.playCount, mySnapshot.topArtists[0]?.playCount)
+                "
+                [class.shared]="sharedArtists.includes(artist.name)"
+              ></div>
+            </div>
+            <span class="play-count">{{ artist.playCount }}</span>
+          </div>
+        </div>
+
+        <h3>🎭 Top Genres</h3>
+        <div class="genre-donut">
+          <svg viewBox="0 0 42 42" class="donut-chart">
+            <circle
+              *ngFor="let slice of getGenreSlices(mySnapshot.topGenres)"
+              class="donut-segment"
+              cx="21"
+              cy="21"
+              r="15.91549430918954"
+              fill="transparent"
+              [attr.stroke]="slice.color"
+              stroke-width="5"
+              [attr.stroke-dasharray]="slice.percentage + ' ' + (100 - slice.percentage)"
+              [attr.stroke-dashoffset]="25 - slice.offset"
+            ></circle>
+          </svg>
+          <div class="genre-legend">
+            <span
+              *ngFor="let genre of mySnapshot.topGenres | slice : 0 : 5"
+              class="genre-tag"
+              [class.shared]="sharedGenres.includes(genre)"
+            >
+              {{ genre }}
+            </span>
+          </div>
+        </div>
+
+        <div class="listening-time">
+          <h3>⏱ Listening Time</h3>
+          <p class="minutes">{{ mySnapshot.totalMinutes | number }} min</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friend's Stats Column -->
+    <div class="stats-column friend-stats">
+      <div *ngIf="friendSnapshot; else noFriend">
+        <h2>{{ friendSnapshot.username }}</h2>
+
+        <div class="section">
+          <h3>🎵 Top Artists</h3>
+          <div class="artist-bars">
+            <div
+              class="artist-bar-row"
+              *ngFor="let artist of friendSnapshot.topArtists | slice : 0 : 5"
+            >
+              <span class="artist-name">{{ artist.name | truncate : 20 }}</span>
+              <div class="bar-container">
+                <div
+                  class="bar friend-bar"
+                  @barGrow
+                  [style.width.%]="
+                    getBarWidth(
+                      artist.playCount,
+                      friendSnapshot.topArtists[0]?.playCount
+                    )
+                  "
+                  [class.shared]="sharedArtists.includes(artist.name)"
+                ></div>
+              </div>
+              <span class="play-count">{{ artist.playCount }}</span>
+            </div>
+          </div>
+
+          <h3>🎭 Top Genres</h3>
+          <div class="genre-donut">
+            <svg viewBox="0 0 42 42" class="donut-chart">
+              <circle
+                *ngFor="let slice of getGenreSlices(friendSnapshot.topGenres)"
+                class="donut-segment"
+                cx="21"
+                cy="21"
+                r="15.91549430918954"
+                fill="transparent"
+                [attr.stroke]="slice.color"
+                stroke-width="5"
+                [attr.stroke-dasharray]="
+                  slice.percentage + ' ' + (100 - slice.percentage)
+                "
+                [attr.stroke-dashoffset]="25 - slice.offset"
+              ></circle>
+            </svg>
+            <div class="genre-legend">
+              <span
+                *ngFor="let genre of friendSnapshot.topGenres | slice : 0 : 5"
+                class="genre-tag"
+                [class.shared]="sharedGenres.includes(genre)"
+              >
+                {{ genre }}
+              </span>
+            </div>
+          </div>
+
+          <div class="listening-time">
+            <h3>⏱ Listening Time</h3>
+            <p class="minutes">{{ friendSnapshot.totalMinutes | number }} min</p>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noFriend>
+        <div class="placeholder">
+          <h2>Friend's Stats</h2>
+          <p>Share your link to compare with a friend!</p>
+          <button class="share-btn" (click)="shareStats()">
+            🔗 Generate Share Link
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Overlap Section -->
+  <div
+    class="overlap-section"
+    *ngIf="!loading && friendSnapshot && mySnapshot"
+  >
+    <h2>🎯 Compatibility</h2>
+    <div class="score-circle">
+      <svg viewBox="0 0 36 36" class="score-ring">
+        <path
+          class="score-bg"
+          d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"
+          fill="none"
+          stroke="#333"
+          stroke-width="3"
+        />
+        <path
+          class="score-fill"
+          d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"
+          fill="none"
+          stroke="#1DB954"
+          stroke-width="3"
+          [attr.stroke-dasharray]="compatibilityScore + ', 100'"
+        />
+        <text x="18" y="20.35" class="score-text" text-anchor="middle">
+          {{ compatibilityScore }}%
+        </text>
+      </svg>
+    </div>
+
+    <div class="shared-items" *ngIf="sharedArtists.length > 0">
+      <h3>Shared Artists</h3>
+      <div class="shared-tags">
+        <span class="shared-tag" *ngFor="let artist of sharedArtists">
+          {{ artist }}
+        </span>
+      </div>
+    </div>
+
+    <div class="shared-items" *ngIf="sharedGenres.length > 0">
+      <h3>Shared Genres</h3>
+      <div class="shared-tags">
+        <span class="shared-tag genre" *ngFor="let genre of sharedGenres">
+          {{ genre }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
