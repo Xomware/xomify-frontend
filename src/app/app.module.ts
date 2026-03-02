@@ -54,6 +54,9 @@ import { NewsComponent } from './pages/news/news.component';
 import { NewsCardComponent } from './components/news-card/news-card.component';
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
 import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
+import { GoalsComponent } from './pages/goals/goals.component';
+import { GoalProgressRingComponent } from './components/goal-progress-ring/goal-progress-ring.component';
+import { CreateGoalSheetComponent } from './components/create-goal-sheet/create-goal-sheet.component';
 
 @NgModule({
   declarations: [
