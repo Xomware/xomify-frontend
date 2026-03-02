@@ -1,0 +1,109 @@
+<div class="weekly-wrapped-page">
+  <!-- Loading -->
+  <app-loader *ngIf="loading"></app-loader>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="!loading && error">
+    <p class="error-message">{{ error }}</p>
+    <button class="btn-primary" (click)="loadData()">Try Again</button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !error && isEmpty">
+    <div class="empty-icon">🎧</div>
+    <h2>Listen more this week to see your Wrapped!</h2>
+    <p>Once you've played some tracks, your weekly stats will appear here.</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && !isEmpty && currentSnapshot">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-text">
+        <h1 class="page-title">Weekly Wrapped</h1>
+        <p class="page-subtitle">{{ currentSnapshot.weekLabel }}</p>
+      </div>
+      <button class="btn-download" (click)="downloadAsImage()" [disabled]="exporting">
+        {{ exporting ? 'Exporting…' : '📸 Download as Image' }}
+      </button>
+    </div>
+
+    <!-- Comparison badge -->
+    <div class="comparison-badge" *ngIf="minutesDelta">
+      {{ getDeltaLabel() }}
+    </div>
+
+    <!-- ═══ Shareable Card ═══ -->
+    <div class="card-wrapper">
+      <div class="wrapped-card" #wrappedCard @cardReveal>
+        <!-- Branding -->
+        <div class="card-brand reveal-item">
+          <span class="brand-logo">🎵 Xomify</span>
+          <span class="brand-week">This Week</span>
+        </div>
+
+        <h2 class="card-title reveal-item">{{ currentSnapshot.weekLabel }}</h2>
+
+        <!-- Total minutes -->
+        <div class="stat-hero reveal-item">
+          <span class="hero-value">{{ currentSnapshot.totalMinutes }}</span>
+          <span class="hero-label">minutes listened</span>
+        </div>
+
+        <!-- Top Artist -->
+        <div class="top-artist reveal-item" *ngIf="currentSnapshot.topArtist">
+          <span class="section-label">Top Artist</span>
+          <div class="artist-row">
+            <span class="artist-name">{{ currentSnapshot.topArtist.name }}</span>
+            <span class="artist-plays">{{ currentSnapshot.topArtist.playCount }} plays</span>
+          </div>
+        </div>
+
+        <!-- Top 3 Songs -->
+        <div class="top-songs reveal-item">
+          <span class="section-label">Top Songs</span>
+          <div class="song-row" *ngFor="let song of currentSnapshot.topSongs; let i = index">
+            <span class="song-rank">{{ i + 1 }}</span>
+            <img *ngIf="song.albumArt" [src]="song.albumArt" class="song-art" alt="">
+            <div class="song-info">
+              <span class="song-name">{{ song.name }}</span>
+              <span class="song-artist">{{ song.artists.join(', ') }}</span>
+            </div>
+            <span class="song-plays">{{ song.playCount }}×</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row reveal-item">
+          <div class="mini-stat">
+            <span class="mini-value">{{ currentSnapshot.uniqueTracks }}</span>
+            <span class="mini-label">tracks</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-value">🔥 {{ currentSnapshot.listeningStreak }}</span>
+            <span class="mini-label">day streak</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Past Weeks ═══ -->
+    <div class="past-weeks" *ngIf="pastWeeks.length > 0">
+      <h3 class="section-heading">Past Weeks</h3>
+      <div class="past-card" *ngFor="let week of pastWeeks">
+        <div class="past-header">
+          <span class="past-label">{{ week.weekLabel }}</span>
+          <span class="past-minutes">{{ week.totalMinutes }}m</span>
+        </div>
+        <div class="past-songs">
+          <span *ngFor="let song of week.topSongs; let i = index" class="past-song">
+            {{ i + 1 }}. {{ song.name }}
+          </span>
+        </div>
+        <div class="past-artist" *ngIf="week.topArtist">
+          Top: {{ week.topArtist.name }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
