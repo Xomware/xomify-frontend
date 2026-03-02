@@ -53,6 +53,7 @@ import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.co
 import { NewsComponent } from './pages/news/news.component';
 import { NewsCardComponent } from './components/news-card/news-card.component';
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
+import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
 
 @NgModule({
   declarations: [
