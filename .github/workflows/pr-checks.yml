@@ -17,7 +17,9 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        # Use --legacy-peer-deps to handle peer dependency conflicts from Dependabot PRs
+        # (e.g. zone.js bumps that are not yet compatible with the current Angular version)
+        run: npm install --legacy-peer-deps
 
       - name: Build
         run: npm run build:prod
