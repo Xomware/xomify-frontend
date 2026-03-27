@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { PlaylistService } from './playlist.service';
@@ -100,7 +100,6 @@ export class CollaborativePlaylistsService {
             );
           }
 
-          const { forkJoin } = require('rxjs');
           return forkJoin(requests).pipe(
             map((responses: any[]) => responses.flatMap((r) => r.items || []))
           );

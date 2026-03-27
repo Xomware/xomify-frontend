@@ -100,10 +100,8 @@ export class ReleaseRadarService {
         }
       )
       .pipe(
-        tap((response) => {
-          console.log(
-            `[ReleaseRadar] History: ${response.weeks?.length || 0} weeks`
-          );
+        tap(() => {
+          // history loaded
         }),
         catchError((err) => {
           console.error('Error fetching release radar history:', err);
@@ -157,7 +155,6 @@ export class ReleaseRadarService {
     // Check frontend cache first
     const cached = this.getCache();
     if (cached && cached.weeks.length > 0) {
-      console.log('[ReleaseRadar] Using cached data');
       return of(cached);
     }
 

@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 
-// Pages
 import { HomeComponent } from './pages/home/home.component';
 import { CallbackComponent } from './components/callback/callback.component';
 import { MyProfileComponent } from './pages/my-profile/my-profile.component';
@@ -17,26 +16,9 @@ import { PlaylistDetailComponent } from './pages/playlist-detail/playlist-detail
 import { MyPlaylistsComponent } from './pages/my-playlists/my-playlists.component';
 import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
-import { FriendsComponent } from './pages/friends/friends.component';
-import { FriendProfileComponent } from './pages/friend-profile/friend-profile.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
-import { GroupsComponent } from './pages/groups/groups.component';
-import { GroupDetailComponent } from './pages/group-detail/group-detail.component';
-import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
 import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
-import { NewReleasesComponent } from './pages/new-releases/new-releases.component';
-import { ArtistDiscoveryComponent } from './pages/artist-discovery/artist-discovery.component';
-import { PlaylistAnalysisComponent } from './pages/playlist-analysis/playlist-analysis.component';
-import { MoodRecommendationsComponent } from './pages/mood-recommendations/mood-recommendations.component';
-import { CollaborativePlaylistsComponent } from './pages/collaborative-playlists/collaborative-playlists.component';
-import { ShareComponent } from './pages/share/share.component';
-import { StreamingStatsComponent } from './pages/streaming-stats/streaming-stats.component';
-import { ConcertDiscoveryComponent } from './pages/concert-discovery/concert-discovery.component';
-import { WeeklyWrappedComponent } from './pages/weekly-wrapped/weekly-wrapped.component';
-import { NewsComponent } from './pages/news/news.component';
-import { MoodTimelineComponent } from './pages/mood-timeline/mood-timeline.component';
-import { GoalsComponent } from './pages/goals/goals.component';
-import { CompareComponent } from './pages/compare/compare.component';
+import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -102,33 +84,8 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'friends',
-    component: FriendsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'friend/:email',
-    component: FriendProfileComponent,
-    canActivate: [AuthGuard],
-  },
-  {
     path: 'ratings',
     component: RatingsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'groups',
-    component: GroupsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'group/:id',
-    component: GroupDetailComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'liked-artists-playlist',
-    component: LikedArtistsPlaylistGeneratorComponent,
     canActivate: [AuthGuard],
   },
   {
@@ -137,44 +94,32 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'new-releases',
-    component: NewReleasesComponent,
+    path: 'liked-artists-playlist',
+    component: LikedArtistsPlaylistGeneratorComponent,
     canActivate: [AuthGuard],
   },
+  // Lazy-loaded feature modules
   {
-    path: 'discover-artists',
-    component: ArtistDiscoveryComponent,
+    path: '',
     canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/social/social.module').then((m) => m.SocialModule),
   },
   {
-    path: 'playlist-analysis',
-    component: PlaylistAnalysisComponent,
+    path: '',
     canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/analytics/analytics.module').then(
+        (m) => m.AnalyticsModule
+      ),
   },
   {
-    path: 'mood-recommendations',
-    component: MoodRecommendationsComponent,
+    path: '',
     canActivate: [AuthGuard],
-  },
-  {
-    path: 'collaborative-playlists',
-    component: CollaborativePlaylistsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'share',
-    component: ShareComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'streaming-stats',
-    component: StreamingStatsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'concerts',
-    component: ConcertDiscoveryComponent,
-    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/discovery/discovery.module').then(
+        (m) => m.DiscoveryModule
+      ),
   },
   // Catch-all redirect
   { path: '**', redirectTo: '' },

@@ -92,9 +92,10 @@ export class WeeklyWrappedComponent implements OnInit {
     this.exporting = true;
 
     try {
-      // Dynamically import html2canvas
-      const html2canvasModule = await import('html2canvas');
-      const html2canvasFn = (html2canvasModule as any).default || html2canvasModule;
+      // Dynamically import html2canvas -- optional dependency
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const html2canvasModule: Record<string, unknown> = await import(/* webpackIgnore: true */ 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js' as string);
+      const html2canvasFn = (html2canvasModule['default'] || html2canvasModule) as (el: HTMLElement, opts: Record<string, unknown>) => Promise<HTMLCanvasElement>;
 
       const canvas = await html2canvasFn(this.wrappedCard.nativeElement, {
         backgroundColor: null,

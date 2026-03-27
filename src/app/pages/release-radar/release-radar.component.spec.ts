@@ -186,53 +186,41 @@ describe('ReleaseRadarComponent', () => {
   describe('Loading Releases', () => {
     beforeEach(() => {
       releaseRadarService.loadReleaseRadar.and.returnValue(of(mockHistoryResponse));
+      // Trigger ngOnInit to set userEmail via userService.getEmail()
+      fixture.detectChanges();
     });
 
-    it('should load and process releases', (done) => {
-      component.loadReleases();
-
-      setTimeout(() => {
-        expect(component.history).toEqual(mockHistoryResponse);
-        expect(component.releases.length).toBe(1);
-        expect(component.loading).toBe(false);
-        done();
-      }, 100);
+    it('should load and process releases', () => {
+      // loadReleases already called via ngOnInit in beforeEach detectChanges
+      expect(component.history).toEqual(mockHistoryResponse);
+      expect(component.releases.length).toBe(1);
+      expect(component.loading).toBe(false);
     });
 
-    it('should set current week as default', (done) => {
-      component.loadReleases();
-
-      setTimeout(() => {
-        expect(component.selectedWeekKey).toBe('2026-08');
-        done();
-      }, 100);
+    it('should set current week as default', () => {
+      expect(component.selectedWeekKey).toBe('2026-08');
     });
 
-    it('should handle loading errors', (done) => {
+    it('should handle loading errors', () => {
       releaseRadarService.loadReleaseRadar.and.returnValue(
         throwError(() => new Error('Load failed'))
       );
 
-      component.loadReleases();
+      // Re-trigger loading
+      component.ngOnInit();
 
-      setTimeout(() => {
-        expect(component.error).toContain('Failed to load releases');
-        expect(component.loading).toBe(false);
-        done();
-      }, 100);
+      expect(component.error).toContain('Failed to load releases');
+      expect(component.loading).toBe(false);
     });
 
-    it('should support force refresh', (done) => {
+    it('should support force refresh', () => {
       releaseRadarService.forceRefresh.and.returnValue(of(mockHistoryResponse));
 
       component.loadReleases(true);
 
-      setTimeout(() => {
-        expect(releaseRadarService.clearCache).toHaveBeenCalled();
-        expect(releaseRadarService.forceRefresh).toHaveBeenCalledWith('test@example.com');
-        expect(toastService.showPositiveToast).toHaveBeenCalledWith('Releases refreshed');
-        done();
-      }, 100);
+      expect(releaseRadarService.clearCache).toHaveBeenCalled();
+      expect(releaseRadarService.forceRefresh).toHaveBeenCalledWith('test@example.com');
+      expect(toastService.showPositiveToast).toHaveBeenCalledWith('Releases refreshed');
     });
   });
 
@@ -504,42 +492,20 @@ describe('ReleaseRadarComponent', () => {
       expect(component.totalReleases).toBeGreaterThanOrEqual(0);
     });
 
-    it('should count albums and singles separately', (done) => {
-      const mixedResponse: ReleaseRadarHistoryResponse = {
-        email: 'test@example.com',
-        weeks: [
-          {
-            ...mockWeek,
-            releases: [
-              { ...mockRelease, albumType: 'album' },
-              { ...mockRelease, albumId: 'single1', albumType: 'single' },
-            ],
-            stats: {
-              artistCount: 2,
-              releaseCount: 2,
-              trackCount: 15,
-              albumCount: 1,
-              singleCount: 1,
-            },
-          },
-        ],
-        count: 1,
-        currentWeek: '2026-08',
-        currentWeekDisplay: 'Feb 22 - Feb 28, 2026',
-      };
+    it('should count albums and singles separately', () => {
+      // Use current-month dates so stats count them in calendar view
+      const today = new Date();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
-      releaseRadarService.loadReleaseRadar.and.returnValue(of(mixedResponse));
-      releaseRadarService.getAllReleasesFromHistory.and.returnValue(
-        mixedResponse.weeks[0].releases
-      );
-
-      component.loadReleases();
-
-      setTimeout(() => {
-        (component as any).updateStats();
-        expect(component.albumCount + component.singleCount).toBeGreaterThan(0);
-        done();
-      }, 100);
+      component.releases = [
+        { ...mockRelease, albumType: 'album', releaseDate: todayStr },
+        { ...mockRelease, albumId: 'single1', albumType: 'single', releaseDate: todayStr },
+      ];
+      component.filteredReleases = [...component.releases];
+      component.viewDate = today;
+      (component as any).updateStats();
+      expect(component.albumCount + component.singleCount).toBeGreaterThan(0);
     });
 
     it('should count upcoming releases', () => {
@@ -595,7 +561,7 @@ describe('ReleaseRadarComponent', () => {
     it('should format full date correctly', () => {
       const testDate = new Date('2026-02-27');
       const formatted = component.formatDate(testDate);
-      expect(formatted).toContain('2026');
+      expect(formatted).toContain('February');
     });
 
     it('should format release date in short format', () => {
@@ -605,14 +571,18 @@ describe('ReleaseRadarComponent', () => {
 
     it('should calculate relative dates correctly', () => {
       const today = new Date();
-      const todayRelease = { ...mockRelease, releaseDate: today.toISOString().split('T')[0] };
+      // Format using local timezone to avoid UTC offset issues
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+      const todayRelease = { ...mockRelease, releaseDate: todayStr };
       expect(component.getRelativeDate(todayRelease)).toBe('Today');
 
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
       const tomorrowRelease = {
         ...mockRelease,
-        releaseDate: tomorrow.toISOString().split('T')[0],
+        releaseDate: tomorrowStr,
       };
       expect(component.getRelativeDate(tomorrowRelease)).toBe('Tomorrow');
     });

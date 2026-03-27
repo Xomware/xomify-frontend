@@ -1,9 +1,19 @@
-// auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ToastService } from './toast.service';
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+}
+
+const STORAGE_KEY_ACCESS = 'xomify_access_token';
+const STORAGE_KEY_REFRESH = 'xomify_refresh_token';
 
 @Injectable({
   providedIn: 'root',
@@ -20,10 +30,33 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ToastService: ToastService
-  ) {}
+    private toastService: ToastService
+  ) {
+    this.restoreTokens();
+  }
 
-  login() {
+  private restoreTokens(): void {
+    const storedAccess = sessionStorage.getItem(STORAGE_KEY_ACCESS);
+    const storedRefresh = sessionStorage.getItem(STORAGE_KEY_REFRESH);
+    if (storedAccess) {
+      this.accessToken = storedAccess;
+    }
+    if (storedRefresh) {
+      this.refreshToken = storedRefresh;
+    }
+  }
+
+  private persistTokens(): void {
+    sessionStorage.setItem(STORAGE_KEY_ACCESS, this.accessToken);
+    sessionStorage.setItem(STORAGE_KEY_REFRESH, this.refreshToken);
+  }
+
+  private clearPersistedTokens(): void {
+    sessionStorage.removeItem(STORAGE_KEY_ACCESS);
+    sessionStorage.removeItem(STORAGE_KEY_REFRESH);
+  }
+
+  login(): void {
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${
       this.clientId
     }&redirect_uri=${encodeURIComponent(
@@ -32,7 +65,7 @@ export class AuthService {
     window.location.href = authUrl;
   }
 
-  handleCallback() {
+  handleCallback(): void {
     const code = new URL(window.location.href).searchParams.get('code');
 
     if (code) {
@@ -40,7 +73,7 @@ export class AuthService {
     }
   }
 
-  private exchangeCodeForToken(code: string) {
+  private exchangeCodeForToken(code: string): void {
     const tokenUrl = 'https://accounts.spotify.com/api/token';
     const body = new URLSearchParams();
 
@@ -48,46 +81,42 @@ export class AuthService {
     body.set('code', code);
     body.set('redirect_uri', this.redirectUri);
     body.set('client_id', this.clientId);
-    body.set('client_secret', this.clientSecret); // Sending the Client Secret
+    body.set('client_secret', this.clientSecret);
 
     this.http
-      .post(tokenUrl, body.toString(), {
+      .post<TokenResponse>(tokenUrl, body.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       })
       .subscribe({
-        next: (response: any) => {
+        next: (response: TokenResponse) => {
           this.accessToken = response.access_token;
           this.refreshToken = response.refresh_token;
-          console.log('Tokens saved.');
-          this.router.navigate(['/my-profile']); // Navigate after login
+          this.persistTokens();
+          this.router.navigate(['/my-profile']);
         },
-        error: (err) => {
-          this.ToastService.showNegativeToast('Token exchange failed.');
-          console.error('Token exchange failed', err);
+        error: () => {
+          this.toastService.showNegativeToast('Token exchange failed.');
         },
       });
   }
 
-  logout() {
+  logout(): void {
     this.accessToken = '';
     this.refreshToken = '';
-    // Optionally navigate to login or home page
+    this.clearPersistedTokens();
   }
 
-  getAccessToken() {
+  getAccessToken(): string {
     return this.accessToken;
   }
-  getRefreshToken() {
+
+  getRefreshToken(): string {
     return this.refreshToken;
   }
 
   isLoggedIn(): boolean {
-    if (!this.accessToken || this.accessToken.trim() === '') {
-      return false;
-    } else {
-      return true;
-    }
+    return this.accessToken.trim().length > 0;
   }
 }

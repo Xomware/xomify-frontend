@@ -101,11 +101,6 @@ export class QueueBuilderComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           this.searchResults = response?.tracks?.items || [];
           this.isSearching = false;
-          console.log(
-            'Search results:',
-            this.searchResults.length,
-            'tracks found'
-          );
         },
         error: (err) => {
           console.error('Search subscription error:', err);

@@ -26,4 +26,3 @@ jobs:
 
       - name: Run tests
         run: npm run test -- --watch=false --browsers=ChromeHeadless
-        continue-on-error: true

@@ -72,7 +72,7 @@ export class ConcertDiscoveryComponent implements OnInit {
     const msg = event.notifyMe
       ? `🔔 You'll be notified about ${event.eventName}`
       : `🔕 Notification removed for ${event.eventName}`;
-    this.toastService.show(msg);
+    this.toastService.showPositiveToast(msg);
   }
 
   formatDate(date: string): string {

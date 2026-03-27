@@ -5,7 +5,8 @@ import { UserService } from 'src/app/services/user.service';
 import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
 import { FriendsService } from 'src/app/services/friends.service';
-import { forkJoin, take, interval, Subscription } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 
 interface TickerItem {
@@ -16,104 +17,121 @@ interface TickerItem {
   type: 'song' | 'artist' | 'genre';
 }
 
+interface SpotifyArtistRef {
+  name: string;
+  id?: string;
+}
+
+interface SpotifyTrackRef {
+  id: string;
+  name: string;
+  album?: { images?: { url: string }[] };
+  artists?: SpotifyArtistRef[];
+  genres?: string[];
+}
+
+interface SpotifyArtistRef2 {
+  id: string;
+  name: string;
+  images?: { url: string }[];
+  genres?: string[];
+}
+
 @Component({
   selector: 'app-my-profile-page',
   templateUrl: './my-profile.component.html',
   styleUrls: ['./my-profile.component.scss'],
 })
 export class MyProfileComponent implements OnInit, OnDestroy {
-  loading: boolean = true;
-  profilePicture: string = '';
-  userName: string = '';
-  email: string = '';
-  followersCount: number = 0;
-  followingCount: number = 0;
-  friendsCount: number = 0;
-  playlistCount: number = 0;
-  country: string = '';
-  product: string = '';
-  userId: string = '';
-  spotifyProfileUrl: string = '';
-  user: any;
-  accessToken: string = '';
-  wrappedEnrolled: boolean = false;
-  releaseRadarEnrolled: boolean = false;
+  loading = true;
+  profilePicture = '';
+  userName = '';
+  email = '';
+  followersCount = 0;
+  followingCount = 0;
+  friendsCount = 0;
+  playlistCount = 0;
+  country = '';
+  product = '';
+  userId = '';
+  spotifyProfileUrl = '';
+  user: Record<string, unknown> | null = null;
+  accessToken = '';
+  wrappedEnrolled = false;
+  releaseRadarEnrolled = false;
   maxEnrollAttempts = 5;
   enrollAttempts = 0;
-  disableEnrollButtons: boolean = false;
-  maxReached: boolean = false;
+  disableEnrollButtons = false;
+  maxReached = false;
 
   // Ticker state
   tickerItems: TickerItem[] = [];
   currentTickerType: 'song' | 'artist' | 'genre' = 'song';
-  tickerLabel: string = 'Top Songs';
-  tickerPaused: boolean = false;
-  tickerLoaded: boolean = false;
+  tickerLabel = 'Top Songs';
+  tickerPaused = false;
+  tickerLoaded = false;
 
-  private topSongs: any[] = [];
-  private topArtists: any[] = [];
+  private topSongs: SpotifyTrackRef[] = [];
+  private topArtists: SpotifyArtistRef2[] = [];
   private topGenres: { name: string; count: number }[] = [];
-  private tickerRotationSub?: Subscription;
-  private friendsListSub?: Subscription;
+  private destroy$ = new Subject<void>();
+  private tickerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
-    private AuthService: AuthService,
-    private UserService: UserService,
-    private SongService: SongService,
-    private ArtistService: ArtistService,
-    private FriendsService: FriendsService,
-    private ToastService: ToastService,
+    private authService: AuthService,
+    private userService: UserService,
+    private songService: SongService,
+    private artistService: ArtistService,
+    private friendsService: FriendsService,
+    private toastService: ToastService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.accessToken = this.AuthService.getAccessToken();
-    this.userName = this.UserService.getUserName();
+    this.accessToken = this.authService.getAccessToken();
+    this.userName = this.userService.getUserName();
 
-    // Subscribe to friends list updates for real-time count
-    this.friendsListSub = this.FriendsService.friendsList$.subscribe((friendsList) => {
-      if (friendsList) {
-        this.friendsCount = friendsList.acceptedCount || 0;
-      }
-    });
+    this.friendsService.friendsList$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((friendsList) => {
+        if (friendsList) {
+          this.friendsCount = friendsList.acceptedCount || 0;
+        }
+      });
 
-    // Set current user email to load cached friends data
-    const email = this.UserService.getEmail();
+    const email = this.userService.getEmail();
     if (email) {
-      this.FriendsService.setCurrentUserEmail(email);
+      this.friendsService.setCurrentUserEmail(email);
     }
 
     if (this.userName.length === 0) {
-      console.log('Need User.');
       this.loadUser();
     } else {
-      console.log('We got dat user.');
       this.populateUserData();
       this.loadAdditionalData();
     }
   }
 
   ngOnDestroy(): void {
-    if (this.tickerRotationSub) {
-      this.tickerRotationSub.unsubscribe();
-    }
-    if (this.friendsListSub) {
-      this.friendsListSub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.tickerInterval) {
+      clearInterval(this.tickerInterval);
     }
   }
 
   private populateUserData(): void {
-    this.user = this.UserService.getUser();
-    this.userName = this.UserService.getUserName();
-    this.profilePicture = this.UserService.getProfilePic();
-    this.email = this.UserService.getEmail();
-    this.followersCount = this.UserService.getFollowers();
-    this.wrappedEnrolled = this.UserService.getWrappedEnrollment();
-    this.releaseRadarEnrolled = this.UserService.getReleaseRadarEnrollment();
+    this.user = this.userService.getUser();
+    this.userName = this.userService.getUserName();
+    this.profilePicture = this.userService.getProfilePic();
+    this.email = this.userService.getEmail();
+    this.followersCount = this.userService.getFollowers();
+    this.wrappedEnrolled = this.userService.getWrappedEnrollment();
+    this.releaseRadarEnrolled = this.userService.getReleaseRadarEnrollment();
 
-    const cachedPlaylistCount = this.UserService.getPlaylistCount();
-    const cachedFollowingCount = this.UserService.getFollowingCount();
-    const cachedFriendsList = this.FriendsService.getCachedFriendsList();
+    const cachedPlaylistCount = this.userService.getPlaylistCount();
+    const cachedFollowingCount = this.userService.getFollowingCount();
+    const cachedFriendsList = this.friendsService.getCachedFriendsList();
 
     if (cachedPlaylistCount > 0) {
       this.playlistCount = cachedPlaylistCount;
@@ -126,127 +144,105 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     }
 
     if (this.user) {
-      this.country = this.user.country || 'Unknown';
-      this.product = this.user.product || 'free';
-      this.userId = this.user.id || '';
-      this.spotifyProfileUrl =
-        this.user.external_urls?.spotify || 'https://open.spotify.com';
+      this.country = (this.user['country'] as string) || 'Unknown';
+      this.product = (this.user['product'] as string) || 'free';
+      this.userId = (this.user['id'] as string) || '';
+      const externalUrls = this.user['external_urls'] as Record<string, string> | undefined;
+      this.spotifyProfileUrl = externalUrls?.['spotify'] || 'https://open.spotify.com';
     }
   }
 
   loadUser(): void {
     this.loading = true;
-    this.UserService.getUserData()
+    this.userService
+      .getUserData()
       .pipe(take(1))
       .subscribe({
         next: (data) => {
-          console.log('USER------', data);
-          this.UserService.setUser(data);
+          this.userService.setUser(data);
           this.populateUserData();
 
-          // Set current user email to load cached friends data
           if (data.email) {
-            this.FriendsService.setCurrentUserEmail(data.email);
+            this.friendsService.setCurrentUserEmail(data.email);
           }
 
           this.loadAdditionalData();
           this.updateUserTable();
 
-          // Fetch Xomify enrollment status
-          this.UserService.getUserTableData(data.email)
+          this.userService
+            .getUserTableData(data.email)
             .pipe(take(1))
             .subscribe({
               next: (xomifyData) => {
-                console.log('XOMIFY USER DATA------', xomifyData);
                 this.wrappedEnrolled = xomifyData?.activeWrapped ?? false;
                 this.releaseRadarEnrolled =
                   xomifyData?.activeReleaseRadar ?? false;
-                this.UserService.setWrappedEnrollment(this.wrappedEnrolled);
-                this.UserService.setReleaseRadarEnrollment(
+                this.userService.setWrappedEnrollment(this.wrappedEnrolled);
+                this.userService.setReleaseRadarEnrollment(
                   this.releaseRadarEnrolled
                 );
               },
-              error: (err) => {
-                console.log('No Xomify user data found (new user)', err);
+              error: () => {
+                // New user -- no xomify data yet
               },
             });
         },
-        error: (err) => {
-          console.error('Error fetching User', err);
-          this.ToastService.showNegativeToast('Error fetching User');
+        error: () => {
+          this.toastService.showNegativeToast('Error fetching User');
           this.loading = false;
-        },
-        complete: () => {
-          console.log('User Loaded.');
         },
       });
   }
 
   private loadAdditionalData(): void {
     forkJoin({
-      playlists: this.UserService.getUserPlaylists(1),
-      following: this.UserService.getFollowedArtists(1),
+      playlists: this.userService.getUserPlaylists(1),
+      following: this.userService.getFollowedArtists(1),
     })
       .pipe(take(1))
       .subscribe({
         next: (data) => {
           this.playlistCount = data.playlists?.total || 0;
-          this.UserService.setPlaylistCount(this.playlistCount);
+          this.userService.setPlaylistCount(this.playlistCount);
 
           this.followingCount = data.following?.artists?.total || 0;
-          this.UserService.setFollowingCount(this.followingCount);
-
-          console.log('Playlist count:', this.playlistCount);
-          console.log('Following count:', this.followingCount);
+          this.userService.setFollowingCount(this.followingCount);
 
           this.loading = false;
-
-          // Load ticker data after main data is loaded
           this.loadTickerData();
-
-          // Load friends count after user data is confirmed loaded
           this.loadFriendsCount();
         },
-        error: (err) => {
-          console.error('Error fetching additional data', err);
+        error: () => {
           this.loading = false;
         },
       });
   }
 
   private loadFriendsCount(): void {
-    // Get email directly from service to ensure we have it
-    const email = this.email || this.UserService.getEmail();
-    if (!email) {
-      console.warn('No email available for loading friends count');
-      return;
-    }
+    const email = this.email || this.userService.getEmail();
+    if (!email) return;
 
-    // First, use cached data if available for instant display
-    const cached = this.FriendsService.getCachedFriendsList();
+    const cached = this.friendsService.getCachedFriendsList();
     if (cached) {
       this.friendsCount = cached.acceptedCount || 0;
-      console.log('Friends count (from cache):', this.friendsCount);
     }
 
-    // Then fetch fresh data to update cache and display
-    this.FriendsService.getFriendsList(email, true) // forceRefresh to get latest
+    this.friendsService
+      .getFriendsList(email, true)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
           this.friendsCount = response.acceptedCount || 0;
-          console.log('Friends count (fresh):', this.friendsCount);
         },
-        error: (err) => {
-          console.error('Error fetching friends count', err);
+        error: () => {
+          // Silently fail -- cached count is already displayed
         },
       });
   }
 
   private loadTickerData(): void {
-    // Check if we have cached data first
-    const cachedSongs = this.SongService.getShortTermTopTracks();
-    const cachedArtists = this.ArtistService.getShortTermTopArtists();
+    const cachedSongs = this.songService.getShortTermTopTracks();
+    const cachedArtists = this.artistService.getShortTermTopArtists();
 
     if (cachedSongs.length > 0 && cachedArtists.length > 0) {
       this.topSongs = cachedSongs.slice(0, 10);
@@ -256,10 +252,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Load fresh data
     forkJoin({
-      songs: this.SongService.getTopTracks('short_term'),
-      artists: this.ArtistService.getTopArtists('short_term'),
+      songs: this.songService.getTopTracks('short_term'),
+      artists: this.artistService.getTopArtists('short_term'),
     })
       .pipe(take(1))
       .subscribe({
@@ -268,23 +263,21 @@ export class MyProfileComponent implements OnInit, OnDestroy {
           this.topArtists = (data.artists.items || []).slice(0, 10);
           this.topGenres = this.extractTopGenres(data.artists.items || []);
 
-          // Cache the data
           if (data.songs.items) {
-            this.SongService.setTopTracks(data.songs.items, [], []);
+            this.songService.setTopTracks(data.songs.items, [], []);
           }
           if (data.artists.items) {
-            this.ArtistService.setShortTermTopArtists(data.artists.items);
+            this.artistService.setShortTermTopArtists(data.artists.items);
           }
 
           this.initializeTicker();
         },
-        error: (err) => {
-          console.error('Error loading ticker data', err);
-        },
       });
   }
 
-  private extractTopGenres(artists: any[]): { name: string; count: number }[] {
+  private extractTopGenres(
+    artists: SpotifyArtistRef2[]
+  ): { name: string; count: number }[] {
     const genreMap = new Map<string, number>();
 
     artists.forEach((artist) => {
@@ -303,10 +296,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     this.updateTickerItems('song');
     this.tickerLoaded = true;
 
-    // Rotate ticker every 15 seconds
-    this.tickerRotationSub = interval(15000).subscribe(() => {
+    this.tickerInterval = setInterval(() => {
       this.rotateTickerType();
-    });
+    }, 15000);
   }
 
   private rotateTickerType(): void {
@@ -333,7 +325,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
           id: song.id,
           name: song.name,
           image: song.album?.images?.[2]?.url || song.album?.images?.[0]?.url,
-          subtitle: song.artists?.map((a: any) => a.name).join(', '),
+          subtitle: song.artists
+            ?.map((a: SpotifyArtistRef) => a.name)
+            .join(', '),
           type: 'song' as const,
         }));
         break;
@@ -376,77 +370,70 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   }
 
   updateUserTable(): void {
-    console.log('Updating User Table ...');
-    this.UserService.updateUserTableRefreshToken()
+    this.userService
+      .updateUserTableRefreshToken()
       .pipe(take(1))
       .subscribe({
         next: (xomUser) => {
-          console.log('Updated Xomify USER Table------', xomUser);
           this.wrappedEnrolled = xomUser.activeWrapped ?? false;
           this.releaseRadarEnrolled = xomUser.activeReleaseRadar ?? false;
-          this.UserService.setReleaseRadarEnrollment(this.releaseRadarEnrolled);
-          this.UserService.setWrappedEnrollment(this.wrappedEnrolled);
+          this.userService.setReleaseRadarEnrollment(
+            this.releaseRadarEnrolled
+          );
+          this.userService.setWrappedEnrollment(this.wrappedEnrolled);
         },
-        error: (err) => {
+        error: (err: unknown) => {
           console.error('Error Updating User Table', err);
-        },
-        complete: () => {
-          console.log('User Table Updated.');
         },
       });
   }
 
   toggleWrapped(): void {
-    console.log('Toggling Wrapped Enrollment...');
     this.wrappedEnrolled = !this.wrappedEnrolled;
     this.toggleEnrollments();
   }
 
   toggleReleaseRadar(): void {
-    console.log('Toggling Release Radar Enrollment...');
     this.releaseRadarEnrolled = !this.releaseRadarEnrolled;
     this.toggleEnrollments();
   }
 
   toggleEnrollments(): void {
-    if (this.maxReached) {
-      return;
-    }
+    if (this.maxReached) return;
 
-    console.log('Updating Enrollments..');
     this.disableEnrollButtons = true;
     this.enrollAttempts++;
 
-    this.UserService.updateUserTableEnrollments(
-      this.wrappedEnrolled,
-      this.releaseRadarEnrolled
-    )
+    this.userService
+      .updateUserTableEnrollments(
+        this.wrappedEnrolled,
+        this.releaseRadarEnrolled
+      )
       .pipe(take(1))
       .subscribe({
-        next: (xomUser) => {
-          console.log('Updated Xomify USER Table------', xomUser);
-          this.UserService.setReleaseRadarEnrollment(this.releaseRadarEnrolled);
-          this.UserService.setWrappedEnrollment(this.wrappedEnrolled);
+        next: () => {
+          this.userService.setReleaseRadarEnrollment(
+            this.releaseRadarEnrolled
+          );
+          this.userService.setWrappedEnrollment(this.wrappedEnrolled);
         },
-        error: (err) => {
-          console.error('Error Updating User Table', err);
-          this.ToastService.showNegativeToast('Error Updating User Table');
+        error: () => {
+          this.toastService.showNegativeToast('Error Updating User Table');
           if (
-            this.wrappedEnrolled !== this.UserService.getWrappedEnrollment()
+            this.wrappedEnrolled !== this.userService.getWrappedEnrollment()
           ) {
             this.wrappedEnrolled = !this.wrappedEnrolled;
           }
           if (
             this.releaseRadarEnrolled !==
-            this.UserService.getReleaseRadarEnrollment()
+            this.userService.getReleaseRadarEnrollment()
           ) {
             this.releaseRadarEnrolled = !this.releaseRadarEnrolled;
           }
           this.disableEnrollButtons = false;
         },
         complete: () => {
-          console.log('User Table Updated.');
-          this.ToastService.showPositiveToast(
+          this.toastService.showPositiveToast(
             'Preferences updated successfully!'
           );
           if (this.enrollAttempts >= this.maxEnrollAttempts) {

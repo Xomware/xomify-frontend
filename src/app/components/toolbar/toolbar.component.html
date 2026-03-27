@@ -1,157 +1,36 @@
-<div class="toolbar" [ngClass]="{ 'show-dropdown': dropdownVisible }">
+<nav class="toolbar" [ngClass]="{ 'show-dropdown': dropdownVisible }" role="navigation" aria-label="Main navigation">
   <a routerLink="/my-profile" class="app-title" *ngIf="isLoggedIn()">
     <img
       class="logo-image"
       src="assets/img/banner-logo-x-rework.png"
-      alt="XOMIFY"
+      alt="Xomify home"
     />
   </a>
   <h2 class="app-title-text" *ngIf="!isLoggedIn()">
     <img
       class="logo-image"
       src="assets/img/banner-logo-x-rework.png"
-      alt="XOMIFY"
+      alt="Xomify"
     />
   </h2>
 
+  <!-- Desktop nav links -->
   <div class="tabs" [ngClass]="{ hidden: dropdownVisible }">
     <div *ngIf="isLoggedIn()">
       <a
-        routerLink="/my-profile"
+        *ngFor="let link of navLinks"
+        [routerLink]="link.route"
         routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/my-profile') }"
+        [ngClass]="{ selected: isSelected(link.route) }"
+        [attr.aria-current]="isSelected(link.route) ? 'page' : null"
       >
-        My Profile
-      </a>
-      <a
-        routerLink="/top-songs"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/top-songs') }"
-      >
-        Top Songs
-      </a>
-      <a
-        routerLink="/top-artists"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/top-artists') }"
-      >
-        Top Artists
-      </a>
-      <a
-        routerLink="/top-genres"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/top-genres') }"
-      >
-        Top Genres
-      </a>
-      <a
-        routerLink="/release-radar"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/release-radar') }"
-      >
-        Release Radar
-      </a>
-      <a
-        routerLink="/wrapped"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/wrapped') }"
-      >
-        Wrapped
-      </a>
-      <a
-        routerLink="/ratings"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/ratings') }"
-      >
-        Ratings
-      </a>
-      <a
-        routerLink="/friends"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/friends') }"
-      >
-        Friends
-        <span class="queue-badge pending" *ngIf="pendingFriendsCount > 0">{{
-          pendingFriendsCount
-        }}</span>
-      </a>
-      <a
-        routerLink="/groups"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/groups') }"
-      >
-        Groups
-      </a>
-      <a
-        routerLink="/playlist-builder"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/playlist-builder') }"
-      >
-        Playlist Builder
-        <span class="queue-badge" *ngIf="queueCount > 0">{{ queueCount }}</span>
-      </a>
-      <a
-        routerLink="/recently-played"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/recently-played') }"
-      >
-        History
-      </a>
-      <a
-        routerLink="/new-releases"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/new-releases') }"
-      >
-        New Releases
-      </a>
-      <a
-        routerLink="/discover-artists"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/discover-artists') }"
-      >
-        Discover
-      </a>
-      <a
-        routerLink="/playlist-analysis"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/playlist-analysis') }"
-      >
-        Playlist Analysis
-      </a>
-      <a
-        routerLink="/mood-recommendations"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/mood-recommendations') }"
-      >
-        Mood Picks
-      </a>
-      <a
-        routerLink="/collaborative-playlists"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/collaborative-playlists') }"
-      >
-        Collab
-      </a>
-      <a
-        routerLink="/share"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/share') }"
-      >
-        Share
-      </a>
-      <a
-        routerLink="/streaming-stats"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/streaming-stats') }"
-      >
-        Stats
-      </a>
-      <a
-        routerLink="/compare"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected('/compare') }"
-      >
-        🤝 Compare
+        {{ link.label }}
+        <span
+          class="queue-badge"
+          [ngClass]="{ pending: link.badge$ === 'friends' }"
+          *ngIf="link.badge$ && getBadgeCount(link) > 0"
+          [attr.aria-label]="getBadgeCount(link) + ' pending'"
+        >{{ getBadgeCount(link) }}</span>
       </a>
     </div>
   </div>
@@ -161,138 +40,40 @@
     class="logout-btn desktop-only"
     *ngIf="isLoggedIn()"
     (click)="logout()"
+    aria-label="Log out"
   >
     Logout
   </button>
 
   <!-- Dropdown Button (Mobile) -->
-  <div class="dropdown-button" *ngIf="isLoggedIn()" (click)="toggleDropdown()">
-    <span class="hamburger">☰</span>
-  </div>
+  <button
+    class="dropdown-button"
+    *ngIf="isLoggedIn()"
+    (click)="toggleDropdown()"
+    [attr.aria-expanded]="dropdownVisible"
+    aria-controls="mobile-nav"
+    aria-label="Toggle navigation menu"
+  >
+    <span class="hamburger" aria-hidden="true">&#9776;</span>
+  </button>
 
   <!-- Mobile Dropdown Menu -->
-  <div class="dropdown" *ngIf="dropdownVisible">
+  <div class="dropdown" id="mobile-nav" *ngIf="dropdownVisible" role="menu">
     <a
-      routerLink="/my-profile"
+      *ngFor="let link of navLinks"
+      [routerLink]="link.route"
       routerLinkActive="active"
-      (click)="selectItem('/my-profile')"
-      >My Profile</a
+      (click)="selectItem(link.route)"
+      role="menuitem"
     >
-    <a
-      routerLink="/top-songs"
-      routerLinkActive="active"
-      (click)="selectItem('/top-songs')"
-      >Top Songs</a
-    >
-    <a
-      routerLink="/top-artists"
-      routerLinkActive="active"
-      (click)="selectItem('/top-artists')"
-      >Top Artists</a
-    >
-    <a
-      routerLink="/top-genres"
-      routerLinkActive="active"
-      (click)="selectItem('/top-genres')"
-      >Top Genres</a
-    >
-    <a
-      routerLink="/release-radar"
-      routerLinkActive="active"
-      (click)="selectItem('/release-radar')"
-      >Release Radar</a
-    >
-    <a
-      routerLink="/wrapped"
-      routerLinkActive="active"
-      (click)="selectItem('/wrapped')"
-      >Wrapped</a
-    >
-    <a
-      routerLink="/ratings"
-      routerLinkActive="active"
-      (click)="selectItem('/ratings')"
-      >Ratings</a
-    >
-    <a
-      routerLink="/friends"
-      routerLinkActive="active"
-      (click)="selectItem('/friends')"
-    >
-      Friends
-      <span class="queue-badge pending" *ngIf="pendingFriendsCount > 0">{{
-        pendingFriendsCount
-      }}</span>
+      {{ link.label }}
+      <span
+        class="queue-badge"
+        [ngClass]="{ pending: link.badge$ === 'friends' }"
+        *ngIf="link.badge$ && getBadgeCount(link) > 0"
+        [attr.aria-label]="getBadgeCount(link) + ' pending'"
+      >{{ getBadgeCount(link) }}</span>
     </a>
-    <a
-      routerLink="/groups"
-      routerLinkActive="active"
-      (click)="selectItem('/groups')"
-    >
-      Groups
-    </a>
-    <a
-      routerLink="/playlist-builder"
-      routerLinkActive="active"
-      (click)="selectItem('/playlist-builder')"
-    >
-      Playlist Builder
-      <span class="queue-badge" *ngIf="queueCount > 0">{{ queueCount }}</span>
-    </a>
-    <a
-      routerLink="/recently-played"
-      routerLinkActive="active"
-      (click)="selectItem('/recently-played')"
-      >History</a
-    >
-    <a
-      routerLink="/new-releases"
-      routerLinkActive="active"
-      (click)="selectItem('/new-releases')"
-      >New Releases</a
-    >
-    <a
-      routerLink="/discover-artists"
-      routerLinkActive="active"
-      (click)="selectItem('/discover-artists')"
-      >Discover</a
-    >
-    <a
-      routerLink="/playlist-analysis"
-      routerLinkActive="active"
-      (click)="selectItem('/playlist-analysis')"
-      >Playlist Analysis</a
-    >
-    <a
-      routerLink="/mood-recommendations"
-      routerLinkActive="active"
-      (click)="selectItem('/mood-recommendations')"
-      >Mood Picks</a
-    >
-    <a
-      routerLink="/collaborative-playlists"
-      routerLinkActive="active"
-      (click)="selectItem('/collaborative-playlists')"
-      >Collab</a
-    >
-    <a
-      routerLink="/share"
-      routerLinkActive="active"
-      (click)="selectItem('/share')"
-      >Share</a
-    >
-    <a
-      routerLink="/streaming-stats"
-      routerLinkActive="active"
-      (click)="selectItem('/streaming-stats')"
-      >Stats</a
-    >
-    <a
-      routerLink="/compare"
-      routerLinkActive="active"
-      (click)="selectItem('/compare')"
-      >🤝 Compare</a
-    >
-    <a class="logout-link" (click)="logout()">Logout</a>
+    <a class="logout-link" (click)="logout()" role="menuitem">Logout</a>
   </div>
-</div>
+</nav>

@@ -4,8 +4,14 @@ import { AuthService } from '../../services/auth.service';
 import { QueueService } from '../../services/queue.service';
 import { FriendsService } from '../../services/friends.service';
 import { UserService } from '../../services/user.service';
-import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+
+export interface NavLink {
+  route: string;
+  label: string;
+  badge$?: 'queue' | 'friends';
+}
 
 @Component({
   selector: 'app-toolbar',
@@ -14,11 +20,33 @@ import { take } from 'rxjs/operators';
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
-  isMobile: boolean = false;
+  isMobile = false;
   queueCount = 0;
   pendingFriendsCount = 0;
 
-  private subscriptions: Subscription[] = [];
+  readonly navLinks: NavLink[] = [
+    { route: '/my-profile', label: 'My Profile' },
+    { route: '/top-songs', label: 'Top Songs' },
+    { route: '/top-artists', label: 'Top Artists' },
+    { route: '/top-genres', label: 'Top Genres' },
+    { route: '/release-radar', label: 'Release Radar' },
+    { route: '/wrapped', label: 'Wrapped' },
+    { route: '/ratings', label: 'Ratings' },
+    { route: '/friends', label: 'Friends', badge$: 'friends' },
+    { route: '/groups', label: 'Groups' },
+    { route: '/playlist-builder', label: 'Playlist Builder', badge$: 'queue' },
+    { route: '/recently-played', label: 'History' },
+    { route: '/new-releases', label: 'New Releases' },
+    { route: '/discover-artists', label: 'Discover' },
+    { route: '/playlist-analysis', label: 'Playlist Analysis' },
+    { route: '/mood-recommendations', label: 'Mood Picks' },
+    { route: '/collaborative-playlists', label: 'Collab' },
+    { route: '/share', label: 'Share' },
+    { route: '/streaming-stats', label: 'Stats' },
+    { route: '/compare', label: 'Compare' },
+  ];
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -32,20 +60,18 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(
-      this.queueService.queueCount$.subscribe((count) => {
+    this.queueService.queueCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((count) => {
         this.queueCount = count;
-      })
-    );
+      });
 
-    // Subscribe to incoming friend requests count
-    this.subscriptions.push(
-      this.friendsService.incomingCount$.subscribe((count) => {
+    this.friendsService.incomingCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((count) => {
         this.pendingFriendsCount = count;
-      })
-    );
+      });
 
-    // Load friends list if logged in (this also updates the pending count)
     if (this.authService.isLoggedIn()) {
       this.loadFriendsData();
     }
@@ -59,27 +85,34 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  toggleDropdown() {
+  getBadgeCount(link: NavLink): number {
+    if (link.badge$ === 'queue') return this.queueCount;
+    if (link.badge$ === 'friends') return this.pendingFriendsCount;
+    return 0;
+  }
+
+  toggleDropdown(): void {
     this.dropdownVisible = !this.dropdownVisible;
   }
 
-  selectItem(route: string) {
+  selectItem(route: string): void {
     this.dropdownVisible = false;
     this.router.navigate([route]);
   }
 
   @HostListener('document:click', ['$event'])
-  closeDropdown(event: MouseEvent) {
+  closeDropdown(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown') && !target.closest('.dropdown-button')) {
       this.dropdownVisible = false;
     }
   }
 
-  checkIfMobile() {
+  checkIfMobile(): void {
     this.isMobile = window.innerWidth <= 768;
   }
 

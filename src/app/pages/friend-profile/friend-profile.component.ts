@@ -97,11 +97,6 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
       .subscribe({
         next: ({ profile, friendsList }) => {
           this.profile = profile;
-          console.log('Friend Profile Data:', profile);
-          console.log('Avatar URL:', profile.avatar);
-          console.log('Top Genres:', profile.topGenres);
-          console.log('Current Term Genres:', this.getCurrentGenres());
-          console.log('Playlists:', profile.playlists);
 
           // Check friendship status
           this.isFriend = friendsList.accepted.some((f: any) =>
@@ -250,11 +245,9 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
 
   getCurrentGenres(): any[] {
     if (!this.profile?.topGenres) {
-      console.log('No topGenres in profile');
       return [];
     }
     const genresData = this.profile.topGenres[this.activeTerm];
-    console.log(`Genres for ${this.activeTerm}:`, genresData);
 
     // If genres is an object (like {country: 67, rap: 53}), convert to array
     if (genresData && typeof genresData === 'object' && !Array.isArray(genresData)) {
@@ -633,14 +626,6 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
     this.compatibilityScore = Math.min(100, Math.max(0, score));
 
     this.compatibilityCalculated = true;
-
-    console.log('Compatibility calculated:', {
-      score: this.compatibilityScore,
-      sharedArtists: this.sharedArtists.length,
-      sharedGenres: this.sharedGenres.length,
-      sharedSongs: this.sharedSongs.length,
-      breakdown: { artistPoints, genrePoints, songPoints },
-    });
   }
 
   private extractGenresFromArtists(artists: any[]): string[] {

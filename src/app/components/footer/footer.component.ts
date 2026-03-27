@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { SongService } from 'src/app/services/song.service';
 import { UserService } from 'src/app/services/user.service';
-import { take } from 'rxjs';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -11,23 +12,24 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
 })
-export class FooterComponent implements OnInit {
-  showDynamicButton: boolean = false;
-  footerButtonText: string = '';
-  githubRepoUrl: string = 'https://github.com/domgiordano/xomify-frontend';
-  userId: string;
+export class FooterComponent implements OnInit, OnDestroy {
+  showDynamicButton = false;
+  footerButtonText = '';
+  githubRepoUrl = 'https://github.com/domgiordano/xomify-frontend';
+  userId = '';
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
-    private SongService: SongService,
-    private PlaylistService: PlaylistService,
-    private UserService: UserService,
-    private ToastService: ToastService,
+    private songService: SongService,
+    private playlistService: PlaylistService,
+    private userService: UserService,
+    private toastService: ToastService
   ) {}
 
-  ngOnInit() {
-    this.userId = this.UserService.getUserId();
-    this.router.events.subscribe(() => {
+  ngOnInit(): void {
+    this.userId = this.userService.getUserId();
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe(() => {
       const url = this.router.url;
 
       if (url.includes('/artist')) {
@@ -42,91 +44,83 @@ export class FooterComponent implements OnInit {
     });
   }
 
-  handleDynamicButtonClick() {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  handleDynamicButtonClick(): void {
     const url = this.router.url;
 
     if (url.includes('/artist')) {
       this.router.navigate(['/top-artists']);
     } else if (url.includes('/top-songs')) {
-      const currentTerm = this.SongService.getCurrentTerm();
+      const currentTerm = this.songService.getCurrentTerm();
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
-      let currentTopSongs = [];
+      let currentTopSongs: { uri: string }[] = [];
       let playlistName = '';
-      let playlistDesc = 'Top songs created by https://xomify.xomware.com';
+      const playlistDesc = 'Top songs created by https://xomify.xomware.com';
 
-      if (currentTerm == 'short_term') {
-        currentTopSongs = this.SongService.getShortTermTopTracks();
+      if (currentTerm === 'short_term') {
+        currentTopSongs = this.songService.getShortTermTopTracks();
         playlistName = `Last Month Top Songs: ${formattedDate}`;
-      } else if (currentTerm == 'medium_term') {
-        currentTopSongs = this.SongService.getMedTermTopTracks();
+      } else if (currentTerm === 'medium_term') {
+        currentTopSongs = this.songService.getMedTermTopTracks();
         playlistName = `Last 6 Months Top Songs: ${formattedDate}`;
       } else {
-        currentTopSongs = this.SongService.getLongTermTopTracks();
+        currentTopSongs = this.songService.getLongTermTopTracks();
         playlistName = `Last Year Top Songs: ${formattedDate}`;
       }
 
-      let currentTopSongsUriList: string[] = currentTopSongs.map(
-        (track) => track.uri,
+      const currentTopSongsUriList: string[] = currentTopSongs.map(
+        (track) => track.uri
       );
-      this.userId = this.UserService.getUserId();
-      this.PlaylistService.createPlaylist(
-        this.userId,
-        playlistName,
-        playlistDesc,
-      )
+      this.userId = this.userService.getUserId();
+      this.playlistService
+        .createPlaylist(this.userId, playlistName, playlistDesc)
         .pipe(take(1))
         .subscribe({
-          next: (playlist) => {
-            this.PlaylistService.addPlaylistSongs(
-              playlist,
-              currentTopSongsUriList,
-            )
+          next: (playlist: { id: string }) => {
+            this.playlistService
+              .addPlaylistSongs(playlist, currentTopSongsUriList)
               .pipe(take(1))
               .subscribe({
-                next: (data) => {
-                  console.log(data);
-                  this.PlaylistService.uploadXomifyLogo(playlist.id).subscribe({
-                    next: (imageData) => {
-                      console.log('Image uploaded successfully:', imageData);
-                    },
-                    error: (err) => {
-                      console.error('Error uploading image:', err);
-                      this.ToastService.showNegativeToast(
-                        'Error uploading playlist image',
-                      );
-                    },
-                    complete: () => {
-                      console.log('Image upload complete.');
-                    },
-                  });
+                next: () => {
+                  this.playlistService
+                    .uploadXomifyLogo(playlist.id)
+                    .pipe(take(1))
+                    .subscribe({
+                      error: (err: unknown) => {
+                        console.error('Error uploading image:', err);
+                        this.toastService.showNegativeToast(
+                          'Error uploading playlist image'
+                        );
+                      },
+                    });
                 },
-                error: (err) => {
+                error: (err: unknown) => {
                   console.error('Error Adding Items to Playlist', err);
-                  this.ToastService.showNegativeToast(
-                    'Error adding songs to playlist',
+                  this.toastService.showNegativeToast(
+                    'Error adding songs to playlist'
                   );
                 },
                 complete: () => {
-                  console.log('Adding Items to Playlist Complete.');
-                  this.ToastService.showPositiveToast(
-                    'Playlist successfully added to your Spotify account!',
+                  this.toastService.showPositiveToast(
+                    'Playlist successfully added to your Spotify account!'
                   );
                 },
               });
           },
-          error: (err) => {
+          error: (err: unknown) => {
             console.error('Error Creating Playlist', err);
-            this.ToastService.showNegativeToast('Error creating playlist');
-          },
-          complete: () => {
-            console.log('Playlist Created.');
+            this.toastService.showNegativeToast('Error creating playlist');
           },
         });
     }
   }
 
-  openGitHubRepo() {
+  openGitHubRepo(): void {
     window.open(this.githubRepoUrl, '_blank');
   }
 }

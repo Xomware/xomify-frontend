@@ -82,11 +82,8 @@ export class LikedArtistsActivityService {
     // Check cache first
     const cached = this.getCache();
     if (cached) {
-      console.log('[LikedArtistsActivity] Using cached timeline');
       return of(cached);
     }
-
-    console.log('[LikedArtistsActivity] Loading timeline from API...');
 
     // Get all followed artists
     return this.userService.getAllFollowedArtists().pipe(

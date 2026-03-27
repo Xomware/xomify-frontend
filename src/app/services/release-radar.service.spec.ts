@@ -20,6 +20,9 @@ describe('ReleaseRadarService', () => {
     uri: 'spotify:album:album123',
   };
 
+  // Use dynamic current week key so tests don't break as time passes
+  let currentWeekKey: string;
+
   const mockReleaseRadarWeek = {
     email: 'test@example.com',
     weekKey: '2026-08',
@@ -38,13 +41,7 @@ describe('ReleaseRadarService', () => {
     createdAt: '2026-02-21T10:00:00Z',
   };
 
-  const mockHistoryResponse: ReleaseRadarHistoryResponse = {
-    email: 'test@example.com',
-    weeks: [mockReleaseRadarWeek],
-    count: 1,
-    currentWeek: '2026-08',
-    currentWeekDisplay: 'Feb 22 - Feb 28, 2026',
-  };
+  let mockHistoryResponse: ReleaseRadarHistoryResponse;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,6 +50,17 @@ describe('ReleaseRadarService', () => {
     });
     service = TestBed.inject(ReleaseRadarService);
     httpMock = TestBed.inject(HttpTestingController);
+
+    // Use actual current week key so buildWeekOptions works correctly
+    currentWeekKey = service.getCurrentWeekKey();
+
+    mockHistoryResponse = {
+      email: 'test@example.com',
+      weeks: [{ ...mockReleaseRadarWeek, weekKey: currentWeekKey }],
+      count: 1,
+      currentWeek: currentWeekKey,
+      currentWeekDisplay: service.formatWeekDisplay(currentWeekKey),
+    };
 
     // Clear sessionStorage before each test
     sessionStorage.clear();
