@@ -6,7 +6,7 @@
   // Full viewport height minus toolbar and footer
   min-height: calc(100vh - 60px - 50px);
   padding: 20px;
-  background: linear-gradient(180deg, #0a0a14 0%, #1a1a2e 100%);
+  background: transparent;
   // Account for toolbar
   padding-top: 70px;
   box-sizing: border-box;
