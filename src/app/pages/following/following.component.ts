@@ -47,9 +47,6 @@ export class FollowingComponent implements OnInit {
         this.filteredArtists = [...cached.artists];
         this.sortArtists();
         this.loading = false;
-        console.log(
-          `Loaded ${cached.artists.length} followed artists from cache`
-        );
         return;
       }
     }
@@ -68,8 +65,6 @@ export class FollowingComponent implements OnInit {
 
           // Cache the results
           this.setCache(artists);
-
-          console.log(`Loaded ${artists.length} followed artists from API`);
 
           if (forceRefresh) {
             this.toastService.showPositiveToast('Following list refreshed');

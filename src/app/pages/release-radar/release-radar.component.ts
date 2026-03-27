@@ -464,7 +464,13 @@ export class ReleaseRadarComponent implements OnInit {
   getRelativeDate(release: ReleaseRadarRelease): string {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const releaseDate = new Date(release.releaseDate);
+    // Parse YYYY-MM-DD as local date (not UTC) by splitting parts
+    const parts = release.releaseDate.split('-');
+    const releaseDate = new Date(
+      parseInt(parts[0], 10),
+      parseInt(parts[1], 10) - 1,
+      parseInt(parts[2], 10)
+    );
     releaseDate.setHours(0, 0, 0, 0);
 
     const diffTime = releaseDate.getTime() - today.getTime();

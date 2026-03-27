@@ -10,16 +10,15 @@ import { AuthService } from 'src/app/services/auth.service';
 export class HomeComponent implements OnInit {
   title = 'XOMIFY';
 
-  constructor(private AuthService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    console.log('Toolbar locked n loaded.');
-    if (this.AuthService.isLoggedIn()) {
-      this.router.navigate(['/my-profile']); // Navigate after login
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/my-profile']);
     }
   }
 
   login(): void {
-    this.AuthService.login();
+    this.authService.login();
   }
 }

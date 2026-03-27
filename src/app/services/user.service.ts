@@ -200,9 +200,9 @@ export class UserService implements OnInit {
     return this.http.get(url, { headers });
   }
 
-  setUser(data): void {
-    this.userName = data.display_name;
-    this.id = data.id;
+  setUser(data: Record<string, unknown>): void {
+    this.userName = (data['display_name'] as string) || '';
+    this.id = (data['id'] as string) || '';
     this.user = data;
   }
 

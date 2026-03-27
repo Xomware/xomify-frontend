@@ -161,6 +161,39 @@ app-footer {
   border: 0;
 }
 
+/* Skip to content link -- visible on focus */
+.skip-link {
+  &:focus {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    width: auto;
+    height: auto;
+    padding: 12px 24px;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: nowrap;
+    background: #9c0abf;
+    color: #fff;
+    border-radius: 8px;
+    z-index: 10000;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+}
+
+/* Focus visible ring for interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #9c0abf;
+  outline-offset: 2px;
+}
+
 /* Animation Classes */
 @keyframes fadeIn {
   from {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ArtistService } from './artist.service';
 import { SongService } from './song.service';
-import { GenreService } from './genre.service';
+import { GenresService } from './genre.service';
 import { UserService } from './user.service';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class ComparisonService {
   constructor(
     private artistService: ArtistService,
     private songService: SongService,
-    private genreService: GenreService,
+    private genreService: GenresService,
     private userService: UserService
   ) {}
 

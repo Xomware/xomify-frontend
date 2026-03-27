@@ -42,7 +42,6 @@ export class MyPlaylistsComponent implements OnInit {
           this.filteredPlaylists = [...playlists];
           this.sortPlaylists();
           this.loading = false;
-          console.log(`Loaded ${playlists.length} playlists`);
         },
         error: (err) => {
           console.error('Error loading playlists', err);

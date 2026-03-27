@@ -1,8 +1,9 @@
+<app-ambient-background></app-ambient-background>
 <div class="app-container">
-  <app-toolbar></app-toolbar> <!-- Toolbar should stay above the content -->
-  <div class="content">
+  <app-toolbar></app-toolbar>
+  <main id="main-content" class="content" role="main" tabindex="-1">
     <app-toast></app-toast>
-    <router-outlet></router-outlet> <!-- This will display the routed component -->
-  </div>
+    <router-outlet></router-outlet>
+  </main>
   <app-footer></app-footer>
 </div>
