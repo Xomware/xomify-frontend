@@ -150,7 +150,7 @@ export class AmbientBackgroundComponent implements AfterViewInit, OnDestroy {
   // -- Lightning --
 
   private scheduleLightning(): void {
-    const delay = 1500 + Math.random() * 3500;
+    const delay = 800 + Math.random() * 2200;
     this.lightningTimer = setTimeout(() => {
       this.strikeLightning();
       this.scheduleLightning();
@@ -168,7 +168,7 @@ export class AmbientBackgroundComponent implements AfterViewInit, OnDestroy {
     const path = this.generateBoltPath(
       startX,
       startY,
-      500 + Math.random() * 700
+      600 + Math.random() * 900
     );
 
     // Weighted toward purple, with green flashes
@@ -183,7 +183,7 @@ export class AmbientBackgroundComponent implements AfterViewInit, OnDestroy {
     bolt.setAttribute('d', path);
     bolt.setAttribute('fill', 'none');
     bolt.setAttribute('stroke', color);
-    bolt.setAttribute('stroke-width', '3.5');
+    bolt.setAttribute('stroke-width', '4.5');
     bolt.setAttribute('stroke-linecap', 'round');
     bolt.setAttribute('filter', 'url(#lightningGlow)');
     bolt.setAttribute('opacity', '0');
@@ -212,7 +212,7 @@ export class AmbientBackgroundComponent implements AfterViewInit, OnDestroy {
           branch.setAttribute('d', branchPath);
           branch.setAttribute('fill', 'none');
           branch.setAttribute('stroke', color);
-          branch.setAttribute('stroke-width', '2');
+          branch.setAttribute('stroke-width', '3');
           branch.setAttribute('stroke-linecap', 'round');
           branch.setAttribute('filter', 'url(#lightningGlow)');
           branch.setAttribute('opacity', '0');
