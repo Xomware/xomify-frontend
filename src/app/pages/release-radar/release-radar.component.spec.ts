@@ -82,6 +82,7 @@ describe('ReleaseRadarComponent', () => {
       'setReleaseRadarEnrollment',
       'updateUserTableEnrollments',
       'getWrappedEnrollment',
+      'ensureLoaded',
     ]);
 
     const playerServiceSpy = jasmine.createSpyObj('PlayerService', [
@@ -117,6 +118,7 @@ describe('ReleaseRadarComponent', () => {
     releaseRadarSpy.getAllReleasesFromHistory.and.returnValue([mockRelease]);
     userServiceSpy.getEmail.and.returnValue('test@example.com');
     userServiceSpy.getReleaseRadarEnrollment.and.returnValue(true);
+    userServiceSpy.ensureLoaded.and.returnValue(of(void 0));
     userServiceSpy.getUser.and.returnValue({
       id: 'user123',
       displayName: 'Test User',

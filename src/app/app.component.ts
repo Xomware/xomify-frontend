@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { PlayerService } from './services/player.service';
 import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, take, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -16,11 +17,20 @@ export class AppComponent implements OnDestroy, OnInit {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private playerService: PlayerService
   ) {}
 
   ngOnInit(): void {
+    // On app boot, if a session already exists, preload Spotify user + the
+    // Xomify enrollment flags so pages like Wrapped/Release Radar don't
+    // render in a "not enrolled / empty" state just because the user landed
+    // directly on them instead of visiting /my-profile first.
+    if (this.authService.isLoggedIn()) {
+      this.userService.ensureLoaded().pipe(take(1)).subscribe();
+    }
+
     // Stop music playback when navigating between pages
     this.router.events
       .pipe(

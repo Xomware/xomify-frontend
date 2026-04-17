@@ -92,9 +92,18 @@ export class ReleaseRadarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isEnrolled = this.userService.getReleaseRadarEnrollment();
-    this.selectedWeekKey = this.releaseRadarService.getCurrentWeekKey();
-    this.loadUserAndReleases();
+    this.loading = true;
+    // Defer the email read and enrollment check until after the Spotify
+    // profile + Xomify user row have been fetched. Direct navigation into
+    // /release-radar without first visiting /my-profile would otherwise see
+    // an empty email and default to an unpopulated calendar week.
+    this.userService
+      .ensureLoaded()
+      .pipe(take(1))
+      .subscribe(() => {
+        this.isEnrolled = this.userService.getReleaseRadarEnrollment();
+        this.loadUserAndReleases();
+      });
   }
 
   private loadUserAndReleases(): void {
@@ -118,7 +127,7 @@ export class ReleaseRadarComponent implements OnInit {
     }
 
     if (forceRefresh) {
-      this.releaseRadarService.clearCache();
+      this.releaseRadarService.clearCache(this.userEmail);
     }
 
     this.loading = true;
@@ -140,12 +149,17 @@ export class ReleaseRadarComponent implements OnInit {
         // Build week options from history
         this.weekOptions = this.releaseRadarService.buildWeekOptions(response);
 
-        // Set current week as default if not already set
-        if (
-          !this.selectedWeekKey ||
-          !this.weekOptions.find((w) => w.weekKey === this.selectedWeekKey)
-        ) {
+        // Default to the most recent week that actually has data in DB.
+        // The release-radar cron runs Saturdays, so the current calendar
+        // week often has no record yet — defaulting to it would render an
+        // empty page even when prior weeks have plenty of releases.
+        const firstPopulatedWeek = response.weeks?.[0]?.weekKey;
+        const stillValid =
+          this.selectedWeekKey &&
+          this.weekOptions.some((w) => w.weekKey === this.selectedWeekKey);
+        if (!stillValid) {
           this.selectedWeekKey =
+            firstPopulatedWeek ||
             response.currentWeek ||
             this.releaseRadarService.getCurrentWeekKey();
         }

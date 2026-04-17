@@ -1,8 +1,8 @@
 // user.service.ts
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, of, forkJoin } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 
@@ -19,6 +19,7 @@ export class UserService implements OnInit {
   activeReleaseRadar: boolean = false;
   playlistCount: number = 0;
   followingCount: number = 0;
+  private bootstrap$: Observable<void> | null = null;
   private baseUrl = 'https://api.spotify.com/v1';
   private xomifyApiUrl: string = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
   private readonly apiAuthToken = environment.apiAuthToken;
@@ -44,6 +45,40 @@ export class UserService implements OnInit {
     return this.http.get(`${this.baseUrl}/me`, {
       headers: this.getAuthHeaders(),
     });
+  }
+
+  /**
+   * Ensure user profile + Xomify enrollment flags are populated before a
+   * page that depends on them runs its own load. Safe to call from any
+   * number of pages — the underlying HTTP work runs once and is shared.
+   * Resolves to `void` once both the Spotify profile and the Xomify user
+   * row have been fetched (or failed gracefully).
+   */
+  ensureLoaded(): Observable<void> {
+    if (this.user?.email) {
+      return of(void 0);
+    }
+    if (!this.bootstrap$) {
+      this.bootstrap$ = this.getUserData().pipe(
+        tap((data) => this.setUser(data)),
+        catchError(() => of(null)),
+        switchMap((data: any) => {
+          const email = data?.email;
+          if (!email) return of(void 0);
+          return this.getUserTableData(email).pipe(
+            tap((xomifyData: any) => {
+              this.activeWrapped = xomifyData?.activeWrapped ?? false;
+              this.activeReleaseRadar =
+                xomifyData?.activeReleaseRadar ?? false;
+            }),
+            catchError(() => of(null)),
+            map(() => void 0),
+          );
+        }),
+        shareReplay(1),
+      );
+    }
+    return this.bootstrap$;
   }
 
   // Get user's playlists (limit=1 to just get total count, or higher for actual list)
