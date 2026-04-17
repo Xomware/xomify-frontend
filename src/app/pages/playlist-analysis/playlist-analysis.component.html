@@ -1,18 +1,14 @@
 <div class="playlist-analysis-page">
-  <!-- Loading playlists -->
   <app-loader *ngIf="loadingPlaylists"></app-loader>
 
-  <!-- Content -->
   <div class="content" *ngIf="!loadingPlaylists">
-    <!-- Page Header -->
     <div class="page-header">
       <div class="header-text">
         <h1 class="page-title">Playlist Analysis</h1>
-        <p class="page-subtitle">Deep-dive into your playlist's audio fingerprint</p>
+        <p class="page-subtitle">Stats, artists, genres, and vintage breakdown for any of your playlists</p>
       </div>
     </div>
 
-    <!-- Playlist Selector -->
     <div class="selector-row">
       <select class="playlist-select" [(ngModel)]="selectedPlaylistId">
         <option *ngFor="let pl of playlists" [value]="pl.id">{{ pl.name }}</option>
@@ -23,19 +19,16 @@
       </button>
     </div>
 
-    <!-- Error -->
     <div class="error-state" *ngIf="error">
       <p class="error-message">{{ error }}</p>
       <button class="btn-primary" (click)="analyze()">Try Again</button>
     </div>
 
-    <!-- Analyzing loader -->
     <div class="analyzing-state" *ngIf="loading">
       <app-loader></app-loader>
-      <p class="analyzing-text">Crunching audio features...</p>
+      <p class="analyzing-text">Crunching stats...</p>
     </div>
 
-    <!-- Analysis Results -->
     <div class="analysis-results" *ngIf="analysis && !loading">
       <p class="analysis-label">Results for: <strong>{{ getSelectedPlaylistName() }}</strong></p>
 
@@ -43,34 +36,67 @@
       <div class="summary-cards">
         <div class="stat-card">
           <span class="stat-emoji">🎵</span>
-          <span class="stat-value">{{ analysis.avgBpm }}</span>
-          <span class="stat-label">Avg BPM</span>
+          <span class="stat-value">{{ analysis.totalTracks }}</span>
+          <span class="stat-label">Tracks</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">⚡</span>
-          <span class="stat-value">{{ analysis.avgEnergy }}%</span>
-          <span class="stat-label">Energy</span>
+          <span class="stat-emoji">⏱️</span>
+          <span class="stat-value">{{ formatDuration(analysis.totalDurationMs) }}</span>
+          <span class="stat-label">Total Duration</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">💃</span>
-          <span class="stat-value">{{ analysis.avgDanceability }}%</span>
-          <span class="stat-label">Danceability</span>
+          <span class="stat-emoji">🔥</span>
+          <span class="stat-value">{{ analysis.avgPopularity }}</span>
+          <span class="stat-label">Avg Popularity</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">😊</span>
-          <span class="stat-value">{{ analysis.avgValence }}%</span>
-          <span class="stat-label">Mood / Valence</span>
+          <span class="stat-emoji">👥</span>
+          <span class="stat-value">{{ analysis.uniqueArtistCount }}</span>
+          <span class="stat-label">Unique Artists</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">🎸</span>
-          <span class="stat-value">{{ analysis.avgAcousticness }}%</span>
-          <span class="stat-label">Acousticness</span>
+          <span class="stat-emoji">🔞</span>
+          <span class="stat-value">{{ getExplicitPercent() }}%</span>
+          <span class="stat-label">Explicit</span>
         </div>
+      </div>
+
+      <!-- Top Artists -->
+      <div class="breakdown-block" *ngIf="analysis.topArtists.length > 0">
+        <h3 class="block-title">Top Artists</h3>
+        <ul class="breakdown-list">
+          <li *ngFor="let a of analysis.topArtists">
+            <span class="breakdown-name">{{ a.name }}</span>
+            <span class="breakdown-count">{{ a.count }} track{{ a.count === 1 ? '' : 's' }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Top Genres -->
+      <div class="breakdown-block" *ngIf="analysis.topGenres.length > 0">
+        <h3 class="block-title">Top Genres</h3>
+        <ul class="breakdown-list">
+          <li *ngFor="let g of analysis.topGenres">
+            <span class="breakdown-name">{{ g.genre }}</span>
+            <span class="breakdown-count">{{ g.count }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Decades -->
+      <div class="breakdown-block" *ngIf="analysis.decades.length > 0">
+        <h3 class="block-title">Decades</h3>
+        <ul class="breakdown-list">
+          <li *ngFor="let d of analysis.decades">
+            <span class="breakdown-name">{{ d.decade }}</span>
+            <span class="breakdown-count">{{ d.count }}</span>
+          </li>
+        </ul>
       </div>
 
       <!-- Empty tracks -->
       <div class="empty-state" *ngIf="analysis.tracks.length === 0">
-        <p>No audio feature data available for this playlist's tracks.</p>
+        <p>No analyzable tracks in this playlist.</p>
       </div>
 
       <!-- Tracks Table -->
@@ -85,17 +111,14 @@
               <th class="sortable" (click)="setSort('artists')">
                 Artist {{ getSortIcon('artists') }}
               </th>
-              <th class="sortable" (click)="setSort('tempo')">
-                BPM {{ getSortIcon('tempo') }}
+              <th class="sortable" (click)="setSort('releaseYear')">
+                Year {{ getSortIcon('releaseYear') }}
               </th>
-              <th class="sortable" (click)="setSort('energy')">
-                Energy {{ getSortIcon('energy') }}
+              <th class="sortable" (click)="setSort('popularity')">
+                Popularity {{ getSortIcon('popularity') }}
               </th>
-              <th class="sortable" (click)="setSort('valence')">
-                Mood {{ getSortIcon('valence') }}
-              </th>
-              <th class="sortable" (click)="setSort('danceability')">
-                Dance {{ getSortIcon('danceability') }}
+              <th class="sortable" (click)="setSort('durationMs')">
+                Duration {{ getSortIcon('durationMs') }}
               </th>
             </tr>
           </thead>
@@ -110,25 +133,14 @@
                 </a>
               </td>
               <td class="col-artist">{{ track.artists }}</td>
-              <td class="col-num">{{ track.features.tempo | number:'1.0-0' }}</td>
+              <td class="col-num">{{ track.releaseYear || '—' }}</td>
               <td class="col-num">
                 <div class="bar-cell">
-                  <div class="mini-bar" [style.width.%]="track.features.energy * 100"></div>
-                  <span>{{ (track.features.energy * 100) | number:'1.0-0' }}%</span>
+                  <div class="mini-bar" [style.width.%]="track.popularity"></div>
+                  <span>{{ track.popularity }}</span>
                 </div>
               </td>
-              <td class="col-num">
-                <div class="bar-cell">
-                  <div class="mini-bar mood-bar" [style.width.%]="track.features.valence * 100"></div>
-                  <span>{{ (track.features.valence * 100) | number:'1.0-0' }}%</span>
-                </div>
-              </td>
-              <td class="col-num">
-                <div class="bar-cell">
-                  <div class="mini-bar dance-bar" [style.width.%]="track.features.danceability * 100"></div>
-                  <span>{{ (track.features.danceability * 100) | number:'1.0-0' }}%</span>
-                </div>
-              </td>
+              <td class="col-num">{{ formatDuration(track.durationMs) }}</td>
             </tr>
           </tbody>
         </table>

@@ -35,6 +35,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     { route: '/friends', label: 'Friends', badge$: 'friends' },
     { route: '/groups', label: 'Groups' },
     { route: '/playlist-builder', label: 'Playlist Builder', badge$: 'queue' },
+    { route: '/playlist-analysis', label: 'Playlist Analysis' },
   ];
 
   private destroy$ = new Subject<void>();
