@@ -64,10 +64,15 @@ export interface ReleaseRadarCheckResponse {
 })
 export class ReleaseRadarService {
   private readonly baseUrl = environment.xomifyApiUrl;
-  private readonly cacheKey = 'xomify_release_radar_history';
+  private readonly cacheKeyPrefix = 'xomify_release_radar_history';
   private readonly cacheTTL = 30 * 60 * 1000; // 30 minutes
+  private currentCacheEmail: string | null = null;
 
   constructor(private http: HttpClient) {}
+
+  private cacheKey(email: string): string {
+    return `${this.cacheKeyPrefix}:${email.toLowerCase()}`;
+  }
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
@@ -152,8 +157,9 @@ export class ReleaseRadarService {
    * Uses session cache for performance.
    */
   loadReleaseRadar(email: string): Observable<ReleaseRadarHistoryResponse> {
+    this.currentCacheEmail = email;
     // Check frontend cache first
-    const cached = this.getCache();
+    const cached = this.getCache(email);
     if (cached && cached.weeks.length > 0) {
       return of(cached);
     }
@@ -162,7 +168,7 @@ export class ReleaseRadarService {
     return this.getHistory(email).pipe(
       tap((response) => {
         if (response.weeks && response.weeks.length > 0) {
-          this.setCache(response);
+          this.setCache(email, response);
         }
       })
     );
@@ -172,11 +178,12 @@ export class ReleaseRadarService {
    * Force refresh - clears cache and reloads from API.
    */
   forceRefresh(email: string): Observable<ReleaseRadarHistoryResponse> {
-    this.clearCache();
+    this.currentCacheEmail = email;
+    this.clearCache(email);
     return this.getHistory(email).pipe(
       tap((response) => {
         if (response.weeks && response.weeks.length > 0) {
-          this.setCache(response);
+          this.setCache(email, response);
         }
       })
     );
@@ -353,16 +360,16 @@ export class ReleaseRadarService {
   // Cache Methods (Session Storage)
   // ============================================
 
-  private getCache(): ReleaseRadarHistoryResponse | null {
+  private getCache(email: string): ReleaseRadarHistoryResponse | null {
     try {
-      const cached = sessionStorage.getItem(this.cacheKey);
+      const cached = sessionStorage.getItem(this.cacheKey(email));
       if (!cached) return null;
 
       const data = JSON.parse(cached);
       const now = Date.now();
 
       if (now - data.timestamp > this.cacheTTL) {
-        sessionStorage.removeItem(this.cacheKey);
+        sessionStorage.removeItem(this.cacheKey(email));
         return null;
       }
 
@@ -372,15 +379,20 @@ export class ReleaseRadarService {
     }
   }
 
-  private setCache(response: ReleaseRadarHistoryResponse): void {
+  private setCache(email: string, response: ReleaseRadarHistoryResponse): void {
     const data = {
       response,
       timestamp: Date.now(),
     };
-    sessionStorage.setItem(this.cacheKey, JSON.stringify(data));
+    sessionStorage.setItem(this.cacheKey(email), JSON.stringify(data));
   }
 
-  clearCache(): void {
-    sessionStorage.removeItem(this.cacheKey);
+  clearCache(email?: string): void {
+    const targetEmail = email || this.currentCacheEmail;
+    if (targetEmail) {
+      sessionStorage.removeItem(this.cacheKey(targetEmail));
+    }
+    // Also clear any legacy un-namespaced cache from prior versions
+    sessionStorage.removeItem(this.cacheKeyPrefix);
   }
 }

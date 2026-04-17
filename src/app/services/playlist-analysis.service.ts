@@ -5,33 +5,46 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { PlaylistService } from './playlist.service';
 
-export interface AudioFeatures {
-  id: string;
-  tempo: number;
-  energy: number;
-  danceability: number;
-  valence: number;
-  acousticness: number;
-  instrumentalness: number;
-  speechiness: number;
-}
-
-export interface TrackWithFeatures {
+export interface TrackSummary {
   id: string;
   name: string;
   artists: string;
+  artistIds: string[];
   albumArt: string;
   spotifyUrl: string;
-  features: AudioFeatures;
+  durationMs: number;
+  popularity: number;
+  explicit: boolean;
+  releaseYear: number | null;
+  addedAt: string | null;
+}
+
+export interface ArtistCount {
+  id: string;
+  name: string;
+  count: number;
+}
+
+export interface GenreCount {
+  genre: string;
+  count: number;
+}
+
+export interface DecadeCount {
+  decade: string;
+  count: number;
 }
 
 export interface PlaylistAnalysis {
-  avgBpm: number;
-  avgEnergy: number;
-  avgDanceability: number;
-  avgValence: number;
-  avgAcousticness: number;
-  tracks: TrackWithFeatures[];
+  totalTracks: number;
+  totalDurationMs: number;
+  avgPopularity: number;
+  explicitCount: number;
+  uniqueArtistCount: number;
+  topArtists: ArtistCount[];
+  topGenres: GenreCount[];
+  decades: DecadeCount[];
+  tracks: TrackSummary[];
 }
 
 @Injectable({
@@ -52,82 +65,131 @@ export class PlaylistAnalysisService {
     });
   }
 
-  getAudioFeatures(trackIds: string[]): Observable<AudioFeatures[]> {
-    if (trackIds.length === 0) return of([]);
-
-    // Batch into groups of 100
-    const batches: string[][] = [];
-    for (let i = 0; i < trackIds.length; i += 100) {
-      batches.push(trackIds.slice(i, i + 100));
-    }
-
-    const requests = batches.map((batch) =>
-      this.http
-        .get<{ audio_features: AudioFeatures[] }>(
-          `${this.spotifyBase}/audio-features?ids=${batch.join(',')}`,
-          { headers: this.getHeaders() }
-        )
-        .pipe(
-          map((res) => (res.audio_features || []).filter((f) => f !== null)),
-          catchError(() => of([] as AudioFeatures[]))
-        )
-    );
-
-    return forkJoin(requests).pipe(
-      map((results) => results.flat())
-    );
-  }
-
   analyzePlaylist(playlistId: string): Observable<PlaylistAnalysis> {
-    // Fetch all tracks from playlist
     return this.fetchAllPlaylistTracks(playlistId).pipe(
       switchMap((trackItems) => {
-        const validTracks = trackItems.filter((t: any) => t.track && t.track.id);
-        const trackIds = validTracks.map((t: any) => t.track.id);
+        const validItems = trackItems.filter((t: any) => t?.track && t.track.id);
+        const tracks = validItems.map((item: any) => this.toSummary(item));
+        const artistIdSet = new Set<string>();
+        tracks.forEach((t) => t.artistIds.forEach((id) => artistIdSet.add(id)));
+        const artistIds = Array.from(artistIdSet);
 
-        return this.getAudioFeatures(trackIds).pipe(
-          map((features) => {
-            const featureMap = new Map<string, AudioFeatures>();
-            features.forEach((f) => featureMap.set(f.id, f));
-
-            const tracks: TrackWithFeatures[] = [];
-            let sumBpm = 0, sumEnergy = 0, sumDance = 0, sumValence = 0, sumAcoustic = 0;
-            let count = 0;
-
-            for (const item of validTracks) {
-              const track = item.track;
-              const feat = featureMap.get(track.id);
-              if (!feat) continue;
-
-              sumBpm += feat.tempo;
-              sumEnergy += feat.energy;
-              sumDance += feat.danceability;
-              sumValence += feat.valence;
-              sumAcoustic += feat.acousticness;
-              count++;
-
-              tracks.push({
-                id: track.id,
-                name: track.name,
-                artists: (track.artists || []).map((a: any) => a.name).join(', '),
-                albumArt: track.album?.images?.[0]?.url || '',
-                spotifyUrl: track.external_urls?.spotify || '',
-                features: feat,
-              });
-            }
-
-            return {
-              avgBpm: count > 0 ? Math.round(sumBpm / count) : 0,
-              avgEnergy: count > 0 ? Math.round((sumEnergy / count) * 100) : 0,
-              avgDanceability: count > 0 ? Math.round((sumDance / count) * 100) : 0,
-              avgValence: count > 0 ? Math.round((sumValence / count) * 100) : 0,
-              avgAcousticness: count > 0 ? Math.round((sumAcoustic / count) * 100) : 0,
-              tracks,
-            } as PlaylistAnalysis;
-          })
+        return this.fetchArtists(artistIds).pipe(
+          map((artists) => this.aggregate(tracks, artists))
         );
       })
     );
+  }
+
+  private toSummary(item: any): TrackSummary {
+    const track = item.track;
+    const releaseDate: string = track.album?.release_date || '';
+    const releaseYear = releaseDate ? parseInt(releaseDate.slice(0, 4), 10) : null;
+    return {
+      id: track.id,
+      name: track.name,
+      artists: (track.artists || []).map((a: any) => a.name).join(', '),
+      artistIds: (track.artists || []).map((a: any) => a.id).filter(Boolean),
+      albumArt: track.album?.images?.[0]?.url || '',
+      spotifyUrl: track.external_urls?.spotify || '',
+      durationMs: track.duration_ms || 0,
+      popularity: typeof track.popularity === 'number' ? track.popularity : 0,
+      explicit: !!track.explicit,
+      releaseYear: Number.isFinite(releaseYear) ? releaseYear : null,
+      addedAt: item.added_at || null,
+    };
+  }
+
+  private aggregate(tracks: TrackSummary[], artists: any[]): PlaylistAnalysis {
+    const totalTracks = tracks.length;
+    const totalDurationMs = tracks.reduce((sum, t) => sum + t.durationMs, 0);
+    const avgPopularity =
+      totalTracks > 0
+        ? Math.round(tracks.reduce((sum, t) => sum + t.popularity, 0) / totalTracks)
+        : 0;
+    const explicitCount = tracks.filter((t) => t.explicit).length;
+
+    // Top artists by appearance count
+    const artistCountMap = new Map<string, ArtistCount>();
+    const artistMetaMap = new Map<string, any>();
+    artists.forEach((a) => artistMetaMap.set(a.id, a));
+
+    tracks.forEach((t) => {
+      t.artistIds.forEach((id) => {
+        const existing = artistCountMap.get(id);
+        const meta = artistMetaMap.get(id);
+        if (existing) {
+          existing.count++;
+        } else {
+          artistCountMap.set(id, {
+            id,
+            name: meta?.name || id,
+            count: 1,
+          });
+        }
+      });
+    });
+
+    const topArtists = Array.from(artistCountMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Genre distribution from artist metadata
+    const genreCountMap = new Map<string, number>();
+    artists.forEach((a) => {
+      const appearances = artistCountMap.get(a.id)?.count || 0;
+      (a.genres || []).forEach((g: string) => {
+        genreCountMap.set(g, (genreCountMap.get(g) || 0) + appearances);
+      });
+    });
+
+    const topGenres = Array.from(genreCountMap.entries())
+      .map(([genre, count]) => ({ genre, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Decade distribution
+    const decadeCountMap = new Map<string, number>();
+    tracks.forEach((t) => {
+      if (t.releaseYear == null) return;
+      const decade = `${Math.floor(t.releaseYear / 10) * 10}s`;
+      decadeCountMap.set(decade, (decadeCountMap.get(decade) || 0) + 1);
+    });
+
+    const decades = Array.from(decadeCountMap.entries())
+      .map(([decade, count]) => ({ decade, count }))
+      .sort((a, b) => a.decade.localeCompare(b.decade));
+
+    return {
+      totalTracks,
+      totalDurationMs,
+      avgPopularity,
+      explicitCount,
+      uniqueArtistCount: artistCountMap.size,
+      topArtists,
+      topGenres,
+      decades,
+      tracks,
+    };
+  }
+
+  private fetchArtists(artistIds: string[]): Observable<any[]> {
+    if (artistIds.length === 0) return of([]);
+    const batches: string[][] = [];
+    for (let i = 0; i < artistIds.length; i += 50) {
+      batches.push(artistIds.slice(i, i + 50));
+    }
+    const requests = batches.map((batch) =>
+      this.http
+        .get<{ artists: any[] }>(`${this.spotifyBase}/artists?ids=${batch.join(',')}`, {
+          headers: this.getHeaders(),
+        })
+        .pipe(
+          map((res) => res.artists || []),
+          catchError(() => of([] as any[]))
+        )
+    );
+    return forkJoin(requests).pipe(map((results) => results.flat()));
   }
 
   private fetchAllPlaylistTracks(playlistId: string): Observable<any[]> {

@@ -79,16 +79,15 @@ export class CompareComponent implements OnInit {
           generatedAt: new Date().toISOString(),
           topArtists: artists.map((a: any, i: number) => ({
             name: a.name,
-            playCount: 100 - i * 8,
+            rank: i + 1,
             imageUrl: a.images?.[0]?.url,
           })),
           topTracks: tracks.map((t: any, i: number) => ({
             name: t.name,
             artist: t.artists?.[0]?.name || 'Unknown',
-            playCount: 80 - i * 6,
+            rank: i + 1,
           })),
           topGenres: Array.from(genreSet).slice(0, 10),
-          totalMinutes: Math.floor(Math.random() * 3000) + 500,
         };
 
         this.calculateOverlap();
@@ -143,9 +142,13 @@ export class CompareComponent implements OnInit {
     });
   }
 
-  getBarWidth(playCount: number, maxCount: number): number {
-    if (!maxCount || maxCount <= 0) return 0;
-    return Math.round((playCount / maxCount) * 100);
+  /**
+   * Map rank (1 = best) to bar width so #1 is longest and #10 is shortest.
+   */
+  getBarWidth(rank: number, total: number): number {
+    if (!total || total <= 0) return 0;
+    const widthPercent = ((total - rank + 1) / total) * 100;
+    return Math.round(widthPercent);
   }
 
   getGenreSlices(

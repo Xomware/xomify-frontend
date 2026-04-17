@@ -6,6 +6,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { AlbumService } from 'src/app/services/album.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { ShareService } from 'src/app/services/share.service';
+import { ShareFeedService } from 'src/app/services/share-feed.service';
 import {
   ReleaseRadarService,
   ReleaseRadarHistoryResponse,
@@ -14,6 +16,7 @@ import {
 } from 'src/app/services/release-radar.service';
 import { take, catchError } from 'rxjs/operators';
 import { of, forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 interface CalendarDay {
   date: Date;
@@ -83,7 +86,9 @@ export class ReleaseRadarComponent implements OnInit {
     private toastService: ToastService,
     private queueService: QueueService,
     private albumService: AlbumService,
-    private playlistService: PlaylistService
+    private playlistService: PlaylistService,
+    private shareService: ShareService,
+    private shareFeedService: ShareFeedService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +130,9 @@ export class ReleaseRadarComponent implements OnInit {
 
     loadObservable.pipe(take(1)).subscribe({
       next: (response) => {
+        if (!environment.production) {
+          console.log('[ReleaseRadar] API response for', this.userEmail, response);
+        }
         this.history = response;
         this.releases =
           this.releaseRadarService.getAllReleasesFromHistory(response);
@@ -410,6 +418,47 @@ export class ReleaseRadarComponent implements OnInit {
 
   refresh(): void {
     this.loadReleases(true);
+  }
+
+  async shareWeek(): Promise<void> {
+    if (!this.history || !this.selectedWeekKey) return;
+    const weekData = this.history.weeks.find((w) => w.weekKey === this.selectedWeekKey);
+    if (!weekData) return;
+
+    const label =
+      this.weekOptions.find((w) => w.weekKey === this.selectedWeekKey)?.label ||
+      weekData.weekDisplay ||
+      this.selectedWeekKey;
+
+    const topFive = weekData.releases
+      .slice(0, 5)
+      .map((r, i) => `${i + 1}. ${r.albumName} — ${r.artistName}`)
+      .join('\n');
+
+    // Persist share to the backend feed (non-blocking)
+    if (this.userEmail) {
+      const payload = {
+        weekLabel: label,
+        weekKey: this.selectedWeekKey,
+        topReleases: weekData.releases.slice(0, 5).map((r) => ({
+          name: r.albumName,
+          artist: r.artistName,
+        })),
+      };
+      this.shareFeedService
+        .createShare(this.userEmail, 'release_radar', payload, 'New releases I loved this week')
+        .pipe(take(1))
+        .subscribe({
+          error: (err) => console.error('Error creating release_radar share:', err),
+        });
+    }
+
+    const shared = await this.shareService.share({
+      title: `Xomify Release Radar — ${label}`,
+      text: `🎧 New this week on my Xomify Release Radar (${label}):\n${topFive}`,
+      url: window.location.href,
+    });
+    this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');
   }
 
   goToAlbum(albumId: string): void {

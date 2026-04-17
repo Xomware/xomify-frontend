@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { take, switchMap } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import {
   MoodRecommendationsService,
   MoodPreset,
@@ -45,27 +45,15 @@ export class MoodRecommendationsComponent implements OnInit {
     this.error = '';
     this.tracks = [];
 
-    const mood = this.selectedMood;
-
     this.moodService
-      .getUserTopTrackIds()
-      .pipe(
-        take(1),
-        switchMap((ids) => {
-          const seedIds = ids.length > 0 ? ids : [];
-          if (seedIds.length === 0) {
-            // Use genre seeds fallback if no top tracks
-            return this.moodService.getRecommendations(mood, ['4uLU6hMCjMI75M1A2tKUQC']); // generic fallback
-          }
-          return this.moodService.getRecommendations(mood, seedIds);
-        })
-      )
+      .getMoodTracks(this.selectedMood)
+      .pipe(take(1))
       .subscribe({
         next: (result) => {
           this.tracks = result;
           this.loading = false;
           if (result.length === 0) {
-            this.error = 'No recommendations found for this mood. Try another!';
+            this.error = "We couldn't match any of your top artists to this mood. Try another!";
           }
         },
         error: (err) => {

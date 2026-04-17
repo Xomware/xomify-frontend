@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 
-import { StreamingStatsComponent } from '../streaming-stats/streaming-stats.component';
 import { PlaylistAnalysisComponent } from '../playlist-analysis/playlist-analysis.component';
 import { MoodRecommendationsComponent } from '../mood-recommendations/mood-recommendations.component';
 import { MoodTimelineComponent } from '../mood-timeline/mood-timeline.component';
@@ -15,7 +14,6 @@ import { WeeklyWrappedComponent } from '../weekly-wrapped/weekly-wrapped.compone
 import { ShareComponent } from '../share/share.component';
 
 const routes: Routes = [
-  { path: 'streaming-stats', component: StreamingStatsComponent },
   { path: 'playlist-analysis', component: PlaylistAnalysisComponent },
   { path: 'mood-recommendations', component: MoodRecommendationsComponent },
   { path: 'mood-timeline', component: MoodTimelineComponent },
@@ -26,7 +24,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    StreamingStatsComponent,
     PlaylistAnalysisComponent,
     MoodRecommendationsComponent,
     MoodTimelineComponent,

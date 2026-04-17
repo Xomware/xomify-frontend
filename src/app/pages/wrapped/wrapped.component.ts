@@ -9,12 +9,15 @@ import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RatingsService } from 'src/app/services/ratings.service';
+import { ShareService } from 'src/app/services/share.service';
+import { ShareFeedService } from 'src/app/services/share-feed.service';
 import {
   SongDetailModalComponent,
   SongDetailTrack,
 } from 'src/app/components/song-detail-modal/song-detail-modal.component';
 import { forkJoin, of } from 'rxjs';
 import { take, catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 interface MonthlyWrap {
   month: string;
@@ -89,7 +92,9 @@ export class WrappedComponent implements OnInit {
     private queueService: QueueService,
     private playlistService: PlaylistService,
     private toastService: ToastService,
-    private ratingsService: RatingsService
+    private ratingsService: RatingsService,
+    private shareService: ShareService,
+    private shareFeedService: ShareFeedService
   ) {}
 
   ngOnInit(): void {
@@ -140,6 +145,9 @@ export class WrappedComponent implements OnInit {
       })
     ).subscribe({
       next: (data: any) => {
+        if (!environment.production) {
+          console.log('[Wrapped] API response for', email, data);
+        }
         if (data && data.wraps && Array.isArray(data.wraps)) {
           this.availableWraps = this.parseWrapsData(data.wraps);
           
@@ -246,6 +254,42 @@ export class WrappedComponent implements OnInit {
     if (this.generatedPlaylistUrl) {
       window.open(this.generatedPlaylistUrl, '_blank');
     }
+  }
+
+  async shareWrap(): Promise<void> {
+    if (!this.selectedWrap) return;
+    const monthYear = `${this.selectedWrap.month} ${this.selectedWrap.year}`;
+    const top = this.displayTracks
+      .slice(0, 5)
+      .map((t, i) => `${i + 1}. ${t.name} — ${(t.artists || []).map((a) => a.name).join(', ')}`)
+      .join('\n');
+
+    // Persist share to the backend feed (non-blocking — don't hold up Web Share dialog)
+    const email = this.userService.getEmail();
+    if (email) {
+      const payload = {
+        month: this.selectedWrap.month,
+        year: this.selectedWrap.year,
+        monthYear,
+        topTracks: this.displayTracks.slice(0, 5).map((t) => ({
+          name: t.name,
+          artists: (t.artists || []).map((a) => a.name),
+        })),
+      };
+      this.shareFeedService
+        .createShare(email, 'wrapped', payload, `My top tracks from ${monthYear}`)
+        .pipe(take(1))
+        .subscribe({
+          error: (err) => console.error('Error creating wrapped share:', err),
+        });
+    }
+
+    const shared = await this.shareService.share({
+      title: `Xomify Wrapped — ${monthYear}`,
+      text: `🎵 My Xomify Wrapped for ${monthYear}:\n${top}`,
+      url: window.location.href,
+    });
+    this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');
   }
 
   private loadWrapDetails(): void {

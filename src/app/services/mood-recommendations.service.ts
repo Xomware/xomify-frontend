@@ -1,52 +1,60 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
-export type MoodType = 'Happy' | 'Chill' | 'Energetic' | 'Melancholic' | 'Focus';
+export type MoodType = 'Happy' | 'Chill' | 'Hype' | 'Focus' | 'Sad' | 'Party' | 'Workout';
 
 export interface MoodPreset {
   name: MoodType;
   emoji: string;
   description: string;
-  params: { [key: string]: number };
+  genreKeywords: string[]; // substring matches against artist.genres
 }
 
 export const MOOD_PRESETS: MoodPreset[] = [
   {
     name: 'Happy',
     emoji: '🌞',
-    description: 'Upbeat and joyful vibes',
-    params: { target_valence: 0.8, target_energy: 0.7 },
+    description: 'Upbeat and joyful',
+    genreKeywords: ['pop', 'dance', 'disco', 'funk', 'indie pop', 'bubblegum'],
   },
   {
     name: 'Chill',
     emoji: '🌊',
-    description: 'Relaxed and mellow sounds',
-    params: { target_valence: 0.5, target_energy: 0.3, target_acousticness: 0.6 },
+    description: 'Relaxed and mellow',
+    genreKeywords: ['chill', 'lo-fi', 'lofi', 'ambient', 'acoustic', 'bedroom', 'singer-songwriter'],
   },
   {
-    name: 'Energetic',
+    name: 'Hype',
     emoji: '⚡',
-    description: 'High energy, pump-up tracks',
-    params: { target_energy: 0.9, target_danceability: 0.8 },
-  },
-  {
-    name: 'Melancholic',
-    emoji: '🌧️',
-    description: 'Introspective and emotional',
-    params: { target_valence: 0.2, target_energy: 0.3 },
+    description: 'High-energy bangers',
+    genreKeywords: ['edm', 'trap', 'drill', 'electronic', 'house', 'dubstep', 'hip hop', 'rap'],
   },
   {
     name: 'Focus',
     emoji: '🧘',
-    description: 'Instrumental, distraction-free',
-    params: {
-      target_instrumentalness: 0.5,
-      target_energy: 0.5,
-      target_speechiness: 0.05,
-    },
+    description: 'Instrumental, clean',
+    genreKeywords: ['ambient', 'classical', 'post-rock', 'instrumental', 'minimal', 'study'],
+  },
+  {
+    name: 'Sad',
+    emoji: '🌧️',
+    description: 'Introspective and emotional',
+    genreKeywords: ['emo', 'indie folk', 'sad', 'melancholy', 'slowcore', 'singer-songwriter', 'ballad'],
+  },
+  {
+    name: 'Party',
+    emoji: '🎉',
+    description: 'Loud, fun, danceable',
+    genreKeywords: ['dance', 'house', 'pop', 'reggaeton', 'latin', 'edm', 'disco', 'funk'],
+  },
+  {
+    name: 'Workout',
+    emoji: '💪',
+    description: 'Drive-through-a-wall energy',
+    genreKeywords: ['hip hop', 'rap', 'edm', 'trap', 'punk', 'metal', 'rock', 'drill'],
   },
 ];
 
@@ -64,11 +72,19 @@ export interface RecommendedTrack {
   preview_url: string | null;
 }
 
+interface SpotifyArtist {
+  id: string;
+  name: string;
+  genres: string[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class MoodRecommendationsService {
   private readonly spotifyBase = 'https://api.spotify.com/v1';
+  private readonly TARGET_TRACKS = 30;
+  private readonly MAX_ARTISTS_TO_SAMPLE = 12;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -78,40 +94,76 @@ export class MoodRecommendationsService {
     });
   }
 
-  getUserTopTrackIds(): Observable<string[]> {
+  /**
+   * Build a mood-tagged set of tracks by picking from the user's top artists
+   * whose genres match the mood, then pulling each matched artist's top tracks.
+   * Uses only non-deprecated Spotify endpoints.
+   */
+  getMoodTracks(mood: MoodPreset): Observable<RecommendedTrack[]> {
+    return this.getUserTopArtists().pipe(
+      switchMap((artists) => {
+        const matched = this.filterArtistsByMood(artists, mood);
+        if (matched.length === 0) {
+          return of([] as RecommendedTrack[]);
+        }
+        const sampled = this.shuffle(matched).slice(0, this.MAX_ARTISTS_TO_SAMPLE);
+        const requests = sampled.map((a) => this.getArtistTopTracks(a.id));
+        return forkJoin(requests).pipe(
+          map((results) => this.dedupeShuffleSlice(results.flat()))
+        );
+      })
+    );
+  }
+
+  private getUserTopArtists(): Observable<SpotifyArtist[]> {
     return this.http
-      .get<{ items: { id: string }[] }>(
-        `${this.spotifyBase}/me/top/tracks?limit=5&time_range=short_term`,
+      .get<{ items: SpotifyArtist[] }>(
+        `${this.spotifyBase}/me/top/artists?limit=50&time_range=medium_term`,
         { headers: this.getHeaders() }
       )
       .pipe(
-        map((res) => res.items.map((t) => t.id)),
-        catchError(() => of([]))
+        map((res) => res.items || []),
+        catchError(() => of([] as SpotifyArtist[]))
       );
   }
 
-  getRecommendations(mood: MoodPreset, seedTrackIds: string[]): Observable<RecommendedTrack[]> {
-    const ids = seedTrackIds.slice(0, 5).join(',');
-    let params = new HttpParams()
-      .set('seed_tracks', ids)
-      .set('limit', '30');
-
-    for (const [key, value] of Object.entries(mood.params)) {
-      params = params.set(key, value.toString());
-    }
-
+  private getArtistTopTracks(artistId: string): Observable<RecommendedTrack[]> {
     return this.http
-      .get<{ tracks: RecommendedTrack[] }>(`${this.spotifyBase}/recommendations`, {
-        headers: this.getHeaders(),
-        params,
-      })
+      .get<{ tracks: RecommendedTrack[] }>(
+        `${this.spotifyBase}/artists/${artistId}/top-tracks?market=US`,
+        { headers: this.getHeaders() }
+      )
       .pipe(
         map((res) => res.tracks || []),
-        catchError((err) => {
-          console.error('[MoodRecs] Error fetching recommendations:', err);
-          throw err;
-        })
+        catchError(() => of([] as RecommendedTrack[]))
       );
+  }
+
+  private filterArtistsByMood(artists: SpotifyArtist[], mood: MoodPreset): SpotifyArtist[] {
+    const needles = mood.genreKeywords.map((k) => k.toLowerCase());
+    return artists.filter((a) =>
+      (a.genres || []).some((g) => needles.some((n) => g.toLowerCase().includes(n)))
+    );
+  }
+
+  private dedupeShuffleSlice(tracks: RecommendedTrack[]): RecommendedTrack[] {
+    const seen = new Set<string>();
+    const deduped: RecommendedTrack[] = [];
+    for (const track of tracks) {
+      if (!track?.id || seen.has(track.id)) continue;
+      seen.add(track.id);
+      deduped.push(track);
+    }
+    return this.shuffle(deduped).slice(0, this.TARGET_TRACKS);
+  }
+
+  private shuffle<T>(arr: T[]): T[] {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
   }
 
   formatDuration(ms: number): string {

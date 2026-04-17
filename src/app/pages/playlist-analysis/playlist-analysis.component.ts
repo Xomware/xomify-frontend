@@ -3,10 +3,12 @@ import { take } from 'rxjs/operators';
 import {
   PlaylistAnalysisService,
   PlaylistAnalysis,
-  TrackWithFeatures,
+  TrackSummary,
 } from 'src/app/services/playlist-analysis.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+type SortColumn = 'name' | 'artists' | 'popularity' | 'durationMs' | 'releaseYear';
 
 @Component({
   selector: 'app-playlist-analysis',
@@ -22,7 +24,7 @@ export class PlaylistAnalysisComponent implements OnInit {
   selectedPlaylistId = '';
   analysis: PlaylistAnalysis | null = null;
 
-  sortColumn: keyof TrackWithFeatures['features'] | 'name' | 'artists' = 'name';
+  sortColumn: SortColumn = 'name';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
@@ -69,8 +71,8 @@ export class PlaylistAnalysisComponent implements OnInit {
         next: (result) => {
           this.analysis = result;
           this.loading = false;
-          if (result.tracks.length === 0) {
-            this.toastService.showNegativeToast('No audio features found for this playlist.');
+          if (result.totalTracks === 0) {
+            this.toastService.showNegativeToast('This playlist has no analyzable tracks.');
           }
         },
         error: (err) => {
@@ -81,50 +83,53 @@ export class PlaylistAnalysisComponent implements OnInit {
       });
   }
 
-  get sortedTracks(): TrackWithFeatures[] {
+  get sortedTracks(): TrackSummary[] {
     if (!this.analysis) return [];
     return [...this.analysis.tracks].sort((a, b) => {
-      let valA: any;
-      let valB: any;
-
-      if (this.sortColumn === 'name' || this.sortColumn === 'artists') {
-        valA = a[this.sortColumn].toLowerCase();
-        valB = b[this.sortColumn].toLowerCase();
-      } else {
-        valA = a.features[this.sortColumn as keyof TrackWithFeatures['features']];
-        valB = b.features[this.sortColumn as keyof TrackWithFeatures['features']];
-      }
-
+      let valA: any = a[this.sortColumn];
+      let valB: any = b[this.sortColumn];
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+      if (valA == null) return 1;
+      if (valB == null) return -1;
       if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }
 
-  setSort(col: string): void {
+  setSort(col: SortColumn): void {
     if (this.sortColumn === col) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-      this.sortColumn = col as any;
+      this.sortColumn = col;
       this.sortDirection = 'asc';
     }
   }
 
-  getSortIcon(col: string): string {
+  getSortIcon(col: SortColumn): string {
     if (this.sortColumn !== col) return '↕';
     return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
-  formatPercent(val: number): string {
-    return `${val}%`;
-  }
-
-  formatBpm(val: number): string {
-    return `${val} BPM`;
+  formatDuration(ms: number): string {
+    const totalSec = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSec / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    const seconds = totalSec % 60;
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
   }
 
   getSelectedPlaylistName(): string {
     const pl = this.playlists.find((p) => p.id === this.selectedPlaylistId);
     return pl ? pl.name : '';
+  }
+
+  getExplicitPercent(): number {
+    if (!this.analysis || this.analysis.totalTracks === 0) return 0;
+    return Math.round((this.analysis.explicitCount / this.analysis.totalTracks) * 100);
   }
 }
