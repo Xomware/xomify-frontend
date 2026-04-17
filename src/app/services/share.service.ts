@@ -53,6 +53,27 @@ export class ShareService {
     }
   }
 
+  /**
+   * Share arbitrary title + text + url using native Web Share API.
+   * Falls back to clipboard (text + url) when unavailable.
+   * Returns true if something was shared or copied.
+   */
+  async share(params: { title?: string; text?: string; url?: string }): Promise<boolean> {
+    const title = params.title || 'Xomify';
+    const text = params.text || '';
+    const url = params.url || window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        return true;
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+    return this.copyToClipboard(`${text}\n${url}`.trim());
+  }
+
   shareStats(stats: ShareableStats): string {
     const songs = stats.topSongs
       .slice(0, 5)

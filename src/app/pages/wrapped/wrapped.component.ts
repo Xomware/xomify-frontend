@@ -9,6 +9,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RatingsService } from 'src/app/services/ratings.service';
+import { ShareService } from 'src/app/services/share.service';
 import {
   SongDetailModalComponent,
   SongDetailTrack,
@@ -90,7 +91,8 @@ export class WrappedComponent implements OnInit {
     private queueService: QueueService,
     private playlistService: PlaylistService,
     private toastService: ToastService,
-    private ratingsService: RatingsService
+    private ratingsService: RatingsService,
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -250,6 +252,21 @@ export class WrappedComponent implements OnInit {
     if (this.generatedPlaylistUrl) {
       window.open(this.generatedPlaylistUrl, '_blank');
     }
+  }
+
+  async shareWrap(): Promise<void> {
+    if (!this.selectedWrap) return;
+    const monthYear = `${this.selectedWrap.month} ${this.selectedWrap.year}`;
+    const top = this.displayTracks
+      .slice(0, 5)
+      .map((t, i) => `${i + 1}. ${t.name} — ${(t.artists || []).map((a) => a.name).join(', ')}`)
+      .join('\n');
+    const shared = await this.shareService.share({
+      title: `Xomify Wrapped — ${monthYear}`,
+      text: `🎵 My Xomify Wrapped for ${monthYear}:\n${top}`,
+      url: window.location.href,
+    });
+    this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');
   }
 
   private loadWrapDetails(): void {

@@ -6,6 +6,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { AlbumService } from 'src/app/services/album.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { ShareService } from 'src/app/services/share.service';
 import {
   ReleaseRadarService,
   ReleaseRadarHistoryResponse,
@@ -84,7 +85,8 @@ export class ReleaseRadarComponent implements OnInit {
     private toastService: ToastService,
     private queueService: QueueService,
     private albumService: AlbumService,
-    private playlistService: PlaylistService
+    private playlistService: PlaylistService,
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -414,6 +416,29 @@ export class ReleaseRadarComponent implements OnInit {
 
   refresh(): void {
     this.loadReleases(true);
+  }
+
+  async shareWeek(): Promise<void> {
+    if (!this.history || !this.selectedWeekKey) return;
+    const weekData = this.history.weeks.find((w) => w.weekKey === this.selectedWeekKey);
+    if (!weekData) return;
+
+    const label =
+      this.weekOptions.find((w) => w.weekKey === this.selectedWeekKey)?.label ||
+      weekData.weekDisplay ||
+      this.selectedWeekKey;
+
+    const topFive = weekData.releases
+      .slice(0, 5)
+      .map((r, i) => `${i + 1}. ${r.albumName} — ${r.artistName}`)
+      .join('\n');
+
+    const shared = await this.shareService.share({
+      title: `Xomify Release Radar — ${label}`,
+      text: `🎧 New this week on my Xomify Release Radar (${label}):\n${topFive}`,
+      url: window.location.href,
+    });
+    this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');
   }
 
   goToAlbum(albumId: string): void {
