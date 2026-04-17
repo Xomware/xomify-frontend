@@ -10,7 +10,6 @@ import { FriendProfileComponent } from '../friend-profile/friend-profile.compone
 import { GroupsComponent } from '../groups/groups.component';
 import { GroupDetailComponent } from '../group-detail/group-detail.component';
 import { CompareComponent } from '../compare/compare.component';
-import { CollaborativePlaylistsComponent } from '../collaborative-playlists/collaborative-playlists.component';
 import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { TruncatePipe } from '../../pipes/truncate.pipe';
@@ -21,7 +20,6 @@ const routes: Routes = [
   { path: 'groups', component: GroupsComponent },
   { path: 'group/:id', component: GroupDetailComponent },
   { path: 'compare', component: CompareComponent },
-  { path: 'collaborative-playlists', component: CollaborativePlaylistsComponent },
 ];
 
 @NgModule({
@@ -31,7 +29,6 @@ const routes: Routes = [
     GroupsComponent,
     GroupDetailComponent,
     CompareComponent,
-    CollaborativePlaylistsComponent,
     AddSongModalComponent,
     AddMemberModalComponent,
     TruncatePipe,

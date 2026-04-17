@@ -31,7 +31,6 @@ import { QueueBuilderComponent } from './pages/queue-builder/queue-builder.compo
 import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
-import { RecentlyPlayedComponent } from './pages/recently-played/recently-played.component';
 import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
 
 import { AuthService } from './services/auth.service';
@@ -58,7 +57,6 @@ import { AuthService } from './services/auth.service';
     WrappedComponent,
     ReleaseRadarComponent,
     RatingsComponent,
-    RecentlyPlayedComponent,
     LikedArtistsPlaylistGeneratorComponent,
   ],
   bootstrap: [AppComponent],
