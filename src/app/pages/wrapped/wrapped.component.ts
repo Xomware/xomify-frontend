@@ -15,8 +15,8 @@ import {
   SongDetailModalComponent,
   SongDetailTrack,
 } from 'src/app/components/song-detail-modal/song-detail-modal.component';
-import { forkJoin, of } from 'rxjs';
-import { take, catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 interface MonthlyWrap {
@@ -145,20 +145,14 @@ export class WrappedComponent implements OnInit {
       return;
     }
 
-    this.wrappedService.getUserWrappedData(email).pipe(
-      take(1),
-      catchError((err) => {
-        console.error('Error loading wrapped data:', err);
-        return of(null);
-      })
-    ).subscribe({
+    this.wrappedService.getUserWrappedData(email).pipe(take(1)).subscribe({
       next: (data: any) => {
         if (!environment.production) {
           console.log('[Wrapped] API response for', email, data);
         }
         if (data && data.wraps && Array.isArray(data.wraps)) {
           this.availableWraps = this.parseWrapsData(data.wraps);
-          
+
           // Auto-select most recent wrap
           if (this.availableWraps.length > 0) {
             this.selectWrap(this.availableWraps[0]);
@@ -166,7 +160,9 @@ export class WrappedComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading wrapped data:', err);
+        this.error = 'Failed to load your Wrapped history. Please try again.';
         this.loading = false;
       }
     });
@@ -335,10 +331,7 @@ export class WrappedComponent implements OnInit {
       return;
     }
 
-    forkJoin(requests).pipe(
-      take(1),
-      catchError(() => of({ tracks: { tracks: [] }, artists: { artists: [] } }))
-    ).subscribe({
+    forkJoin(requests).pipe(take(1)).subscribe({
       next: (data: any) => {
         this.displayTracks = (data.tracks?.tracks || []).map((track: any) => ({
           id: track.id,
@@ -357,8 +350,14 @@ export class WrappedComponent implements OnInit {
 
         this.loadingDetails = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading wrap details from Spotify:', err);
+        this.displayTracks = [];
+        this.displayArtists = [];
         this.loadingDetails = false;
+        this.toastService.showNegativeToast(
+          'Failed to load details from Spotify. Try selecting the month again.'
+        );
       }
     });
   }

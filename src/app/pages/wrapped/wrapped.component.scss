@@ -43,6 +43,39 @@
   50% { transform: scaleY(1); }
 }
 
+// Error State
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+
+  .error-text {
+    color: #ff4757;
+    font-size: 1.1rem;
+    margin: 20px 0;
+  }
+
+  .retry-btn {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(156, 10, 191, 0.4);
+    }
+  }
+}
+
 // Page Header
 .page-header {
   text-align: center;
