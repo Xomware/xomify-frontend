@@ -9,16 +9,15 @@ describe('ComparisonService', () => {
     username: 'TestUser',
     generatedAt: '2026-03-01T00:00:00.000Z',
     topArtists: [
-      { name: 'Artist A', playCount: 100 },
-      { name: 'Artist B', playCount: 80 },
-      { name: 'Artist C', playCount: 60 },
+      { name: 'Artist A', rank: 1 },
+      { name: 'Artist B', rank: 2 },
+      { name: 'Artist C', rank: 3 },
     ],
     topTracks: [
-      { name: 'Track 1', artist: 'Artist A', playCount: 50 },
-      { name: 'Track 2', artist: 'Artist B', playCount: 40 },
+      { name: 'Track 1', artist: 'Artist A', rank: 1 },
+      { name: 'Track 2', artist: 'Artist B', rank: 2 },
     ],
     topGenres: ['rock', 'pop', 'indie'],
-    totalMinutes: 1500,
   };
 
   beforeEach(() => {

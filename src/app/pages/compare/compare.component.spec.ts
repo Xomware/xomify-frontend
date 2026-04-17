@@ -17,14 +17,13 @@ describe('CompareComponent', () => {
     username: 'FriendUser',
     generatedAt: '2026-03-01T00:00:00.000Z',
     topArtists: [
-      { name: 'Artist X', playCount: 90 },
-      { name: 'Artist Y', playCount: 70 },
+      { name: 'Artist X', rank: 1 },
+      { name: 'Artist Y', rank: 2 },
     ],
     topTracks: [
-      { name: 'Song 1', artist: 'Artist X', playCount: 45 },
+      { name: 'Song 1', artist: 'Artist X', rank: 1 },
     ],
     topGenres: ['rock', 'electronic'],
-    totalMinutes: 1200,
   };
 
   const encodedSnapshot = btoa(JSON.stringify(mockSnapshot));
