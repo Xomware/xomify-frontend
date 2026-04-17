@@ -73,11 +73,12 @@ describe('CompareComponent', () => {
     expect(component.friendSnapshot).toBeNull();
   });
 
-  it('should calculate bar width correctly', () => {
+  it('should calculate bar width correctly (rank 1 = longest bar)', () => {
     createComponent();
-    expect(component.getBarWidth(50, 100)).toBe(50);
-    expect(component.getBarWidth(100, 100)).toBe(100);
-    expect(component.getBarWidth(0, 100)).toBe(0);
+    // getBarWidth(rank, total): rank 1 out of 10 = (10-1+1)/10 = 100%
+    expect(component.getBarWidth(1, 10)).toBe(100);
+    expect(component.getBarWidth(10, 10)).toBe(10);
+    expect(component.getBarWidth(5, 10)).toBe(60);
   });
 
   it('should return 0 bar width when max is 0', () => {

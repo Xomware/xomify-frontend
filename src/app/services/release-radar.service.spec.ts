@@ -176,7 +176,7 @@ describe('ReleaseRadarService', () => {
         response: mockHistoryResponse,
         timestamp: Date.now(),
       };
-      sessionStorage.setItem('xomify_release_radar_history', JSON.stringify(cacheData));
+      sessionStorage.setItem('xomify_release_radar_history:test@example.com', JSON.stringify(cacheData));
 
       service.loadReleaseRadar('test@example.com').subscribe((response) => {
         expect(response.weeks.length).toBe(1);
@@ -201,7 +201,7 @@ describe('ReleaseRadarService', () => {
 
     it('should cache successful responses', (done) => {
       service.loadReleaseRadar('test@example.com').subscribe(() => {
-        const cached = sessionStorage.getItem('xomify_release_radar_history');
+        const cached = sessionStorage.getItem('xomify_release_radar_history:test@example.com');
         expect(cached).toBeTruthy();
         const parsedCache = JSON.parse(cached!);
         expect(parsedCache.response.weeks.length).toBe(1);
@@ -222,11 +222,11 @@ describe('ReleaseRadarService', () => {
         response: mockHistoryResponse,
         timestamp: Date.now(),
       };
-      sessionStorage.setItem('xomify_release_radar_history', JSON.stringify(cacheData));
+      sessionStorage.setItem('xomify_release_radar_history:test@example.com', JSON.stringify(cacheData));
 
       service.forceRefresh('test@example.com').subscribe(() => {
         // Cache should be refreshed with new data
-        const cached = sessionStorage.getItem('xomify_release_radar_history');
+        const cached = sessionStorage.getItem('xomify_release_radar_history:test@example.com');
         expect(cached).toBeTruthy();
         done();
       });
@@ -380,10 +380,10 @@ describe('ReleaseRadarService', () => {
         response: mockHistoryResponse,
         timestamp: Date.now(),
       };
-      sessionStorage.setItem('xomify_release_radar_history', JSON.stringify(cacheData));
+      sessionStorage.setItem('xomify_release_radar_history:test@example.com', JSON.stringify(cacheData));
 
-      service.clearCache();
-      expect(sessionStorage.getItem('xomify_release_radar_history')).toBeNull();
+      service.clearCache('test@example.com');
+      expect(sessionStorage.getItem('xomify_release_radar_history:test@example.com')).toBeNull();
     });
 
     it('should expire cache after TTL', (done) => {
@@ -391,7 +391,7 @@ describe('ReleaseRadarService', () => {
         response: mockHistoryResponse,
         timestamp: Date.now() - 31 * 60 * 1000, // 31 minutes ago (TTL is 30)
       };
-      sessionStorage.setItem('xomify_release_radar_history', JSON.stringify(cacheData));
+      sessionStorage.setItem('xomify_release_radar_history:test@example.com', JSON.stringify(cacheData));
 
       service.loadReleaseRadar('test@example.com').subscribe(() => {
         done();
