@@ -1,0 +1,136 @@
+<article class="share-card" *ngIf="share">
+  <!-- Header: author + time -->
+  <header class="card-header">
+    <div class="author">
+      <div class="author-avatar" aria-hidden="true">
+        {{ authorLabel.charAt(0).toUpperCase() }}
+      </div>
+      <div class="author-meta">
+        <span class="author-name">{{ authorLabel }}</span>
+        <span class="created-at">{{ relativeTime }}</span>
+      </div>
+    </div>
+    <span class="type-badge" [attr.data-type]="share.type">{{
+      share.type === 'release_radar' ? 'Release Radar' :
+      share.type === 'wrapped' ? 'Wrapped' :
+      share.type === 'playlist' ? 'Playlist' : 'Track'
+    }}</span>
+  </header>
+
+  <!-- Caption -->
+  <p class="caption" *ngIf="share.caption">{{ share.caption }}</p>
+
+  <!-- Wrapped share -->
+  <div class="card-body wrapped" *ngIf="share.type === 'wrapped'" (click)="onCardTargetClick()">
+    <div class="body-title">
+      <span class="body-label">Wrapped</span>
+      <span class="body-value">{{ monthYearLabel }}</span>
+    </div>
+    <ol class="mini-list" *ngIf="topTracks.length > 0">
+      <li *ngFor="let t of topTracks; let i = index">
+        <span class="rank">{{ i + 1 }}.</span>
+        <span class="track-name">{{ t.name }}</span>
+        <span class="track-artist" *ngIf="t.artists?.length">
+          — {{ t.artists?.join(', ') }}
+        </span>
+      </li>
+    </ol>
+    <span class="open-link">Open Wrapped →</span>
+  </div>
+
+  <!-- Release Radar share -->
+  <div
+    class="card-body release-radar"
+    *ngIf="share.type === 'release_radar'"
+    (click)="onCardTargetClick()"
+  >
+    <div class="body-title">
+      <span class="body-label">New Releases</span>
+      <span class="body-value">{{ weekLabel }}</span>
+    </div>
+    <ol class="mini-list" *ngIf="topReleases.length > 0">
+      <li *ngFor="let r of topReleases; let i = index">
+        <span class="rank">{{ i + 1 }}.</span>
+        <span class="track-name">{{ r.name }}</span>
+        <span class="track-artist" *ngIf="r.artist">— {{ r.artist }}</span>
+      </li>
+    </ol>
+    <span class="open-link">Open Release Radar →</span>
+  </div>
+
+  <!-- Track share -->
+  <div class="card-body track-share" *ngIf="share.type === 'track'">
+    <div class="track-row">
+      <div class="track-art" *ngIf="trackImage">
+        <img [src]="trackImage" [alt]="trackName" />
+      </div>
+      <div class="track-info">
+        <span class="body-label">Track</span>
+        <span class="track-name-big">{{ trackName }}</span>
+        <span class="track-artist">{{ trackArtist }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Playlist share -->
+  <div class="card-body playlist-share" *ngIf="share.type === 'playlist'">
+    <div class="track-row">
+      <div class="track-art" *ngIf="playlistCover">
+        <img [src]="playlistCover" [alt]="playlistName" />
+      </div>
+      <div class="track-info">
+        <span class="body-label">Playlist</span>
+        <span class="track-name-big">{{ playlistName }}</span>
+        <span class="track-artist" *ngIf="playlistTrackCount">
+          {{ playlistTrackCount }} {{ playlistTrackCount === 1 ? 'track' : 'tracks' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions: reactions + share -->
+  <footer class="card-actions">
+    <div class="reactions">
+      <button
+        type="button"
+        class="reaction-btn"
+        *ngFor="let r of reactions"
+        [class.active]="isActive(r.action)"
+        [disabled]="reactionPending"
+        (click)="reactOrToggle(r.action)"
+        [attr.aria-label]="r.label"
+        [attr.aria-pressed]="isActive(r.action)"
+      >
+        <span class="reaction-emoji" aria-hidden="true">{{ r.emoji }}</span>
+        <span class="reaction-count" *ngIf="getCount(r.action) > 0">{{
+          getCount(r.action)
+        }}</span>
+      </button>
+    </div>
+    <button
+      type="button"
+      class="share-btn"
+      (click)="shareLink()"
+      aria-label="Share this post"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+      </svg>
+      Share
+    </button>
+  </footer>
+</article>

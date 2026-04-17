@@ -25,6 +25,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   pendingFriendsCount = 0;
 
   readonly navLinks: NavLink[] = [
+    { route: '/feed', label: 'Feed' },
     { route: '/my-profile', label: 'My Profile' },
     { route: '/top-songs', label: 'Top Songs' },
     { route: '/top-artists', label: 'Top Artists' },
