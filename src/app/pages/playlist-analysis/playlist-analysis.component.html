@@ -61,37 +61,49 @@
         </div>
       </div>
 
-      <!-- Top Artists -->
-      <div class="breakdown-block" *ngIf="analysis.topArtists.length > 0">
-        <h3 class="block-title">Top Artists</h3>
-        <ul class="breakdown-list">
-          <li *ngFor="let a of analysis.topArtists">
-            <span class="breakdown-name">{{ a.name }}</span>
-            <span class="breakdown-count">{{ a.count }} track{{ a.count === 1 ? '' : 's' }}</span>
-          </li>
-        </ul>
-      </div>
+      <!-- Breakdown grid: Top Artists / Top Genres / Decades -->
+      <div class="breakdown-grid">
+        <div class="breakdown-block" *ngIf="analysis.topArtists.length > 0">
+          <div class="block-header">
+            <span class="block-icon">🎤</span>
+            <h3 class="block-title">Top Artists</h3>
+          </div>
+          <ul class="breakdown-list">
+            <li *ngFor="let a of analysis.topArtists; let i = index">
+              <span class="breakdown-rank">{{ i + 1 }}</span>
+              <span class="breakdown-name">{{ a.name }}</span>
+              <span class="breakdown-count">{{ a.count }}</span>
+            </li>
+          </ul>
+        </div>
 
-      <!-- Top Genres -->
-      <div class="breakdown-block" *ngIf="analysis.topGenres.length > 0">
-        <h3 class="block-title">Top Genres</h3>
-        <ul class="breakdown-list">
-          <li *ngFor="let g of analysis.topGenres">
-            <span class="breakdown-name">{{ g.genre }}</span>
-            <span class="breakdown-count">{{ g.count }}</span>
-          </li>
-        </ul>
-      </div>
+        <div class="breakdown-block" *ngIf="analysis.topGenres.length > 0">
+          <div class="block-header">
+            <span class="block-icon">🎛️</span>
+            <h3 class="block-title">Top Genres</h3>
+          </div>
+          <ul class="breakdown-list">
+            <li *ngFor="let g of analysis.topGenres; let i = index">
+              <span class="breakdown-rank">{{ i + 1 }}</span>
+              <span class="breakdown-name">{{ g.genre }}</span>
+              <span class="breakdown-count">{{ g.count }}</span>
+            </li>
+          </ul>
+        </div>
 
-      <!-- Decades -->
-      <div class="breakdown-block" *ngIf="analysis.decades.length > 0">
-        <h3 class="block-title">Decades</h3>
-        <ul class="breakdown-list">
-          <li *ngFor="let d of analysis.decades">
-            <span class="breakdown-name">{{ d.decade }}</span>
-            <span class="breakdown-count">{{ d.count }}</span>
-          </li>
-        </ul>
+        <div class="breakdown-block" *ngIf="analysis.decades.length > 0">
+          <div class="block-header">
+            <span class="block-icon">📅</span>
+            <h3 class="block-title">Decades</h3>
+          </div>
+          <ul class="breakdown-list">
+            <li *ngFor="let d of analysis.decades; let i = index">
+              <span class="breakdown-rank">{{ i + 1 }}</span>
+              <span class="breakdown-name">{{ d.decade }}</span>
+              <span class="breakdown-count">{{ d.count }}</span>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Empty tracks -->
