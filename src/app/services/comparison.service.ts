@@ -6,13 +6,24 @@ import { UserService } from './user.service';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
+export interface RankedArtist {
+  name: string;
+  rank: number;
+  imageUrl?: string;
+}
+
+export interface RankedTrack {
+  name: string;
+  artist: string;
+  rank: number;
+}
+
 export interface ListeningSnapshot {
   username: string;
   generatedAt: string;
-  topArtists: { name: string; playCount: number; imageUrl?: string }[];
-  topTracks: { name: string; artist: string; playCount: number }[];
+  topArtists: RankedArtist[];
+  topTracks: RankedTrack[];
   topGenres: string[];
-  totalMinutes: number;
 }
 
 @Injectable({
@@ -38,16 +49,16 @@ export class ComparisonService {
       ),
     }).pipe(
       map(({ artists, tracks }) => {
-        const topArtists = artists.map((a: any, i: number) => ({
+        const topArtists: RankedArtist[] = artists.map((a: any, i: number) => ({
           name: a.name,
-          playCount: 100 - i * 8,
+          rank: i + 1,
           imageUrl: a.images?.[0]?.url,
         }));
 
-        const topTracks = tracks.map((t: any, i: number) => ({
+        const topTracks: RankedTrack[] = tracks.map((t: any, i: number) => ({
           name: t.name,
           artist: t.artists?.[0]?.name || 'Unknown',
-          playCount: 80 - i * 6,
+          rank: i + 1,
         }));
 
         const genreSet = new Set<string>();
@@ -61,11 +72,10 @@ export class ComparisonService {
           topArtists,
           topTracks,
           topGenres: Array.from(genreSet).slice(0, 10),
-          totalMinutes: Math.floor(Math.random() * 3000) + 500,
         };
 
         const uuid = this.generateUUID();
-        const encoded = btoa(JSON.stringify(snapshot));
+        const encoded = btoa(encodeURIComponent(JSON.stringify(snapshot)));
 
         localStorage.setItem(`xomify-snap-${uuid}`, encoded);
 
@@ -76,7 +86,7 @@ export class ComparisonService {
 
   decodeSnapshot(encoded: string): ListeningSnapshot | null {
     try {
-      return JSON.parse(atob(encoded));
+      return JSON.parse(decodeURIComponent(atob(encoded)));
     } catch {
       return null;
     }
@@ -88,6 +98,10 @@ export class ComparisonService {
     return this.decodeSnapshot(encoded);
   }
 
+  /**
+   * Jaccard similarity on case-insensitive name sets.
+   * Deterministic — same inputs always produce the same score.
+   */
   calculateCompatibility(
     myArtists: { name: string }[],
     friendArtists: { name: string }[]
@@ -106,6 +120,9 @@ export class ComparisonService {
   }
 
   private generateUUID(): string {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return (crypto as any).randomUUID();
+    }
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
       const v = c === 'x' ? r : (r & 0x3) | 0x8;
