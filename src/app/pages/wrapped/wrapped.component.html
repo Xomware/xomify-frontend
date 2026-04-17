@@ -11,8 +11,26 @@
     <p class="loading-text">Loading your Wrapped history...</p>
   </div>
 
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#ff4757"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+    <p class="error-text">{{ error }}</p>
+    <button class="retry-btn" (click)="loadWrappedData()">Try Again</button>
+  </div>
+
   <!-- Main Content -->
-  <div class="content" *ngIf="!loading">
+  <div class="content" *ngIf="!loading && !error">
     <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">
