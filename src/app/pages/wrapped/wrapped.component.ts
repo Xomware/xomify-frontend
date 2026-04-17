@@ -98,9 +98,17 @@ export class WrappedComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get enrollment status from user service (same pattern as Release Radar)
-    this.isEnrolled = this.userService.getWrappedEnrollment();
-    this.loadWrappedData();
+    this.loading = true;
+    // Wait for the Spotify profile + Xomify enrollment row before reading
+    // enrollment / email, otherwise direct navigation into /wrapped shows
+    // "not enrolled" for users who actually are enrolled.
+    this.userService
+      .ensureLoaded()
+      .pipe(take(1))
+      .subscribe(() => {
+        this.isEnrolled = this.userService.getWrappedEnrollment();
+        this.loadWrappedData();
+      });
   }
 
   toggleEnrollment(): void {
