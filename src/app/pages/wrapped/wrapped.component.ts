@@ -15,6 +15,7 @@ import {
 } from 'src/app/components/song-detail-modal/song-detail-modal.component';
 import { forkJoin, of } from 'rxjs';
 import { take, catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 interface MonthlyWrap {
   month: string;
@@ -140,6 +141,9 @@ export class WrappedComponent implements OnInit {
       })
     ).subscribe({
       next: (data: any) => {
+        if (!environment.production) {
+          console.log('[Wrapped] API response for', email, data);
+        }
         if (data && data.wraps && Array.isArray(data.wraps)) {
           this.availableWraps = this.parseWrapsData(data.wraps);
           

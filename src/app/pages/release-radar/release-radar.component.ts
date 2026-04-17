@@ -14,6 +14,7 @@ import {
 } from 'src/app/services/release-radar.service';
 import { take, catchError } from 'rxjs/operators';
 import { of, forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 interface CalendarDay {
   date: Date;
@@ -125,6 +126,9 @@ export class ReleaseRadarComponent implements OnInit {
 
     loadObservable.pipe(take(1)).subscribe({
       next: (response) => {
+        if (!environment.production) {
+          console.log('[ReleaseRadar] API response for', this.userEmail, response);
+        }
         this.history = response;
         this.releases =
           this.releaseRadarService.getAllReleasesFromHistory(response);
