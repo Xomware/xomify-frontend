@@ -125,6 +125,57 @@
   }
 }
 
+// Group filter chips
+.group-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px 2px 4px;
+  margin: 4px 0 0;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cfcfdc;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+
+    &:hover:not(.active) {
+      background: rgba(156, 10, 191, 0.12);
+      border-color: rgba(156, 10, 191, 0.35);
+      color: #fff;
+    }
+
+    &.active {
+      background: linear-gradient(
+        135deg,
+        rgba(156, 10, 191, 0.3) 0%,
+        rgba(27, 220, 111, 0.28) 100%
+      );
+      border-color: rgba(156, 10, 191, 0.5);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(156, 10, 191, 0.6);
+      outline-offset: 2px;
+    }
+  }
+}
+
 .feed-list {
   display: flex;
   flex-direction: column;

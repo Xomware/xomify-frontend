@@ -1,0 +1,126 @@
+<div class="page-container">
+  <div class="settings-content">
+    <header class="page-header">
+      <h1 class="page-title">Notifications</h1>
+      <p class="page-subtitle">
+        Manage push notification registrations for your devices.
+      </p>
+    </header>
+
+    <!-- Mode tabs -->
+    <div class="tabs-nav" role="tablist">
+      <button
+        class="tab-btn"
+        role="tab"
+        type="button"
+        [class.active]="mode === 'unregister'"
+        [attr.aria-selected]="mode === 'unregister'"
+        (click)="switchMode('unregister')"
+      >
+        Unregister device
+      </button>
+      <button
+        class="tab-btn"
+        role="tab"
+        type="button"
+        [class.active]="mode === 'register'"
+        [attr.aria-selected]="mode === 'register'"
+        (click)="switchMode('register')"
+      >
+        Register device
+      </button>
+    </div>
+
+    <!-- Info banner (no list endpoint yet) -->
+    <div class="info-banner" role="note">
+      <p>
+        Listing registered devices isn't available yet from this UI. Paste the
+        device token shown in the Xomify iOS app under
+        <em>Settings &rarr; Notifications &rarr; Debug</em> to manage it here.
+      </p>
+    </div>
+
+    <!-- Unregister form -->
+    <section class="panel" *ngIf="mode === 'unregister'">
+      <label class="field-label" for="unregister-token-input">
+        Device token
+      </label>
+      <input
+        id="unregister-token-input"
+        class="field-input"
+        type="text"
+        placeholder="Paste device token here"
+        autocomplete="off"
+        spellcheck="false"
+        [(ngModel)]="deviceTokenInput"
+        [disabled]="submitting"
+        (keyup.enter)="unregister()"
+      />
+      <p class="field-hint">
+        Stops Xomify from sending push notifications to the device this token
+        belongs to.
+      </p>
+
+      <div class="actions-row">
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="unregister()"
+          [disabled]="submitting || !deviceTokenInput?.trim()"
+          [attr.aria-busy]="submitting"
+        >
+          {{ submitting ? 'Unregistering...' : 'Unregister device' }}
+        </button>
+      </div>
+    </section>
+
+    <!-- Register form -->
+    <section class="panel" *ngIf="mode === 'register'">
+      <label class="field-label" for="register-token-input">
+        Device token
+      </label>
+      <input
+        id="register-token-input"
+        class="field-input"
+        type="text"
+        placeholder="Paste device token here"
+        autocomplete="off"
+        spellcheck="false"
+        [(ngModel)]="deviceTokenInput"
+        [disabled]="submitting"
+        (keyup.enter)="register()"
+      />
+
+      <label class="field-label" for="register-platform-input">
+        Platform
+      </label>
+      <select
+        id="register-platform-input"
+        class="field-input"
+        [(ngModel)]="platformInput"
+        [disabled]="submitting"
+      >
+        <option value="ios">iOS</option>
+        <option value="android">Android</option>
+        <option value="web">Web</option>
+      </select>
+
+      <p class="field-hint">
+        Usually the iOS app registers itself on launch — only use this if you
+        need to re-register a specific device manually.
+      </p>
+
+      <div class="actions-row">
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="register()"
+          [disabled]="submitting || !deviceTokenInput?.trim()"
+          [attr.aria-busy]="submitting"
+        >
+          {{ submitting ? 'Registering...' : 'Register device' }}
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

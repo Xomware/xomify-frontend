@@ -1,0 +1,222 @@
+<div class="page-container">
+  <app-loader [loading]="loading" message="Loading invites..."></app-loader>
+
+  <div class="invites-content" *ngIf="!loading">
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-top">
+        <div>
+          <h1 class="page-title">Invites</h1>
+          <p class="page-subtitle">
+            Invite a friend to Xomify, or redeem a code you were sent.
+          </p>
+        </div>
+        <button
+          class="refresh-btn"
+          type="button"
+          (click)="refresh()"
+          [attr.aria-busy]="loading"
+          aria-label="Refresh invites"
+          title="Refresh"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M23 4v6h-6M1 20v-6h6" />
+            <path
+              d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-nav" role="tablist">
+        <button
+          class="tab-btn"
+          role="tab"
+          type="button"
+          [class.active]="activeTab === 'outstanding'"
+          [attr.aria-selected]="activeTab === 'outstanding'"
+          (click)="switchTab('outstanding')"
+        >
+          Outstanding
+          <span class="badge" *ngIf="invites.length > 0">{{
+            invites.length
+          }}</span>
+        </button>
+        <button
+          class="tab-btn"
+          role="tab"
+          type="button"
+          [class.active]="activeTab === 'accept'"
+          [attr.aria-selected]="activeTab === 'accept'"
+          (click)="switchTab('accept')"
+        >
+          Accept a code
+        </button>
+      </div>
+    </header>
+
+    <!-- Error -->
+    <div class="page-error" *ngIf="error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn-primary" type="button" (click)="refresh()">
+        Try again
+      </button>
+    </div>
+
+    <!-- Outstanding tab -->
+    <div class="tab-content" *ngIf="activeTab === 'outstanding' && !error">
+      <section class="create-panel">
+        <div class="create-copy">
+          <h2>Invite a friend</h2>
+          <p>
+            Generate a one-time code and share it. They become your friend as
+            soon as they redeem it.
+          </p>
+        </div>
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="createInvite()"
+          [disabled]="creating || !currentEmail"
+          [attr.aria-busy]="creating"
+        >
+          {{ creating ? 'Creating...' : '+ Create invite' }}
+        </button>
+      </section>
+
+      <!-- Last-created highlight -->
+      <section class="last-created" *ngIf="lastCreated">
+        <div class="last-created-head">
+          <span class="label">Latest invite</span>
+          <span class="code">{{ lastCreated.inviteCode }}</span>
+        </div>
+        <p class="last-created-url" *ngIf="lastCreated.inviteUrl">
+          {{ lastCreated.inviteUrl }}
+        </p>
+      </section>
+
+      <!-- Invites list -->
+      <div class="invites-list" *ngIf="invites.length > 0">
+        <article
+          class="invite-row"
+          *ngFor="let invite of invites; trackBy: trackByInviteCode"
+          [class.expired]="isExpired(invite)"
+        >
+          <div class="invite-info">
+            <div class="invite-code-row">
+              <span class="code">{{ invite.inviteCode }}</span>
+              <span
+                class="expiry-pill"
+                [class.warn]="isExpired(invite)"
+              >{{ expiresLabel(invite) }}</span>
+            </div>
+            <p class="invite-meta">
+              Created {{ formatDate(invite.createdAt) }}
+              <span *ngIf="invite.expiresAt">
+                · Expires {{ formatDate(invite.expiresAt) }}
+              </span>
+            </p>
+          </div>
+
+          <div class="invite-actions">
+            <button
+              class="btn-ghost"
+              type="button"
+              (click)="copyLink(invite, $event)"
+              [disabled]="copyingCode[invite.inviteCode]"
+              [attr.aria-busy]="copyingCode[invite.inviteCode]"
+            >
+              {{ copyingCode[invite.inviteCode] ? '...' : 'Copy link' }}
+            </button>
+            <button
+              class="btn-ghost"
+              type="button"
+              (click)="shareInvite(invite, $event)"
+              [disabled]="sharingCode[invite.inviteCode]"
+              [attr.aria-busy]="sharingCode[invite.inviteCode]"
+            >
+              {{ sharingCode[invite.inviteCode] ? '...' : 'Share' }}
+            </button>
+            <button
+              class="btn-danger-ghost"
+              type="button"
+              (click)="revokeLocally(invite, $event)"
+              [disabled]="revokingCode[invite.inviteCode]"
+              [attr.aria-busy]="revokingCode[invite.inviteCode]"
+              title="Hide locally. Backend revoke is not available yet — the code still expires after 30 days."
+            >
+              {{ revokingCode[invite.inviteCode] ? '...' : 'Revoke' }}
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="invites.length === 0">
+        <div class="empty-icon" aria-hidden="true">
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 4h16v16H4z" />
+            <path d="M22 6l-10 7L2 6" />
+          </svg>
+        </div>
+        <h3>No outstanding invites</h3>
+        <p>Create one above and share the link with a friend.</p>
+      </div>
+    </div>
+
+    <!-- Accept tab -->
+    <div class="tab-content" *ngIf="activeTab === 'accept' && !error">
+      <section class="accept-panel">
+        <label class="accept-label" for="invite-code-input">
+          Invite code
+        </label>
+        <div class="accept-row">
+          <input
+            id="invite-code-input"
+            class="accept-input"
+            type="text"
+            placeholder="e.g. 7c4f-ab9d"
+            autocomplete="off"
+            spellcheck="false"
+            [(ngModel)]="acceptCodeInput"
+            (keyup.enter)="acceptInvite()"
+            [disabled]="accepting"
+          />
+          <button
+            class="btn-primary"
+            type="button"
+            (click)="acceptInvite()"
+            [disabled]="accepting || !acceptCodeInput?.trim()"
+            [attr.aria-busy]="accepting"
+          >
+            {{ accepting ? 'Accepting...' : 'Accept' }}
+          </button>
+        </div>
+        <p class="accept-hint">
+          You will become friends with whoever sent the invite as soon as
+          you redeem it.
+        </p>
+      </section>
+    </div>
+  </div>
+</div>

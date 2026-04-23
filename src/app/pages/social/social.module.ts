@@ -10,6 +10,8 @@ import { FriendProfileComponent } from '../friend-profile/friend-profile.compone
 import { GroupsComponent } from '../groups/groups.component';
 import { GroupDetailComponent } from '../group-detail/group-detail.component';
 import { FeedComponent } from '../feed/feed.component';
+import { InvitesComponent } from '../invites/invites.component';
+import { NotificationSettingsComponent } from '../notification-settings/notification-settings.component';
 import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { ShareCardComponent } from '../../components/share-card/share-card.component';
@@ -22,6 +24,11 @@ const routes: Routes = [
   { path: 'friend/:email', component: FriendProfileComponent },
   { path: 'groups', component: GroupsComponent },
   { path: 'group/:id', component: GroupDetailComponent },
+  { path: 'invites', component: InvitesComponent },
+  {
+    path: 'settings/notifications',
+    component: NotificationSettingsComponent,
+  },
 ];
 
 @NgModule({
@@ -31,6 +38,8 @@ const routes: Routes = [
     FriendProfileComponent,
     GroupsComponent,
     GroupDetailComponent,
+    InvitesComponent,
+    NotificationSettingsComponent,
     AddSongModalComponent,
     AddMemberModalComponent,
     ShareCardComponent,

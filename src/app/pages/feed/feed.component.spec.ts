@@ -10,6 +10,7 @@ import {
   Share,
   ShareFeedService,
 } from 'src/app/services/share-feed.service';
+import { Group, GroupsService } from 'src/app/services/groups.service';
 import { UserService } from 'src/app/services/user.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -37,22 +38,36 @@ describe('FeedComponent', () => {
   let component: FeedComponent;
   let fixture: ComponentFixture<FeedComponent>;
   let shareFeed: jasmine.SpyObj<ShareFeedService>;
+  let groupsService: jasmine.SpyObj<GroupsService>;
   let userService: jasmine.SpyObj<UserService>;
+
+  const mkGroup = (id: string, name: string): Group => ({
+    id,
+    name,
+    createdBy: 'dom@example.com',
+    createdAt: '2026-04-01T00:00:00Z',
+    memberCount: 2,
+    songCount: 0,
+  });
 
   beforeEach(async () => {
     const shareFeedSpy = jasmine.createSpyObj('ShareFeedService', ['getFeed']);
+    const groupsSpy = jasmine.createSpyObj('GroupsService', ['getGroups']);
     const userSpy = jasmine.createSpyObj('UserService', ['getEmail']);
     const toastSpy = jasmine.createSpyObj('ToastService', [
       'showPositiveToast',
       'showNegativeToast',
     ]);
     userSpy.getEmail.and.returnValue('dom@example.com');
+    // Default: no groups. Tests that need chips override this.
+    groupsSpy.getGroups.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       declarations: [FeedComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
         { provide: ShareFeedService, useValue: shareFeedSpy },
+        { provide: GroupsService, useValue: groupsSpy },
         { provide: UserService, useValue: userSpy },
         { provide: ToastService, useValue: toastSpy },
       ],
@@ -60,6 +75,7 @@ describe('FeedComponent', () => {
     }).compileComponents();
 
     shareFeed = TestBed.inject(ShareFeedService) as jasmine.SpyObj<ShareFeedService>;
+    groupsService = TestBed.inject(GroupsService) as jasmine.SpyObj<GroupsService>;
     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
 
     fixture = TestBed.createComponent(FeedComponent);
@@ -138,5 +154,50 @@ describe('FeedComponent', () => {
 
     expect(component.shares[0].shareId).toBe('new');
     expect(component.composerOpen).toBe(false);
+  });
+
+  it('loadGroups populates the chip list on init', () => {
+    groupsService.getGroups.and.returnValue(
+      of([mkGroup('g1', 'Hiking'), mkGroup('g2', 'Drivin')]),
+    );
+    shareFeed.getFeed.and.returnValue(of({ shares: [], nextBefore: null }));
+
+    fixture.detectChanges();
+
+    expect(groupsService.getGroups).toHaveBeenCalledWith('dom@example.com');
+    expect(component.groups.length).toBe(2);
+    expect(component.activeGroupId).toBeNull();
+  });
+
+  it('selectGroup reloads the feed with the chosen groupId', () => {
+    groupsService.getGroups.and.returnValue(of([mkGroup('g1', 'Hiking')]));
+    shareFeed.getFeed.and.returnValue(of({ shares: [], nextBefore: null }));
+
+    fixture.detectChanges();
+    // Clear the initial call so we only inspect the one triggered by selectGroup.
+    shareFeed.getFeed.calls.reset();
+
+    component.selectGroup('g1');
+
+    expect(component.activeGroupId).toBe('g1');
+    expect(shareFeed.getFeed).toHaveBeenCalledWith(
+      'dom@example.com',
+      jasmine.objectContaining({ groupId: 'g1' }),
+    );
+  });
+
+  it('selectGroup(null) does not include groupId in the query', () => {
+    groupsService.getGroups.and.returnValue(of([mkGroup('g1', 'Hiking')]));
+    shareFeed.getFeed.and.returnValue(of({ shares: [], nextBefore: null }));
+
+    fixture.detectChanges();
+    component.activeGroupId = 'g1';
+    shareFeed.getFeed.calls.reset();
+
+    component.selectGroup(null);
+
+    expect(component.activeGroupId).toBeNull();
+    const opts = shareFeed.getFeed.calls.mostRecent().args[1] ?? {};
+    expect((opts as any).groupId).toBeUndefined();
   });
 });

@@ -1,0 +1,558 @@
+.page-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
+  padding: 90px 24px 120px;
+}
+
+.invites-content {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+// =============================================
+// Header + tabs — matches Friends page shell
+// =============================================
+
+.page-header {
+  margin-bottom: 28px;
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px 0;
+    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: #8a8a9a;
+    margin: 0;
+  }
+}
+
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8a8a9a;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.35);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(156, 10, 191, 0.6);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.tabs-nav {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #8a8a9a;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    background: linear-gradient(
+      135deg,
+      rgba(156, 10, 191, 0.22) 0%,
+      rgba(27, 220, 111, 0.22) 100%
+    );
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(156, 10, 191, 0.6);
+    outline-offset: 2px;
+  }
+
+  .badge {
+    background: rgba(27, 220, 111, 0.2);
+    color: #1bdc6f;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// =============================================
+// Error
+// =============================================
+
+.page-error {
+  text-align: center;
+  padding: 40px 20px;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.08);
+  border-radius: 14px;
+  color: #cfcfdc;
+
+  p {
+    margin: 0 0 16px 0;
+  }
+}
+
+// =============================================
+// Create panel (top of Outstanding tab)
+// =============================================
+
+.create-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(156, 10, 191, 0.08) 0%,
+    rgba(27, 220, 111, 0.08) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  margin-bottom: 20px;
+
+  .create-copy {
+    flex: 1 1 240px;
+    min-width: 0;
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 4px 0;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #8a8a9a;
+      margin: 0;
+    }
+  }
+}
+
+.last-created {
+  background: rgba(27, 220, 111, 0.08);
+  border: 1px solid rgba(27, 220, 111, 0.25);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+
+  .last-created-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    .label {
+      font-size: 0.8rem;
+      color: #8a8a9a;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .code {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1bdc6f;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+        monospace;
+    }
+  }
+
+  .last-created-url {
+    margin: 8px 0 0;
+    font-size: 0.85rem;
+    color: #cfcfdc;
+    word-break: break-all;
+  }
+}
+
+// =============================================
+// Invite list rows
+// =============================================
+
+.invites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invite-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  transition: border-color 0.25s ease, background 0.25s ease;
+
+  &:hover {
+    border-color: rgba(156, 10, 191, 0.35);
+  }
+
+  &.expired {
+    opacity: 0.55;
+  }
+}
+
+.invite-info {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.invite-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .code {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+      monospace;
+  }
+}
+
+.expiry-pill {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #8a8a9a;
+
+  &.warn {
+    background: rgba(255, 71, 87, 0.15);
+    color: #ff8391;
+  }
+}
+
+.invite-meta {
+  font-size: 0.82rem;
+  color: #8a8a9a;
+  margin: 6px 0 0;
+}
+
+.invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+// =============================================
+// Buttons (shared)
+// =============================================
+
+.btn-primary {
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  border: none;
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(156, 10, 191, 0.4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(27, 220, 111, 0.6);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cfcfdc;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.35);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(156, 10, 191, 0.6);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: #ff8391;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 71, 87, 0.12);
+    color: #ff6b6b;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 71, 87, 0.55);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// =============================================
+// Empty state
+// =============================================
+
+.empty-state {
+  text-align: center;
+  padding: 50px 24px;
+  color: #cfcfdc;
+
+  .empty-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4a4a5a;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 6px 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #8a8a9a;
+    margin: 0;
+  }
+}
+
+// =============================================
+// Accept tab
+// =============================================
+
+.accept-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.accept-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #cfcfdc;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.accept-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .accept-input {
+    flex: 1 1 240px;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+      monospace;
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &::placeholder {
+      color: #6a6a7a;
+    }
+
+    &:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(156, 10, 191, 0.5);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.accept-hint {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: #8a8a9a;
+}
+
+// =============================================
+// Mobile
+// =============================================
+
+@media (max-width: 640px) {
+  .page-container {
+    padding: 80px 16px 100px;
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 1.6rem;
+    }
+    .page-subtitle {
+      font-size: 0.85rem;
+    }
+  }
+
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .create-panel {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn-primary {
+      width: 100%;
+    }
+  }
+
+  .invite-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invite-actions {
+    width: 100%;
+
+    .btn-ghost,
+    .btn-danger-ghost {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  .accept-row {
+    flex-direction: column;
+
+    .btn-primary {
+      width: 100%;
+    }
+  }
+}
