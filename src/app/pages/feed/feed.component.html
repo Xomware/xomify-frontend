@@ -63,6 +63,36 @@
           </button>
         </div>
       </div>
+
+      <!-- Group filter chips -->
+      <div
+        class="group-filter"
+        *ngIf="groups.length > 0"
+        role="tablist"
+        aria-label="Filter feed by group"
+      >
+        <button
+          class="chip"
+          type="button"
+          role="tab"
+          [class.active]="activeGroupId === null"
+          [attr.aria-selected]="activeGroupId === null"
+          (click)="selectGroup(null)"
+        >
+          All Friends
+        </button>
+        <button
+          class="chip"
+          type="button"
+          role="tab"
+          *ngFor="let group of groups; trackBy: trackByGroupId"
+          [class.active]="activeGroupId === group.id"
+          [attr.aria-selected]="activeGroupId === group.id"
+          (click)="selectGroup(group.id)"
+        >
+          {{ group.name }}
+        </button>
+      </div>
     </header>
 
     <!-- Error -->

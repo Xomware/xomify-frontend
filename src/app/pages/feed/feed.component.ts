@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { take } from 'rxjs/operators';
+import { Group, GroupsService } from 'src/app/services/groups.service';
 import {
   FeedQueryOptions,
   Share,
@@ -26,17 +27,51 @@ export class FeedComponent implements OnInit {
 
   composerOpen = false;
 
+  // Group filter — null means "all friends".
+  groups: Group[] = [];
+  activeGroupId: string | null = null;
+
   private currentEmail = '';
 
   constructor(
     private shareFeedService: ShareFeedService,
+    private groupsService: GroupsService,
     private userService: UserService,
     private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.currentEmail = this.userService.getEmail();
+    this.loadGroups();
     this.loadFeed();
+  }
+
+  loadGroups(): void {
+    if (!this.currentEmail) return;
+    this.groupsService
+      .getGroups(this.currentEmail)
+      .pipe(take(1))
+      .subscribe({
+        next: (groups) => {
+          this.groups = groups || [];
+        },
+        error: (err) => {
+          // Non-fatal — feed still works; just skip filter chips.
+          console.warn('Could not load groups for feed filter:', err);
+        },
+      });
+  }
+
+  selectGroup(groupId: string | null): void {
+    if (this.activeGroupId === groupId) return;
+    this.activeGroupId = groupId;
+    this.nextBefore = null;
+    this.shares = [];
+    this.loadFeed();
+  }
+
+  trackByGroupId(_index: number, group: Group): string {
+    return group.id;
   }
 
   loadFeed(userInitiated = false): void {
@@ -58,6 +93,7 @@ export class FeedComponent implements OnInit {
     this.error = null;
 
     const opts: FeedQueryOptions = { limit: FEED_PAGE_SIZE };
+    if (this.activeGroupId) opts.groupId = this.activeGroupId;
 
     this.shareFeedService
       .getFeed(this.currentEmail, opts)
@@ -91,11 +127,14 @@ export class FeedComponent implements OnInit {
     this.loadingMore = true;
     const before = this.nextBefore;
 
+    const opts: FeedQueryOptions = {
+      limit: FEED_PAGE_SIZE,
+      before,
+    };
+    if (this.activeGroupId) opts.groupId = this.activeGroupId;
+
     this.shareFeedService
-      .getFeed(this.currentEmail, {
-        limit: FEED_PAGE_SIZE,
-        before,
-      })
+      .getFeed(this.currentEmail, opts)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
