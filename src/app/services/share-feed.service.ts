@@ -1,53 +1,106 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-export type ShareType = 'wrapped' | 'release_radar' | 'track' | 'playlist';
-export type ReactionAction = 'like' | 'fire' | 'love' | 'none';
+// ============================================
+// Types — canonical shapes match the deployed
+// backend (see xomify-backend/lambdas/shares_*).
+// ============================================
 
-export interface InteractionCounts {
-  [action: string]: number;
-}
+export type MoodTag =
+  | 'hype'
+  | 'chill'
+  | 'sad'
+  | 'party'
+  | 'focus'
+  | 'discovery';
 
+export type ReactionAction = 'queued' | 'rated' | 'unqueued' | 'unrated';
+
+/** A denormalized track share. Backend emits this shape from
+ *  shares_create, shares_feed, and shares_user. */
 export interface Share {
   shareId: string;
+  /** Author email — the `sharedBy` in the epic doc is `email` on the wire. */
   email: string;
-  type: ShareType;
-  payload: any;
+  trackId: string;
+  trackUri: string;
+  trackName: string;
+  artistName: string;
+  albumName: string;
+  albumArtUrl: string;
   caption?: string;
+  moodTag?: MoodTag;
+  genreTags?: string[];
   createdAt: string;
-  interactionCounts: InteractionCounts;
+  sharedAt?: string;
+
+  // Enrichment fields (present on feed responses, may be absent on create response)
+  queuedCount?: number;
+  ratedCount?: number;
+  viewerHasQueued?: boolean;
+  viewerRating?: number | null;
+  sharerRating?: number | null;
 }
 
 export interface FeedResponse {
-  email: string;
-  totalCount: number;
   shares: Share[];
+  nextBefore: string | null;
+}
+
+export interface FeedQueryOptions {
+  groupId?: string;
+  limit?: number;
+  before?: string;
+}
+
+export interface CreateShareRequest {
+  trackId: string;
+  trackUri: string;
+  trackName: string;
+  artistName: string;
+  albumName: string;
+  albumArtUrl: string;
+  caption?: string;
+  moodTag?: MoodTag;
+  genreTags?: string[];
 }
 
 export interface CreateShareResponse {
-  success: boolean;
   shareId: string;
+  email: string;
+  trackId: string;
+  trackUri: string;
+  trackName: string;
+  artistName: string;
+  albumName: string;
+  albumArtUrl: string;
+  caption?: string;
+  moodTag?: MoodTag;
+  genreTags?: string[];
+  createdAt: string;
+  sharedAt?: string;
 }
 
+export interface ReactRequest {
+  shareId: string;
+  action: ReactionAction;
+  rating?: number;
+}
+
+/** Enrichment echoed back by /shares/react. */
 export interface ReactResponse {
-  success: boolean;
+  queuedCount: number;
+  ratedCount: number;
+  viewerHasQueued: boolean;
+  viewerRating: number | null;
+  sharerRating: number | null;
 }
 
-export interface CreateInviteResponse {
-  success: boolean;
-  inviteCode: string;
-  shareUrl: string;
-  expiresAt: string;
-  status: string;
-}
-
-export interface AcceptInviteResponse {
-  success: boolean;
-  inviteCode: string;
-  friendEmail: string;
-}
+// ============================================
+// Service
+// ============================================
 
 @Injectable({
   providedIn: 'root',
@@ -65,60 +118,78 @@ export class ShareFeedService {
     });
   }
 
-  // POST /shares/create
+  /**
+   * POST /shares/create
+   * Create a new track share. Caller provides denormalized track metadata and
+   * optional caption / mood / genre tags (validated server-side).
+   */
   createShare(
     email: string,
-    type: ShareType,
-    payload: any,
-    caption?: string,
+    track: CreateShareRequest,
   ): Observable<CreateShareResponse> {
     const url = `${this.xomifyApiUrl}/shares/create`;
-    const body: { email: string; type: ShareType; payload: any; caption?: string } = {
+    const body: Record<string, unknown> = {
       email,
-      type,
-      payload,
+      trackId: track.trackId,
+      trackUri: track.trackUri,
+      trackName: track.trackName,
+      artistName: track.artistName,
+      albumName: track.albumName,
+      albumArtUrl: track.albumArtUrl,
     };
-    if (caption) {
-      body.caption = caption;
+    if (track.caption !== undefined && track.caption !== '') {
+      body['caption'] = track.caption;
+    }
+    if (track.moodTag) {
+      body['moodTag'] = track.moodTag;
+    }
+    if (track.genreTags && track.genreTags.length > 0) {
+      body['genreTags'] = track.genreTags;
     }
     return this.http.post<CreateShareResponse>(url, body, {
       headers: this.getHeaders(),
     });
   }
 
-  // GET /shares/feed?email={email}
-  getFeed(email: string): Observable<FeedResponse> {
-    const url = `${this.xomifyApiUrl}/shares/feed?email=${encodeURIComponent(email)}`;
-    return this.http.get<FeedResponse>(url, { headers: this.getHeaders() });
+  /**
+   * GET /shares/feed?email=...&groupId=...&limit=...&before=...
+   * Returns the merged feed (self + accepted friends), newest first.
+   */
+  getFeed(email: string, opts: FeedQueryOptions = {}): Observable<FeedResponse> {
+    const url = `${this.xomifyApiUrl}/shares/feed`;
+    let params = new HttpParams().set('email', email);
+    if (opts.groupId) {
+      params = params.set('groupId', opts.groupId);
+    }
+    if (opts.limit !== undefined) {
+      params = params.set('limit', String(opts.limit));
+    }
+    if (opts.before) {
+      params = params.set('before', opts.before);
+    }
+    return this.http.get<FeedResponse>(url, {
+      headers: this.getHeaders(),
+      params,
+    });
   }
 
-  // POST /shares/react
+  /**
+   * POST /shares/react
+   * Queue / un-queue a share, or set / clear a rating. `rating` is required
+   * when `action === 'rated'` (1..5).
+   */
   reactToShare(
-    shareId: string,
     email: string,
+    shareId: string,
     action: ReactionAction,
+    rating?: number,
   ): Observable<ReactResponse> {
     const url = `${this.xomifyApiUrl}/shares/react`;
-    const body = { shareId, email, action };
+    const body: Record<string, unknown> = { email, shareId, action };
+    if (action === 'rated' && rating !== undefined) {
+      body['rating'] = rating;
+    }
     return this.http.post<ReactResponse>(url, body, {
-      headers: this.getHeaders(),
-    });
-  }
-
-  // POST /invites/create
-  createInvite(email: string): Observable<CreateInviteResponse> {
-    const url = `${this.xomifyApiUrl}/invites/create`;
-    const body = { email };
-    return this.http.post<CreateInviteResponse>(url, body, {
-      headers: this.getHeaders(),
-    });
-  }
-
-  // POST /invites/accept
-  acceptInvite(email: string, inviteCode: string): Observable<AcceptInviteResponse> {
-    const url = `${this.xomifyApiUrl}/invites/accept`;
-    const body = { email, inviteCode };
-    return this.http.post<AcceptInviteResponse>(url, body, {
       headers: this.getHeaders(),
     });
   }

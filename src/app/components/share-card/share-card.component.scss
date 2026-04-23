@@ -31,6 +31,22 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover .author-name {
+      color: #d07bec;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(156, 10, 191, 0.6);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
   }
 
   .author-avatar {
@@ -59,6 +75,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      transition: color 0.2s ease;
     }
 
     .created-at {
@@ -74,28 +91,69 @@
     letter-spacing: 0.04em;
     padding: 4px 10px;
     border-radius: 10px;
-    background: rgba(156, 10, 191, 0.15);
-    color: #d07bec;
-    border: 1px solid rgba(156, 10, 191, 0.25);
+    background: rgba(255, 183, 77, 0.15);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 183, 77, 0.3);
     flex-shrink: 0;
+  }
+}
 
-    &[data-type='release_radar'] {
-      background: rgba(27, 220, 111, 0.15);
-      color: #1bdc6f;
-      border-color: rgba(27, 220, 111, 0.3);
-    }
+.card-body.track-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 14px;
 
-    &[data-type='track'] {
-      background: rgba(255, 183, 77, 0.15);
-      color: #ffb74d;
-      border-color: rgba(255, 183, 77, 0.3);
-    }
+  .track-art {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.04);
 
-    &[data-type='playlist'] {
-      background: rgba(120, 160, 255, 0.15);
-      color: #89a8ff;
-      border-color: rgba(120, 160, 255, 0.3);
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
+  }
+
+  .track-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .track-name {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-artist {
+    color: #cfcfdc;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-album {
+    color: #8a8a9a;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -106,147 +164,56 @@
   line-height: 1.45;
 }
 
-.card-body {
+.tag-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease;
+  flex-wrap: wrap;
+  gap: 6px;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(156, 10, 191, 0.3);
-  }
-
-  &.track-share,
-  &.playlist-share {
-    cursor: default;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(255, 255, 255, 0.05);
-    }
-  }
-
-  .body-title {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .body-label {
+  .chip {
+    display: inline-flex;
+    align-items: center;
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #8a8a9a;
+    letter-spacing: 0.02em;
+    padding: 4px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: #cfcfdc;
+    text-transform: capitalize;
   }
 
-  .body-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .mini-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    li {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: #cfcfdc;
-      overflow: hidden;
-
-      .rank {
-        color: #6a6a7a;
-        font-weight: 600;
-        flex-shrink: 0;
-        width: 20px;
-      }
-
-      .track-name {
-        color: #fff;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .track-artist {
-        color: #8a8a9a;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
-  .open-link {
-    align-self: flex-end;
-    font-size: 0.85rem;
-    font-weight: 500;
+  .mood-chip {
+    background: rgba(156, 10, 191, 0.15);
     color: #d07bec;
+    border-color: rgba(156, 10, 191, 0.35);
   }
 
-  .track-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  .genre-chip {
+    background: rgba(27, 220, 111, 0.12);
+    color: #1bdc6f;
+    border-color: rgba(27, 220, 111, 0.28);
+  }
+}
 
-    .track-art {
-      width: 64px;
-      height: 64px;
-      border-radius: 10px;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.04);
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  flex-wrap: wrap;
 
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-    }
+  .rating-label {
+    font-size: 0.8rem;
+    color: #8a8a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-    .track-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .track-name-big {
-      color: #fff;
-      font-weight: 600;
-      font-size: 1rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .track-artist {
-      color: #8a8a9a;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .rated-count {
+    font-size: 0.8rem;
+    color: #8a8a9a;
+    margin-left: auto;
   }
 }
 
@@ -257,20 +224,14 @@
   gap: 12px;
   padding-top: 4px;
 
-  .reactions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .reaction-btn {
+  .queue-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 6px 12px;
+    padding: 7px 14px;
     font-size: 0.9rem;
     color: #cfcfdc;
     cursor: pointer;
@@ -290,10 +251,10 @@
     &.active {
       background: linear-gradient(
         135deg,
-        rgba(156, 10, 191, 0.2) 0%,
+        rgba(156, 10, 191, 0.25) 0%,
         rgba(27, 220, 111, 0.2) 100%
       );
-      border-color: rgba(156, 10, 191, 0.5);
+      border-color: rgba(156, 10, 191, 0.55);
       color: #fff;
     }
 
@@ -302,15 +263,18 @@
       cursor: not-allowed;
     }
 
-    .reaction-emoji {
-      font-size: 1rem;
-      line-height: 1;
+    .queue-label {
+      font-weight: 600;
     }
 
-    .reaction-count {
+    .queue-count {
       font-weight: 600;
       font-size: 0.85rem;
       min-width: 14px;
+      text-align: center;
+      padding: 0 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
     }
   }
 
@@ -322,7 +286,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #cfcfdc;
     border-radius: 20px;
-    padding: 6px 14px;
+    padding: 7px 14px;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -350,17 +314,28 @@
     padding: 14px 14px;
   }
 
+  .card-body.track-body {
+    .track-art {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
   .card-actions {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
 
-    .reactions {
-      justify-content: space-between;
-    }
-
+    .queue-btn,
     .share-btn {
       justify-content: center;
+    }
+  }
+
+  .rating-row {
+    .rated-count {
+      margin-left: 0;
+      width: 100%;
     }
   }
 }

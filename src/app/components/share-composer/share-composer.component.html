@@ -1,0 +1,208 @@
+<div
+  class="modal-backdrop"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="share-composer-title"
+>
+  <div class="modal-content">
+    <button class="close-btn" type="button" (click)="close()" aria-label="Close">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+
+    <h2 class="modal-title" id="share-composer-title">Share a track</h2>
+    <p class="modal-sub">Pick a track, add a caption, tag the vibe.</p>
+
+    <!-- Track search -->
+    <div class="field-group" *ngIf="!selectedTrack">
+      <label class="field-label" for="track-search">Track</label>
+      <div class="search-input-container">
+        <svg
+          class="search-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          id="track-search"
+          type="text"
+          class="text-input"
+          placeholder="Search Spotify..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="search-loading" *ngIf="searchLoading" role="status">
+        <span>Searching...</span>
+      </div>
+
+      <ul
+        class="search-results"
+        *ngIf="!searchLoading && searchResults.length > 0"
+      >
+        <li *ngFor="let track of searchResults">
+          <button
+            type="button"
+            class="result-item"
+            (click)="selectTrack(track)"
+            [attr.aria-label]="'Select ' + track.name + ' by ' + getArtistNames(track)"
+          >
+            <img
+              class="result-art"
+              [src]="getAlbumArt(track)"
+              [alt]="track.album?.name || track.name"
+            />
+            <div class="result-info">
+              <span class="result-name">{{ track.name }}</span>
+              <span class="result-artist">{{ getArtistNames(track) }}</span>
+            </div>
+          </button>
+        </li>
+      </ul>
+
+      <p class="search-hint" *ngIf="!searchLoading && searchQuery.length < 2">
+        Type at least 2 characters to search.
+      </p>
+    </div>
+
+    <!-- Selected track preview -->
+    <div class="selected-track" *ngIf="selectedTrack">
+      <img
+        class="selected-art"
+        [src]="getAlbumArt(selectedTrack)"
+        [alt]="selectedTrack.album?.name || selectedTrack.name"
+      />
+      <div class="selected-info">
+        <span class="selected-name">{{ selectedTrack.name }}</span>
+        <span class="selected-artist">{{ getArtistNames(selectedTrack) }}</span>
+        <span class="selected-album" *ngIf="selectedTrack.album?.name">
+          {{ selectedTrack.album?.name }}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="change-btn"
+        (click)="clearSelection()"
+        aria-label="Change track"
+      >
+        Change
+      </button>
+    </div>
+
+    <!-- Caption -->
+    <div class="field-group" *ngIf="selectedTrack">
+      <label class="field-label" for="share-caption">Caption</label>
+      <textarea
+        id="share-caption"
+        class="text-area"
+        [(ngModel)]="caption"
+        [maxlength]="captionMax"
+        rows="3"
+        placeholder="Why are you sharing this?"
+      ></textarea>
+      <span
+        class="char-counter"
+        [class.at-limit]="captionRemaining <= 0"
+      >{{ captionRemaining }}</span>
+    </div>
+
+    <!-- Mood -->
+    <div class="field-group" *ngIf="selectedTrack">
+      <label class="field-label">Mood</label>
+      <div class="mood-grid">
+        <button
+          type="button"
+          class="mood-btn"
+          *ngFor="let m of moodOptions"
+          [class.active]="moodTag === m.value"
+          (click)="moodTag = moodTag === m.value ? '' : m.value"
+          [attr.aria-pressed]="moodTag === m.value"
+        >
+          {{ m.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Genre tags -->
+    <div class="field-group" *ngIf="selectedTrack">
+      <label class="field-label" for="genre-input">
+        Genre tags ({{ genreTags.length }}/{{ genreTagMax }})
+      </label>
+      <div class="tag-input-row">
+        <input
+          id="genre-input"
+          type="text"
+          class="text-input"
+          [(ngModel)]="genreInput"
+          (keydown)="onGenreKey($event)"
+          [disabled]="genreTags.length >= genreTagMax"
+          placeholder="e.g. indie, ambient"
+        />
+        <button
+          type="button"
+          class="add-tag-btn"
+          (click)="addGenreTag()"
+          [disabled]="!genreInput.trim() || genreTags.length >= genreTagMax"
+        >
+          Add
+        </button>
+      </div>
+      <ul class="tag-chips" *ngIf="genreTags.length > 0" aria-label="Selected genre tags">
+        <li *ngFor="let tag of genreTags">
+          <button
+            type="button"
+            class="tag-chip"
+            (click)="removeGenreTag(tag)"
+            [attr.aria-label]="'Remove ' + tag"
+          >
+            {{ tag }}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Submit -->
+    <button
+      class="submit-btn"
+      type="button"
+      [disabled]="!canSubmit"
+      (click)="submit()"
+    >
+      {{ submitting ? 'Sharing...' : 'Share to feed' }}
+    </button>
+  </div>
+</div>

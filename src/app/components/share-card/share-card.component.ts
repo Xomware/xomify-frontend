@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
+  ReactResponse,
   ReactionAction,
   Share,
   ShareFeedService,
@@ -10,13 +11,14 @@ import { ShareService } from 'src/app/services/share.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
 
-type ReactionKind = 'fire' | 'love' | 'like';
-
-interface ReactionButton {
-  action: ReactionKind;
-  emoji: string;
-  label: string;
-}
+const MOOD_LABELS: Record<string, string> = {
+  hype: 'Hype',
+  chill: 'Chill',
+  sad: 'Sad',
+  party: 'Party',
+  focus: 'Focus',
+  discovery: 'Discovery',
+};
 
 @Component({
   selector: 'app-share-card',
@@ -25,19 +27,14 @@ interface ReactionButton {
 })
 export class ShareCardComponent {
   @Input() share!: Share;
-  @Output() reacted = new EventEmitter<{ shareId: string; action: ReactionAction }>();
+  @Output() reacted = new EventEmitter<{
+    shareId: string;
+    action: ReactionAction;
+    rating?: number;
+  }>();
 
-  // Local optimistic copies of the counts + which reaction this user is showing
-  // Note: backend doesn't yet return the viewer's current reaction, so we track
-  // the last action this user clicked in this session only.
-  private myReaction: ReactionKind | null = null;
-  reactionPending = false;
-
-  readonly reactions: ReactionButton[] = [
-    { action: 'fire', emoji: '🔥', label: 'Fire' },
-    { action: 'love', emoji: '❤️', label: 'Love' },
-    { action: 'like', emoji: '👍', label: 'Like' },
-  ];
+  queuePending = false;
+  ratingPending = false;
 
   constructor(
     private router: Router,
@@ -52,11 +49,12 @@ export class ShareCardComponent {
   // ============================================
 
   get authorLabel(): string {
-    return this.share.payload?.displayName || this.share.email;
+    return this.share.email;
   }
 
   get relativeTime(): string {
-    const created = new Date(this.share.createdAt).getTime();
+    const ts = this.share.sharedAt || this.share.createdAt;
+    const created = new Date(ts).getTime();
     if (isNaN(created)) return '';
     const diffMs = Date.now() - created;
     const sec = Math.floor(diffMs / 1000);
@@ -75,145 +73,140 @@ export class ShareCardComponent {
     return `${yr}y ago`;
   }
 
-  get monthYearLabel(): string {
-    const p = this.share.payload || {};
-    if (p.monthYear) return p.monthYear;
-    if (p.month && p.year) return `${p.month} ${p.year}`;
-    return '';
+  get moodLabel(): string {
+    if (!this.share.moodTag) return '';
+    return MOOD_LABELS[this.share.moodTag] || this.share.moodTag;
   }
 
-  get weekLabel(): string {
-    return this.share.payload?.weekLabel || this.share.payload?.weekKey || '';
+  get genreTags(): string[] {
+    return Array.isArray(this.share.genreTags) ? this.share.genreTags : [];
   }
 
-  get topTracks(): Array<{ name: string; artists?: string[] }> {
-    const items = this.share.payload?.topTracks;
-    return Array.isArray(items) ? items : [];
+  get queuedCount(): number {
+    return this.share.queuedCount ?? 0;
   }
 
-  get topReleases(): Array<{ name: string; artist?: string }> {
-    const items = this.share.payload?.topReleases;
-    return Array.isArray(items) ? items : [];
+  get ratedCount(): number {
+    return this.share.ratedCount ?? 0;
   }
 
-  get trackName(): string {
-    return this.share.payload?.name || '';
+  get viewerHasQueued(): boolean {
+    return this.share.viewerHasQueued === true;
   }
 
-  get trackArtist(): string {
-    const artists = this.share.payload?.artists;
-    if (Array.isArray(artists)) return artists.join(', ');
-    return this.share.payload?.artist || '';
-  }
-
-  get trackImage(): string | null {
-    return (
-      this.share.payload?.albumArt ||
-      this.share.payload?.image ||
-      this.share.payload?.album?.images?.[0]?.url ||
-      null
-    );
-  }
-
-  get playlistName(): string {
-    return this.share.payload?.playlistName || this.share.payload?.name || '';
-  }
-
-  get playlistCover(): string | null {
-    return (
-      this.share.payload?.cover ||
-      this.share.payload?.image ||
-      this.share.payload?.images?.[0]?.url ||
-      null
-    );
-  }
-
-  get playlistTrackCount(): number {
-    const n =
-      this.share.payload?.trackCount ?? this.share.payload?.tracks?.total;
-    return typeof n === 'number' ? n : 0;
-  }
-
-  getCount(action: ReactionKind): number {
-    return this.share.interactionCounts?.[action] || 0;
-  }
-
-  isActive(action: ReactionKind): boolean {
-    return this.myReaction === action;
+  get viewerRating(): number {
+    return this.share.viewerRating ?? 0;
   }
 
   // ============================================
   // Actions
   // ============================================
 
-  reactOrToggle(action: ReactionKind): void {
-    if (this.reactionPending) return;
+  toggleQueue(): void {
+    if (this.queuePending) return;
 
     const email = this.userService.getEmail();
     if (!email) {
-      this.toastService.showNegativeToast('Sign in to react');
+      this.toastService.showNegativeToast('Sign in to queue');
       return;
     }
 
-    const wasActive = this.myReaction === action;
-    const nextAction: ReactionAction = wasActive ? 'none' : action;
-    const previousReaction = this.myReaction;
+    const wasQueued = this.viewerHasQueued;
+    const nextAction: ReactionAction = wasQueued ? 'unqueued' : 'queued';
 
     // Optimistic update
-    if (!this.share.interactionCounts) {
-      this.share.interactionCounts = {};
-    }
-    if (wasActive) {
-      this.share.interactionCounts[action] = Math.max(
-        0,
-        (this.share.interactionCounts[action] || 0) - 1,
-      );
-      this.myReaction = null;
-    } else {
-      // If another reaction was active, decrement it
-      if (previousReaction) {
-        this.share.interactionCounts[previousReaction] = Math.max(
-          0,
-          (this.share.interactionCounts[previousReaction] || 0) - 1,
-        );
-      }
-      this.share.interactionCounts[action] =
-        (this.share.interactionCounts[action] || 0) + 1;
-      this.myReaction = action;
-    }
-
-    this.reactionPending = true;
+    const prevQueuedCount = this.queuedCount;
+    this.share.viewerHasQueued = !wasQueued;
+    this.share.queuedCount = Math.max(
+      0,
+      prevQueuedCount + (wasQueued ? -1 : 1),
+    );
+    this.queuePending = true;
 
     this.shareFeedService
-      .reactToShare(this.share.shareId, email, nextAction)
+      .reactToShare(email, this.share.shareId, nextAction)
       .pipe(take(1))
       .subscribe({
-        next: () => {
-          this.reactionPending = false;
-          this.reacted.emit({ shareId: this.share.shareId, action: nextAction });
+        next: (resp) => {
+          this.applyEnrichment(resp);
+          this.queuePending = false;
+          this.reacted.emit({
+            shareId: this.share.shareId,
+            action: nextAction,
+          });
         },
         error: (err) => {
-          console.error('Error reacting to share:', err);
-          // Revert optimistic update
-          if (wasActive) {
-            this.share.interactionCounts[action] =
-              (this.share.interactionCounts[action] || 0) + 1;
-            this.myReaction = action;
-          } else {
-            this.share.interactionCounts[action] = Math.max(
-              0,
-              (this.share.interactionCounts[action] || 0) - 1,
-            );
-            if (previousReaction) {
-              this.share.interactionCounts[previousReaction] =
-                (this.share.interactionCounts[previousReaction] || 0) + 1;
-            }
-            this.myReaction = previousReaction;
-          }
-          this.reactionPending = false;
-          this.toastService.showNegativeToast('Could not save reaction');
+          console.error('Error toggling queue:', err);
+          // Rollback
+          this.share.viewerHasQueued = wasQueued;
+          this.share.queuedCount = prevQueuedCount;
+          this.queuePending = false;
+          this.toastService.showNegativeToast('Could not save queue');
         },
       });
+  }
+
+  onRatingChange(rating: number): void {
+    if (this.ratingPending) return;
+
+    const email = this.userService.getEmail();
+    if (!email) {
+      this.toastService.showNegativeToast('Sign in to rate');
+      return;
+    }
+
+    // Treat picking the same rating as "clear" — backend supports `unrated`.
+    const prevRating = this.viewerRating;
+    const prevRatedCount = this.ratedCount;
+    const isClear = rating === prevRating || rating <= 0;
+
+    const nextAction: ReactionAction = isClear ? 'unrated' : 'rated';
+    const nextRating = isClear ? 0 : rating;
+
+    // Optimistic
+    this.share.viewerRating = nextRating || null;
+    if (isClear && prevRating) {
+      this.share.ratedCount = Math.max(0, prevRatedCount - 1);
+    } else if (!isClear && !prevRating) {
+      this.share.ratedCount = prevRatedCount + 1;
+    }
+    this.ratingPending = true;
+
+    this.shareFeedService
+      .reactToShare(
+        email,
+        this.share.shareId,
+        nextAction,
+        nextAction === 'rated' ? nextRating : undefined,
+      )
+      .pipe(take(1))
+      .subscribe({
+        next: (resp) => {
+          this.applyEnrichment(resp);
+          this.ratingPending = false;
+          this.reacted.emit({
+            shareId: this.share.shareId,
+            action: nextAction,
+            rating: nextAction === 'rated' ? nextRating : undefined,
+          });
+        },
+        error: (err) => {
+          console.error('Error saving rating:', err);
+          // Rollback
+          this.share.viewerRating = prevRating || null;
+          this.share.ratedCount = prevRatedCount;
+          this.ratingPending = false;
+          this.toastService.showNegativeToast('Could not save rating');
+        },
+      });
+  }
+
+  private applyEnrichment(resp: ReactResponse): void {
+    this.share.queuedCount = resp.queuedCount;
+    this.share.ratedCount = resp.ratedCount;
+    this.share.viewerHasQueued = resp.viewerHasQueued;
+    this.share.viewerRating = resp.viewerRating;
+    this.share.sharerRating = resp.sharerRating;
   }
 
   async shareLink(): Promise<void> {
@@ -222,7 +215,7 @@ export class ShareCardComponent {
     )}`;
     const shared = await this.shareService.share({
       title: `${this.authorLabel} on Xomify`,
-      text: this.share.caption || '',
+      text: this.share.caption || this.share.trackName,
       url: profileUrl,
     });
     this.toastService.showPositiveToast(
@@ -230,16 +223,8 @@ export class ShareCardComponent {
     );
   }
 
-  onCardTargetClick(): void {
-    switch (this.share.type) {
-      case 'wrapped':
-        this.router.navigate(['/wrapped']);
-        break;
-      case 'release_radar':
-        this.router.navigate(['/release-radar']);
-        break;
-      default:
-        break;
-    }
+  openAuthor(): void {
+    if (!this.share.email) return;
+    this.router.navigate(['/friend', this.share.email]);
   }
 }

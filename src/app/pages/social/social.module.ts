@@ -13,6 +13,7 @@ import { FeedComponent } from '../feed/feed.component';
 import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { ShareCardComponent } from '../../components/share-card/share-card.component';
+import { ShareComposerComponent } from '../../components/share-composer/share-composer.component';
 import { TruncatePipe } from '../../pipes/truncate.pipe';
 
 const routes: Routes = [
@@ -33,6 +34,7 @@ const routes: Routes = [
     AddSongModalComponent,
     AddMemberModalComponent,
     ShareCardComponent,
+    ShareComposerComponent,
     TruncatePipe,
   ],
   imports: [

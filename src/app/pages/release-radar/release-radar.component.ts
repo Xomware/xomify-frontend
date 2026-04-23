@@ -7,7 +7,6 @@ import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { AlbumService } from 'src/app/services/album.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { ShareService } from 'src/app/services/share.service';
-import { ShareFeedService } from 'src/app/services/share-feed.service';
 import {
   ReleaseRadarService,
   ReleaseRadarHistoryResponse,
@@ -87,8 +86,7 @@ export class ReleaseRadarComponent implements OnInit {
     private queueService: QueueService,
     private albumService: AlbumService,
     private playlistService: PlaylistService,
-    private shareService: ShareService,
-    private shareFeedService: ShareFeedService
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -449,23 +447,9 @@ export class ReleaseRadarComponent implements OnInit {
       .map((r, i) => `${i + 1}. ${r.albumName} — ${r.artistName}`)
       .join('\n');
 
-    // Persist share to the backend feed (non-blocking)
-    if (this.userEmail) {
-      const payload = {
-        weekLabel: label,
-        weekKey: this.selectedWeekKey,
-        topReleases: weekData.releases.slice(0, 5).map((r) => ({
-          name: r.albumName,
-          artist: r.artistName,
-        })),
-      };
-      this.shareFeedService
-        .createShare(this.userEmail, 'release_radar', payload, 'New releases I loved this week')
-        .pipe(take(1))
-        .subscribe({
-          error: (err) => console.error('Error creating release_radar share:', err),
-        });
-    }
+    // Note: Release Radar digests are no longer persisted as backend shares —
+    // the new feed schema only accepts per-track shares. The native Web Share
+    // flow below is unchanged.
 
     const shared = await this.shareService.share({
       title: `Xomify Release Radar — ${label}`,
