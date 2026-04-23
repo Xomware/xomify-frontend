@@ -11,33 +11,57 @@
             Shares from you and your friends
           </p>
         </div>
-        <button
-          class="refresh-btn"
-          type="button"
-          (click)="refresh()"
-          [disabled]="refreshing"
-          [attr.aria-busy]="refreshing"
-          aria-label="Refresh feed"
-          title="Refresh"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            [class.spinning]="refreshing"
-            aria-hidden="true"
+        <div class="header-actions">
+          <button
+            class="share-cta"
+            type="button"
+            (click)="openComposer()"
+            aria-label="Share a track"
           >
-            <path d="M23 4v6h-6M1 20v-6h6" />
-            <path
-              d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
-            />
-          </svg>
-        </button>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Share</span>
+          </button>
+          <button
+            class="refresh-btn"
+            type="button"
+            (click)="refresh()"
+            [disabled]="refreshing"
+            [attr.aria-busy]="refreshing"
+            aria-label="Refresh feed"
+            title="Refresh"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [class.spinning]="refreshing"
+              aria-hidden="true"
+            >
+              <path d="M23 4v6h-6M1 20v-6h6" />
+              <path
+                d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -70,8 +94,11 @@
       </div>
       <h3>No shares yet</h3>
       <p>
-        Follow some friends or share your Wrapped to get started.
+        Share a track to get started, or add friends to see what they're into.
       </p>
+      <button class="btn-primary" type="button" (click)="openComposer()">
+        Share a track
+      </button>
     </div>
 
     <!-- Feed list -->
@@ -80,6 +107,25 @@
         *ngFor="let share of shares; trackBy: trackByShareId"
         [share]="share"
       ></app-share-card>
+
+      <div class="load-more-row" *ngIf="nextBefore">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="loadMore()"
+          [disabled]="loadingMore"
+          [attr.aria-busy]="loadingMore"
+        >
+          {{ loadingMore ? 'Loading...' : 'Load more' }}
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Composer modal -->
+  <app-share-composer
+    *ngIf="composerOpen"
+    (shared)="onShareCreated($event)"
+    (closed)="closeComposer()"
+  ></app-share-composer>
 </div>

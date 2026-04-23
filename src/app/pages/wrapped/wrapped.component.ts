@@ -10,7 +10,6 @@ import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { RatingsService } from 'src/app/services/ratings.service';
 import { ShareService } from 'src/app/services/share.service';
-import { ShareFeedService } from 'src/app/services/share-feed.service';
 import {
   SongDetailModalComponent,
   SongDetailTrack,
@@ -93,8 +92,7 @@ export class WrappedComponent implements OnInit {
     private playlistService: PlaylistService,
     private toastService: ToastService,
     private ratingsService: RatingsService,
-    private shareService: ShareService,
-    private shareFeedService: ShareFeedService
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -268,25 +266,9 @@ export class WrappedComponent implements OnInit {
       .map((t, i) => `${i + 1}. ${t.name} — ${(t.artists || []).map((a) => a.name).join(', ')}`)
       .join('\n');
 
-    // Persist share to the backend feed (non-blocking — don't hold up Web Share dialog)
-    const email = this.userService.getEmail();
-    if (email) {
-      const payload = {
-        month: this.selectedWrap.month,
-        year: this.selectedWrap.year,
-        monthYear,
-        topTracks: this.displayTracks.slice(0, 5).map((t) => ({
-          name: t.name,
-          artists: (t.artists || []).map((a) => a.name),
-        })),
-      };
-      this.shareFeedService
-        .createShare(email, 'wrapped', payload, `My top tracks from ${monthYear}`)
-        .pipe(take(1))
-        .subscribe({
-          error: (err) => console.error('Error creating wrapped share:', err),
-        });
-    }
+    // Note: Wrapped digests are no longer persisted as backend shares — the new
+    // feed schema only accepts per-track shares. The native Web Share flow
+    // below is unchanged.
 
     const shared = await this.shareService.share({
       title: `Xomify Wrapped — ${monthYear}`,
