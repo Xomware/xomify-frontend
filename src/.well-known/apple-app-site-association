@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["A3HMLDS2AL.com.Xomware.Xomify"],
+        "components": [
+          {
+            "/": "/invite/*",
+            "comment": "Matches invite deep links"
+          }
+        ]
+      }
+    ]
+  }
+}
