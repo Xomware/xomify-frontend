@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { SongService } from 'src/app/services/song.service';
@@ -59,6 +59,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   accessToken = '';
   wrappedEnrolled = false;
   releaseRadarEnrolled = false;
+
+  /** In-page tab: `overview` (default) or `settings`. Synced to `?tab=` query. */
+  activeTab: 'overview' | 'settings' = 'overview';
   maxEnrollAttempts = 5;
   enrollAttempts = 0;
   disableEnrollButtons = false;
@@ -84,12 +87,19 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     private artistService: ArtistService,
     private friendsService: FriendsService,
     private toastService: ToastService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.accessToken = this.authService.getAccessToken();
     this.userName = this.userService.getUserName();
+
+    // Drive tab selection from the URL so /my-profile?tab=settings is a deep link.
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      const tab = params.get('tab');
+      this.activeTab = tab === 'settings' ? 'settings' : 'overview';
+    });
 
     this.friendsService.friendsList$
       .pipe(takeUntil(this.destroy$))
@@ -118,6 +128,21 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     if (this.tickerInterval) {
       clearInterval(this.tickerInterval);
     }
+  }
+
+  selectTab(tab: 'overview' | 'settings'): void {
+    this.activeTab = tab;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: tab === 'overview' ? {} : { tab: 'settings' },
+      queryParamsHandling: '',
+      replaceUrl: true,
+    });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/home']);
   }
 
   private populateUserData(): void {

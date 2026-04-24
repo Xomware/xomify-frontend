@@ -14,28 +14,74 @@
     />
   </h2>
 
-  <!-- Desktop nav links -->
+  <!-- Desktop nav -->
   <div class="tabs" [ngClass]="{ hidden: dropdownVisible }">
-    <div *ngIf="isLoggedIn()">
-      <a
-        *ngFor="let link of navLinks"
-        [routerLink]="link.route"
-        routerLinkActive="active"
-        [ngClass]="{ selected: isSelected(link.route) }"
-        [attr.aria-current]="isSelected(link.route) ? 'page' : null"
-      >
-        {{ link.label }}
-        <span
-          class="queue-badge"
-          [ngClass]="{ pending: link.badge$ === 'friends' }"
-          *ngIf="link.badge$ && getBadgeCount(link) > 0"
-          [attr.aria-label]="getBadgeCount(link) + ' pending'"
-        >{{ getBadgeCount(link) }}</span>
-      </a>
-    </div>
+    <ng-container *ngIf="isLoggedIn()">
+      <ng-container *ngFor="let entry of navEntries">
+        <!-- Leaf link -->
+        <a
+          *ngIf="asLink(entry) as link"
+          [routerLink]="link.route"
+          routerLinkActive="active"
+          [ngClass]="{ selected: isSelected(link.route) }"
+          [attr.aria-current]="isSelected(link.route) ? 'page' : null"
+        >
+          {{ link.label }}
+          <span
+            class="queue-badge"
+            [ngClass]="{ pending: link.badge$ === 'friends' }"
+            *ngIf="link.badge$ && getBadgeCount(link) > 0"
+            [attr.aria-label]="getBadgeCount(link) + ' pending'"
+          >{{ getBadgeCount(link) }}</span>
+        </a>
+
+        <!-- Grouped dropdown -->
+        <div
+          class="nav-group"
+          *ngIf="asGroup(entry) as group"
+          [ngClass]="{ open: openGroupLabel === group.label }"
+        >
+          <button
+            type="button"
+            class="group-trigger"
+            [ngClass]="{ selected: isGroupActive(group) }"
+            [attr.aria-expanded]="openGroupLabel === group.label"
+            [attr.aria-haspopup]="true"
+            (click)="toggleGroup(group.label, $event)"
+          >
+            {{ group.label }}
+            <span class="chevron" aria-hidden="true">▾</span>
+            <span
+              class="queue-badge"
+              [ngClass]="{ pending: group.badge$ === 'friends' }"
+              *ngIf="group.badge$ && getBadgeCount(group) > 0"
+              [attr.aria-label]="getBadgeCount(group) + ' pending'"
+            >{{ getBadgeCount(group) }}</span>
+          </button>
+
+          <div class="group-menu" role="menu" *ngIf="openGroupLabel === group.label">
+            <a
+              *ngFor="let link of group.links"
+              [routerLink]="link.route"
+              routerLinkActive="active"
+              role="menuitem"
+              (click)="closeGroups()"
+            >
+              {{ link.label }}
+              <span
+                class="queue-badge"
+                [ngClass]="{ pending: link.badge$ === 'friends' }"
+                *ngIf="link.badge$ && getBadgeCount(link) > 0"
+                [attr.aria-label]="getBadgeCount(link) + ' pending'"
+              >{{ getBadgeCount(link) }}</span>
+            </a>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
   </div>
 
-  <!-- Logout Button (Desktop) -->
+  <!-- Logout (Desktop) -->
   <button
     class="logout-btn desktop-only"
     *ngIf="isLoggedIn()"
@@ -59,21 +105,46 @@
 
   <!-- Mobile Dropdown Menu -->
   <div class="dropdown" id="mobile-nav" *ngIf="dropdownVisible" role="menu">
-    <a
-      *ngFor="let link of navLinks"
-      [routerLink]="link.route"
-      routerLinkActive="active"
-      (click)="selectItem(link.route)"
-      role="menuitem"
-    >
-      {{ link.label }}
-      <span
-        class="queue-badge"
-        [ngClass]="{ pending: link.badge$ === 'friends' }"
-        *ngIf="link.badge$ && getBadgeCount(link) > 0"
-        [attr.aria-label]="getBadgeCount(link) + ' pending'"
-      >{{ getBadgeCount(link) }}</span>
-    </a>
+    <ng-container *ngFor="let entry of mobileEntries">
+      <!-- Leaf link on mobile -->
+      <a
+        *ngIf="asLink(entry) as link"
+        [routerLink]="link.route"
+        routerLinkActive="active"
+        (click)="selectItem(link.route)"
+        role="menuitem"
+      >
+        {{ link.label }}
+        <span
+          class="queue-badge"
+          [ngClass]="{ pending: link.badge$ === 'friends' }"
+          *ngIf="link.badge$ && getBadgeCount(link) > 0"
+          [attr.aria-label]="getBadgeCount(link) + ' pending'"
+        >{{ getBadgeCount(link) }}</span>
+      </a>
+
+      <!-- Mobile group — render header + children flattened -->
+      <div class="mobile-group" *ngIf="asGroup(entry) as group">
+        <div class="mobile-group-label">{{ group.label }}</div>
+        <a
+          *ngFor="let link of group.links"
+          [routerLink]="link.route"
+          routerLinkActive="active"
+          (click)="selectItem(link.route)"
+          role="menuitem"
+          class="mobile-group-item"
+        >
+          {{ link.label }}
+          <span
+            class="queue-badge"
+            [ngClass]="{ pending: link.badge$ === 'friends' }"
+            *ngIf="link.badge$ && getBadgeCount(link) > 0"
+            [attr.aria-label]="getBadgeCount(link) + ' pending'"
+          >{{ getBadgeCount(link) }}</span>
+        </a>
+      </div>
+    </ng-container>
+
     <a class="logout-link" (click)="logout()" role="menuitem">Logout</a>
   </div>
 </nav>

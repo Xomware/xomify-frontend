@@ -7,11 +7,25 @@ import { UserService } from '../../services/user.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
+/** A single navigable destination — either a leaf link or a group header. */
 export interface NavLink {
   route: string;
   label: string;
   badge$?: 'queue' | 'friends';
 }
+
+export interface NavGroup {
+  label: string;
+  /** Routes considered "active" when this group's dropdown button should highlight. */
+  activeRoutes: string[];
+  links: NavLink[];
+  /** Aggregate badges across child links — sum of matching badge counts. */
+  badge$?: 'queue' | 'friends';
+}
+
+export type NavEntry =
+  | { kind: 'link'; link: NavLink }
+  | { kind: 'group'; group: NavGroup };
 
 @Component({
   selector: 'app-toolbar',
@@ -19,28 +33,70 @@ export interface NavLink {
   styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
+  /** Mobile hamburger menu. */
   dropdownVisible = false;
+  /** Desktop group dropdowns — keyed by group label; only one open at a time. */
+  openGroupLabel: string | null = null;
   isMobile = false;
   queueCount = 0;
   pendingFriendsCount = 0;
 
-  readonly navLinks: NavLink[] = [
-    { route: '/feed', label: 'Feed' },
-    { route: '/my-profile', label: 'My Profile' },
-    { route: '/top-songs', label: 'Top Songs' },
-    { route: '/top-artists', label: 'Top Artists' },
-    { route: '/top-genres', label: 'Top Genres' },
-    { route: '/release-radar', label: 'Release Radar' },
-    { route: '/wrapped', label: 'Wrapped' },
-    { route: '/ratings', label: 'Ratings' },
-    { route: '/friends', label: 'Friends', badge$: 'friends' },
-    { route: '/invites', label: 'Invites' },
-    { route: '/groups', label: 'Groups' },
-    { route: '/playlist-builder', label: 'Playlist Builder', badge$: 'queue' },
-    { route: '/playlist-analysis', label: 'Playlist Analysis' },
-    { route: '/mood-recommendations', label: 'Mood Picks' },
-    { route: '/settings/notifications', label: 'Notifications' },
+  /** Grouped nav — empty groups are hidden in the template. */
+  readonly navEntries: NavEntry[] = [
+    { kind: 'link', link: { route: '/feed', label: 'Feed' } },
+    {
+      kind: 'group',
+      group: {
+        label: 'Top',
+        activeRoutes: ['/top-songs', '/top-artists', '/top-genres'],
+        links: [
+          { route: '/top-songs', label: 'Songs' },
+          { route: '/top-artists', label: 'Artists' },
+          { route: '/top-genres', label: 'Genres' },
+        ],
+      },
+    },
+    {
+      kind: 'group',
+      group: {
+        label: 'Playlists',
+        activeRoutes: [
+          '/my-playlists',
+          '/playlist-builder',
+          '/playlist-analysis',
+          '/mood-recommendations',
+          '/liked-artists-playlist',
+        ],
+        badge$: 'queue',
+        links: [
+          { route: '/my-playlists', label: 'My Playlists' },
+          { route: '/playlist-builder', label: 'Builder', badge$: 'queue' },
+          { route: '/playlist-analysis', label: 'Analysis' },
+          { route: '/mood-recommendations', label: 'Mood Picks' },
+          { route: '/liked-artists-playlist', label: 'Liked Artists' },
+        ],
+      },
+    },
+    {
+      kind: 'group',
+      group: {
+        label: 'Social',
+        activeRoutes: ['/friends', '/invites', '/groups'],
+        badge$: 'friends',
+        links: [
+          { route: '/friends', label: 'Friends', badge$: 'friends' },
+          { route: '/invites', label: 'Invites' },
+          { route: '/groups', label: 'Groups' },
+        ],
+      },
+    },
+    { kind: 'link', link: { route: '/release-radar', label: 'Release Radar' } },
+    { kind: 'link', link: { route: '/wrapped', label: 'Wrapped' } },
+    { kind: 'link', link: { route: '/ratings', label: 'Ratings' } },
   ];
+
+  /** Flat list for the mobile dropdown — groups render as headers. */
+  readonly mobileEntries: NavEntry[] = this.navEntries;
 
   private destroy$ = new Subject<void>();
 
@@ -85,10 +141,33 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  getBadgeCount(link: NavLink): number {
-    if (link.badge$ === 'queue') return this.queueCount;
-    if (link.badge$ === 'friends') return this.pendingFriendsCount;
+  /** Used by the template's `*ngFor`-friendly pattern matching helpers. */
+  asLink(entry: NavEntry): NavLink | null {
+    return entry.kind === 'link' ? entry.link : null;
+  }
+
+  asGroup(entry: NavEntry): NavGroup | null {
+    return entry.kind === 'group' ? entry.group : null;
+  }
+
+  getBadgeCount(source: NavLink | NavGroup | undefined): number {
+    if (!source?.badge$) return 0;
+    if (source.badge$ === 'queue') return this.queueCount;
+    if (source.badge$ === 'friends') return this.pendingFriendsCount;
     return 0;
+  }
+
+  isGroupActive(group: NavGroup): boolean {
+    return group.activeRoutes.some((r) => this.router.url.startsWith(r));
+  }
+
+  toggleGroup(label: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.openGroupLabel = this.openGroupLabel === label ? null : label;
+  }
+
+  closeGroups(): void {
+    this.openGroupLabel = null;
   }
 
   toggleDropdown(): void {
@@ -97,14 +176,18 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   selectItem(route: string): void {
     this.dropdownVisible = false;
+    this.openGroupLabel = null;
     this.router.navigate([route]);
   }
 
   @HostListener('document:click', ['$event'])
-  closeDropdown(event: MouseEvent): void {
+  handleDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown') && !target.closest('.dropdown-button')) {
       this.dropdownVisible = false;
+    }
+    if (!target.closest('.nav-group')) {
+      this.openGroupLabel = null;
     }
   }
 
@@ -117,12 +200,13 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   }
 
   isSelected(route: string): boolean {
-    return this.router.url === route;
+    return this.router.url === route || this.router.url.startsWith(route + '?');
   }
 
   logout(): void {
     this.authService.logout();
     this.dropdownVisible = false;
+    this.openGroupLabel = null;
     this.router.navigate(['/home']);
   }
 }
