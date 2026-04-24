@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -173,8 +173,9 @@ export class FriendsService {
       }
     }
 
+    const params = new HttpParams().set('email', email);
     const url = `${this.xomifyApiUrl}/user/all`;
-    return this.http.get<SearchResult[]>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.get<SearchResult[]>(url, { headers: this.getHeaders(), params }).pipe(
       tap((users) => {
         this.setCache(this.CACHE_KEY_USERS, users);
       }),
