@@ -9,6 +9,123 @@
   margin: 0 auto;
 }
 
+// Tab switcher under the header
+.profile-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: -24px 0 28px;
+  background: rgba(26, 26, 46, 0.7);
+  border: 1px solid rgba(156, 10, 191, 0.25);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+
+  .profile-tab {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: #b0b0c0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 8px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 140%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(156, 10, 191, 0.35);
+    }
+  }
+}
+
+// Settings tab cards
+.settings-section {
+  .account-info-card {
+    background: rgba(26, 26, 46, 0.7);
+    border: 1px solid rgba(156, 10, 191, 0.22);
+    border-radius: 18px;
+    padding: 8px 20px;
+  }
+
+  .settings-cta-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(26, 26, 46, 0.7);
+    border: 1px solid rgba(156, 10, 191, 0.22);
+    border-radius: 18px;
+    padding: 18px 22px;
+
+    .settings-cta-body {
+      flex: 1;
+    }
+
+    .settings-cta-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 4px;
+    }
+
+    .settings-cta-desc {
+      font-size: 0.85rem;
+      color: #b0b0c0;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .settings-cta-btn {
+      appearance: none;
+      border: none;
+      text-decoration: none;
+      background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 160%);
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(156, 10, 191, 0.35);
+      }
+
+      &.danger {
+        background: transparent;
+        border: 2px solid #ff5c8a;
+        color: #ff5c8a;
+
+        &:hover {
+          background: #ff5c8a;
+          color: #fff;
+          box-shadow: 0 8px 24px rgba(255, 92, 138, 0.3);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .settings-cta-card {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: left;
+
+      .settings-cta-btn {
+        align-self: flex-end;
+      }
+    }
+  }
+}
+
 // Profile Header
 .profile-header {
   position: relative;

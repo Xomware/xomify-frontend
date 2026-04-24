@@ -60,6 +60,32 @@
       </div>
     </div>
 
+    <!-- Tab switcher: Overview | Settings -->
+    <div class="profile-tabs" role="tablist" aria-label="Profile sections">
+      <button
+        type="button"
+        class="profile-tab"
+        role="tab"
+        [class.active]="activeTab === 'overview'"
+        [attr.aria-selected]="activeTab === 'overview'"
+        (click)="selectTab('overview')"
+      >
+        Overview
+      </button>
+      <button
+        type="button"
+        class="profile-tab"
+        role="tab"
+        [class.active]="activeTab === 'settings'"
+        [attr.aria-selected]="activeTab === 'settings'"
+        (click)="selectTab('settings')"
+      >
+        Settings
+      </button>
+    </div>
+
+    <!-- Overview tab -->
+    <ng-container *ngIf="activeTab === 'overview'">
     <!-- Quick Stats Section -->
     <section class="section quick-stats-section">
       <div class="section-header">
@@ -279,6 +305,78 @@
         </div>
       </div>
     </section>
+    </ng-container>
+    <!-- /overview tab -->
+
+    <!-- Settings tab -->
+    <ng-container *ngIf="activeTab === 'settings'">
+      <section class="section settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Account</h2>
+          <span class="section-subtitle">Read-only basics pulled from Spotify</span>
+        </div>
+        <div class="account-info-card">
+          <div class="account-row">
+            <span class="account-label">Display Name</span>
+            <span class="account-value">{{ userName }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label">Email</span>
+            <span class="account-value mono">{{ email }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label">Country</span>
+            <span class="account-value">{{ country }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label">Subscription</span>
+            <span class="account-value">{{ product | titlecase }}</span>
+          </div>
+          <div class="account-row">
+            <span class="account-label">User ID</span>
+            <span class="account-value mono">{{ userId }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Notifications</h2>
+          <span class="section-subtitle">Manage push notification devices</span>
+        </div>
+        <div class="settings-cta-card">
+          <div class="settings-cta-body">
+            <p class="settings-cta-title">Device registrations</p>
+            <p class="settings-cta-desc">
+              Xomify sends push notifications to devices registered from the iOS app.
+              Open the manager to register or unregister a device by its token.
+            </p>
+          </div>
+          <a class="settings-cta-btn" routerLink="/settings/notifications">
+            Manage devices
+          </a>
+        </div>
+      </section>
+
+      <section class="section settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Session</h2>
+          <span class="section-subtitle">End your Xomify session</span>
+        </div>
+        <div class="settings-cta-card">
+          <div class="settings-cta-body">
+            <p class="settings-cta-title">Log out</p>
+            <p class="settings-cta-desc">
+              You'll be returned to the sign-in screen. Your Spotify account stays connected.
+            </p>
+          </div>
+          <button type="button" class="settings-cta-btn danger" (click)="logout()">
+            Log out
+          </button>
+        </div>
+      </section>
+    </ng-container>
+    <!-- /settings tab -->
   </div>
 </div>
 
