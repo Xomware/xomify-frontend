@@ -110,7 +110,7 @@
           <h3 class="playlist-name">{{ playlist.name }}</h3>
           <p class="playlist-description" *ngIf="playlist.description">
             {{ playlist.description | slice : 0 : 60
-            }}{{ playlist.description.length > 60 ? "..." : "" }}
+            }}{{ (playlist.description?.length || 0) > 60 ? "..." : "" }}
           </p>
           <div class="playlist-meta">
             <span class="track-count">

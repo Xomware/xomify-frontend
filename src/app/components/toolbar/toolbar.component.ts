@@ -65,7 +65,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
           '/playlist-builder',
           '/playlist-analysis',
           '/mood-recommendations',
-          '/liked-artists-playlist',
         ],
         badge$: 'queue',
         links: [
@@ -73,7 +72,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
           { route: '/playlist-builder', label: 'Builder', badge$: 'queue' },
           { route: '/playlist-analysis', label: 'Analysis' },
           { route: '/mood-recommendations', label: 'Mood Picks' },
-          { route: '/liked-artists-playlist', label: 'Liked Artists' },
         ],
       },
     },

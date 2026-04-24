@@ -59,8 +59,8 @@ export class MyPlaylistsComponent implements OnInit {
     } else {
       this.filteredPlaylists = this.allPlaylists.filter(
         (playlist) =>
-          playlist.name.toLowerCase().includes(query) ||
-          playlist.description?.toLowerCase().includes(query)
+          playlist?.name?.toLowerCase().includes(query) ||
+          playlist?.description?.toLowerCase().includes(query)
       );
     }
 
@@ -75,10 +75,14 @@ export class MyPlaylistsComponent implements OnInit {
   sortPlaylists(): void {
     switch (this.sortBy) {
       case 'name':
-        this.filteredPlaylists.sort((a, b) => a.name.localeCompare(b.name));
+        this.filteredPlaylists.sort((a, b) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        );
         break;
       case 'name-desc':
-        this.filteredPlaylists.sort((a, b) => b.name.localeCompare(a.name));
+        this.filteredPlaylists.sort((a, b) =>
+          (b?.name || '').localeCompare(a?.name || '')
+        );
         break;
       case 'tracks':
         this.filteredPlaylists.sort(
