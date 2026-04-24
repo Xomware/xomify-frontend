@@ -39,12 +39,13 @@ export class PlaylistAnalysisComponent implements OnInit {
 
   loadPlaylists(): void {
     this.loadingPlaylists = true;
+    this.error = '';
     this.playlistService
       .getUserPlaylists(50, 0)
       .pipe(take(1))
       .subscribe({
         next: (res) => {
-          this.playlists = res.items || [];
+          this.playlists = (res?.items || []).filter((p: any) => p != null);
           if (this.playlists.length > 0) {
             this.selectedPlaylistId = this.playlists[0].id;
           }
@@ -52,7 +53,9 @@ export class PlaylistAnalysisComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error loading playlists:', err);
-          this.error = 'Failed to load your playlists.';
+          const status = err?.status ? ` (${err.status})` : '';
+          const detail = err?.error?.error?.message || err?.message || '';
+          this.error = `Failed to load your playlists${status}${detail ? ': ' + detail : '.'}`;
           this.loadingPlaylists = false;
         },
       });

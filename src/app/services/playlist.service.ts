@@ -31,13 +31,20 @@ export class PlaylistService {
   // ============================================
 
   /**
-   * Get user's playlists
+   * Get user's playlists. Strips `null` entries from `items` — Spotify can
+   * return nulls for deleted/unreadable playlists and downstream templates
+   * assume `playlist.name` is defined.
    */
   getUserPlaylists(limit: number = 50, offset: number = 0): Observable<any> {
-    return this.http.get(`${this.apiUrl}/me/playlists`, {
+    return this.http.get<any>(`${this.apiUrl}/me/playlists`, {
       headers: this.getHeaders(),
       params: { limit: limit.toString(), offset: offset.toString() },
-    });
+    }).pipe(
+      map((res: any) => ({
+        ...res,
+        items: (res?.items || []).filter((p: any) => p != null),
+      })),
+    );
   }
 
   /**
@@ -68,22 +75,41 @@ export class PlaylistService {
   }
 
   /**
-   * Get playlist details
+   * Get playlist details. Filters `null` track entries inside
+   * `tracks.items` — Spotify returns nulls for removed/unavailable tracks
+   * and the template renders `item.track.name` unconditionally for
+   * in-queue checks.
    */
   getPlaylistDetails(playlistId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/playlists/${playlistId}`, {
+    return this.http.get<any>(`${this.apiUrl}/playlists/${playlistId}`, {
       headers: this.getHeaders(),
-    });
+    }).pipe(
+      map((res: any) => {
+        if (!res?.tracks?.items) return res;
+        return {
+          ...res,
+          tracks: {
+            ...res.tracks,
+            items: res.tracks.items.filter((i: any) => i?.track != null),
+          },
+        };
+      }),
+    );
   }
 
   /**
-   * Get playlist tracks with pagination
+   * Get playlist tracks with pagination. Filters null-track items.
    */
   getPlaylistTracks(playlistId: string, limit: number = 50, offset: number = 0): Observable<any> {
-    return this.http.get(`${this.apiUrl}/playlists/${playlistId}/tracks`, {
+    return this.http.get<any>(`${this.apiUrl}/playlists/${playlistId}/tracks`, {
       headers: this.getHeaders(),
       params: { limit: limit.toString(), offset: offset.toString() },
-    });
+    }).pipe(
+      map((res: any) => ({
+        ...res,
+        items: (res?.items || []).filter((i: any) => i?.track != null),
+      })),
+    );
   }
 
   /**
