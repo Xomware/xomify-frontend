@@ -41,20 +41,28 @@ export class PlaylistService {
   }
 
   /**
-   * Get all user's playlists (paginated, returns all)
+   * Get all user's playlists (paginated, returns all).
+   *
+   * Tracks `offset` locally rather than trusting `response.offset` — some
+   * Spotify client paths strip the paging metadata and leave it `undefined`,
+   * which turns `undefined + 50` into `NaN` and stalls pagination. Also
+   * filters out `null` entries Spotify occasionally returns for deleted or
+   * unreadable playlists (those would crash the template on `playlist.name`).
    */
   getAllUserPlaylists(): Observable<any[]> {
     const limit = 50;
-    return this.getUserPlaylists(limit, 0).pipe(
+    let offset = 0;
+    return this.getUserPlaylists(limit, offset).pipe(
       expand((response) => {
-        if (response.next) {
-          const nextOffset = response.offset + limit;
-          return this.getUserPlaylists(limit, nextOffset);
+        if (response?.next) {
+          offset += limit;
+          return this.getUserPlaylists(limit, offset);
         }
         return EMPTY;
       }),
       reduce((acc: any[], response) => {
-        return acc.concat(response.items || []);
+        const items = (response?.items || []).filter((p: any) => p != null);
+        return acc.concat(items);
       }, [])
     );
   }

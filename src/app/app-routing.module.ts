@@ -17,7 +17,6 @@ import { MyPlaylistsComponent } from './pages/my-playlists/my-playlists.componen
 import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
-import { LikedArtistsPlaylistGeneratorComponent } from './pages/liked-artists-playlist-generator/liked-artists-playlist-generator.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -85,11 +84,6 @@ const routes: Routes = [
   {
     path: 'ratings',
     component: RatingsComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'liked-artists-playlist',
-    component: LikedArtistsPlaylistGeneratorComponent,
     canActivate: [AuthGuard],
   },
   // Lazy-loaded feature modules
