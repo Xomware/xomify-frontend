@@ -50,7 +50,9 @@ describe('NotificationsService', () => {
       deviceToken: token,
       platform: 'ios',
     });
-    expect(req.request.headers.get('Authorization')).toContain('Bearer');
+    // Authorization header is attached globally by AuthInterceptor (sub-feature
+    // 0e). The interceptor is not registered in this isolated TestBed; header
+    // attachment is covered by `auth.interceptor.spec.ts`.
     req.flush(mockResponse);
   });
 

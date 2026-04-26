@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -73,7 +73,7 @@ export interface SearchResult {
 })
 export class FriendsService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   // Cache subjects
   private friendsListSubject = new BehaviorSubject<FriendsListResponse | null>(
@@ -96,13 +96,6 @@ export class FriendsService {
 
   constructor(private http: HttpClient) {
     // Don't auto-load cache - wait until we know which user
-  }
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
   }
 
   // Load cached data for a specific user
@@ -175,7 +168,7 @@ export class FriendsService {
 
     const params = new HttpParams().set('email', email);
     const url = `${this.xomifyApiUrl}/user/all`;
-    return this.http.get<SearchResult[]>(url, { headers: this.getHeaders(), params }).pipe(
+    return this.http.get<SearchResult[]>(url, { params }).pipe(
       tap((users) => {
         this.setCache(this.CACHE_KEY_USERS, users);
       }),
@@ -204,7 +197,7 @@ export class FriendsService {
 
     const url = `${this.xomifyApiUrl}/friends/list?email=${encodeURIComponent(email)}`;
     return this.http
-      .get<FriendsListResponse>(url, { headers: this.getHeaders() })
+      .get<FriendsListResponse>(url)
       .pipe(
         tap((response) => {
           // Only update subjects if this is the current user's data
@@ -229,7 +222,7 @@ export class FriendsService {
     const url = `${this.xomifyApiUrl}/friends/request`;
     const body = { email, requestEmail };
     return this.http
-      .post(url, body, { headers: this.getHeaders() })
+      .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
@@ -239,7 +232,7 @@ export class FriendsService {
     const url = `${this.xomifyApiUrl}/friends/accept`;
     const body = { email, requestEmail };
     return this.http
-      .post(url, body, { headers: this.getHeaders() })
+      .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
@@ -249,7 +242,7 @@ export class FriendsService {
     const url = `${this.xomifyApiUrl}/friends/reject`;
     const body = { email, requestEmail };
     return this.http
-      .post(url, body, { headers: this.getHeaders() })
+      .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
@@ -258,7 +251,6 @@ export class FriendsService {
     const url = `${this.xomifyApiUrl}/friends/remove`;
     return this.http
       .delete(url, {
-        headers: this.getHeaders(),
         params: {
           email: email,
           friendEmail: friendEmail,
@@ -282,7 +274,7 @@ export class FriendsService {
     }
 
     const url = `${this.xomifyApiUrl}/friends/profile?friendEmail=${encodeURIComponent(friendEmail)}`;
-    return this.http.get<FriendProfile>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.get<FriendProfile>(url).pipe(
       tap((profile) => {
         this.setProfileCache(cacheKey, profile);
       })

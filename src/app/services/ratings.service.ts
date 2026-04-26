@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -29,7 +29,7 @@ export interface FriendRating {
 })
 export class RatingsService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   // Cache settings
   private readonly CACHE_KEY_PREFIX = 'xomify_ratings_';
@@ -41,13 +41,6 @@ export class RatingsService {
 
   constructor(private http: HttpClient) {
     this.loadFromLocalStorage();
-  }
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
   }
 
   // Load ratings from localStorage on init
@@ -110,7 +103,7 @@ export class RatingsService {
 
     const url = `${this.xomifyApiUrl}/ratings/all?email=${encodeURIComponent(email)}`;
     return this.http
-      .get<any>(url, { headers: this.getHeaders() })
+      .get<any>(url)
       .pipe(
         tap((response) => {
           // Handle both array and object responses
@@ -143,7 +136,7 @@ export class RatingsService {
 
     const url = `${this.xomifyApiUrl}/ratings/track/?trackId=${trackId}&email=${encodeURIComponent(email)}`;
     return this.http
-      .get<any>(url, { headers: this.getHeaders() })
+      .get<any>(url)
       .pipe(
         map((response) => response ? this.mapRatingResponse(response) : null),
         catchError(() => of(null))
@@ -174,7 +167,7 @@ export class RatingsService {
     };
 
     return this.http
-      .post<any>(url, body, { headers: this.getHeaders() })
+      .post<any>(url, body)
       .pipe(
         map((response) => {
           // Construct the rating with our known data (API may return incomplete/snake_case fields)
@@ -229,7 +222,7 @@ export class RatingsService {
   // DELETE rating
   deleteRating(email: string, trackId: string): Observable<void> {
     const url = `${this.xomifyApiUrl}/ratings/remove?trackId=${trackId}&email=${encodeURIComponent(email)}`;
-    return this.http.delete<void>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         // Remove from local cache
         const current = this.ratingsSubject.getValue();
@@ -258,7 +251,7 @@ export class RatingsService {
   ): Observable<FriendRating[]> {
     const url = `${this.xomifyApiUrl}/ratings/track?trackId=${trackId}&email=${encodeURIComponent(email)}`;
     return this.http
-      .get<FriendRating[]>(url, { headers: this.getHeaders() })
+      .get<FriendRating[]>(url)
       .pipe(catchError(() => of([])));
   }
 

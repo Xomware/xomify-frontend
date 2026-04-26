@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -107,16 +107,9 @@ export interface ReactResponse {
 })
 export class ShareFeedService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   constructor(private http: HttpClient) {}
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-  }
 
   /**
    * POST /shares/create
@@ -146,9 +139,7 @@ export class ShareFeedService {
     if (track.genreTags && track.genreTags.length > 0) {
       body['genreTags'] = track.genreTags;
     }
-    return this.http.post<CreateShareResponse>(url, body, {
-      headers: this.getHeaders(),
-    });
+    return this.http.post<CreateShareResponse>(url, body);
   }
 
   /**
@@ -167,10 +158,7 @@ export class ShareFeedService {
     if (opts.before) {
       params = params.set('before', opts.before);
     }
-    return this.http.get<FeedResponse>(url, {
-      headers: this.getHeaders(),
-      params,
-    });
+    return this.http.get<FeedResponse>(url, { params });
   }
 
   /**
@@ -189,8 +177,6 @@ export class ShareFeedService {
     if (action === 'rated' && rating !== undefined) {
       body['rating'] = rating;
     }
-    return this.http.post<ReactResponse>(url, body, {
-      headers: this.getHeaders(),
-    });
+    return this.http.post<ReactResponse>(url, body);
   }
 }

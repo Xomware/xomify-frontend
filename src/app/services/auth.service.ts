@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ToastService } from './toast.service';
+import { XomifyAuthService } from './xomify-auth.service';
 
 interface TokenResponse {
   access_token: string;
-  refresh_token: string;
+  /** Spotify only returns this on the initial code-exchange, not on refresh. */
+  refresh_token?: string;
   token_type: string;
   expires_in: number;
   scope: string;
@@ -24,13 +28,15 @@ export class AuthService {
   private readonly redirectUri = `${environment.baseCallbackUrl}/callback`;
   private readonly scope =
     'user-read-private user-read-email user-library-read user-top-read playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-playback-state streaming';
+  private readonly spotifyTokenUrl = 'https://accounts.spotify.com/api/token';
   accessToken: string = '';
   refreshToken: string = '';
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private xomifyAuth: XomifyAuthService,
   ) {
     this.restoreTokens();
   }
@@ -74,7 +80,6 @@ export class AuthService {
   }
 
   private exchangeCodeForToken(code: string): void {
-    const tokenUrl = 'https://accounts.spotify.com/api/token';
     const body = new URLSearchParams();
 
     body.set('grant_type', 'authorization_code');
@@ -84,16 +89,31 @@ export class AuthService {
     body.set('client_secret', this.clientSecret);
 
     this.http
-      .post<TokenResponse>(tokenUrl, body.toString(), {
-        headers: {
+      .post<TokenResponse>(this.spotifyTokenUrl, body.toString(), {
+        headers: new HttpHeaders({
           'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        }),
       })
       .subscribe({
         next: (response: TokenResponse) => {
           this.accessToken = response.access_token;
-          this.refreshToken = response.refresh_token;
+          if (response.refresh_token) {
+            this.refreshToken = response.refresh_token;
+          }
           this.persistTokens();
+
+          // Sub-feature 0e: mint a per-user Xomify JWT from the Spotify
+          // access token. Fire-and-forget — the AuthInterceptor falls back
+          // to the legacy static token while this round-trip completes,
+          // and the backend authorizer accepts both during the migration.
+          this.xomifyAuth
+            .mintFromSpotifyAccessToken(this.accessToken)
+            .subscribe({
+              error: () => {
+                // Errors are already logged inside XomifyAuthService.
+              },
+            });
+
           this.router.navigate(['/my-profile']);
         },
         error: () => {
@@ -102,10 +122,51 @@ export class AuthService {
       });
   }
 
+  /**
+   * Refresh the Spotify access token using the stored refresh token. Returns
+   * the new access token (or `null` if no refresh token is available / the
+   * call fails). Used by the AuthInterceptor on a 401 to bootstrap a fresh
+   * `/auth/login` round-trip.
+   */
+  refreshSpotifyAccessToken(): Observable<string | null> {
+    if (!this.refreshToken || this.refreshToken.trim().length === 0) {
+      return of(null);
+    }
+
+    const body = new URLSearchParams();
+    body.set('grant_type', 'refresh_token');
+    body.set('refresh_token', this.refreshToken);
+    body.set('client_id', this.clientId);
+    body.set('client_secret', this.clientSecret);
+
+    return this.http
+      .post<TokenResponse>(this.spotifyTokenUrl, body.toString(), {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }),
+      })
+      .pipe(
+        map((response) => {
+          this.accessToken = response.access_token;
+          // Spotify may rotate the refresh token; persist whichever we got.
+          if (response.refresh_token) {
+            this.refreshToken = response.refresh_token;
+          }
+          this.persistTokens();
+          return this.accessToken;
+        }),
+        catchError((err) => {
+          console.warn('[AuthService] Spotify refresh failed', err);
+          return of(null);
+        }),
+      );
+  }
+
   logout(): void {
     this.accessToken = '';
     this.refreshToken = '';
     this.clearPersistedTokens();
+    this.xomifyAuth.clear();
   }
 
   getAccessToken(): string {

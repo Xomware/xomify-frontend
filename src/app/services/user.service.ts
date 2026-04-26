@@ -22,7 +22,7 @@ export class UserService implements OnInit {
   private bootstrap$: Observable<void> | null = null;
   private baseUrl = 'https://api.spotify.com/v1';
   private xomifyApiUrl: string = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   constructor(
     private http: HttpClient,
@@ -199,11 +199,7 @@ export class UserService implements OnInit {
       refreshToken: this.refreshToken,
       avatar: this.getProfilePic(),
     };
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-    return this.http.post(url, body, { headers });
+    return this.http.post(url, body);
   }
 
   updateUserTableEnrollments(
@@ -217,22 +213,14 @@ export class UserService implements OnInit {
       wrappedEnrolled: wrappedEnrolled,
       releaseRadarEnrolled: releaseRadarEnrolled,
     };
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-    return this.http.post(url, body, { headers });
+    return this.http.post(url, body);
   }
 
   getUserTableData(email: string): Observable<any> {
     const url = `${
       this.xomifyApiUrl
     }/user/data?email=${encodeURIComponent(email)}`;
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-    return this.http.get(url, { headers });
+    return this.http.get(url);
   }
 
   setUser(data: Record<string, unknown>): void {

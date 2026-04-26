@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 export interface ReleaseRadarRelease {
@@ -74,12 +74,7 @@ export class ReleaseRadarService {
     return `${this.cacheKeyPrefix}:${email.toLowerCase()}`;
   }
 
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${environment.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-  }
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   // ============================================
   // API Methods
@@ -99,10 +94,7 @@ export class ReleaseRadarService {
     return this.http
       .get<ReleaseRadarHistoryResponse>(
         `${this.baseUrl}/release-radar/history`,
-        {
-          headers: this.getHeaders(),
-          params,
-        }
+        { params }
       )
       .pipe(
         tap(() => {
@@ -129,7 +121,6 @@ export class ReleaseRadarService {
 
     return this.http
       .get<ReleaseRadarCheckResponse>(`${this.baseUrl}/release-radar/check`, {
-        headers: this.getHeaders(),
         params,
       })
       .pipe(

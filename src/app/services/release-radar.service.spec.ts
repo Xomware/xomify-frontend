@@ -88,18 +88,9 @@ describe('ReleaseRadarService', () => {
       req.flush(mockHistoryResponse);
     });
 
-    it('should include authorization header', (done) => {
-      service.getHistory('test@example.com').subscribe(() => {
-        done();
-      });
-
-      const req = httpMock.expectOne(
-        (request) => request.url.includes('/release-radar/history')
-      );
-      expect(req.request.headers.has('Authorization')).toBe(true);
-      expect(req.request.headers.get('Authorization')).toContain('Bearer');
-      req.flush(mockHistoryResponse);
-    });
+    // Note: per-service Authorization header attach was dropped in
+    // sub-feature 0e. The AuthInterceptor now attaches `Bearer <jwt>`
+    // globally; coverage lives in `auth.interceptor.spec.ts`.
 
     it('should set custom limit parameter', (done) => {
       service.getHistory('test@example.com', 52).subscribe(() => {

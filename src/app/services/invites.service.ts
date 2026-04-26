@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -49,25 +49,18 @@ export interface DeclineInviteResponse {
 })
 export class InvitesService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   private pendingInvitesSubject = new BehaviorSubject<Invite[]>([]);
   pendingInvites$ = this.pendingInvitesSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-  }
-
   /** POST /invites/create — mint a new invite code for the caller. */
   createInvite(email: string): Observable<CreateInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/create`;
     return this.http
-      .post<CreateInviteResponse>(url, { email }, { headers: this.getHeaders() })
+      .post<CreateInviteResponse>(url, { email })
       .pipe(
         tap((resp) => {
           // Optimistically prepend the new invite to the cache if it's populated.
@@ -90,11 +83,7 @@ export class InvitesService {
     inviteCode: string,
   ): Observable<AcceptInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/accept`;
-    return this.http.post<AcceptInviteResponse>(
-      url,
-      { email, inviteCode },
-      { headers: this.getHeaders() },
-    );
+    return this.http.post<AcceptInviteResponse>(url, { email, inviteCode });
   }
 
   /** GET /invites/pending — list outstanding invites minted by the caller. */
@@ -102,10 +91,7 @@ export class InvitesService {
     const url = `${this.xomifyApiUrl}/invites/pending`;
     const params = new HttpParams().set('email', email);
     return this.http
-      .get<PendingInvitesResponse>(url, {
-        headers: this.getHeaders(),
-        params,
-      })
+      .get<PendingInvitesResponse>(url, { params })
       .pipe(
         tap((resp) => {
           this.pendingInvitesSubject.next(resp.invites || []);
@@ -119,11 +105,7 @@ export class InvitesService {
     inviteCode: string,
   ): Observable<DeclineInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/decline`;
-    return this.http.post<DeclineInviteResponse>(
-      url,
-      { email, inviteCode },
-      { headers: this.getHeaders() },
-    );
+    return this.http.post<DeclineInviteResponse>(url, { email, inviteCode });
   }
 
   /** Client-only removal from the in-memory cache. Backend has no revoke

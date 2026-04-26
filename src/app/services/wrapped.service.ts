@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -36,16 +36,9 @@ export interface WrappedDataResponse {
 })
 export class WrappedService {
   private xomifyApiUrl: string = environment.xomifyApiUrl;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   constructor(private http: HttpClient) {}
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-  }
 
   /**
    * Get all wrapped data for a user including enrollment status and history.
@@ -56,7 +49,7 @@ export class WrappedService {
       email,
     )}`;
     return this.http
-      .get<WrappedDataResponse>(url, { headers: this.getHeaders() })
+      .get<WrappedDataResponse>(url)
       .pipe(
         map((response) => {
           // Ensure wraps array exists
@@ -87,7 +80,7 @@ export class WrappedService {
     const url = `${this.xomifyApiUrl}/wrapped/month?email=${encodeURIComponent(
       email,
     )}&monthKey=${encodeURIComponent(monthKey)}`;
-    return this.http.get<MonthlyWrap>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.get<MonthlyWrap>(url).pipe(
       catchError((error) => {
         console.error(`Error fetching wrapped for ${monthKey}:`, error);
         return of(null);
@@ -103,7 +96,7 @@ export class WrappedService {
       email,
     )}&year=${encodeURIComponent(year)}`;
     return this.http
-      .get<MonthlyWrap[]>(url, { headers: this.getHeaders() })
+      .get<MonthlyWrap[]>(url)
       .pipe(
         catchError((error) => {
           console.error(`Error fetching wrapped for year ${year}:`, error);
@@ -128,6 +121,6 @@ export class WrappedService {
       refreshToken: refreshToken,
       active: optIn,
     };
-    return this.http.post(url, body, { headers: this.getHeaders() });
+    return this.http.post(url, body);
   }
 }
