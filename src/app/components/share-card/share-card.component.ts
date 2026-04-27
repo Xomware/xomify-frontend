@@ -4,8 +4,10 @@ import { take } from 'rxjs/operators';
 import {
   ReactResponse,
   ReactionAction,
+  ReactionToggleResponse,
   Share,
   ShareFeedService,
+  ShareReaction,
 } from 'src/app/services/share-feed.service';
 import { PlayerService } from 'src/app/services/player.service';
 import { ShareService } from 'src/app/services/share.service';
@@ -37,6 +39,9 @@ export class ShareCardComponent {
   queuePending = false;
   ratingPending = false;
   menuOpen = false;
+
+  /** Slugs currently in flight on the reactions row, scoped per card. */
+  reactingSlugs = new Set<ShareReaction>();
 
   constructor(
     private router: Router,
@@ -106,6 +111,18 @@ export class ShareCardComponent {
 
   get viewerRating(): number {
     return this.share.viewerRating ?? 0;
+  }
+
+  get commentCount(): number {
+    return this.share.commentCount ?? 0;
+  }
+
+  get reactionCounts(): Partial<Record<ShareReaction, number>> {
+    return this.share.reactionCounts || {};
+  }
+
+  get viewerReactions(): ShareReaction[] {
+    return this.share.viewerReactions || [];
   }
 
   // ============================================
@@ -276,5 +293,77 @@ export class ShareCardComponent {
   openAuthor(): void {
     if (!this.share.email) return;
     this.router.navigate(['/friend', this.share.email]);
+  }
+
+  /**
+   * Navigate to the share-detail page. Triggered by the card body tap-zone
+   * (header + track + caption + tags) and by the comment-count chip — mirrors
+   * iOS `ShareCardView.swift:116-125`. The action footer (kebab, ratings,
+   * reactions) is intentionally NOT inside the tap target.
+   */
+  openDetail(): void {
+    if (!this.share.shareId) return;
+    this.router.navigate(['/share', this.share.shareId]);
+  }
+
+  /**
+   * Toggle one emoji reaction. Optimistic patch (counts + viewerReactions),
+   * server response replaces local state, rollback on error.
+   */
+  onReactionToggle(reaction: ShareReaction): void {
+    if (!this.share || this.reactingSlugs.has(reaction)) return;
+
+    const email = this.userService.getEmail();
+    if (!email) {
+      this.toastService.showNegativeToast('Sign in to react');
+      return;
+    }
+
+    const previousCounts: Partial<Record<ShareReaction, number>> = {
+      ...(this.share.reactionCounts || {}),
+    };
+    const previousViewer: ShareReaction[] = [
+      ...(this.share.viewerReactions || []),
+    ];
+
+    // Optimistic patch.
+    const nextCounts: Partial<Record<ShareReaction, number>> = { ...previousCounts };
+    const nextViewer: ShareReaction[] = [...previousViewer];
+    if (previousViewer.includes(reaction)) {
+      const idx = nextViewer.indexOf(reaction);
+      if (idx >= 0) nextViewer.splice(idx, 1);
+      const next = Math.max(0, (nextCounts[reaction] ?? 0) - 1);
+      if (next === 0) {
+        delete nextCounts[reaction];
+      } else {
+        nextCounts[reaction] = next;
+      }
+    } else {
+      nextViewer.push(reaction);
+      nextCounts[reaction] = (nextCounts[reaction] ?? 0) + 1;
+    }
+    this.share.reactionCounts = nextCounts;
+    this.share.viewerReactions = nextViewer;
+
+    this.reactingSlugs.add(reaction);
+
+    this.shareFeedService
+      .toggleReaction(this.share.shareId, reaction)
+      .pipe(take(1))
+      .subscribe({
+        next: (resp: ReactionToggleResponse) => {
+          this.share.reactionCounts = resp.counts || {};
+          this.share.viewerReactions = resp.viewerReactions || [];
+          this.reactingSlugs.delete(reaction);
+        },
+        error: (err) => {
+          console.error('Error toggling reaction:', err);
+          // Rollback.
+          this.share.reactionCounts = previousCounts;
+          this.share.viewerReactions = previousViewer;
+          this.reactingSlugs.delete(reaction);
+          this.toastService.showNegativeToast('Could not save reaction');
+        },
+      });
   }
 }

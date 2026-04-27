@@ -1,0 +1,73 @@
+<div
+  class="reactions-bar"
+  [class.compact]="compact"
+  role="group"
+  aria-label="Reactions"
+>
+  <button
+    *ngFor="let reaction of activeReactions; trackBy: trackByReaction"
+    type="button"
+    class="pill"
+    [class.active]="isViewerActive(reaction)"
+    [class.in-flight]="isInFlight(reaction)"
+    [disabled]="isInFlight(reaction)"
+    (click)="onPillClick($event, reaction)"
+    [attr.aria-label]="labelFor(reaction)"
+    [attr.aria-pressed]="isViewerActive(reaction)"
+    [attr.aria-disabled]="isInFlight(reaction)"
+    [title]="labelFor(reaction)"
+  >
+    <span class="emoji" aria-hidden="true">{{ emojiFor(reaction) }}</span>
+    <span class="count">{{ countFor(reaction) }}</span>
+  </button>
+
+  <div class="picker-wrapper">
+    <button
+      type="button"
+      class="add-btn"
+      (click)="togglePicker($event)"
+      aria-label="Add a reaction"
+      [attr.aria-expanded]="pickerOpen"
+      [attr.aria-haspopup]="'menu'"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <line x1="9" y1="10" x2="9.01" y2="10" />
+        <line x1="15" y1="10" x2="15.01" y2="10" />
+        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+      </svg>
+    </button>
+
+    <div
+      class="picker-popover"
+      *ngIf="pickerOpen"
+      role="menu"
+      aria-label="Pick a reaction"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        *ngFor="let reaction of allReactions; trackBy: trackByReaction"
+        type="button"
+        class="picker-item"
+        role="menuitem"
+        [class.active]="isViewerActive(reaction)"
+        [disabled]="isInFlight(reaction)"
+        (click)="onPickerSelect($event, reaction)"
+        [attr.aria-label]="labelFor(reaction)"
+        [title]="labelFor(reaction)"
+      >
+        <span aria-hidden="true">{{ emojiFor(reaction) }}</span>
+      </button>
+    </div>
+  </div>
+</div>

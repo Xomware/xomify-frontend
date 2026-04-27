@@ -1,0 +1,103 @@
+<div
+  class="modal-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="friends-rated-title"
+  (click)="onBackdropClick($event)"
+>
+  <div class="modal-panel" role="document">
+    <header class="modal-header">
+      <div class="header-text">
+        <h2 id="friends-rated-title">Friends rated</h2>
+        <p class="track-name" *ngIf="trackName">{{ trackName }}</p>
+        <p class="count-label">{{ countLabel }}</p>
+      </div>
+      <button
+        type="button"
+        class="modal-close"
+        (click)="close()"
+        aria-label="Close"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="average-card" *ngIf="average !== null && average !== undefined">
+        <div class="average-icon" aria-hidden="true">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+            />
+          </svg>
+        </div>
+        <div class="average-text">
+          <strong>{{ averageDisplay() }}</strong>
+          <span>Average friend rating</span>
+        </div>
+      </div>
+
+      <div class="empty" *ngIf="ratings.length === 0">
+        No friends have rated this yet.
+      </div>
+
+      <ul class="rating-list" *ngIf="ratings.length > 0">
+        <li
+          class="rating-row"
+          *ngFor="let rating of ratings; trackBy: trackByEmail"
+        >
+          <div class="row-avatar" aria-hidden="true">
+            <img
+              *ngIf="rating.avatar"
+              [src]="rating.avatar"
+              [alt]="''"
+            />
+            <span *ngIf="!rating.avatar">{{ initialOf(rating) }}</span>
+          </div>
+          <div class="row-body">
+            <div class="row-author">{{ authorOf(rating) }}</div>
+            <p class="row-review" *ngIf="rating.review">{{ rating.review }}</p>
+          </div>
+          <span
+            class="row-stars"
+            [attr.aria-label]="
+              authorOf(rating) + ' rated ' + starsFor(rating) + ' out of 5'
+            "
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            <span>{{ starsFor(rating) }}/5</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

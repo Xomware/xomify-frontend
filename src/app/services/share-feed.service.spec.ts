@@ -5,10 +5,15 @@ import {
 } from '@angular/common/http/testing';
 
 import {
+  CommentDeleteResponse,
+  CommentsListResponse,
   CreateShareRequest,
   CreateShareResponse,
   FeedResponse,
   ReactResponse,
+  ReactionToggleResponse,
+  ShareComment,
+  ShareDetailResponse,
   ShareFeedService,
 } from './share-feed.service';
 
@@ -219,6 +224,225 @@ describe('ShareFeedService', () => {
       // Caller email must NOT be in the body.
       expect(req.request.body['email']).toBeUndefined();
       req.flush(mockEnrichment);
+    });
+  });
+
+  // ============================================
+  // Share-detail
+  // ============================================
+
+  describe('getShareDetail', () => {
+    const mockResponse: ShareDetailResponse = {
+      share: {
+        shareId: 's1',
+        email,
+        trackId: 't1',
+        trackUri: 'spotify:track:t1',
+        trackName: 'Name',
+        artistName: 'Artist',
+        albumName: 'Album',
+        albumArtUrl: 'https://art/1',
+        createdAt: '2026-04-23T10:00:00Z',
+        sharedAt: '2026-04-23T10:00:00Z',
+        queuedCount: 1,
+        ratedCount: 2,
+        viewerHasQueued: false,
+        viewerRating: null,
+        sharerRating: 4,
+        commentCount: 3,
+        reactionCounts: { fire: 2, heart: 1 },
+        viewerReactions: ['fire'],
+      },
+      interactions: [
+        {
+          email: 'a@b.com',
+          displayName: 'Alice',
+          avatar: null,
+          action: 'queued',
+          createdAt: '2026-04-23T10:00:00Z',
+        },
+      ],
+      friendRatings: [
+        {
+          email: 'c@d.com',
+          displayName: 'Cara',
+          avatar: null,
+          rating: 5,
+          review: null,
+          ratedAt: '2026-04-23T09:00:00Z',
+        },
+      ],
+    };
+
+    it('GETs /shares/detail with only shareId when no extras', (done) => {
+      service.getShareDetail('s1').subscribe((resp) => {
+        expect(resp.share.shareId).toBe('s1');
+        expect(resp.interactions.length).toBe(1);
+        expect(resp.friendRatings.length).toBe(1);
+        done();
+      });
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/detail'));
+      expect(req.request.method).toBe('GET');
+      expect(req.request.params.get('shareId')).toBe('s1');
+      expect(req.request.params.get('sharedBy')).toBeNull();
+      expect(req.request.params.get('sharedAt')).toBeNull();
+      req.flush(mockResponse);
+    });
+
+    it('forwards sharedBy / sharedAt when provided (forward-compat)', (done) => {
+      service
+        .getShareDetail('s1', 'author@example.com', '2026-04-23T10:00:00Z')
+        .subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/detail'));
+      expect(req.request.params.get('shareId')).toBe('s1');
+      expect(req.request.params.get('sharedBy')).toBe('author@example.com');
+      expect(req.request.params.get('sharedAt')).toBe('2026-04-23T10:00:00Z');
+      req.flush(mockResponse);
+    });
+  });
+
+  // ============================================
+  // Comments
+  // ============================================
+
+  describe('listComments', () => {
+    const mockResponse: CommentsListResponse = {
+      comments: [
+        {
+          commentId: 'c1',
+          shareId: 's1',
+          email: 'a@b.com',
+          displayName: 'Alice',
+          avatar: null,
+          body: 'Hello',
+          createdAt: '2026-04-23T10:00:00Z',
+        },
+      ],
+      nextBefore: null,
+    };
+
+    it('GETs /shares/comments-list with shareId only when no paging', (done) => {
+      service.listComments('s1').subscribe((resp) => {
+        expect(resp.comments.length).toBe(1);
+        done();
+      });
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/comments-list'),
+      );
+      expect(req.request.method).toBe('GET');
+      expect(req.request.params.get('shareId')).toBe('s1');
+      expect(req.request.params.get('limit')).toBeNull();
+      expect(req.request.params.get('before')).toBeNull();
+      req.flush(mockResponse);
+    });
+
+    it('forwards limit and before when given', (done) => {
+      service.listComments('s1', 25, '2026-04-23T09:00:00Z').subscribe(() => done());
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/comments-list'),
+      );
+      expect(req.request.params.get('shareId')).toBe('s1');
+      expect(req.request.params.get('limit')).toBe('25');
+      expect(req.request.params.get('before')).toBe('2026-04-23T09:00:00Z');
+      req.flush(mockResponse);
+    });
+  });
+
+  describe('createComment', () => {
+    it('POSTs /shares/comments-create with shareId + body (no caller email)', (done) => {
+      const mockResponse: ShareComment = {
+        commentId: 'c1',
+        shareId: 's1',
+        email,
+        displayName: 'Dom',
+        avatar: null,
+        body: 'Hello',
+        createdAt: '2026-04-23T10:00:00Z',
+      };
+      service.createComment('s1', 'Hello').subscribe((resp) => {
+        expect(resp.commentId).toBe('c1');
+        done();
+      });
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/comments-create'),
+      );
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ shareId: 's1', body: 'Hello' });
+      expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
+      req.flush(mockResponse);
+    });
+  });
+
+  describe('deleteComment', () => {
+    it('DELETEs /shares/comments-delete with shareId + commentId in the body', (done) => {
+      const mockResponse: CommentDeleteResponse = {
+        deleted: true,
+        commentId: 'c1',
+      };
+      service.deleteComment('s1', 'c1').subscribe((resp) => {
+        expect(resp.deleted).toBe(true);
+        done();
+      });
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/comments-delete'),
+      );
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual({ shareId: 's1', commentId: 'c1' });
+      req.flush(mockResponse);
+    });
+  });
+
+  // ============================================
+  // Emoji reactions
+  // ============================================
+
+  describe('toggleReaction', () => {
+    it('POSTs /shares/reactions-toggle with the shareId + reaction slug', (done) => {
+      const mockResponse: ReactionToggleResponse = {
+        active: true,
+        reaction: 'fire',
+        counts: { fire: 1 },
+        viewerReactions: ['fire'],
+      };
+      service.toggleReaction('s1', 'fire').subscribe((resp) => {
+        expect(resp.active).toBe(true);
+        expect(resp.counts.fire).toBe(1);
+        expect(resp.viewerReactions).toEqual(['fire']);
+        done();
+      });
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/reactions-toggle'),
+      );
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ shareId: 's1', reaction: 'fire' });
+      // Caller email must NOT be in the body.
+      expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
+      req.flush(mockResponse);
+    });
+
+    it('passes the underscored slug for mind_blown', (done) => {
+      const mockResponse: ReactionToggleResponse = {
+        active: true,
+        reaction: 'mind_blown',
+        counts: { mind_blown: 1 },
+        viewerReactions: ['mind_blown'],
+      };
+      service.toggleReaction('s1', 'mind_blown').subscribe(() => done());
+
+      const req = httpMock.expectOne((r) =>
+        r.url.endsWith('/shares/reactions-toggle'),
+      );
+      expect((req.request.body as Record<string, unknown>)['reaction']).toBe(
+        'mind_blown',
+      );
+      req.flush(mockResponse);
     });
   });
 });

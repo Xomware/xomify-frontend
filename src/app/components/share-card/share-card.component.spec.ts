@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of, throwError } from 'rxjs';
 
 import { ShareCardComponent } from './share-card.component';
@@ -65,6 +66,9 @@ describe('ShareCardComponent', () => {
         { provide: UserService, useValue: userSpy },
         { provide: PlayerService, useValue: playerSpy },
       ],
+      // Allow the new <app-reactions-bar> child without dragging in the
+      // SocialModule wiring — the component is covered by its own spec.
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     shareFeed = TestBed.inject(ShareFeedService) as jasmine.SpyObj<ShareFeedService>;
