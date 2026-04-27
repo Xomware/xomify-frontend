@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import {
@@ -7,6 +7,7 @@ import {
   Share,
   ShareFeedService,
 } from 'src/app/services/share-feed.service';
+import { PlayerService } from 'src/app/services/player.service';
 import { ShareService } from 'src/app/services/share.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
@@ -35,14 +36,23 @@ export class ShareCardComponent {
 
   queuePending = false;
   ratingPending = false;
+  menuOpen = false;
 
   constructor(
     private router: Router,
     private shareFeedService: ShareFeedService,
+    private playerService: PlayerService,
     private shareService: ShareService,
     private toastService: ToastService,
     private userService: UserService,
   ) {}
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.menuOpen) {
+      this.menuOpen = false;
+    }
+  }
 
   // ============================================
   // Render helpers
@@ -207,6 +217,46 @@ export class ShareCardComponent {
     this.share.viewerHasQueued = resp.viewerHasQueued;
     this.share.viewerRating = resp.viewerRating;
     this.share.sharerRating = resp.sharerRating;
+  }
+
+  // ============================================
+  // Kebab menu
+  // ============================================
+
+  toggleMenu(event: Event): void {
+    event.stopPropagation();
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
+  menuPlay(): void {
+    this.menuOpen = false;
+    if (this.share.trackId) {
+      this.playerService.playSong(this.share.trackId);
+    }
+  }
+
+  menuQueue(): void {
+    this.menuOpen = false;
+    this.toggleQueue();
+  }
+
+  menuSharePostLink(): void {
+    this.menuOpen = false;
+    this.shareLink();
+  }
+
+  menuOpenInSpotify(): void {
+    this.menuOpen = false;
+    const url = this.share.trackUri
+      ? `https://open.spotify.com/track/${this.share.trackId}`
+      : '';
+    if (url) {
+      window.open(url, '_blank', 'noopener');
+    }
   }
 
   async shareLink(): Promise<void> {

@@ -31,6 +31,7 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+    flex: 1;
     background: none;
     border: none;
     padding: 0;
@@ -278,16 +279,20 @@
     }
   }
 
-  .share-btn {
+  .kebab-wrapper {
+    position: relative;
+  }
+
+  .kebab-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #cfcfdc;
-    border-radius: 20px;
-    padding: 7px 14px;
-    font-size: 0.9rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -295,16 +300,58 @@
       background: rgba(156, 10, 191, 0.12);
       border-color: rgba(156, 10, 191, 0.35);
       color: #fff;
-      transform: translateY(-1px);
     }
 
     &:focus-visible {
       outline: 2px solid rgba(156, 10, 191, 0.6);
       outline-offset: 2px;
     }
+  }
 
-    svg {
-      flex-shrink: 0;
+  .kebab-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 6px 0;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+      color: #cfcfdc;
+      font-size: 0.9rem;
+      padding: 10px 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+
+      svg {
+        flex-shrink: 0;
+        opacity: 0.8;
+      }
+
+      &:hover {
+        background: rgba(156, 10, 191, 0.12);
+        color: #fff;
+
+        svg {
+          opacity: 1;
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(156, 10, 191, 0.6);
+        outline-offset: -2px;
+      }
     }
   }
 }
@@ -322,12 +369,10 @@
   }
 
   .card-actions {
-    flex-direction: column;
-    align-items: stretch;
     gap: 8px;
 
-    .queue-btn,
-    .share-btn {
+    .queue-btn {
+      flex: 1;
       justify-content: center;
     }
   }
