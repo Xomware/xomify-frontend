@@ -1,21 +1,24 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
+  map,
   take,
   takeUntil,
 } from 'rxjs/operators';
 import {
+  LikesByUserResponse,
   LikesService,
   LikesTrackDisplayItem,
 } from 'src/app/services/likes.service';
 import { PlayerService } from 'src/app/services/player.service';
+import { SongService } from 'src/app/services/song.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
 
-const PAGE_LIMIT = 30;
+const PAGE_LIMIT = 50;
 
 @Component({
   selector: 'app-likes',
@@ -34,7 +37,8 @@ export class LikesComponent implements OnInit, OnDestroy {
   total = 0;
   /**
    * Next offset to request, or `null` when no more pages.
-   * Backend uses offset-based pagination (see lambdas/likes_by_user/handler.py).
+   *  - Self path: Spotify offset into `/me/tracks`.
+   *  - Friend path: backend offset into `/likes/by-user`.
    */
   nextOffset: number | null = 0;
 
@@ -45,6 +49,7 @@ export class LikesComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private likesService: LikesService,
+    private songService: SongService,
     private playerService: PlayerService,
     private toastService: ToastService,
     private userService: UserService,
@@ -61,12 +66,10 @@ export class LikesComponent implements OnInit, OnDestroy {
     });
 
     // Search is client-side (mirroring iOS LikesViewModel.filteredItems).
-    // Debounce stays so we don't thrash the filter on every keystroke, but
-    // we no longer re-fetch from the server.
     this.search$
       .pipe(debounceTime(150), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
-        // No-op subscription; `filteredTracks` getter recomputes on render.
+        // No-op — `filteredTracks` getter recomputes on render.
       });
   }
 
@@ -83,11 +86,7 @@ export class LikesComponent implements OnInit, OnDestroy {
   loadMore(): void {
     if (this.nextOffset == null || this.loadingMore || !this.email) return;
     this.loadingMore = true;
-    this.likesService
-      .getLikesByUser(this.email, {
-        limit: PAGE_LIMIT,
-        offset: this.nextOffset,
-      })
+    this.fetch(this.nextOffset)
       .pipe(take(1))
       .subscribe({
         next: (resp) => {
@@ -152,8 +151,7 @@ export class LikesComponent implements OnInit, OnDestroy {
       this.loading = false;
       return;
     }
-    this.likesService
-      .getLikesByUser(this.email, { limit: PAGE_LIMIT, offset: 0 })
+    this.fetch(0)
       .pipe(take(1))
       .subscribe({
         next: (resp) => {
@@ -170,4 +168,55 @@ export class LikesComponent implements OnInit, OnDestroy {
         },
       });
   }
+
+  /**
+   * Self path goes straight to Spotify `/me/tracks` (mirrors iOS
+   * `LikesSource.spotifyDirect`) — first page lands instantly without
+   * waiting for the backend likes cache to be warm.
+   *
+   * Friend path goes through backend `/likes/by-user` (subject to the
+   * target user's `likesPublic` flag — backend enforces).
+   */
+  private fetch(offset: number): Observable<LikesByUserResponse> {
+    if (this.isSelf) {
+      return this.songService.getUserTracks(offset, PAGE_LIMIT).pipe(
+        map((spotifyResp: any) => {
+          const items = spotifyResp?.items ?? [];
+          const tracks: LikesTrackDisplayItem[] = items.map(mapSavedTrackItem);
+          const total: number = spotifyResp?.total ?? offset + tracks.length;
+          const itemsSoFar = offset + tracks.length;
+          return {
+            tracks,
+            total,
+            nextOffset: itemsSoFar,
+            hasMore: itemsSoFar < total,
+          };
+        }),
+      );
+    }
+
+    return this.likesService.getLikesByUser(this.email!, {
+      limit: PAGE_LIMIT,
+      offset,
+    });
+  }
+}
+
+/**
+ * Convert a Spotify saved-tracks `items[i]` into the shared display shape.
+ * Spotify wraps the actual track in `.track`; `added_at` lives on the wrapper.
+ */
+function mapSavedTrackItem(item: any): LikesTrackDisplayItem {
+  const track = item?.track ?? {};
+  const artists: any[] = Array.isArray(track.artists) ? track.artists : [];
+  const images: any[] = Array.isArray(track.album?.images) ? track.album.images : [];
+  return {
+    trackId: track.id ?? '',
+    addedAt: item?.added_at ?? '',
+    trackName: track.name ?? '',
+    artistName: artists.map((a) => a?.name).filter(Boolean).join(', '),
+    albumName: track.album?.name ?? '',
+    albumArtUrl: images[0]?.url ?? '',
+    trackUri: track.uri ?? '',
+  };
 }

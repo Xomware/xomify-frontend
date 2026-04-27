@@ -22,13 +22,16 @@ export class SongService implements OnInit {
     this.accessToken = this.AuthService.getAccessToken();
   }
 
-  getUserTracks(offset: number = 0): Observable<any> {
+  getUserTracks(offset: number = 0, limit: number = 50): Observable<any> {
+    // Refresh the cached token before each call. ngOnInit does not fire on
+    // Angular services, so the constructor-time `accessToken` is stale.
+    this.accessToken = this.AuthService.getAccessToken();
     return this.http.get(`${this.baseUrl}/me/tracks`, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
       },
       params: {
-        limit: "50",
+        limit: String(limit),
         offset: offset.toString(),
       },
     });
