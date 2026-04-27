@@ -47,9 +47,17 @@ export class ShareCardComponent {
     action: ReactionAction;
     rating?: number;
   }>();
+  /**
+   * Emitted after the viewer (the share author) successfully deletes their
+   * own share. The parent feed listens for this so it can drop the card
+   * from `shares` without a full reload. Mirrors iOS `TrackActionsMenu`
+   * delete callback.
+   */
+  @Output() deleted = new EventEmitter<string>();
 
   queuePending = false;
   ratingPending = false;
+  deletePending = false;
   menuOpen = false;
 
   /** Slugs currently in flight on the reactions row, scoped per card. */
@@ -157,6 +165,16 @@ export class ShareCardComponent {
 
   get viewerReactions(): ShareReaction[] {
     return this.share.viewerReactions || [];
+  }
+
+  /**
+   * True when the signed-in viewer is the share's author. Drives the
+   * `Delete share` menu item visibility (mirrors iOS `TrackActionsMenu`).
+   */
+  get viewerIsAuthor(): boolean {
+    const viewer = this.userService.getEmail();
+    if (!viewer) return false;
+    return this.share?.email === viewer;
   }
 
   // ============================================
@@ -308,6 +326,42 @@ export class ShareCardComponent {
     if (url) {
       window.open(url, '_blank', 'noopener');
     }
+  }
+
+  /**
+   * Delete the viewer's own share. Owner-only at the UI (`viewerIsAuthor`)
+   * AND backend (`shares_delete` 403s anyone else). Confirms before issuing
+   * the DELETE — there's no undo. Emits `deleted` so the parent feed can
+   * drop the card without a full refresh.
+   */
+  menuDelete(): void {
+    this.menuOpen = false;
+    if (this.deletePending) return;
+    if (!this.viewerIsAuthor) return;
+    if (!this.share?.shareId) return;
+
+    const ok = window.confirm(
+      'Delete this share? This cannot be undone.',
+    );
+    if (!ok) return;
+
+    this.deletePending = true;
+
+    this.shareFeedService
+      .deleteShare(this.share.shareId, this.share.sharedAt)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.deletePending = false;
+          this.toastService.showPositiveToast('Share deleted');
+          this.deleted.emit(this.share.shareId);
+        },
+        error: (err) => {
+          console.error('Error deleting share:', err);
+          this.deletePending = false;
+          this.toastService.showNegativeToast('Could not delete share');
+        },
+      });
   }
 
   async shareLink(): Promise<void> {

@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ShareCardIdentity } from 'src/app/components/share-card/share-card.component';
+import { FriendsService } from 'src/app/services/friends.service';
 import {
   ReactionToggleResponse,
   Share,
@@ -54,6 +56,15 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
   reactingSlugs = new Set<ShareReaction>();
   reactionError: string | null = null;
 
+  /**
+   * Resolved display-name + avatar for every author this page might surface.
+   * Built from the viewer's own profile + accepted friends — same map shape
+   * the feed cards use (`pages/feed/feed.component.ts:loadIdentities`). When
+   * an entry is missing, `authorLabel` falls back to the email local-part
+   * and the avatar falls back to the letter chip.
+   */
+  identitiesByEmail: Record<string, ShareCardIdentity> = {};
+
   private routeSub: Subscription | null = null;
 
   constructor(
@@ -62,9 +73,11 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
     private shareFeedService: ShareFeedService,
     private toastService: ToastService,
     private userService: UserService,
+    private friendsService: FriendsService,
   ) {}
 
   ngOnInit(): void {
+    this.loadIdentities();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const id = params.get('shareId') || '';
       if (id !== this.shareId) {
@@ -72,6 +85,46 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
         this.loadDetail();
       }
     });
+  }
+
+  /**
+   * Build `identitiesByEmail` from the viewer's own profile + their accepted
+   * friends. Mirrors `FeedComponent.loadIdentities` so the same author shows
+   * the same display name + avatar across feed and detail. Best-effort —
+   * a failure here just means the header falls back to email-as-label.
+   */
+  private loadIdentities(): void {
+    const map: Record<string, ShareCardIdentity> = {};
+    const selfEmail = this.userService.getEmail();
+    if (selfEmail) {
+      map[selfEmail] = {
+        displayName: this.userService.getUserName() || selfEmail,
+        avatar: this.userService.getProfilePic() || null,
+      };
+    }
+    if (!selfEmail) {
+      this.identitiesByEmail = map;
+      return;
+    }
+    this.friendsService
+      .getFriendsList(selfEmail)
+      .pipe(take(1))
+      .subscribe({
+        next: (resp) => {
+          for (const friend of resp?.accepted ?? []) {
+            const email = friend.friendEmail;
+            if (!email) continue;
+            map[email] = {
+              displayName: friend.displayName || email,
+              avatar: friend.avatar || null,
+            };
+          }
+          this.identitiesByEmail = map;
+        },
+        error: () => {
+          this.identitiesByEmail = map;
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -128,8 +181,28 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
   // Render helpers
   // ============================================
 
+  /**
+   * Resolved display label for the share author. Mirrors the share-card
+   * fallback chain: friend's display name -> email local-part -> 'Friend'.
+   * Stops the page from rendering "Shared by foo@gmail.com".
+   */
   get authorLabel(): string {
-    return this.share?.email || '';
+    const email = this.share?.email?.trim() || '';
+    const identity = email ? this.identitiesByEmail[email] : undefined;
+    const name = identity?.displayName?.trim();
+    if (name) return name;
+    if (email) {
+      const at = email.indexOf('@');
+      return at > 0 ? email.slice(0, at) : email;
+    }
+    return 'Friend';
+  }
+
+  /** Resolved avatar URL for the author, or null to fall back to the letter chip. */
+  get authorAvatarUrl(): string | null {
+    const email = this.share?.email?.trim() || '';
+    if (!email) return null;
+    return this.identitiesByEmail[email]?.avatar?.trim() || null;
   }
 
   get authorInitial(): string {

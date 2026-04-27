@@ -137,6 +137,7 @@
         *ngFor="let share of shares; trackBy: trackByShareId"
         [share]="share"
         [identity]="identitiesByEmail[share.email]"
+        (deleted)="onShareDeleted($event)"
       ></app-share-card>
 
       <div class="load-more-row" *ngIf="nextBefore">

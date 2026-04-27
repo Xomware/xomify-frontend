@@ -11,6 +11,10 @@ import {
   ShareFeedService,
   ShareReaction,
 } from '../../services/share-feed.service';
+import {
+  FriendsListResponse,
+  FriendsService,
+} from '../../services/friends.service';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
 
@@ -61,6 +65,7 @@ describe('ShareDetailComponent', () => {
   let shareFeedService: jasmine.SpyObj<ShareFeedService>;
   let toastService: jasmine.SpyObj<ToastService>;
   let userService: jasmine.SpyObj<UserService>;
+  let friendsService: jasmine.SpyObj<FriendsService>;
 
   const mockResponse: ShareDetailResponse = {
     share: {
@@ -133,8 +138,36 @@ describe('ShareDetailComponent', () => {
 
     userService = jasmine.createSpyObj<UserService>('UserService', [
       'getEmail',
+      'getUserName',
+      'getProfilePic',
     ]);
     userService.getEmail.and.returnValue('viewer@example.com');
+    userService.getUserName.and.returnValue('Viewer Name');
+    userService.getProfilePic.and.returnValue('https://avatar/viewer');
+
+    friendsService = jasmine.createSpyObj<FriendsService>('FriendsService', [
+      'getFriendsList',
+    ]);
+    const friendsResp: FriendsListResponse = {
+      email: 'viewer@example.com',
+      totalCount: 1,
+      accepted: [
+        {
+          email: 'viewer@example.com',
+          friendEmail: 'author@example.com',
+          displayName: 'Author Display',
+          avatar: 'https://avatar/author',
+        },
+      ],
+      requested: [],
+      pending: [],
+      blocked: [],
+      acceptedCount: 1,
+      requestedCount: 0,
+      pendingCount: 0,
+      blockedCount: 0,
+    };
+    friendsService.getFriendsList.and.returnValue(of(friendsResp));
 
     await TestBed.configureTestingModule({
       imports: [CommonModule, FormsModule],
@@ -150,6 +183,7 @@ describe('ShareDetailComponent', () => {
         { provide: ShareFeedService, useValue: shareFeedService },
         { provide: ToastService, useValue: toastService },
         { provide: UserService, useValue: userService },
+        { provide: FriendsService, useValue: friendsService },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -245,6 +279,48 @@ describe('ShareDetailComponent', () => {
     fixture.detectChanges();
     component.onCommentCountChange(7);
     expect(component.share?.commentCount).toBe(7);
+  });
+
+  // ============================================
+  // Identity resolution (#275)
+  // ============================================
+
+  it('resolves the share author against the friends list and shows the display name', () => {
+    fixture.detectChanges();
+    expect(friendsService.getFriendsList).toHaveBeenCalledWith(
+      'viewer@example.com',
+    );
+    expect(component.authorLabel).toBe('Author Display');
+    expect(component.authorAvatarUrl).toBe('https://avatar/author');
+    const html = (fixture.nativeElement as HTMLElement).textContent || '';
+    expect(html).toContain('Shared by Author Display');
+    expect(html).not.toContain('Shared by author@example.com');
+  });
+
+  it('falls back to the email local-part when no friend identity matches', () => {
+    friendsService.getFriendsList.and.returnValue(
+      of({
+        email: 'viewer@example.com',
+        totalCount: 0,
+        accepted: [],
+        requested: [],
+        pending: [],
+        blocked: [],
+        acceptedCount: 0,
+        requestedCount: 0,
+        pendingCount: 0,
+        blockedCount: 0,
+      }),
+    );
+    shareFeedService.getShareDetail.and.returnValue(
+      of({
+        ...mockResponse,
+        share: { ...mockResponse.share, email: 'somebody@gmail.com' },
+      }),
+    );
+    fixture.detectChanges();
+    expect(component.authorLabel).toBe('somebody');
+    expect(component.authorAvatarUrl).toBeNull();
   });
 
   it('shows an inline error when /shares/detail fails', () => {

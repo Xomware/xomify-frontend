@@ -371,7 +371,7 @@
         opacity: 0.8;
       }
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: rgba(156, 10, 191, 0.12);
         color: #fff;
 
@@ -383,6 +383,32 @@
       &:focus-visible {
         outline: 2px solid rgba(156, 10, 191, 0.6);
         outline-offset: -2px;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    // Destructive (delete) variant — red text + red hover so the action
+    // reads as "this is permanent" without an extra confirmation modal.
+    .menu-item-destructive {
+      color: #f88;
+
+      svg {
+        color: #f88;
+        opacity: 0.9;
+      }
+
+      &:hover:not(:disabled) {
+        background: rgba(244, 67, 54, 0.12);
+        color: #ff6b6b;
+
+        svg {
+          color: #ff6b6b;
+          opacity: 1;
+        }
       }
     }
   }

@@ -210,6 +210,30 @@ describe('FeedComponent', () => {
     );
   });
 
+  it('onShareDeleted removes the matching share from the list (#275)', () => {
+    shareFeed.getFeed.and.returnValue(
+      of({
+        shares: [mkShare('a'), mkShare('b'), mkShare('c')],
+        nextBefore: null,
+      }),
+    );
+    fixture.detectChanges();
+    expect(component.shares.length).toBe(3);
+
+    component.onShareDeleted('b');
+
+    expect(component.shares.map((s) => s.shareId)).toEqual(['a', 'c']);
+  });
+
+  it('onShareDeleted is a no-op when shareId is empty', () => {
+    shareFeed.getFeed.and.returnValue(
+      of({ shares: [mkShare('a')], nextBefore: null }),
+    );
+    fixture.detectChanges();
+    component.onShareDeleted('');
+    expect(component.shares.length).toBe(1);
+  });
+
   it('selectGroup(null) does not include groupId in the query', () => {
     groupsService.getGroups.and.returnValue(of([mkGroup('g1', 'Hiking')]));
     shareFeed.getFeed.and.returnValue(of({ shares: [], nextBefore: null }));

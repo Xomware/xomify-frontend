@@ -5,7 +5,10 @@
 }
 
 .feed-content {
-  max-width: 720px;
+  // Wider on desktop so the two-column grid breathes; the column itself is
+  // still capped via .feed-list at narrower breakpoints so single-column
+  // reading width doesn't blow out.
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -177,13 +180,33 @@
 }
 
 .feed-list {
-  display: flex;
-  flex-direction: column;
+  // Mobile-first: single column, full width. Tablet caps the column width
+  // for comfortable reading; desktop flips to a 2-up grid (matches iOS
+  // "wide" feed treatment).
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   animation: fadeIn 0.3s ease;
+
+  @media (min-width: 600px) {
+    // Single column with a capped reading width when viewport is between
+    // phone and small laptop.
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 900px) {
+    // Side-by-side cards on desktop. minmax(0, 1fr) prevents long album
+    // names / captions from busting out of the cell.
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+    margin: 0;
+  }
 }
 
 .load-more-row {
+  // Always span every column so the button stays centered under the grid.
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   padding: 12px 0 4px;
