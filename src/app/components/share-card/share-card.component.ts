@@ -21,6 +21,17 @@ const MOOD_LABELS: Record<string, string> = {
   discovery: 'Discovery',
 };
 
+/**
+ * Resolved identity for a share's author. Built by the parent feed component
+ * from the friends list + the viewer's own profile and passed in so each
+ * card renders the friend's real display name + avatar instead of the raw
+ * email. Mirrors iOS `SharerIdentity` in `FeedViewModel.swift`.
+ */
+export interface ShareCardIdentity {
+  displayName: string;
+  avatar: string | null;
+}
+
 @Component({
   selector: 'app-share-card',
   templateUrl: './share-card.component.html',
@@ -28,6 +39,7 @@ const MOOD_LABELS: Record<string, string> = {
 })
 export class ShareCardComponent {
   @Input() share!: Share;
+  @Input() identity?: ShareCardIdentity;
   @Output() reacted = new EventEmitter<{
     shareId: string;
     action: ReactionAction;
@@ -59,7 +71,24 @@ export class ShareCardComponent {
   // ============================================
 
   get authorLabel(): string {
-    return this.share.email;
+    const name = this.identity?.displayName?.trim();
+    if (name) return name;
+    // Fall back to the local-part of the email so the header isn't an
+    // ugly full address. e.g. dominickj.giordano@gmail.com -> dominickj.giordano
+    const email = this.share.email || '';
+    const at = email.indexOf('@');
+    return at > 0 ? email.slice(0, at) : email;
+  }
+
+  /** Resolved avatar URL for the author, or `null` to fall back to the letter chip. */
+  get authorAvatarUrl(): string | null {
+    return this.identity?.avatar?.trim() || null;
+  }
+
+  /** First letter of `authorLabel` for the fallback avatar chip. */
+  get authorInitial(): string {
+    const label = this.authorLabel;
+    return label ? label.charAt(0).toUpperCase() : '?';
   }
 
   get relativeTime(): string {
