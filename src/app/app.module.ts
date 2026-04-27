@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -77,6 +78,22 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true,
+    },
+    // Block app bootstrap until the per-user Xomify JWT is in sessionStorage.
+    // Without this, components that fire API calls in their constructors race
+    // with the async mint and 401 because the helper can no longer fall back
+    // to a query/body `email` (sub-feature 1j). The factory is a no-op when
+    // the user isn't logged in via Spotify or already has a valid JWT.
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (auth: AuthService) => () => {
+        if (!auth.isLoggedIn()) {
+          return Promise.resolve();
+        }
+        return firstValueFrom(auth.ensureXomifyJwt()).catch(() => null);
+      },
+      deps: [AuthService],
       multi: true,
     },
   ],
