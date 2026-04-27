@@ -31,7 +31,7 @@ describe('InvitesService', () => {
     httpMock.verify();
   });
 
-  it('createInvite posts email and updates the pending cache optimistically', (done) => {
+  it('createInvite posts an empty body (caller comes from JWT) and updates the pending cache optimistically', (done) => {
     const mockResponse: CreateInviteResponse = {
       inviteCode: 'ABC-123',
       inviteUrl: 'https://xomify.app/invite/ABC-123',
@@ -52,14 +52,16 @@ describe('InvitesService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/invites/create'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ email });
+    // Caller email must NOT be sent — it's sourced from the JWT context.
+    expect(req.request.body).toEqual({});
+    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
     // Authorization header is attached globally by AuthInterceptor (sub-feature
     // 0e). The interceptor is not registered in this isolated TestBed; header
     // attachment is covered by `auth.interceptor.spec.ts`.
     req.flush(mockResponse);
   });
 
-  it('acceptInvite posts email + inviteCode and returns backend response', (done) => {
+  it('acceptInvite posts inviteCode only (caller comes from JWT)', (done) => {
     const mockResponse: AcceptInviteResponse = {
       ok: true,
       senderEmail: 'sender@example.com',
@@ -73,11 +75,13 @@ describe('InvitesService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/invites/accept'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ email, inviteCode: 'XYZ-999' });
+    expect(req.request.body).toEqual({ inviteCode: 'XYZ-999' });
+    // Caller email must NOT be sent.
+    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
     req.flush(mockResponse);
   });
 
-  it('listPending GETs with email query param and populates cache', (done) => {
+  it('listPending GETs without email query param (caller comes from JWT) and populates cache', (done) => {
     const mockResponse: PendingInvitesResponse = {
       email,
       count: 2,
@@ -107,11 +111,12 @@ describe('InvitesService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/invites/pending'));
     expect(req.request.method).toBe('GET');
-    expect(req.request.params.get('email')).toBe(email);
+    // Caller email must NOT be in the query string.
+    expect(req.request.params.get('email')).toBeNull();
     req.flush(mockResponse);
   });
 
-  it('declineInvite posts email + inviteCode', (done) => {
+  it('declineInvite posts inviteCode only (caller comes from JWT)', (done) => {
     const mockResponse: DeclineInviteResponse = {
       ok: true,
       inviteCode: 'DEC-1',
@@ -125,7 +130,9 @@ describe('InvitesService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/invites/decline'));
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ email, inviteCode: 'DEC-1' });
+    expect(req.request.body).toEqual({ inviteCode: 'DEC-1' });
+    // Caller email must NOT be sent.
+    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
     req.flush(mockResponse);
   });
 

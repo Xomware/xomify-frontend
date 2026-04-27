@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -154,10 +154,12 @@ export class FriendsService {
     this.friendsListSubject.next(null);
   }
 
-  // GET /user/all?email={email}
+  // GET /user/all
   // Returns: [{ email, displayName, avatar, isFriend, isPending, mutualCount }]
-  // Uses cache if available and not expired
-  getAllUsers(email: string, forceRefresh = false): Observable<SearchResult[]> {
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1i). Uses cache
+  // if available and not expired.
+  getAllUsers(_email: string, forceRefresh = false): Observable<SearchResult[]> {
     // Return cached data if available and not forcing refresh
     if (!forceRefresh) {
       const cached = this.getCache(this.CACHE_KEY_USERS);
@@ -166,19 +168,21 @@ export class FriendsService {
       }
     }
 
-    const params = new HttpParams().set('email', email);
     const url = `${this.xomifyApiUrl}/user/all`;
-    return this.http.get<SearchResult[]>(url, { params }).pipe(
+    return this.http.get<SearchResult[]>(url).pipe(
       tap((users) => {
         this.setCache(this.CACHE_KEY_USERS, users);
       }),
     );
   }
 
-  // GET /friends/list?email={email}
+  // GET /friends/list
   // Returns: { accepted, requested, pending, blocked, counts... }
-  // Uses cache if available and not expired
-  // IMPORTANT: Cache is now per-email to avoid mixing user data
+  // Uses cache if available and not expired.
+  // IMPORTANT: Cache is now per-email to avoid mixing user data — the `email`
+  // arg is retained both for cache-key partitioning AND call-site
+  // compatibility, but is NOT forwarded to the backend. Caller identity comes
+  // from the JWT context (1a).
   getFriendsList(email: string, forceRefresh = false): Observable<FriendsListResponse> {
     const cacheKey = this.CACHE_KEY_FRIENDS_PREFIX + email;
 
@@ -195,7 +199,7 @@ export class FriendsService {
       }
     }
 
-    const url = `${this.xomifyApiUrl}/friends/list?email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/friends/list`;
     return this.http
       .get<FriendsListResponse>(url)
       .pipe(
@@ -217,42 +221,53 @@ export class FriendsService {
   }
 
   // POST /friends/request
-  // Body: { "email": "user@email.com", "requestEmail": "friend@email.com" }
-  sendFriendRequest(email: string, requestEmail: string): Observable<any> {
+  // Body: { "requestEmail": "friend@email.com" }
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1a).
+  // `requestEmail` (target) stays.
+  sendFriendRequest(_email: string, requestEmail: string): Observable<any> {
     const url = `${this.xomifyApiUrl}/friends/request`;
-    const body = { email, requestEmail };
+    const body = { requestEmail };
     return this.http
       .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
   // POST /friends/accept
-  // Body: { "email": "user@email.com", "requestEmail": "requester@email.com" }
-  acceptFriendRequest(email: string, requestEmail: string): Observable<any> {
+  // Body: { "requestEmail": "requester@email.com" }
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1a).
+  // `requestEmail` (target — the original requester) stays.
+  acceptFriendRequest(_email: string, requestEmail: string): Observable<any> {
     const url = `${this.xomifyApiUrl}/friends/accept`;
-    const body = { email, requestEmail };
+    const body = { requestEmail };
     return this.http
       .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
   // POST /friends/reject
-  // Body: { "email": "user@email.com", "requestEmail": "requester@email.com" }
-  rejectFriendRequest(email: string, requestEmail: string): Observable<any> {
+  // Body: { "requestEmail": "requester@email.com" }
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1a).
+  // `requestEmail` (target) stays.
+  rejectFriendRequest(_email: string, requestEmail: string): Observable<any> {
     const url = `${this.xomifyApiUrl}/friends/reject`;
-    const body = { email, requestEmail };
+    const body = { requestEmail };
     return this.http
       .post(url, body)
       .pipe(tap(() => this.clearCache()));
   }
 
   // DELETE /friends/remove
-  removeFriend(email: string, friendEmail: string): Observable<any> {
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1a).
+  // `friendEmail` (target) stays.
+  removeFriend(_email: string, friendEmail: string): Observable<any> {
     const url = `${this.xomifyApiUrl}/friends/remove`;
     return this.http
       .delete(url, {
         params: {
-          email: email,
           friendEmail: friendEmail,
         },
       })

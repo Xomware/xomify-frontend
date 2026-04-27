@@ -81,15 +81,17 @@ export class ReleaseRadarService {
   // ============================================
 
   /**
-   * Get user's release radar history from database.
+   * Get caller's release radar history from database.
+   *
+   * The `email` arg is retained both for call-site compatibility AND to
+   * populate the offline fallback response, but is no longer forwarded —
+   * caller identity comes from the JWT context (1g).
    */
   getHistory(
     email: string,
     limit: number = 26
   ): Observable<ReleaseRadarHistoryResponse> {
-    const params = new HttpParams()
-      .set('email', email)
-      .set('limit', limit.toString());
+    const params = new HttpParams().set('limit', limit.toString());
 
     return this.http
       .get<ReleaseRadarHistoryResponse>(
@@ -114,15 +116,15 @@ export class ReleaseRadarService {
   }
 
   /**
-   * Check user's release radar status.
+   * Check caller's release radar status.
+   *
+   * The `email` arg is retained both for call-site compatibility AND to
+   * populate the offline fallback response, but is no longer forwarded —
+   * caller identity comes from the JWT context (1g).
    */
   checkStatus(email: string): Observable<ReleaseRadarCheckResponse> {
-    const params = new HttpParams().set('email', email);
-
     return this.http
-      .get<ReleaseRadarCheckResponse>(`${this.baseUrl}/release-radar/check`, {
-        params,
-      })
+      .get<ReleaseRadarCheckResponse>(`${this.baseUrl}/release-radar/check`)
       .pipe(
         catchError((err) => {
           console.error('Error checking release radar status:', err);

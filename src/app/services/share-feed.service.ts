@@ -115,14 +115,16 @@ export class ShareFeedService {
    * POST /shares/create
    * Create a new track share. Caller provides denormalized track metadata and
    * optional caption / mood / genre tags (validated server-side).
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1c).
    */
   createShare(
-    email: string,
+    _email: string,
     track: CreateShareRequest,
   ): Observable<CreateShareResponse> {
     const url = `${this.xomifyApiUrl}/shares/create`;
     const body: Record<string, unknown> = {
-      email,
       trackId: track.trackId,
       trackUri: track.trackUri,
       trackName: track.trackName,
@@ -143,12 +145,15 @@ export class ShareFeedService {
   }
 
   /**
-   * GET /shares/feed?email=...&groupId=...&limit=...&before=...
+   * GET /shares/feed?groupId=...&limit=...&before=...
    * Returns the merged feed (self + accepted friends), newest first.
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1c).
    */
-  getFeed(email: string, opts: FeedQueryOptions = {}): Observable<FeedResponse> {
+  getFeed(_email: string, opts: FeedQueryOptions = {}): Observable<FeedResponse> {
     const url = `${this.xomifyApiUrl}/shares/feed`;
-    let params = new HttpParams().set('email', email);
+    let params = new HttpParams();
     if (opts.groupId) {
       params = params.set('groupId', opts.groupId);
     }
@@ -165,15 +170,18 @@ export class ShareFeedService {
    * POST /shares/react
    * Queue / un-queue a share, or set / clear a rating. `rating` is required
    * when `action === 'rated'` (1..5).
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1c).
    */
   reactToShare(
-    email: string,
+    _email: string,
     shareId: string,
     action: ReactionAction,
     rating?: number,
   ): Observable<ReactResponse> {
     const url = `${this.xomifyApiUrl}/shares/react`;
-    const body: Record<string, unknown> = { email, shareId, action };
+    const body: Record<string, unknown> = { shareId, action };
     if (action === 'rated' && rating !== undefined) {
       body['rating'] = rating;
     }

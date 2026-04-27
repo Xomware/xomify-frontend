@@ -35,28 +35,31 @@ export class NotificationsService {
 
   constructor(private http: HttpClient) {}
 
-  /** POST /notifications/register — opt a device into push. */
+  /** POST /notifications/register — opt a device into push.
+   *  The `email` arg is retained for call-site compatibility but is no longer
+   *  forwarded — caller identity comes from the JWT context (1f).
+   *  `deviceToken` is the target identifier of the device being registered. */
   registerDevice(
-    email: string,
+    _email: string,
     deviceToken: string,
     platform: DevicePlatform = 'ios',
   ): Observable<RegisterDeviceResponse> {
     const url = `${this.xomifyApiUrl}/notifications/register`;
     return this.http.post<RegisterDeviceResponse>(url, {
-      email,
       deviceToken,
       platform,
     });
   }
 
-  /** POST /notifications/unregister — stop push to a specific device token. */
+  /** POST /notifications/unregister — stop push to a specific device token.
+   *  The `email` arg is retained for call-site compatibility but is no longer
+   *  forwarded — caller identity comes from the JWT context (1f). */
   unregisterDevice(
-    email: string,
+    _email: string,
     deviceToken: string,
   ): Observable<UnregisterDeviceResponse> {
     const url = `${this.xomifyApiUrl}/notifications/unregister`;
     return this.http.post<UnregisterDeviceResponse>(url, {
-      email,
       deviceToken,
     });
   }

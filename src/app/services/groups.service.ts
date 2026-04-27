@@ -192,7 +192,9 @@ export class GroupsService {
   // GROUP CRUD OPERATIONS
   // ============================================
 
-  getGroups(email: string, forceRefresh = false): Observable<Group[]> {
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  getGroups(_email: string, forceRefresh = false): Observable<Group[]> {
     if (!forceRefresh) {
       const cached = this.groupsListSubject.getValue();
       if (cached.length > 0) {
@@ -200,7 +202,7 @@ export class GroupsService {
       }
     }
 
-    const url = `${this.xomifyApiUrl}/groups/list?email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/groups/list`;
     return this.http
       .get<GroupListResponse>(url)
       .pipe(
@@ -216,9 +218,12 @@ export class GroupsService {
       );
   }
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b). `groupId` is
+  // the target.
   getGroup(
     groupId: string,
-    email: string,
+    _email: string,
     forceRefresh = false,
   ): Observable<GroupDetail | null> {
     const cacheKey = `${this.CACHE_KEY_GROUP_PREFIX}${groupId}`;
@@ -231,7 +236,7 @@ export class GroupsService {
       }
     }
 
-    const url = `${this.xomifyApiUrl}/groups/info?groupId=${groupId}&email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/groups/info?groupId=${groupId}`;
     return this.http.get<GroupDetail>(url).pipe(
       tap((group) => {
         this.currentGroupSubject.next(group);
@@ -244,9 +249,11 @@ export class GroupsService {
     );
   }
 
-  createGroup(email: string, request: CreateGroupRequest): Observable<Group> {
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  createGroup(_email: string, request: CreateGroupRequest): Observable<Group> {
     const url = `${this.xomifyApiUrl}/groups/create`;
-    const body = { email, ...request };
+    const body = { ...request };
 
     return this.http
       .post<Group>(url, body)
@@ -263,13 +270,16 @@ export class GroupsService {
       );
   }
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b). `groupId` is
+  // the target.
   updateGroup(
     groupId: string,
-    email: string,
+    _email: string,
     updates: Partial<CreateGroupRequest>,
   ): Observable<Group> {
     const url = `${this.xomifyApiUrl}/groups/update`;
-    const body = { email, groupId, ...updates };
+    const body = { groupId, ...updates };
 
     return this.http.put<Group>(url, body).pipe(
       tap((updatedGroup) => {
@@ -288,8 +298,11 @@ export class GroupsService {
     );
   }
 
-  deleteGroup(groupId: string, email: string): Observable<void> {
-    const url = `${this.xomifyApiUrl}/groups/remove?groupId=${groupId}&email=${encodeURIComponent(email)}`;
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b). `groupId` is
+  // the target.
+  deleteGroup(groupId: string, _email: string): Observable<void> {
+    const url = `${this.xomifyApiUrl}/groups/remove?groupId=${groupId}`;
 
     return this.http.delete<void>(url).pipe(
       tap(() => {
@@ -309,13 +322,16 @@ export class GroupsService {
   // MEMBER MANAGEMENT
   // ============================================
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  // `memberEmail` (target) stays.
   addMember(
     groupId: string,
-    email: string,
+    _email: string,
     memberEmail: string,
   ): Observable<GroupMember> {
     const url = `${this.xomifyApiUrl}/groups/add-member`;
-    const body = { email, groupId, memberEmail };
+    const body = { groupId, memberEmail };
 
     return this.http
       .post<GroupMember>(url, body)
@@ -331,12 +347,15 @@ export class GroupsService {
       );
   }
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  // `memberEmail` (target) stays.
   removeMember(
     groupId: string,
-    email: string,
+    _email: string,
     memberEmail: string,
   ): Observable<void> {
-    const url = `${this.xomifyApiUrl}/groups/remove-member?groupId=${groupId}&memberEmail=${encodeURIComponent(memberEmail)}&email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/groups/remove-member?groupId=${groupId}&memberEmail=${encodeURIComponent(memberEmail)}`;
 
     return this.http.delete<void>(url).pipe(
       tap(() => {
@@ -350,9 +369,11 @@ export class GroupsService {
     );
   }
 
-  leaveGroup(groupId: string, email: string): Observable<void> {
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  leaveGroup(groupId: string, _email: string): Observable<void> {
     const url = `${this.xomifyApiUrl}/groups/leave`;
-    const body = { email, groupId };
+    const body = { groupId };
 
     return this.http.post<void>(url, body).pipe(
       tap(() => {
@@ -372,13 +393,15 @@ export class GroupsService {
   // SONG MANAGEMENT
   // ============================================
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
   addSong(
     groupId: string,
-    email: string,
+    _email: string,
     request: AddSongRequest,
   ): Observable<GroupSong> {
     const url = `${this.xomifyApiUrl}/groups/add-song`;
-    const body = { email, groupId, ...request };
+    const body = { groupId, ...request };
 
     return this.http
       .post<GroupSong>(url, body)
@@ -394,13 +417,15 @@ export class GroupsService {
       );
   }
 
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
   addSongByUrl(
     groupId: string,
-    email: string,
+    _email: string,
     spotifyUrl: string,
   ): Observable<GroupSong> {
     const url = `${this.xomifyApiUrl}/groups/add-song-url`;
-    const body = { email, groupId, spotifyUrl };
+    const body = { groupId, spotifyUrl };
 
     return this.http
       .post<GroupSong>(url, body)
@@ -416,8 +441,13 @@ export class GroupsService {
       );
   }
 
-  removeSong(groupId: string, email: string, songId: string): Observable<void> {
-    const url = `${this.xomifyApiUrl}/groups/remove-song?groupId=${groupId}&songId${songId}=email=${encodeURIComponent(email)}`;
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded — caller identity comes from the JWT context (1b).
+  // NOTE: The original URL had a pre-existing typo around `songId${songId}=` —
+  // preserving that here so this PR is a strict caller-email sweep, no behavior
+  // change beyond the email drop.
+  removeSong(groupId: string, _email: string, songId: string): Observable<void> {
+    const url = `${this.xomifyApiUrl}/groups/remove-song?groupId=${groupId}&songId${songId}=`;
 
     return this.http.delete<void>(url).pipe(
       tap(() => {
@@ -435,6 +465,10 @@ export class GroupsService {
   // SONG STATUS MANAGEMENT
   // ============================================
 
+  // The `email` arg is retained both for call-site compatibility AND because
+  // local cache writes below tag the userStatus with the caller's email so
+  // subsequent reads can identify whose status this is. It is NOT forwarded
+  // to the backend — caller identity comes from the JWT context (1b).
   updateSongStatus(
     groupId: string,
     email: string,
@@ -442,7 +476,7 @@ export class GroupsService {
     status: Partial<Pick<GroupSongUserStatus, 'addedToQueue' | 'listened'>>,
   ): Observable<GroupSongUserStatus> {
     const url = `${this.xomifyApiUrl}/groups/song-status`;
-    const body = { email, groupId, songId, ...status };
+    const body = { groupId, songId, ...status };
 
     return this.http
       .put<GroupSongUserStatus>(url, body)
@@ -505,12 +539,16 @@ export class GroupsService {
     return this.updateSongStatus(groupId, email, songId, { listened: false });
   }
 
+  // The `email` arg is retained both for call-site compatibility AND because
+  // local cache writes below tag userStatus rows with the caller's email. It
+  // is NOT forwarded to the backend — caller identity comes from the JWT
+  // context (1b).
   markAllAsListened(
     groupId: string,
     email: string,
   ): Observable<{ count: number }> {
     const url = `${this.xomifyApiUrl}/groups/mark-all-listened`;
-    const body = { email, groupId };
+    const body = { groupId };
 
     return this.http
       .post<{ count: number }>(url, body)

@@ -192,8 +192,9 @@ export class UserService implements OnInit {
   updateUserTableRefreshToken(): Observable<any> {
     this.refreshToken = this.AuthService.getRefreshToken();
     const url = `${this.xomifyApiUrl}/user/update`;
+    // Caller email comes from JWT context on the backend (1i). `userId` and
+    // `refreshToken` are token-persistence fields — these stay.
     const body = {
-      email: this.user.email,
       userId: this.id,
       displayName: this.user.display_name || this.user.email,
       refreshToken: this.refreshToken,
@@ -208,18 +209,18 @@ export class UserService implements OnInit {
   ): Observable<any> {
     this.refreshToken = this.AuthService.getRefreshToken();
     const url = `${this.xomifyApiUrl}/user/update`;
+    // Caller email comes from JWT context on the backend (1i).
     const body = {
-      email: this.user.email,
       wrappedEnrolled: wrappedEnrolled,
       releaseRadarEnrolled: releaseRadarEnrolled,
     };
     return this.http.post(url, body);
   }
 
-  getUserTableData(email: string): Observable<any> {
-    const url = `${
-      this.xomifyApiUrl
-    }/user/data?email=${encodeURIComponent(email)}`;
+  // The `email` arg is retained for call-site compatibility but is no longer
+  // forwarded to the backend — caller identity is sourced from the JWT (1i).
+  getUserTableData(_email: string): Observable<any> {
+    const url = `${this.xomifyApiUrl}/user/data`;
     return this.http.get(url);
   }
 
