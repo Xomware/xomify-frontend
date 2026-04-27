@@ -34,7 +34,11 @@ export interface LikesByUserResponse {
   cursor?: string | null;
 }
 
-const BATCH_SIZE = 100;
+// AWS Managed WAF rules' default `SizeRestrictions_BODY` rejects request
+// bodies > 8 KB with a 403 ForbiddenException — measured before the lambda
+// is even invoked. 100 tracks per batch was hitting that ceiling on /likes/push.
+// 25 keeps the body well under 8 KB while still amortizing round-trip cost.
+const BATCH_SIZE = 25;
 
 @Injectable({
   providedIn: 'root',

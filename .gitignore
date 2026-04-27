@@ -54,3 +54,6 @@ src/environments/environment.dev.ts
 # Personal Claude overrides (not shared)
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Agent worktrees (local only)
+.claude/worktrees/
