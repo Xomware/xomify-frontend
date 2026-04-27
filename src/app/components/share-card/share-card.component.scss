@@ -25,6 +25,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  // Hard floor so the header is always visible even if displayName is
+  // missing AND email is missing (defense-in-depth — the data layer
+  // shouldn't allow that, but it has been observed).
+  min-height: 44px;
 
   .author {
     display: flex;
@@ -76,6 +80,10 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    // Reserve vertical space so the name + timestamp are always laid out,
+    // even when the name is briefly empty during identity resolution.
+    min-height: 38px;
+    justify-content: center;
 
     .author-name {
       color: #fff;
@@ -85,6 +93,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
       transition: color 0.2s ease;
+      // Don't collapse to zero height when the string is empty.
+      min-height: 1em;
     }
 
     .created-at {
