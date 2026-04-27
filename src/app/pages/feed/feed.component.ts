@@ -236,4 +236,15 @@ export class FeedComponent implements OnInit {
     this.shares = [share, ...this.shares];
     this.toastService.showPositiveToast('Shared to your feed');
   }
+
+  /**
+   * Drop the deleted share from the local list when a card emits `deleted`
+   * (the share-card already issued the DELETE and showed the success toast).
+   * Backend feed is authoritative on next refresh; this just keeps the UI
+   * in sync without forcing a full reload.
+   */
+  onShareDeleted(shareId: string): void {
+    if (!shareId) return;
+    this.shares = this.shares.filter((s) => s.shareId !== shareId);
+  }
 }

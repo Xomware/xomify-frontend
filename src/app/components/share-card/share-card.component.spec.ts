@@ -44,7 +44,10 @@ describe('ShareCardComponent', () => {
   };
 
   beforeEach(async () => {
-    const shareFeedSpy = jasmine.createSpyObj('ShareFeedService', ['reactToShare']);
+    const shareFeedSpy = jasmine.createSpyObj('ShareFeedService', [
+      'reactToShare',
+      'deleteShare',
+    ]);
     const toastSpy = jasmine.createSpyObj('ToastService', [
       'showPositiveToast',
       'showNegativeToast',
@@ -227,6 +230,74 @@ describe('ShareCardComponent', () => {
       component.menuQueue();
       expect(component.menuOpen).toBe(false);
       expect(shareFeed.reactToShare).toHaveBeenCalled();
+    });
+  });
+
+  // ============================================
+  // Delete share (#275)
+  // ============================================
+
+  describe('delete share', () => {
+    it('viewerIsAuthor is true when viewer email matches share.email', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('dom@example.com');
+      expect(component.viewerIsAuthor).toBe(true);
+    });
+
+    it('viewerIsAuthor is false when viewer email does not match', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('someone-else@example.com');
+      expect(component.viewerIsAuthor).toBe(false);
+    });
+
+    it('menuDelete calls deleteShare and emits the deleted shareId on success', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('dom@example.com'); // matches share.email
+      shareFeed.deleteShare.and.returnValue(of(undefined as unknown as void));
+      spyOn(window, 'confirm').and.returnValue(true);
+      const emitted: string[] = [];
+      component.deleted.subscribe((id) => emitted.push(id));
+
+      component.menuDelete();
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(shareFeed.deleteShare).toHaveBeenCalledWith(
+        'share-1',
+        baseShare.sharedAt,
+      );
+      expect(emitted).toEqual(['share-1']);
+      expect(toast.showPositiveToast).toHaveBeenCalledWith('Share deleted');
+    });
+
+    it('menuDelete bails when the confirm dialog is cancelled', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('dom@example.com');
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.menuDelete();
+      expect(shareFeed.deleteShare).not.toHaveBeenCalled();
+    });
+
+    it('menuDelete is a no-op when the viewer is not the share author', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('not-the-author@example.com');
+      spyOn(window, 'confirm');
+      component.menuDelete();
+      expect(window.confirm).not.toHaveBeenCalled();
+      expect(shareFeed.deleteShare).not.toHaveBeenCalled();
+    });
+
+    it('menuDelete shows a negative toast and does NOT emit on error', () => {
+      const userSpy = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      userSpy.getEmail.and.returnValue('dom@example.com');
+      shareFeed.deleteShare.and.returnValue(throwError(() => new Error('boom')));
+      spyOn(window, 'confirm').and.returnValue(true);
+      const emitted: string[] = [];
+      component.deleted.subscribe((id) => emitted.push(id));
+
+      component.menuDelete();
+
+      expect(emitted.length).toBe(0);
+      expect(toast.showNegativeToast).toHaveBeenCalledWith('Could not delete share');
     });
   });
 });

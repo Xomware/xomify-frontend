@@ -228,6 +228,36 @@ describe('ShareFeedService', () => {
   });
 
   // ============================================
+  // Delete share (#275)
+  // ============================================
+
+  describe('deleteShare', () => {
+    it('issues DELETE /shares/delete with shareId in the body (not POST)', (done) => {
+      service.deleteShare('s1').subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/delete'));
+      // Method must be DELETE — iOS bug-fix lineage swapped POST -> DELETE
+      // and this guards against the same regression on web.
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual({ shareId: 's1' });
+      // Caller email must NOT be in the body — sourced from the JWT.
+      expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+
+    it('forwards sharedAt when provided (forward-compat with iOS)', (done) => {
+      service.deleteShare('s1', '2026-04-23T10:00:00Z').subscribe(() => done());
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/delete'));
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual({
+        shareId: 's1',
+        sharedAt: '2026-04-23T10:00:00Z',
+      });
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+  });
+
+  // ============================================
   // Share-detail
   // ============================================
 

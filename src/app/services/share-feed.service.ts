@@ -282,6 +282,24 @@ export class ShareFeedService {
   }
 
   /**
+   * DELETE /shares/delete
+   * Hard-delete a share by id. Owner-only — backend reads caller identity
+   * from the JWT and returns 403 otherwise. Body-on-DELETE matches the
+   * deployed lambda contract (`lambdas/shares_delete/handler.py:_extract_share_id`)
+   * which reads `shareId` from the JSON body, falling back to query params.
+   * `sharedAt` is accepted for forward compat but unused server-side.
+   *
+   * iOS counterpart was POST -> DELETE method swap; the web service uses
+   * DELETE explicitly so we don't repeat that bug.
+   */
+  deleteShare(shareId: string, sharedAt?: string): Observable<void> {
+    const url = `${this.xomifyApiUrl}/shares/delete`;
+    const body: Record<string, unknown> = { shareId };
+    if (sharedAt) body['sharedAt'] = sharedAt;
+    return this.http.request<void>('DELETE', url, { body });
+  }
+
+  /**
    * POST /shares/react
    * Queue / un-queue a share, or set / clear a rating. `rating` is required
    * when `action === 'rated'` (1..5).

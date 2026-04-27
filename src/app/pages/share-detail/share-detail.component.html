@@ -35,84 +35,97 @@
     </div>
 
     <ng-container *ngIf="share && !error">
-      <!-- Hero art -->
-      <div class="hero-art" aria-hidden="true">
-        <img
-          *ngIf="share.albumArtUrl"
-          [src]="share.albumArtUrl"
-          [alt]="share.albumName || share.trackName"
-        />
-        <div class="hero-fallback" *ngIf="!share.albumArtUrl">
-          <svg
-            width="64"
-            height="64"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M9 18V5l12-2v13" />
-            <circle cx="6" cy="18" r="3" />
-            <circle cx="18" cy="16" r="3" />
-          </svg>
+      <!-- Hero row: art on the left at desktop, stacked on mobile. The
+           sharer-block stays inside the same row so identity sits next to
+           the track at desktop width. -->
+      <div class="hero-row">
+        <!-- Hero art -->
+        <div class="hero-art" aria-hidden="true">
+          <img
+            *ngIf="share.albumArtUrl"
+            [src]="share.albumArtUrl"
+            [alt]="share.albumName || share.trackName"
+          />
+          <div class="hero-fallback" *ngIf="!share.albumArtUrl">
+            <svg
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="hero-meta">
+          <!-- Track header -->
+          <section class="track-header">
+            <h1 class="track-name">{{ share.trackName }}</h1>
+            <p class="track-artist">{{ share.artistName }}</p>
+            <p class="track-album" *ngIf="share.albumName">{{ share.albumName }}</p>
+            <div
+              class="tag-row"
+              *ngIf="moodLabel || genreTags.length > 0"
+              aria-label="Mood and genre tags"
+            >
+              <span class="chip mood-chip" *ngIf="moodLabel">{{ moodLabel }}</span>
+              <span class="chip genre-chip" *ngFor="let g of genreTags">{{ g }}</span>
+            </div>
+          </section>
+
+          <!-- Sharer block -->
+          <section class="sharer-block">
+            <div class="sharer-row">
+              <button
+                type="button"
+                class="sharer-avatar"
+                (click)="openAuthor()"
+                [attr.aria-label]="'Open ' + authorLabel + '\'s profile'"
+              >
+                <img
+                  *ngIf="authorAvatarUrl as url"
+                  [src]="url"
+                  [alt]="authorLabel"
+                  loading="lazy"
+                />
+                <span *ngIf="!authorAvatarUrl">{{ authorInitial }}</span>
+              </button>
+              <div class="sharer-meta">
+                <span class="sharer-name">Shared by {{ authorLabel }}</span>
+                <span class="sharer-time">{{ relativeTime }}</span>
+              </div>
+              <span
+                class="sharer-rating-pill"
+                *ngIf="sharerRating !== null && sharerRating > 0"
+                [attr.aria-label]="
+                  authorLabel + ' rated this ' + sharerRating + ' out of 5'
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+                {{ sharerRating }}/5
+              </span>
+            </div>
+            <p class="sharer-caption" *ngIf="share.caption">{{ share.caption }}</p>
+          </section>
         </div>
       </div>
-
-      <!-- Track header -->
-      <section class="track-header">
-        <h1 class="track-name">{{ share.trackName }}</h1>
-        <p class="track-artist">{{ share.artistName }}</p>
-        <p class="track-album" *ngIf="share.albumName">{{ share.albumName }}</p>
-        <div
-          class="tag-row"
-          *ngIf="moodLabel || genreTags.length > 0"
-          aria-label="Mood and genre tags"
-        >
-          <span class="chip mood-chip" *ngIf="moodLabel">{{ moodLabel }}</span>
-          <span class="chip genre-chip" *ngFor="let g of genreTags">{{ g }}</span>
-        </div>
-      </section>
-
-      <!-- Sharer block -->
-      <section class="sharer-block">
-        <div class="sharer-row">
-          <button
-            type="button"
-            class="sharer-avatar"
-            (click)="openAuthor()"
-            [attr.aria-label]="'Open ' + authorLabel + '\'s profile'"
-          >
-            {{ authorInitial }}
-          </button>
-          <div class="sharer-meta">
-            <span class="sharer-name">Shared by {{ authorLabel }}</span>
-            <span class="sharer-time">{{ relativeTime }}</span>
-          </div>
-          <span
-            class="sharer-rating-pill"
-            *ngIf="sharerRating !== null && sharerRating > 0"
-            [attr.aria-label]="
-              authorLabel + ' rated this ' + sharerRating + ' out of 5'
-            "
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-              />
-            </svg>
-            {{ sharerRating }}/5
-          </span>
-        </div>
-        <p class="sharer-caption" *ngIf="share.caption">{{ share.caption }}</p>
-      </section>
 
       <!-- Stats row: friends queued + friends rated + your rating -->
       <section class="stats-row" aria-label="Share stats">
