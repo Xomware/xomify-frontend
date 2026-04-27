@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
-  switchMap,
   take,
   takeUntil,
 } from 'rxjs/operators';
@@ -33,7 +32,11 @@ export class LikesComponent implements OnInit, OnDestroy {
 
   tracks: LikesTrackDisplayItem[] = [];
   total = 0;
-  cursor: string | null = null;
+  /**
+   * Next offset to request, or `null` when no more pages.
+   * Backend uses offset-based pagination (see lambdas/likes_by_user/handler.py).
+   */
+  nextOffset: number | null = 0;
 
   searchQuery = '';
   private search$ = new Subject<string>();
@@ -57,12 +60,13 @@ export class LikesComponent implements OnInit, OnDestroy {
       this.loadPage();
     });
 
-    // Debounced search
+    // Search is client-side (mirroring iOS LikesViewModel.filteredItems).
+    // Debounce stays so we don't thrash the filter on every keystroke, but
+    // we no longer re-fetch from the server.
     this.search$
-      .pipe(debounceTime(350), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((q) => {
-        this.reset();
-        this.loadPage(q);
+      .pipe(debounceTime(150), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        // No-op subscription; `filteredTracks` getter recomputes on render.
       });
   }
 
@@ -72,23 +76,23 @@ export class LikesComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(q: string): void {
+    this.searchQuery = q;
     this.search$.next(q);
   }
 
   loadMore(): void {
-    if (!this.cursor || this.loadingMore) return;
+    if (this.nextOffset == null || this.loadingMore || !this.email) return;
     this.loadingMore = true;
     this.likesService
-      .getLikesByUser(this.email!, {
+      .getLikesByUser(this.email, {
         limit: PAGE_LIMIT,
-        cursor: this.cursor,
-        q: this.searchQuery || undefined,
+        offset: this.nextOffset,
       })
       .pipe(take(1))
       .subscribe({
         next: (resp) => {
           this.tracks = [...this.tracks, ...resp.tracks];
-          this.cursor = resp.cursor ?? null;
+          this.nextOffset = resp.hasMore ? resp.nextOffset ?? null : null;
           this.total = resp.total;
           this.loadingMore = false;
         },
@@ -114,7 +118,7 @@ export class LikesComponent implements OnInit, OnDestroy {
   }
 
   get hasMore(): boolean {
-    return !!this.cursor;
+    return this.nextOffset != null;
   }
 
   get displayName(): string {
@@ -122,26 +126,39 @@ export class LikesComponent implements OnInit, OnDestroy {
     return this.email ? `${this.email}'s` : "Friend's";
   }
 
+  /** Client-side search filter — matches iOS LikesViewModel.filteredItems. */
+  get filteredTracks(): LikesTrackDisplayItem[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.tracks;
+    return this.tracks.filter((t) => {
+      const haystack = [t.trackName, t.artistName, t.albumName]
+        .filter((s): s is string => !!s)
+        .map((s) => s.toLowerCase())
+        .join(' ');
+      return haystack.includes(q);
+    });
+  }
+
   private reset(): void {
     this.tracks = [];
-    this.cursor = null;
+    this.nextOffset = 0;
     this.total = 0;
     this.isPrivate = false;
     this.loading = true;
   }
 
-  private loadPage(q?: string): void {
+  private loadPage(): void {
     if (!this.email) {
       this.loading = false;
       return;
     }
     this.likesService
-      .getLikesByUser(this.email, { limit: PAGE_LIMIT, q })
+      .getLikesByUser(this.email, { limit: PAGE_LIMIT, offset: 0 })
       .pipe(take(1))
       .subscribe({
         next: (resp) => {
           this.tracks = resp.tracks;
-          this.cursor = resp.cursor ?? null;
+          this.nextOffset = resp.hasMore ? resp.nextOffset ?? null : null;
           this.total = resp.total;
           this.loading = false;
         },

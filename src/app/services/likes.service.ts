@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
-import { concatMap, toArray } from 'rxjs/operators';
+import { concatMap, map, toArray } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 // ============================================
@@ -31,7 +31,9 @@ export interface LikesTrackDisplayItem {
 export interface LikesByUserResponse {
   tracks: LikesTrackDisplayItem[];
   total: number;
-  cursor?: string | null;
+  /** Derived locally — backend uses offset-based pagination, not a cursor token. */
+  nextOffset?: number;
+  hasMore?: boolean;
 }
 
 // AWS Managed WAF rules' default `SizeRestrictions_BODY` rejects request
@@ -69,26 +71,36 @@ export class LikesService {
   }
 
   /**
-   * Fetch paginated liked tracks for a given user email.
+   * Fetch paginated liked tracks for a given user.
    * Subject to that user's `likesPublic` privacy flag (backend enforces).
+   *
+   * Backend contract (lambdas/likes_by_user/handler.py): query params are
+   * `targetEmail` (required) + `limit` + `offset` (int). `q`/search is
+   * client-side only on iOS; this service drops the query and the page
+   * filters locally (mirroring iOS LikesViewModel.filteredItems).
    */
   getLikesByUser(
-    email: string,
-    opts: { limit?: number; cursor?: string; q?: string } = {},
+    targetEmail: string,
+    opts: { limit?: number; offset?: number } = {},
   ): Observable<LikesByUserResponse> {
-    let params = new HttpParams().set('email', email);
-    if (opts.limit != null) {
-      params = params.set('limit', String(opts.limit));
-    }
-    if (opts.cursor) {
-      params = params.set('cursor', opts.cursor);
-    }
-    if (opts.q) {
-      params = params.set('q', opts.q);
-    }
-    return this.http.get<LikesByUserResponse>(`${this.apiUrl}/likes/by-user`, {
-      params,
-    });
+    const limit = opts.limit ?? 30;
+    const offset = opts.offset ?? 0;
+    const params = new HttpParams()
+      .set('targetEmail', targetEmail)
+      .set('limit', String(limit))
+      .set('offset', String(offset));
+    return this.http
+      .get<LikesByUserResponse>(`${this.apiUrl}/likes/by-user`, { params })
+      .pipe(
+        map((resp) => {
+          const itemsSoFar = offset + (resp.tracks?.length ?? 0);
+          return {
+            ...resp,
+            nextOffset: itemsSoFar,
+            hasMore: itemsSoFar < (resp.total ?? 0),
+          };
+        }),
+      );
   }
 
   /**

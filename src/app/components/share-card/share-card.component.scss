@@ -233,59 +233,9 @@
   gap: 12px;
   padding-top: 4px;
 
-  .queue-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 7px 14px;
-    font-size: 0.9rem;
-    color: #cfcfdc;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(156, 10, 191, 0.35);
-      transform: translateY(-1px);
-    }
-
-    &:focus-visible {
-      outline: 2px solid rgba(156, 10, 191, 0.6);
-      outline-offset: 2px;
-    }
-
-    &.active {
-      background: linear-gradient(
-        135deg,
-        rgba(156, 10, 191, 0.25) 0%,
-        rgba(27, 220, 111, 0.2) 100%
-      );
-      border-color: rgba(156, 10, 191, 0.55);
-      color: #fff;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .queue-label {
-      font-weight: 600;
-    }
-
-    .queue-count {
-      font-weight: 600;
-      font-size: 0.85rem;
-      min-width: 14px;
-      text-align: center;
-      padding: 0 6px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.08);
-    }
-  }
+  // Queue button removed — moved into the kebab menu to mirror iOS, since
+  // the front-of-card button only flipped a DDB flag and didn't actually
+  // queue on Spotify (misleading affordance).
 
   .kebab-wrapper {
     position: relative;
@@ -378,11 +328,6 @@
 
   .card-actions {
     gap: 8px;
-
-    .queue-btn {
-      flex: 1;
-      justify-content: center;
-    }
   }
 
   .rating-row {

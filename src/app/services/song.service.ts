@@ -49,12 +49,15 @@ export class SongService implements OnInit {
     return new Observable((observer) => {
       const fetchTracks = () => {
         this.getUserTracks(offset).subscribe((data) => {
-          allTracks = [...allTracks, ...data.items];
-          offset += 300;
+          const items = data.items ?? [];
+          allTracks = [...allTracks, ...items];
+          // Advance by what we actually got. Was `+= 300` with `limit=50`,
+          // which skipped 250 tracks per cycle and silently truncated
+          // most users' libraries.
+          offset += items.length;
 
-          // Check if there are more tracks to fetch
-          if (data.items.length > 0) {
-            fetchTracks(); // Fetch next batch
+          if (items.length > 0) {
+            fetchTracks();
           } else {
             observer.next(allTracks);
             this.tracks = allTracks;

@@ -40,8 +40,8 @@
       </div>
 
       <!-- Track list -->
-      <div class="tracks-list" *ngIf="tracks.length > 0">
-        <div class="track-item" *ngFor="let track of tracks; let i = index">
+      <div class="tracks-list" *ngIf="filteredTracks.length > 0">
+        <div class="track-item" *ngFor="let track of filteredTracks; let i = index">
           <div class="track-art" *ngIf="track.albumArtUrl">
             <img [src]="track.albumArtUrl" [alt]="track.albumName || track.trackName" />
           </div>
@@ -83,7 +83,7 @@
       </div>
 
       <!-- Empty state (no results) -->
-      <div class="empty-state" *ngIf="tracks.length === 0">
+      <div class="empty-state" *ngIf="filteredTracks.length === 0">
         <div class="empty-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M9 18V5l12-2v13" />

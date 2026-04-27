@@ -66,38 +66,10 @@
     </span>
   </div>
 
-  <!-- Actions: queue toggle + kebab menu -->
+  <!-- Actions: kebab menu (Queue moved into the menu, mirroring iOS — the
+       front-of-card Queue button only flipped a DDB flag, never actually
+       queued on Spotify, so it was misleading). -->
   <footer class="card-actions">
-    <button
-      type="button"
-      class="queue-btn"
-      [class.active]="viewerHasQueued"
-      [disabled]="queuePending"
-      (click)="toggleQueue()"
-      [attr.aria-pressed]="viewerHasQueued"
-      [attr.aria-label]="viewerHasQueued ? 'Remove from queue' : 'Add to queue'"
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <line *ngIf="!viewerHasQueued" x1="12" y1="5" x2="12" y2="19" />
-        <line *ngIf="!viewerHasQueued" x1="5" y1="12" x2="19" y2="12" />
-        <polyline *ngIf="viewerHasQueued" points="20 6 9 17 4 12" />
-      </svg>
-      <span class="queue-label">
-        {{ viewerHasQueued ? 'Queued' : 'Queue' }}
-      </span>
-      <span class="queue-count" *ngIf="queuedCount > 0">{{ queuedCount }}</span>
-    </button>
-
     <!-- 3-dot kebab menu -->
     <div class="kebab-wrapper">
       <button
@@ -114,9 +86,9 @@
           fill="currentColor"
           aria-hidden="true"
         >
-          <circle cx="12" cy="5" r="1.5" />
+          <circle cx="5"  cy="12" r="1.5" />
           <circle cx="12" cy="12" r="1.5" />
-          <circle cx="12" cy="19" r="1.5" />
+          <circle cx="19" cy="12" r="1.5" />
         </svg>
       </button>
 
