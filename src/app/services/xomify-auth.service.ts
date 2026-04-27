@@ -17,14 +17,25 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
-/** Raw response shape returned by `POST /auth/login`. */
+/**
+ * Raw response shape returned by `POST /auth/login`.
+ *
+ * Note: the backend's `success_response` helper does NOT wrap the body in a
+ * `{ data, error, meta }` envelope — the body is the raw dict the handler
+ * returned. Tolerate both shapes (with/without `data` wrapper) so a future
+ * envelope migration doesn't break us.
+ */
 export interface AuthLoginResponse {
-  data: {
-    token: string;
-    expiresAt: string;
+  // Wrapped shape (envelope), in case backend ever adopts one.
+  data?: {
+    token?: string;
+    expiresAt?: string | null;
   } | null;
-  error: { code?: string; message?: string } | null;
-  meta: Record<string, unknown>;
+  // Unwrapped shape — current backend.
+  token?: string;
+  expiresAt?: string | null;
+  error?: { code?: string; message?: string } | null;
+  meta?: Record<string, unknown>;
 }
 
 /** sessionStorage key for the per-user Xomify JWT (Q3 in the epic plan). */
@@ -79,8 +90,10 @@ export class XomifyAuthService {
       .post<AuthLoginResponse>(this.loginUrl, { spotifyAccessToken }, { headers })
       .pipe(
         map((resp) => {
-          const token = resp?.data?.token ?? null;
-          const expiresAt = resp?.data?.expiresAt ?? null;
+          // success_response returns the body raw — no `data` envelope.
+          // Tolerate both shapes for safety.
+          const token = resp?.token ?? resp?.data?.token ?? null;
+          const expiresAt = resp?.expiresAt ?? resp?.data?.expiresAt ?? null;
           if (token) {
             this.persist(token, expiresAt);
           }
