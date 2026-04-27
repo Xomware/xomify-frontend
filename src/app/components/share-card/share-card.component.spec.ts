@@ -10,6 +10,7 @@ import {
   ShareFeedService,
   ReactResponse,
 } from 'src/app/services/share-feed.service';
+import { PlayerService } from 'src/app/services/player.service';
 import { UserService } from 'src/app/services/user.service';
 import { ShareService } from 'src/app/services/share.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -49,8 +50,10 @@ describe('ShareCardComponent', () => {
     ]);
     const shareSpy = jasmine.createSpyObj('ShareService', ['share']);
     const userSpy = jasmine.createSpyObj('UserService', ['getEmail']);
+    const playerSpy = jasmine.createSpyObj('PlayerService', ['playSong', 'addToSpotifyQueue']);
     userSpy.getEmail.and.returnValue('viewer@example.com');
     shareSpy.share.and.resolveTo(true);
+    playerSpy.addToSpotifyQueue.and.returnValue(of(true));
 
     await TestBed.configureTestingModule({
       declarations: [ShareCardComponent],
@@ -60,6 +63,7 @@ describe('ShareCardComponent', () => {
         { provide: ToastService, useValue: toastSpy },
         { provide: ShareService, useValue: shareSpy },
         { provide: UserService, useValue: userSpy },
+        { provide: PlayerService, useValue: playerSpy },
       ],
     }).compileComponents();
 
@@ -173,5 +177,52 @@ describe('ShareCardComponent', () => {
 
     expect(component.share.viewerRating).toBe(2);
     expect(toast.showNegativeToast).toHaveBeenCalled();
+  });
+
+  describe('kebab menu', () => {
+    it('toggleMenu opens the menu and stops propagation', () => {
+      expect(component.menuOpen).toBe(false);
+      const event = new MouseEvent('click');
+      spyOn(event, 'stopPropagation');
+      component.toggleMenu(event);
+      expect(component.menuOpen).toBe(true);
+      expect(event.stopPropagation).toHaveBeenCalled();
+    });
+
+    it('toggleMenu closes the menu on second call', () => {
+      const event = new MouseEvent('click');
+      component.toggleMenu(event);
+      component.toggleMenu(event);
+      expect(component.menuOpen).toBe(false);
+    });
+
+    it('document click closes the menu via HostListener', () => {
+      component.menuOpen = true;
+      component.onDocumentClick();
+      expect(component.menuOpen).toBe(false);
+    });
+
+    it('menuPlay calls playerService.playSong and closes menu', () => {
+      const playerService = TestBed.inject(PlayerService) as jasmine.SpyObj<PlayerService>;
+      component.menuOpen = true;
+      component.menuPlay();
+      expect(component.menuOpen).toBe(false);
+      expect(playerService.playSong).toHaveBeenCalledWith('t1');
+    });
+
+    it('menuQueue delegates to toggleQueue and closes menu', () => {
+      const resp: ReactResponse = {
+        queuedCount: 3,
+        ratedCount: 1,
+        viewerHasQueued: true,
+        viewerRating: null,
+        sharerRating: null,
+      };
+      shareFeed.reactToShare.and.returnValue(of(resp));
+      component.menuOpen = true;
+      component.menuQueue();
+      expect(component.menuOpen).toBe(false);
+      expect(shareFeed.reactToShare).toHaveBeenCalled();
+    });
   });
 });
