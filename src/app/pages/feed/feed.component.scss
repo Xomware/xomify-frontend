@@ -14,15 +14,12 @@
 
 .page-header {
   margin-bottom: 24px;
-  position: sticky;
-  top: 72px;
-  z-index: 5;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 20, 0.96) 0%,
-    rgba(10, 10, 20, 0.82) 100%
-  );
-  backdrop-filter: blur(8px);
+  // Was sticky w/ a semi-transparent gradient; cards scrolled UNDER it
+  // and were visually clipped at the top because the gradient bottom
+  // was 82% opacity. Going back to normal flow — the user can scroll
+  // past it and the cards stay fully visible.
+  position: relative;
+  background: transparent;
   padding: 12px 0 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 

@@ -243,37 +243,31 @@
   }
 }
 
-.rating-row {
+.card-actions {
+  // Single horizontal row: stars | reactions | comment chip | kebab.
+  // Was three stacked rows (.rating-row + .card-reactions + .card-actions)
+  // — collapsed into one to match the user's request and reduce vertical
+  // height of each card.
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 0;
+  padding-top: 4px;
   flex-wrap: wrap;
 
-  .rating-label {
-    font-size: 0.8rem;
-    color: #8a8a9a;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .card-rating {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
-  .rated-count {
-    font-size: 0.8rem;
-    color: #8a8a9a;
-    margin-left: auto;
+  // The reactions bar grows to fill available space; the comment chip +
+  // kebab cluster on the right via margin-left: auto on the chip.
+  .card-reactions {
+    display: inline-flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
   }
-}
-
-.card-reactions {
-  display: block;
-}
-
-.card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 4px;
 
   // Queue button removed — moved into the kebab menu to mirror iOS, since
   // the front-of-card button only flipped a DDB flag and didn't actually
@@ -294,6 +288,8 @@
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease,
       border-color 0.15s ease;
+    // Push comment + kebab to the right edge of the action row.
+    margin-left: auto;
 
     .comment-count {
       font-variant-numeric: tabular-nums;
