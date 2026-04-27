@@ -107,6 +107,34 @@
   }
 }
 
+.detail-tap-zone {
+  // The tap target wrapping header + track + caption + tags. Mirrors iOS
+  // ShareCardView.swift:116-125 — only this part of the card opens the
+  // detail page; the action footer below stays inert to clicks here.
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(156, 10, 191, 0.6);
+    outline-offset: 4px;
+  }
+}
+
 .card-body.track-body {
   display: flex;
   align-items: center;
@@ -226,6 +254,10 @@
   }
 }
 
+.card-reactions {
+  display: block;
+}
+
 .card-actions {
   display: flex;
   align-items: center;
@@ -236,6 +268,38 @@
   // Queue button removed — moved into the kebab menu to mirror iOS, since
   // the front-of-card button only flipped a DDB flag and didn't actually
   // queue on Spotify (misleading affordance).
+
+  .comment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    min-height: 32px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cfcfdc;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease,
+      border-color 0.15s ease;
+
+    .comment-count {
+      font-variant-numeric: tabular-nums;
+    }
+
+    &:hover {
+      background: rgba(156, 10, 191, 0.15);
+      border-color: rgba(156, 10, 191, 0.35);
+      color: #ffffff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(156, 10, 191, 0.6);
+      outline-offset: 2px;
+    }
+  }
 
   .kebab-wrapper {
     position: relative;

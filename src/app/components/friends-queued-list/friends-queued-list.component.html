@@ -1,0 +1,79 @@
+<div
+  class="modal-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="friends-queued-title"
+  (click)="onBackdropClick($event)"
+>
+  <div class="modal-panel" role="document">
+    <header class="modal-header">
+      <div class="header-text">
+        <h2 id="friends-queued-title">Friends queued</h2>
+        <p class="track-name" *ngIf="trackName">{{ trackName }}</p>
+        <p class="count-label">{{ countLabel }}</p>
+      </div>
+      <button
+        type="button"
+        class="modal-close"
+        (click)="close()"
+        aria-label="Close"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="empty" *ngIf="listeners.length === 0">
+        No friends have queued this yet.
+      </div>
+
+      <ul class="listener-list" *ngIf="listeners.length > 0">
+        <li
+          class="listener-row"
+          *ngFor="let entry of listeners; trackBy: trackByEmail"
+        >
+          <div class="row-avatar" aria-hidden="true">
+            <img
+              *ngIf="entry.avatar"
+              [src]="entry.avatar"
+              [alt]="''"
+            />
+            <span *ngIf="!entry.avatar">{{ initialOf(entry) }}</span>
+          </div>
+          <span class="row-author">{{ authorOf(entry) }}</span>
+          <span class="row-badge" aria-hidden="true">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="14" y2="12" />
+              <line x1="3" y1="18" x2="14" y2="18" />
+              <line x1="18" y1="14" x2="18" y2="20" />
+              <line x1="15" y1="17" x2="21" y2="17" />
+            </svg>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

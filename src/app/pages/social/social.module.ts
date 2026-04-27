@@ -13,10 +13,15 @@ import { FeedComponent } from '../feed/feed.component';
 import { InvitesComponent } from '../invites/invites.component';
 import { NotificationSettingsComponent } from '../notification-settings/notification-settings.component';
 import { LikesComponent } from '../likes/likes.component';
+import { ShareDetailComponent } from '../share-detail/share-detail.component';
 import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { ShareCardComponent } from '../../components/share-card/share-card.component';
 import { ShareComposerComponent } from '../../components/share-composer/share-composer.component';
+import { ReactionsBarComponent } from '../../components/reactions-bar/reactions-bar.component';
+import { CommentThreadComponent } from '../../components/comment-thread/comment-thread.component';
+import { FriendsRatedListComponent } from '../../components/friends-rated-list/friends-rated-list.component';
+import { FriendsQueuedListComponent } from '../../components/friends-queued-list/friends-queued-list.component';
 import { TruncatePipe } from '../../pipes/truncate.pipe';
 
 const routes: Routes = [
@@ -32,6 +37,9 @@ const routes: Routes = [
   },
   { path: 'likes', component: LikesComponent },
   { path: 'likes/:email', component: LikesComponent },
+  // Share-detail page (xomify-backend/lambdas/shares_detail). Mirrors iOS
+  // FeedView.swift:124-126,145-151 navigation to ShareDetailView.
+  { path: 'share/:shareId', component: ShareDetailComponent },
 ];
 
 @NgModule({
@@ -44,10 +52,15 @@ const routes: Routes = [
     InvitesComponent,
     NotificationSettingsComponent,
     LikesComponent,
+    ShareDetailComponent,
     AddSongModalComponent,
     AddMemberModalComponent,
     ShareCardComponent,
     ShareComposerComponent,
+    ReactionsBarComponent,
+    CommentThreadComponent,
+    FriendsRatedListComponent,
+    FriendsQueuedListComponent,
     TruncatePipe,
   ],
   imports: [

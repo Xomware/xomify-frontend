@@ -24,34 +24,45 @@
     <span class="type-badge" aria-hidden="true">Track</span>
   </header>
 
-  <!-- Track row: album art + metadata -->
-  <div class="card-body track-body">
-    <div class="track-art" *ngIf="share.albumArtUrl">
-      <img [src]="share.albumArtUrl" [alt]="share.albumName || share.trackName" />
-    </div>
-    <div class="track-info">
-      <span class="track-name" [title]="share.trackName">{{ share.trackName }}</span>
-      <span class="track-artist" [title]="share.artistName">{{ share.artistName }}</span>
-      <span
-        class="track-album"
-        *ngIf="share.albumName"
-        [title]="share.albumName"
-      >{{ share.albumName }}</span>
-    </div>
-  </div>
-
-  <!-- Caption -->
-  <p class="caption" *ngIf="share.caption">{{ share.caption }}</p>
-
-  <!-- Mood + genre chips -->
-  <div
-    class="tag-row"
-    *ngIf="moodLabel || genreTags.length > 0"
-    aria-label="Mood and genre tags"
+  <!-- Tap-zone: header + track + caption + tags. Mirrors iOS
+       ShareCardView.swift:116-125 — the action footer (kebab, ratings,
+       reactions) is intentionally outside this region so taps on those
+       controls don't also navigate. -->
+  <button
+    type="button"
+    class="detail-tap-zone"
+    (click)="openDetail()"
+    [attr.aria-label]="'Open share by ' + authorLabel"
   >
-    <span class="chip mood-chip" *ngIf="moodLabel">{{ moodLabel }}</span>
-    <span class="chip genre-chip" *ngFor="let g of genreTags">{{ g }}</span>
-  </div>
+    <!-- Track row: album art + metadata -->
+    <div class="card-body track-body">
+      <div class="track-art" *ngIf="share.albumArtUrl">
+        <img [src]="share.albumArtUrl" [alt]="share.albumName || share.trackName" />
+      </div>
+      <div class="track-info">
+        <span class="track-name" [title]="share.trackName">{{ share.trackName }}</span>
+        <span class="track-artist" [title]="share.artistName">{{ share.artistName }}</span>
+        <span
+          class="track-album"
+          *ngIf="share.albumName"
+          [title]="share.albumName"
+        >{{ share.albumName }}</span>
+      </div>
+    </div>
+
+    <!-- Caption -->
+    <p class="caption" *ngIf="share.caption">{{ share.caption }}</p>
+
+    <!-- Mood + genre chips -->
+    <div
+      class="tag-row"
+      *ngIf="moodLabel || genreTags.length > 0"
+      aria-label="Mood and genre tags"
+    >
+      <span class="chip mood-chip" *ngIf="moodLabel">{{ moodLabel }}</span>
+      <span class="chip genre-chip" *ngFor="let g of genreTags">{{ g }}</span>
+    </div>
+  </button>
 
   <!-- Rating row -->
   <div class="rating-row">
@@ -66,10 +77,49 @@
     </span>
   </div>
 
-  <!-- Actions: kebab menu (Queue moved into the menu, mirroring iOS — the
-       front-of-card Queue button only flipped a DDB flag, never actually
-       queued on Spotify, so it was misleading). -->
+  <!-- Reactions row (xomify-backend#139). Pills for active emoji + smiley
+       picker. Tied to the share through the parent (see share-feed). -->
+  <app-reactions-bar
+    class="card-reactions"
+    [counts]="reactionCounts"
+    [viewerReactions]="viewerReactions"
+    [inFlight]="reactingSlugs"
+    [compact]="true"
+    (toggle)="onReactionToggle($event)"
+  ></app-reactions-bar>
+
+  <!-- Actions: comment chip + kebab menu (Queue moved into the menu, mirroring
+       iOS — the front-of-card Queue button only flipped a DDB flag, never
+       actually queued on Spotify, so it was misleading). -->
   <footer class="card-actions">
+    <button
+      type="button"
+      class="comment-chip"
+      (click)="openDetail()"
+      [attr.aria-label]="
+        commentCount === 1
+          ? '1 comment. Open share to view.'
+          : commentCount + ' comments. Open share to view.'
+      "
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path
+          d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+        />
+      </svg>
+      <span class="comment-count">{{ commentCount }}</span>
+    </button>
+
     <!-- 3-dot kebab menu -->
     <div class="kebab-wrapper">
       <button
