@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -103,7 +103,7 @@ export interface SpotifyUrlParseResult {
 })
 export class GroupsService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   // Cache subjects
   private groupsListSubject = new BehaviorSubject<Group[]>([]);
@@ -120,13 +120,6 @@ export class GroupsService {
 
   constructor(private http: HttpClient) {
     this.loadFromCache();
-  }
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
   }
 
   // ============================================
@@ -209,7 +202,7 @@ export class GroupsService {
 
     const url = `${this.xomifyApiUrl}/groups/list?email=${encodeURIComponent(email)}`;
     return this.http
-      .get<GroupListResponse>(url, { headers: this.getHeaders() })
+      .get<GroupListResponse>(url)
       .pipe(
         map((response) => response.groups || []),
         tap((groups) => {
@@ -239,7 +232,7 @@ export class GroupsService {
     }
 
     const url = `${this.xomifyApiUrl}/groups/info?groupId=${groupId}&email=${encodeURIComponent(email)}`;
-    return this.http.get<GroupDetail>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.get<GroupDetail>(url).pipe(
       tap((group) => {
         this.currentGroupSubject.next(group);
         this.setCache(cacheKey, group);
@@ -256,7 +249,7 @@ export class GroupsService {
     const body = { email, ...request };
 
     return this.http
-      .post<Group>(url, body, { headers: this.getHeaders() })
+      .post<Group>(url, body)
       .pipe(
         tap((newGroup) => {
           const current = this.groupsListSubject.getValue();
@@ -278,7 +271,7 @@ export class GroupsService {
     const url = `${this.xomifyApiUrl}/groups/update`;
     const body = { email, groupId, ...updates };
 
-    return this.http.put<Group>(url, body, { headers: this.getHeaders() }).pipe(
+    return this.http.put<Group>(url, body).pipe(
       tap((updatedGroup) => {
         const current = this.groupsListSubject.getValue();
         const index = current.findIndex((g) => g.id === groupId);
@@ -298,7 +291,7 @@ export class GroupsService {
   deleteGroup(groupId: string, email: string): Observable<void> {
     const url = `${this.xomifyApiUrl}/groups/remove?groupId=${groupId}&email=${encodeURIComponent(email)}`;
 
-    return this.http.delete<void>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         const current = this.groupsListSubject.getValue();
         this.groupsListSubject.next(current.filter((g) => g.id !== groupId));
@@ -325,7 +318,7 @@ export class GroupsService {
     const body = { email, groupId, memberEmail };
 
     return this.http
-      .post<GroupMember>(url, body, { headers: this.getHeaders() })
+      .post<GroupMember>(url, body)
       .pipe(
         tap(() => {
           this.clearGroupCache(groupId);
@@ -345,7 +338,7 @@ export class GroupsService {
   ): Observable<void> {
     const url = `${this.xomifyApiUrl}/groups/remove-member?groupId=${groupId}&memberEmail=${encodeURIComponent(memberEmail)}&email=${encodeURIComponent(email)}`;
 
-    return this.http.delete<void>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         this.clearGroupCache(groupId);
         localStorage.removeItem(this.CACHE_KEY_GROUPS);
@@ -361,7 +354,7 @@ export class GroupsService {
     const url = `${this.xomifyApiUrl}/groups/leave`;
     const body = { email, groupId };
 
-    return this.http.post<void>(url, body, { headers: this.getHeaders() }).pipe(
+    return this.http.post<void>(url, body).pipe(
       tap(() => {
         const current = this.groupsListSubject.getValue();
         this.groupsListSubject.next(current.filter((g) => g.id !== groupId));
@@ -388,7 +381,7 @@ export class GroupsService {
     const body = { email, groupId, ...request };
 
     return this.http
-      .post<GroupSong>(url, body, { headers: this.getHeaders() })
+      .post<GroupSong>(url, body)
       .pipe(
         tap(() => {
           this.clearGroupCache(groupId);
@@ -410,7 +403,7 @@ export class GroupsService {
     const body = { email, groupId, spotifyUrl };
 
     return this.http
-      .post<GroupSong>(url, body, { headers: this.getHeaders() })
+      .post<GroupSong>(url, body)
       .pipe(
         tap(() => {
           this.clearGroupCache(groupId);
@@ -426,7 +419,7 @@ export class GroupsService {
   removeSong(groupId: string, email: string, songId: string): Observable<void> {
     const url = `${this.xomifyApiUrl}/groups/remove-song?groupId=${groupId}&songId${songId}=email=${encodeURIComponent(email)}`;
 
-    return this.http.delete<void>(url, { headers: this.getHeaders() }).pipe(
+    return this.http.delete<void>(url).pipe(
       tap(() => {
         this.clearGroupCache(groupId);
         localStorage.removeItem(this.CACHE_KEY_GROUPS);
@@ -452,7 +445,7 @@ export class GroupsService {
     const body = { email, groupId, songId, ...status };
 
     return this.http
-      .put<GroupSongUserStatus>(url, body, { headers: this.getHeaders() })
+      .put<GroupSongUserStatus>(url, body)
       .pipe(
         tap(() => {
           // Update local cache
@@ -520,7 +513,7 @@ export class GroupsService {
     const body = { email, groupId };
 
     return this.http
-      .post<{ count: number }>(url, body, { headers: this.getHeaders() })
+      .post<{ count: number }>(url, body)
       .pipe(
         tap(() => {
           // Update local cache - mark all songs as listened

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -31,16 +31,9 @@ export interface UnregisterDeviceResponse {
 })
 export class NotificationsService {
   private xomifyApiUrl = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
-  private readonly apiAuthToken = environment.apiAuthToken;
+  // Authorization for Xomify API calls is attached by AuthInterceptor (sub-feature 0e).
 
   constructor(private http: HttpClient) {}
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.apiAuthToken}`,
-      'Content-Type': 'application/json',
-    });
-  }
 
   /** POST /notifications/register — opt a device into push. */
   registerDevice(
@@ -49,11 +42,11 @@ export class NotificationsService {
     platform: DevicePlatform = 'ios',
   ): Observable<RegisterDeviceResponse> {
     const url = `${this.xomifyApiUrl}/notifications/register`;
-    return this.http.post<RegisterDeviceResponse>(
-      url,
-      { email, deviceToken, platform },
-      { headers: this.getHeaders() },
-    );
+    return this.http.post<RegisterDeviceResponse>(url, {
+      email,
+      deviceToken,
+      platform,
+    });
   }
 
   /** POST /notifications/unregister — stop push to a specific device token. */
@@ -62,10 +55,9 @@ export class NotificationsService {
     deviceToken: string,
   ): Observable<UnregisterDeviceResponse> {
     const url = `${this.xomifyApiUrl}/notifications/unregister`;
-    return this.http.post<UnregisterDeviceResponse>(
-      url,
-      { email, deviceToken },
-      { headers: this.getHeaders() },
-    );
+    return this.http.post<UnregisterDeviceResponse>(url, {
+      email,
+      deviceToken,
+    });
   }
 }
