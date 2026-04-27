@@ -26,7 +26,7 @@ describe('LikesService', () => {
   });
 
   describe('pushUserLikes', () => {
-    it('sends a single batch when tracks < 100', (done) => {
+    it('sends a single batch when tracks <= BATCH_SIZE', (done) => {
       const tracks: LikePushItem[] = [
         { trackId: 't1', addedAt: '2026-01-01T00:00:00Z' },
         { trackId: 't2', addedAt: '2026-01-02T00:00:00Z' },
@@ -40,23 +40,27 @@ describe('LikesService', () => {
       req.flush(null);
     });
 
-    it('splits into multiple batches when tracks > 100', (done) => {
-      const tracks: LikePushItem[] = Array.from({ length: 150 }, (_, i) => ({
+    it('splits into batches of 25 (WAF body-size limit)', (done) => {
+      // BATCH_SIZE is 25 — kept under the 8 KB WAF SizeRestrictions_BODY rule.
+      // 60 tracks => 25 + 25 + 10.
+      const tracks: LikePushItem[] = Array.from({ length: 60 }, (_, i) => ({
         trackId: `t${i}`,
         addedAt: '2026-01-01T00:00:00Z',
       }));
 
       service.pushUserLikes(tracks).subscribe(() => done());
 
-      // First batch of 100
       const req1 = httpMock.expectOne(`${API}/likes/push`);
-      expect(req1.request.body.tracks.length).toBe(100);
+      expect(req1.request.body.tracks.length).toBe(25);
       req1.flush(null);
 
-      // Second batch of 50
       const req2 = httpMock.expectOne(`${API}/likes/push`);
-      expect(req2.request.body.tracks.length).toBe(50);
+      expect(req2.request.body.tracks.length).toBe(25);
       req2.flush(null);
+
+      const req3 = httpMock.expectOne(`${API}/likes/push`);
+      expect(req3.request.body.tracks.length).toBe(10);
+      req3.flush(null);
     });
 
     it('completes immediately with empty array when no tracks', (done) => {
