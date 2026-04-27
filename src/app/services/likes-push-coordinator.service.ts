@@ -41,7 +41,10 @@ export class LikesPushCoordinatorService {
 
   private isDue(): boolean {
     try {
-      const raw = sessionStorage.getItem(PUSHED_AT_KEY);
+      // localStorage so the 24h gate persists across tabs/refreshes.
+      // sessionStorage was per-tab and re-fired the heavy push flow on
+      // every refresh / new tab.
+      const raw = localStorage.getItem(PUSHED_AT_KEY);
       if (!raw) return true;
       const pushedAt = new Date(raw).getTime();
       return Date.now() - pushedAt >= PUSH_INTERVAL_MS;
@@ -52,7 +55,7 @@ export class LikesPushCoordinatorService {
 
   private markPushed(): void {
     try {
-      sessionStorage.setItem(PUSHED_AT_KEY, new Date().toISOString());
+      localStorage.setItem(PUSHED_AT_KEY, new Date().toISOString());
     } catch {
       // best-effort
     }

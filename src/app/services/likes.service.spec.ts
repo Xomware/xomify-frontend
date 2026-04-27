@@ -83,38 +83,60 @@ describe('LikesService', () => {
         },
       ],
       total: 1,
-      cursor: null,
     };
 
-    it('GETs with email param', (done) => {
+    it('GETs with targetEmail + default offset/limit', (done) => {
       service.getLikesByUser('dom@example.com').subscribe((resp) => {
         expect(resp.total).toBe(1);
+        // hasMore derived locally — 1 of 1 -> no more.
+        expect(resp.hasMore).toBe(false);
+        expect(resp.nextOffset).toBe(1);
         done();
       });
 
       const req = httpMock.expectOne((r) =>
-        r.url.endsWith('/likes/by-user') && r.params.get('email') === 'dom@example.com',
+        r.url.endsWith('/likes/by-user') &&
+        r.params.get('targetEmail') === 'dom@example.com' &&
+        r.params.get('offset') === '0' &&
+        r.params.get('limit') === '30',
       );
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
 
-    it('passes limit, cursor, and q when provided', (done) => {
+    it('passes custom limit + offset when provided', (done) => {
       service
-        .getLikesByUser('dom@example.com', {
-          limit: 20,
-          cursor: 'abc',
-          q: 'bohemian',
-        })
-        .subscribe(() => done());
+        .getLikesByUser('dom@example.com', { limit: 20, offset: 40 })
+        .subscribe((resp) => {
+          // 40 + 1 of 1 total -> still no more.
+          expect(resp.nextOffset).toBe(41);
+          done();
+        });
 
-      const req = httpMock.expectOne((r) =>
-        r.url.endsWith('/likes/by-user'),
-      );
+      const req = httpMock.expectOne((r) => r.url.endsWith('/likes/by-user'));
+      expect(req.request.params.get('targetEmail')).toBe('dom@example.com');
       expect(req.request.params.get('limit')).toBe('20');
-      expect(req.request.params.get('cursor')).toBe('abc');
-      expect(req.request.params.get('q')).toBe('bohemian');
+      expect(req.request.params.get('offset')).toBe('40');
       req.flush(mockResponse);
+    });
+
+    it('marks hasMore=true when offset+page < total', (done) => {
+      service
+        .getLikesByUser('dom@example.com', { limit: 10, offset: 0 })
+        .subscribe((resp) => {
+          expect(resp.hasMore).toBe(true);
+          expect(resp.nextOffset).toBe(10);
+          done();
+        });
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/likes/by-user'));
+      req.flush({
+        tracks: Array.from({ length: 10 }, (_, i) => ({
+          trackId: `t${i}`,
+          addedAt: '2026-01-01T00:00:00Z',
+        })),
+        total: 100,
+      });
     });
   });
 
