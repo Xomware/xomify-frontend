@@ -13,6 +13,7 @@ import { of } from 'rxjs';
 describe('AuthService.ensureXomifyJwt', () => {
   let service: AuthService;
   let xomifyAuth: jasmine.SpyObj<XomifyAuthService>;
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
     const xomifyAuthSpy = jasmine.createSpyObj<XomifyAuthService>(
@@ -33,6 +34,11 @@ describe('AuthService.ensureXomifyJwt', () => {
     xomifyAuth = TestBed.inject(
       XomifyAuthService,
     ) as jasmine.SpyObj<XomifyAuthService>;
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   it('returns existing JWT without minting when hasJwt() is true', (done) => {
@@ -46,28 +52,60 @@ describe('AuthService.ensureXomifyJwt', () => {
     });
   });
 
-  it('mints a new JWT when hasJwt() is false and accessToken is set', (done) => {
+  it('refreshes Spotify access token then mints when hasJwt() is false and refreshToken is set', (done) => {
     xomifyAuth.hasJwt.and.returnValue(false);
     xomifyAuth.mintFromSpotifyAccessToken.and.returnValue(of('new-jwt'));
-    service.accessToken = 'spotify-access-token';
+    service.refreshToken = 'spotify-refresh-token';
 
     service.ensureXomifyJwt().subscribe((jwt) => {
       expect(jwt).toBe('new-jwt');
+      // The mint call must use the FRESH access token, not the previously
+      // stored one — that's the whole point of the bootstrap hotfix.
       expect(xomifyAuth.mintFromSpotifyAccessToken).toHaveBeenCalledWith(
-        'spotify-access-token',
+        'fresh-access-token',
       );
       done();
     });
+
+    const tokenReq = httpMock.expectOne(
+      'https://accounts.spotify.com/api/token',
+    );
+    expect(tokenReq.request.method).toBe('POST');
+    tokenReq.flush({
+      access_token: 'fresh-access-token',
+      token_type: 'Bearer',
+      expires_in: 3600,
+      scope: '',
+    });
   });
 
-  it('returns null when hasJwt() is false and no Spotify accessToken', (done) => {
+  it('returns null when hasJwt() is false and no Spotify refreshToken', (done) => {
     xomifyAuth.hasJwt.and.returnValue(false);
-    service.accessToken = '';
+    service.refreshToken = '';
 
     service.ensureXomifyJwt().subscribe((jwt) => {
       expect(jwt).toBeNull();
       expect(xomifyAuth.mintFromSpotifyAccessToken).not.toHaveBeenCalled();
       done();
     });
+  });
+
+  it('returns null when Spotify refresh fails', (done) => {
+    xomifyAuth.hasJwt.and.returnValue(false);
+    service.refreshToken = 'spotify-refresh-token';
+
+    service.ensureXomifyJwt().subscribe((jwt) => {
+      expect(jwt).toBeNull();
+      expect(xomifyAuth.mintFromSpotifyAccessToken).not.toHaveBeenCalled();
+      done();
+    });
+
+    const tokenReq = httpMock.expectOne(
+      'https://accounts.spotify.com/api/token',
+    );
+    tokenReq.flush(
+      { error: 'invalid_grant' },
+      { status: 400, statusText: 'Bad Request' },
+    );
   });
 });
