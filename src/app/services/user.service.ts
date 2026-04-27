@@ -19,6 +19,8 @@ export class UserService implements OnInit {
   activeReleaseRadar: boolean = false;
   playlistCount: number = 0;
   followingCount: number = 0;
+  likesCount: number = 0;
+  likesPublic: boolean = false;
   private bootstrap$: Observable<void> | null = null;
   private baseUrl = 'https://api.spotify.com/v1';
   private xomifyApiUrl: string = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
@@ -70,6 +72,8 @@ export class UserService implements OnInit {
               this.activeWrapped = xomifyData?.activeWrapped ?? false;
               this.activeReleaseRadar =
                 xomifyData?.activeReleaseRadar ?? false;
+              this.likesCount = xomifyData?.likesCount ?? 0;
+              this.likesPublic = xomifyData?.likesPublic ?? false;
             }),
             catchError(() => of(null)),
             map(() => void 0),
@@ -296,5 +300,21 @@ export class UserService implements OnInit {
 
   getFollowingCount(): number {
     return this.followingCount;
+  }
+
+  getLikesCount(): number {
+    return this.likesCount;
+  }
+
+  setLikesCount(count: number): void {
+    this.likesCount = count;
+  }
+
+  getLikesPublic(): boolean {
+    return this.likesPublic;
+  }
+
+  setLikesPublic(value: boolean): void {
+    this.likesPublic = value;
   }
 }

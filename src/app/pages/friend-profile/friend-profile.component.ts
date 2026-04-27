@@ -343,6 +343,10 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToLikes(): void {
+    this.router.navigate(['/likes', this.friendEmail]);
+  }
+
   // Navigation
   goBack(): void {
     this.router.navigate(['/friends']);

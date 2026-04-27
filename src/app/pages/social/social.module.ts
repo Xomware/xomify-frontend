@@ -12,6 +12,7 @@ import { GroupDetailComponent } from '../group-detail/group-detail.component';
 import { FeedComponent } from '../feed/feed.component';
 import { InvitesComponent } from '../invites/invites.component';
 import { NotificationSettingsComponent } from '../notification-settings/notification-settings.component';
+import { LikesComponent } from '../likes/likes.component';
 import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { ShareCardComponent } from '../../components/share-card/share-card.component';
@@ -29,6 +30,8 @@ const routes: Routes = [
     path: 'settings/notifications',
     component: NotificationSettingsComponent,
   },
+  { path: 'likes', component: LikesComponent },
+  { path: 'likes/:email', component: LikesComponent },
 ];
 
 @NgModule({
@@ -40,6 +43,7 @@ const routes: Routes = [
     GroupDetailComponent,
     InvitesComponent,
     NotificationSettingsComponent,
+    LikesComponent,
     AddSongModalComponent,
     AddMemberModalComponent,
     ShareCardComponent,

@@ -79,6 +79,15 @@
               <span class="stat-value">{{ playlistCount | number }}</span>
               <span class="stat-label">Playlists</span>
             </div>
+            <div class="stat-divider" *ngIf="profile.likesCount != null"></div>
+            <div
+              class="stat-item clickable"
+              *ngIf="profile.likesCount != null"
+              (click)="goToLikes()"
+            >
+              <span class="stat-value">{{ profile.likesCount | number }}</span>
+              <span class="stat-label">Likes</span>
+            </div>
           </div>
 
           <!-- Friend Status Actions -->

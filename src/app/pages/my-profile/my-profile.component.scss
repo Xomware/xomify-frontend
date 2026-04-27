@@ -113,6 +113,69 @@
     }
   }
 
+  .settings-toggle-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(26, 26, 46, 0.7);
+    border: 1px solid rgba(156, 10, 191, 0.22);
+    border-radius: 18px;
+    padding: 18px 22px;
+
+    .settings-toggle-body {
+      flex: 1;
+    }
+  }
+
+  // Toggle switch
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 26px;
+      transition: background 0.25s ease;
+
+      &::before {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        left: 3px;
+        top: 3px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.25s ease;
+      }
+    }
+
+    input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 160%);
+    }
+
+    input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+
+    input:disabled + .toggle-slider {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
   @media (max-width: 640px) {
     .settings-cta-card {
       flex-direction: column;
@@ -121,6 +184,15 @@
 
       .settings-cta-btn {
         align-self: flex-end;
+      }
+    }
+
+    .settings-toggle-card {
+      flex-direction: column;
+      align-items: stretch;
+
+      .toggle-switch {
+        align-self: flex-start;
       }
     }
   }

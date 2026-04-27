@@ -39,6 +39,8 @@ export interface FriendProfile {
   followingCount?: number;
   playlistCount?: number;
   friendsCount?: number;
+  likesCount?: number;
+  likesUpdatedAt?: string;
   topSongs?: {
     short_term?: any[];
     medium_term?: any[];
