@@ -4,7 +4,7 @@ import { UserService } from './services/user.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { PlayerService } from './services/player.service';
 import { Subject } from 'rxjs';
-import { filter, take, takeUntil } from 'rxjs/operators';
+import { filter, switchMap, take, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -23,12 +23,20 @@ export class AppComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit(): void {
-    // On app boot, if a session already exists, preload Spotify user + the
-    // Xomify enrollment flags so pages like Wrapped/Release Radar don't
-    // render in a "not enrolled / empty" state just because the user landed
-    // directly on them instead of visiting /my-profile first.
+    // On app boot, if a session already exists:
+    // 1. Mint a Xomify JWT preemptively (restored sessions lack one until the
+    //    OAuth callback fires again, causing 401s on the first API call).
+    // 2. Then preload Spotify user + enrollment flags so pages like
+    //    Wrapped/Release Radar don't render empty on a direct-URL visit.
     if (this.authService.isLoggedIn()) {
-      this.userService.ensureLoaded().pipe(take(1)).subscribe();
+      this.authService
+        .ensureXomifyJwt()
+        .pipe(
+          take(1),
+          switchMap(() => this.userService.ensureLoaded()),
+          take(1),
+        )
+        .subscribe();
     }
 
     // Stop music playback when navigating between pages
