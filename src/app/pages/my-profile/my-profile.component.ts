@@ -288,6 +288,27 @@ export class MyProfileComponent implements OnInit, OnDestroy {
           // Silently fail -- cached count is already displayed
         },
       });
+
+    // Refresh the likes count from the live source (`/likes/by-user`).
+    // The cached value on UserService comes from the post-OAuth /user/data
+    // pull and goes stale fast; the chip on the profile then shows 0
+    // even when the user has thousands of likes. Ask the server for the
+    // current `total` and update the chip + cache.
+    this.likesService
+      .getLikesByUser(email, { limit: 1, offset: 0 })
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          const fresh = response?.total ?? 0;
+          if (fresh > 0) {
+            this.likesCount = fresh;
+            this.userService.setLikesCount(fresh);
+          }
+        },
+        error: () => {
+          // Silently fall back to whatever was cached.
+        },
+      });
   }
 
   /**
