@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
-import { forkJoin, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ArtistService } from 'src/app/services/artist.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { TopItemsService } from 'src/app/services/top-items.service';
 
 @Component({
   selector: 'app-top-artists-page',
@@ -14,20 +14,22 @@ export class TopArtistsComponent implements OnInit {
   transitioning = false;
   selectedTerm = 'short_term';
   displayedArtists: any[] = [];
-  
+  /** Soft warning surfaced when one or more Spotify ranges failed upstream. */
+  partialWarning = '';
+
   private topArtistsShortTerm: any[] = [];
   private topArtistsMedTerm: any[] = [];
   private topArtistsLongTerm: any[] = [];
 
   constructor(
-    private authService: AuthService,
     private artistService: ArtistService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private topItemsService: TopItemsService
   ) {}
 
   ngOnInit(): void {
     const cached = this.artistService.getShortTermTopArtists();
-    
+
     if (cached.length === 0) {
       this.loadTopArtists();
     } else {
@@ -41,30 +43,38 @@ export class TopArtistsComponent implements OnInit {
 
   loadTopArtists(): void {
     this.loading = true;
-    
-    forkJoin({
-      short: this.artistService.getTopArtists('short_term'),
-      medium: this.artistService.getTopArtists('medium_term'),
-      long: this.artistService.getTopArtists('long_term')
-    }).pipe(take(1)).subscribe({
-      next: (data) => {
-        this.topArtistsShortTerm = data.short.items;
-        this.topArtistsMedTerm = data.medium.items;
-        this.topArtistsLongTerm = data.long.items;
-        
-        this.artistService.setShortTermTopArtists(this.topArtistsShortTerm);
-        this.artistService.setMedTermTopArtists(this.topArtistsMedTerm);
-        this.artistService.setLongTermTopArtists(this.topArtistsLongTerm);
-        
-        this.displayedArtists = [...this.topArtistsShortTerm];
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error fetching top artists', err);
-        this.toastService.showNegativeToast('Error loading top artists');
-        this.loading = false;
-      }
-    });
+    this.partialWarning = '';
+
+    this.topItemsService
+      .getTopItems()
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          const artists = response.data.artists;
+          this.topArtistsShortTerm = artists.short_term ?? [];
+          this.topArtistsMedTerm = artists.medium_term ?? [];
+          this.topArtistsLongTerm = artists.long_term ?? [];
+
+          this.artistService.setShortTermTopArtists(this.topArtistsShortTerm);
+          this.artistService.setMedTermTopArtists(this.topArtistsMedTerm);
+          this.artistService.setLongTermTopArtists(this.topArtistsLongTerm);
+
+          this.displayedArtists = [...this.topArtistsShortTerm];
+
+          const failed = response.data.meta?.failed_ranges ?? [];
+          if (failed.length > 0) {
+            this.partialWarning =
+              'Some periods unavailable from Spotify — refresh in a moment.';
+          }
+
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error fetching top artists', err);
+          this.toastService.showNegativeToast('Error loading top artists');
+          this.loading = false;
+        },
+      });
   }
 
   selectTerm(term: string): void {
