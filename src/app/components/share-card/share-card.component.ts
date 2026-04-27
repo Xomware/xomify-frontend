@@ -75,9 +75,14 @@ export class ShareCardComponent {
     if (name) return name;
     // Fall back to the local-part of the email so the header isn't an
     // ugly full address. e.g. dominickj.giordano@gmail.com -> dominickj.giordano
-    const email = this.share.email || '';
-    const at = email.indexOf('@');
-    return at > 0 ? email.slice(0, at) : email;
+    const email = this.share.email?.trim() || '';
+    if (email) {
+      const at = email.indexOf('@');
+      return at > 0 ? email.slice(0, at) : email;
+    }
+    // Ultimate fallback so the row is never visually empty (which on the
+    // feed looked like the avatar + timestamp had no person attached at all).
+    return 'Friend';
   }
 
   /** Resolved avatar URL for the author, or `null` to fall back to the letter chip. */
