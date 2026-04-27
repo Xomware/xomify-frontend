@@ -6,6 +6,7 @@ import { LikesService } from 'src/app/services/likes.service';
 import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
 import { FriendsService } from 'src/app/services/friends.service';
+import { TopItemsService } from 'src/app/services/top-items.service';
 import { forkJoin, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
@@ -91,6 +92,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     private songService: SongService,
     private artistService: ArtistService,
     private friendsService: FriendsService,
+    private topItemsService: TopItemsService,
     private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
@@ -228,6 +230,21 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   }
 
   private loadAdditionalData(): void {
+    // Cache fast-path: both counts persist on UserService for the session.
+    // If we already have non-zero values, skip the Spotify round-trip --
+    // these are display-only counters that don't change mid-session.
+    const cachedPlaylistCount = this.userService.getPlaylistCount();
+    const cachedFollowingCount = this.userService.getFollowingCount();
+
+    if (cachedPlaylistCount > 0 && cachedFollowingCount > 0) {
+      this.playlistCount = cachedPlaylistCount;
+      this.followingCount = cachedFollowingCount;
+      this.loading = false;
+      this.loadTickerData();
+      this.loadFriendsCount();
+      return;
+    }
+
     forkJoin({
       playlists: this.userService.getUserPlaylists(1),
       following: this.userService.getFollowedArtists(1),
@@ -273,6 +290,18 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Hydrate the profile ticker from the consolidated `/user/top-items`
+   * endpoint via {@link TopItemsService}. Same source as the Music Taste
+   * pages (top-songs/top-artists/top-genres), server-cached per UTC day.
+   *
+   * Fast-path: if SongService + ArtistService already have short-term
+   * caches populated by a prior visit to top-songs/top-artists, reuse
+   * them and skip the network call. We never WRITE back to those caches
+   * here — partial writes (short only, medium/long empty) used to poison
+   * the cache and trigger duplicate `/user/top-items` fetches on the
+   * Music Taste pages. TopItemsService owns the source of truth.
+   */
   private loadTickerData(): void {
     const cachedSongs = this.songService.getShortTermTopTracks();
     const cachedArtists = this.artistService.getShortTermTopArtists();
@@ -285,25 +314,24 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    forkJoin({
-      songs: this.songService.getTopTracks('short_term'),
-      artists: this.artistService.getTopArtists('short_term'),
-    })
+    this.topItemsService
+      .getTopItems()
       .pipe(take(1))
       .subscribe({
-        next: (data) => {
-          this.topSongs = (data.songs.items || []).slice(0, 10);
-          this.topArtists = (data.artists.items || []).slice(0, 10);
-          this.topGenres = this.extractTopGenres(data.artists.items || []);
+        next: (response) => {
+          const tracks = response.data.tracks.short_term ?? [];
+          const artists = response.data.artists.short_term ?? [];
 
-          if (data.songs.items) {
-            this.songService.setTopTracks(data.songs.items, [], []);
-          }
-          if (data.artists.items) {
-            this.artistService.setShortTermTopArtists(data.artists.items);
-          }
+          this.topSongs = tracks.slice(0, 10);
+          this.topArtists = artists.slice(0, 10);
+          this.topGenres = this.extractTopGenres(artists);
 
           this.initializeTicker();
+        },
+        error: () => {
+          // Ticker is non-critical UI -- swallow the error so the rest of
+          // the profile page still renders. Surfacing here would duplicate
+          // toasts already shown by other surfaces that share this endpoint.
         },
       });
   }

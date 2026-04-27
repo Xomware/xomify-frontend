@@ -197,6 +197,16 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     return this.authService.isLoggedIn();
   }
 
+  /**
+   * Avatar URL for the top-right chip. Falls back to the bundled default when
+   * the Spotify profile hasn't been hydrated yet (UserService.user is null
+   * pre-bootstrap). Template binds the fallback path itself so this getter
+   * returns an empty string in that case.
+   */
+  get profilePicture(): string {
+    return this.userService.getProfilePic();
+  }
+
   isSelected(route: string): boolean {
     return this.router.url === route || this.router.url.startsWith(route + '?');
   }

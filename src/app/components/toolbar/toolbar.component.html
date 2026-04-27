@@ -81,6 +81,20 @@
     </ng-container>
   </div>
 
+  <!-- Profile avatar chip — visible on both desktop and mobile when logged in. -->
+  <a
+    class="avatar-chip"
+    *ngIf="isLoggedIn()"
+    routerLink="/my-profile"
+    aria-label="My profile"
+  >
+    <img
+      class="avatar-chip-img"
+      [src]="profilePicture || 'assets/img/default-avatar.png'"
+      alt=""
+    />
+  </a>
+
   <!-- Logout (Desktop) -->
   <button
     class="logout-btn desktop-only"
