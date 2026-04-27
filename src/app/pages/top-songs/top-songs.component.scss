@@ -63,6 +63,19 @@
   }
 }
 
+// Soft warning banner — shown when one or more Spotify ranges failed upstream.
+.partial-warning {
+  max-width: 720px;
+  margin: -16px auto 24px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fcd97a;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 // Songs Grid
 .songs-grid {
   display: grid;

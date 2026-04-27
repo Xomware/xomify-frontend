@@ -6,6 +6,10 @@ import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { RatingsService } from 'src/app/services/ratings.service';
 import {
+  TopItemsService,
+  TopItemsTimeRange,
+} from 'src/app/services/top-items.service';
+import {
   SongDetailModalComponent,
   SongDetailTrack,
 } from 'src/app/components/song-detail-modal/song-detail-modal.component';
@@ -40,7 +44,9 @@ export class TopSongsComponent implements OnInit, OnDestroy {
   topSongs: TopSong[] = [];
   loading: boolean = true;
   error: string = '';
-  activeTimeRange: 'short_term' | 'medium_term' | 'long_term' = 'short_term';
+  /** Soft warning surfaced when one or more Spotify ranges failed upstream. */
+  partialWarning: string = '';
+  activeTimeRange: TopItemsTimeRange = 'short_term';
   currentlyFlippedIndex: number | null = null;
 
   timeRanges = [
@@ -55,6 +61,7 @@ export class TopSongsComponent implements OnInit, OnDestroy {
     private queueService: QueueService,
     private toastService: ToastService,
     private ratingsService: RatingsService,
+    private topItemsService: TopItemsService,
     private router: Router
   ) {}
 
@@ -86,26 +93,44 @@ export class TopSongsComponent implements OnInit, OnDestroy {
   loadTopSongs(): void {
     this.loading = true;
     this.error = '';
+    this.partialWarning = '';
     this.currentlyFlippedIndex = null;
 
-    // Check for cached data first
-    const cachedData = this.getCachedSongs();
-    if (cachedData.length > 0) {
-      this.topSongs = cachedData.map((song) => ({ ...song, flipped: false }));
+    // Reuse cached data if a previous fetch in this session already populated
+    // every range. The backend itself caches per-user per UTC day, but this
+    // avoids a second HTTP round-trip when the user switches time ranges.
+    const cachedShort = this.songService.getShortTermTopTracks();
+    const cachedMedium = this.songService.getMediumTermTopTracks();
+    const cachedLong = this.songService.getLongTermTopTracks();
+    if (
+      cachedShort.length > 0 &&
+      cachedMedium.length > 0 &&
+      cachedLong.length > 0
+    ) {
+      this.applyActiveRange(cachedShort, cachedMedium, cachedLong);
       this.loading = false;
       return;
     }
 
-    this.songService
-      .getTopTracks(this.activeTimeRange, 50)
+    this.topItemsService
+      .getTopItems()
       .pipe(take(1))
       .subscribe({
         next: (response) => {
-          this.topSongs = (response.items || []).map((song: any) => ({
-            ...song,
-            flipped: false,
-          }));
-          this.cacheSongs(this.topSongs);
+          const tracks = response.data.tracks;
+          const short = tracks.short_term ?? [];
+          const medium = tracks.medium_term ?? [];
+          const long = tracks.long_term ?? [];
+
+          this.songService.setTopTracks(short, medium, long);
+          this.applyActiveRange(short, medium, long);
+
+          const failed = response.data.meta?.failed_ranges ?? [];
+          if (failed.length > 0) {
+            this.partialWarning =
+              'Some periods unavailable from Spotify — refresh in a moment.';
+          }
+
           this.loading = false;
         },
         error: (err) => {
@@ -116,36 +141,24 @@ export class TopSongsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getCachedSongs(): any[] {
-    switch (this.activeTimeRange) {
-      case 'short_term':
-        return this.songService.getShortTermTopTracks();
-      case 'medium_term':
-        return this.songService.getMediumTermTopTracks();
-      case 'long_term':
-        return this.songService.getLongTermTopTracks();
-      default:
-        return [];
-    }
-  }
-
-  private cacheSongs(songs: any[]): void {
-    const short =
+  private applyActiveRange(
+    short: any[],
+    medium: any[],
+    long: any[]
+  ): void {
+    const active =
       this.activeTimeRange === 'short_term'
-        ? songs
-        : this.songService.getShortTermTopTracks();
-    const medium =
-      this.activeTimeRange === 'medium_term'
-        ? songs
-        : this.songService.getMediumTermTopTracks();
-    const long =
-      this.activeTimeRange === 'long_term'
-        ? songs
-        : this.songService.getLongTermTopTracks();
-    this.songService.setTopTracks(short, medium, long);
+        ? short
+        : this.activeTimeRange === 'medium_term'
+        ? medium
+        : long;
+    this.topSongs = (active || []).map((song: any) => ({
+      ...song,
+      flipped: false,
+    }));
   }
 
-  onTimeRangeChange(range: 'short_term' | 'medium_term' | 'long_term'): void {
+  onTimeRangeChange(range: TopItemsTimeRange): void {
     if (range !== this.activeTimeRange) {
       this.activeTimeRange = range;
       this.loadTopSongs();

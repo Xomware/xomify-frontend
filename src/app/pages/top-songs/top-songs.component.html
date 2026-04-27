@@ -35,6 +35,16 @@
     <p class="loading-text">Loading your top songs...</p>
   </div>
 
+  <!-- Partial-failure warning (some Spotify ranges unavailable) -->
+  <div
+    class="partial-warning"
+    role="status"
+    aria-live="polite"
+    *ngIf="partialWarning && !loading && !error"
+  >
+    {{ partialWarning }}
+  </div>
+
   <!-- Error State -->
   <div class="error-container" *ngIf="error && !loading">
     <svg

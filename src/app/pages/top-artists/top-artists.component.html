@@ -9,6 +9,16 @@
     <p class="page-subtitle">The artists you've been vibing with</p>
   </header>
 
+  <!-- Partial-failure warning (some Spotify ranges unavailable) -->
+  <div
+    class="partial-warning"
+    role="status"
+    aria-live="polite"
+    *ngIf="partialWarning"
+  >
+    {{ partialWarning }}
+  </div>
+
   <!-- Term Selector -->
   <div class="term-selector">
     <button

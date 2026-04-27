@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { forkJoin, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ArtistService } from 'src/app/services/artist.service';
 import {
   GenresService,
@@ -7,6 +7,7 @@ import {
   GenreGroup,
 } from 'src/app/services/genre.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { TopItemsService } from 'src/app/services/top-items.service';
 
 @Component({
   selector: 'app-top-genres-page',
@@ -18,6 +19,8 @@ export class TopGenresComponent implements OnInit {
   transitioning = false;
   selectedTerm = 'short_term';
   viewMode: 'detailed' | 'grouped' = 'detailed';
+  /** Soft warning surfaced when one or more Spotify ranges failed upstream. */
+  partialWarning = '';
 
   // Detailed genres (weighted)
   genreList: GenreItem[] = [];
@@ -42,7 +45,8 @@ export class TopGenresComponent implements OnInit {
   constructor(
     private artistService: ArtistService,
     private genreService: GenresService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private topItemsService: TopItemsService
   ) {}
 
   ngOnInit(): void {
@@ -59,22 +63,27 @@ export class TopGenresComponent implements OnInit {
 
   loadTopArtists(): void {
     this.loading = true;
+    this.partialWarning = '';
 
-    forkJoin({
-      short: this.artistService.getTopArtists('short_term'),
-      medium: this.artistService.getTopArtists('medium_term'),
-      long: this.artistService.getTopArtists('long_term'),
-    })
+    this.topItemsService
+      .getTopItems()
       .pipe(take(1))
       .subscribe({
-        next: (data) => {
-          this.artistsShortTerm = data.short.items;
-          this.artistsMedTerm = data.medium.items;
-          this.artistsLongTerm = data.long.items;
+        next: (response) => {
+          const artists = response.data.artists;
+          this.artistsShortTerm = artists.short_term ?? [];
+          this.artistsMedTerm = artists.medium_term ?? [];
+          this.artistsLongTerm = artists.long_term ?? [];
 
           this.artistService.setShortTermTopArtists(this.artistsShortTerm);
           this.artistService.setMedTermTopArtists(this.artistsMedTerm);
           this.artistService.setLongTermTopArtists(this.artistsLongTerm);
+
+          const failed = response.data.meta?.failed_ranges ?? [];
+          if (failed.length > 0) {
+            this.partialWarning =
+              'Some periods unavailable from Spotify — refresh in a moment.';
+          }
 
           this.processGenres();
         },
