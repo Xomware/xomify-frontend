@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
+import { LikesService } from 'src/app/services/likes.service';
 import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
 import { FriendsService } from 'src/app/services/friends.service';
@@ -51,6 +52,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   followingCount = 0;
   friendsCount = 0;
   playlistCount = 0;
+  likesCount = 0;
+  likesPublic = false;
+  likesPublicSaving = false;
   country = '';
   product = '';
   userId = '';
@@ -83,6 +87,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private likesService: LikesService,
     private songService: SongService,
     private artistService: ArtistService,
     private friendsService: FriendsService,
@@ -157,6 +162,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     const cachedPlaylistCount = this.userService.getPlaylistCount();
     const cachedFollowingCount = this.userService.getFollowingCount();
     const cachedFriendsList = this.friendsService.getCachedFriendsList();
+
+    this.likesCount = this.userService.getLikesCount();
+    this.likesPublic = this.userService.getLikesPublic();
 
     if (cachedPlaylistCount > 0) {
       this.playlistCount = cachedPlaylistCount;
@@ -409,6 +417,32 @@ export class MyProfileComponent implements OnInit, OnDestroy {
         },
         error: (err: unknown) => {
           console.error('Error Updating User Table', err);
+        },
+      });
+  }
+
+  toggleLikesPublic(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const previous = this.likesPublic;
+    this.likesPublic = checked;
+    this.likesPublicSaving = true;
+
+    this.likesService
+      .setLikesPublic(checked)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.userService.setLikesPublic(checked);
+          this.likesPublicSaving = false;
+          this.toastService.showPositiveToast(
+            checked ? 'Likes are now visible to friends.' : 'Likes are now private.',
+          );
+        },
+        error: () => {
+          // Rollback
+          this.likesPublic = previous;
+          this.likesPublicSaving = false;
+          this.toastService.showNegativeToast('Could not update likes privacy.');
         },
       });
   }

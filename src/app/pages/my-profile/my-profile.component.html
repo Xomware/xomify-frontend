@@ -46,6 +46,11 @@
               <span class="stat-value">{{ playlistCount | number }}</span>
               <span class="stat-label">Playlists</span>
             </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item clickable" routerLink="/likes">
+              <span class="stat-value">{{ likesCount | number }}</span>
+              <span class="stat-label">Likes</span>
+            </div>
           </div>
 
           <a [href]="spotifyProfileUrl" target="_blank" class="spotify-btn">
@@ -355,6 +360,31 @@
           <a class="settings-cta-btn" routerLink="/settings/notifications">
             Manage devices
           </a>
+        </div>
+      </section>
+
+      <section class="section settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Privacy</h2>
+          <span class="section-subtitle">Control what friends can see</span>
+        </div>
+        <div class="settings-toggle-card">
+          <div class="settings-toggle-body">
+            <p class="settings-cta-title">Liked Songs Visibility</p>
+            <p class="settings-cta-desc">
+              When enabled, friends can view your liked songs library on your profile.
+            </p>
+          </div>
+          <label class="toggle-switch" [class.saving]="likesPublicSaving">
+            <input
+              type="checkbox"
+              [checked]="likesPublic"
+              [disabled]="likesPublicSaving"
+              (change)="toggleLikesPublic($event)"
+              aria-label="Make my likes visible to friends"
+            />
+            <span class="toggle-slider"></span>
+          </label>
         </div>
       </section>
 

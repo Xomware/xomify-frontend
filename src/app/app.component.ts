@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
+import { LikesPushCoordinatorService } from './services/likes-push-coordinator.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { PlayerService } from './services/player.service';
 import { Subject } from 'rxjs';
@@ -18,6 +19,7 @@ export class AppComponent implements OnDestroy, OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private likesPushCoordinator: LikesPushCoordinatorService,
     private router: Router,
     private playerService: PlayerService
   ) {}
@@ -37,6 +39,11 @@ export class AppComponent implements OnDestroy, OnInit {
           take(1),
         )
         .subscribe();
+
+      // Fire-and-forget likes push (max once per 24h).
+      // Errors are swallowed inside the coordinator — push failure must not
+      // block UI or other initialization paths.
+      this.likesPushCoordinator.runIfDue().subscribe();
     }
 
     // Stop music playback when navigating between pages
