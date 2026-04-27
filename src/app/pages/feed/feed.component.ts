@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { take } from 'rxjs/operators';
+import { ShareCardIdentity } from 'src/app/components/share-card/share-card.component';
+import { FriendsService } from 'src/app/services/friends.service';
 import { Group, GroupsService } from 'src/app/services/groups.service';
 import {
   FeedQueryOptions,
@@ -31,19 +33,68 @@ export class FeedComponent implements OnInit {
   groups: Group[] = [];
   activeGroupId: string | null = null;
 
+  /**
+   * Resolved display-name + avatar for every author the feed might surface.
+   * Built from the viewer's own profile + accepted friends. Mirrors iOS
+   * `FeedViewModel.identitiesByEmail`. Cards fall back to the email
+   * local-part + a letter chip when an entry is missing.
+   */
+  identitiesByEmail: Record<string, ShareCardIdentity> = {};
+
   private currentEmail = '';
 
   constructor(
     private shareFeedService: ShareFeedService,
     private groupsService: GroupsService,
+    private friendsService: FriendsService,
     private userService: UserService,
     private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
     this.currentEmail = this.userService.getEmail();
+    this.loadIdentities();
     this.loadGroups();
     this.loadFeed();
+  }
+
+  /**
+   * Build `identitiesByEmail` from the viewer's own profile + their accepted
+   * friends. Best-effort — a failure here just means cards fall back to
+   * email-as-label and the letter chip avatar.
+   */
+  private loadIdentities(): void {
+    const map: Record<string, ShareCardIdentity> = {};
+    const selfEmail = this.userService.getEmail();
+    if (selfEmail) {
+      map[selfEmail] = {
+        displayName: this.userService.getUserName() || selfEmail,
+        avatar: this.userService.getProfilePic() || null,
+      };
+    }
+    if (!selfEmail) {
+      this.identitiesByEmail = map;
+      return;
+    }
+    this.friendsService
+      .getFriendsList(selfEmail)
+      .pipe(take(1))
+      .subscribe({
+        next: (resp) => {
+          for (const friend of resp?.accepted ?? []) {
+            const email = friend.friendEmail;
+            if (!email) continue;
+            map[email] = {
+              displayName: friend.displayName || email,
+              avatar: friend.avatar || null,
+            };
+          }
+          this.identitiesByEmail = map;
+        },
+        error: () => {
+          this.identitiesByEmail = map;
+        },
+      });
   }
 
   loadGroups(): void {

@@ -8,7 +8,13 @@
       [attr.aria-label]="'Open ' + authorLabel + '\'s profile'"
     >
       <div class="author-avatar" aria-hidden="true">
-        {{ authorLabel.charAt(0).toUpperCase() }}
+        <img
+          *ngIf="authorAvatarUrl as url"
+          [src]="url"
+          [alt]="authorLabel"
+          loading="lazy"
+        />
+        <span *ngIf="!authorAvatarUrl">{{ authorInitial }}</span>
       </div>
       <div class="author-meta">
         <span class="author-name">{{ authorLabel }}</span>

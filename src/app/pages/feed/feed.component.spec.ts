@@ -13,6 +13,7 @@ import {
 import { Group, GroupsService } from 'src/app/services/groups.service';
 import { UserService } from 'src/app/services/user.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { FriendsService } from 'src/app/services/friends.service';
 
 function mkShare(id: string, createdAt = '2026-04-23T10:00:00Z'): Share {
   return {
@@ -53,13 +54,35 @@ describe('FeedComponent', () => {
   beforeEach(async () => {
     const shareFeedSpy = jasmine.createSpyObj('ShareFeedService', ['getFeed']);
     const groupsSpy = jasmine.createSpyObj('GroupsService', ['getGroups']);
-    const userSpy = jasmine.createSpyObj('UserService', ['getEmail']);
+    const userSpy = jasmine.createSpyObj('UserService', [
+      'getEmail',
+      'getUserName',
+      'getProfilePic',
+    ]);
+    const friendsSpy = jasmine.createSpyObj('FriendsService', [
+      'getFriendsList',
+    ]);
     const toastSpy = jasmine.createSpyObj('ToastService', [
       'showPositiveToast',
       'showNegativeToast',
     ]);
     userSpy.getEmail.and.returnValue('dom@example.com');
-    // Default: no groups. Tests that need chips override this.
+    userSpy.getUserName.and.returnValue('Dom');
+    userSpy.getProfilePic.and.returnValue('');
+    friendsSpy.getFriendsList.and.returnValue(
+      of({
+        email: 'dom@example.com',
+        totalCount: 0,
+        accepted: [],
+        requested: [],
+        pending: [],
+        blocked: [],
+        acceptedCount: 0,
+        requestedCount: 0,
+        pendingCount: 0,
+        blockedCount: 0,
+      }),
+    );
     groupsSpy.getGroups.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
@@ -69,6 +92,7 @@ describe('FeedComponent', () => {
         { provide: ShareFeedService, useValue: shareFeedSpy },
         { provide: GroupsService, useValue: groupsSpy },
         { provide: UserService, useValue: userSpy },
+        { provide: FriendsService, useValue: friendsSpy },
         { provide: ToastService, useValue: toastSpy },
       ],
       schemas: [NO_ERRORS_SCHEMA],

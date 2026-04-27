@@ -136,6 +136,7 @@
       <app-share-card
         *ngFor="let share of shares; trackBy: trackByShareId"
         [share]="share"
+        [identity]="identitiesByEmail[share.email]"
       ></app-share-card>
 
       <div class="load-more-row" *ngIf="nextBefore">

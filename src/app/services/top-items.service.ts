@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 // ============================================
@@ -87,8 +88,24 @@ export class TopItemsService {
    * this on page mount without worrying about Spotify rate limits.
    *
    * Auth is provided by the global JWT interceptor — no header needed here.
+   *
+   * The backend's `success_response` returns the body raw (no `{ data, error,
+   * meta }` envelope). Wrap the raw payload into the envelope shape here so
+   * existing callers' `response.data.tracks` access pattern keeps working
+   * without forcing a refactor across all Music Taste pages.
    */
   getTopItems(): Observable<TopItemsResponse> {
-    return this.http.get<TopItemsResponse>(this.apiUrl);
+    return this.http.get<unknown>(this.apiUrl).pipe(
+      map((raw) => {
+        if (raw && typeof raw === 'object' && 'data' in (raw as object)) {
+          return raw as TopItemsResponse;
+        }
+        return {
+          data: raw as TopItemsData,
+          error: null,
+          meta: {},
+        };
+      }),
+    );
   }
 }
