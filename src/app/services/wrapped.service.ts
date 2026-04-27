@@ -43,11 +43,12 @@ export class WrappedService {
   /**
    * Get all wrapped data for a user including enrollment status and history.
    * Returns wraps sorted newest first.
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1h).
    */
-  getUserWrappedData(email: string): Observable<WrappedDataResponse> {
-    const url = `${this.xomifyApiUrl}/wrapped/all?email=${encodeURIComponent(
-      email,
-    )}`;
+  getUserWrappedData(_email: string): Observable<WrappedDataResponse> {
+    const url = `${this.xomifyApiUrl}/wrapped/all`;
     return this.http
       .get<WrappedDataResponse>(url)
       .pipe(
@@ -72,14 +73,15 @@ export class WrappedService {
 
   /**
    * Get wrapped data for a specific month.
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1h).
    */
   getWrappedMonth(
-    email: string,
+    _email: string,
     monthKey: string,
   ): Observable<MonthlyWrap | null> {
-    const url = `${this.xomifyApiUrl}/wrapped/month?email=${encodeURIComponent(
-      email,
-    )}&monthKey=${encodeURIComponent(monthKey)}`;
+    const url = `${this.xomifyApiUrl}/wrapped/month?monthKey=${encodeURIComponent(monthKey)}`;
     return this.http.get<MonthlyWrap>(url).pipe(
       catchError((error) => {
         console.error(`Error fetching wrapped for ${monthKey}:`, error);
@@ -90,11 +92,12 @@ export class WrappedService {
 
   /**
    * Get all wrapped data for a specific year.
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1h).
    */
-  getWrappedYear(email: string, year: string): Observable<MonthlyWrap[]> {
-    const url = `${this.xomifyApiUrl}/wrapped/year?email=${encodeURIComponent(
-      email,
-    )}&year=${encodeURIComponent(year)}`;
+  getWrappedYear(_email: string, year: string): Observable<MonthlyWrap[]> {
+    const url = `${this.xomifyApiUrl}/wrapped/year?year=${encodeURIComponent(year)}`;
     return this.http
       .get<MonthlyWrap[]>(url)
       .pipe(
@@ -107,16 +110,19 @@ export class WrappedService {
 
   /**
    * Opt user in or out of monthly wrapped.
+   *
+   * The `email` arg is retained for call-site compatibility but is no longer
+   * forwarded — caller identity comes from the JWT context (1h). `userId` and
+   * `refreshToken` are token-persistence fields and stay in the body.
    */
   optInOrOutUserForWrapped(
-    email: string,
+    _email: string,
     userId: string,
     refreshToken: string,
     optIn: boolean,
   ): Observable<any> {
     const url = `${this.xomifyApiUrl}/wrapped/all`;
     const body = {
-      email: email,
       userId: userId,
       refreshToken: refreshToken,
       active: optIn,

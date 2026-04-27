@@ -30,7 +30,7 @@ describe('NotificationsService', () => {
     httpMock.verify();
   });
 
-  it('registerDevice posts email + deviceToken + platform (defaults to ios)', (done) => {
+  it('registerDevice posts deviceToken + platform (defaults to ios) — caller comes from JWT', (done) => {
     const mockResponse: RegisterDeviceResponse = {
       ok: true,
       deviceToken: token,
@@ -46,10 +46,11 @@ describe('NotificationsService', () => {
     );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
-      email,
       deviceToken: token,
       platform: 'ios',
     });
+    // Caller email must NOT be sent — sourced from JWT context.
+    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
     // Authorization header is attached globally by AuthInterceptor (sub-feature
     // 0e). The interceptor is not registered in this isolated TestBed; header
     // attachment is covered by `auth.interceptor.spec.ts`.
@@ -66,7 +67,7 @@ describe('NotificationsService', () => {
     req.flush({ ok: true, deviceToken: token });
   });
 
-  it('unregisterDevice posts email + deviceToken', (done) => {
+  it('unregisterDevice posts deviceToken — caller comes from JWT', (done) => {
     const mockResponse: UnregisterDeviceResponse = {
       ok: true,
       deviceToken: token,
@@ -81,7 +82,9 @@ describe('NotificationsService', () => {
       r.url.endsWith('/notifications/unregister'),
     );
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ email, deviceToken: token });
+    expect(req.request.body).toEqual({ deviceToken: token });
+    // Caller email must NOT be sent.
+    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
     req.flush(mockResponse);
   });
 });

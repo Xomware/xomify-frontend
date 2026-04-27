@@ -72,7 +72,7 @@ describe('ReleaseRadarService', () => {
   });
 
   describe('getHistory', () => {
-    it('should fetch release radar history from API', (done) => {
+    it('should fetch release radar history from API without caller email (caller comes from JWT)', (done) => {
       service.getHistory('test@example.com').subscribe((response) => {
         expect(response.weeks.length).toBe(1);
         expect(response.weeks[0].releases[0].albumName).toBe('Test Album');
@@ -80,11 +80,11 @@ describe('ReleaseRadarService', () => {
       });
 
       const req = httpMock.expectOne(
-        (request) =>
-          request.url.includes('/release-radar/history') &&
-          request.params.get('email') === 'test@example.com'
+        (request) => request.url.includes('/release-radar/history')
       );
       expect(req.request.method).toBe('GET');
+      // Caller email must NOT be in the query string.
+      expect(req.request.params.get('email')).toBeNull();
       req.flush(mockHistoryResponse);
     });
 
@@ -120,7 +120,7 @@ describe('ReleaseRadarService', () => {
   });
 
   describe('checkStatus', () => {
-    it('should check user release radar enrollment status', (done) => {
+    it('should check user release radar enrollment status without caller email (caller comes from JWT)', (done) => {
       const mockCheckResponse = {
         email: 'test@example.com',
         enrolled: true,
@@ -138,11 +138,11 @@ describe('ReleaseRadarService', () => {
       });
 
       const req = httpMock.expectOne(
-        (request) =>
-          request.url.includes('/release-radar/check') &&
-          request.params.get('email') === 'test@example.com'
+        (request) => request.url.includes('/release-radar/check')
       );
       expect(req.request.method).toBe('GET');
+      // Caller email must NOT be in the query string.
+      expect(req.request.params.get('email')).toBeNull();
       req.flush(mockCheckResponse);
     });
 

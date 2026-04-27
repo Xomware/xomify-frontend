@@ -88,9 +88,11 @@ export class RatingsService {
     };
   }
 
-  // GET all ratings for a user
+  // GET all ratings for the caller. The `email` arg is retained for call-site
+  // compatibility but is no longer forwarded — caller identity comes from the
+  // JWT context on the backend (1e).
   getAllRatings(
-    email: string,
+    _email: string,
     forceRefresh = false,
   ): Observable<TrackRating[]> {
     // Return cached if available
@@ -101,7 +103,7 @@ export class RatingsService {
       }
     }
 
-    const url = `${this.xomifyApiUrl}/ratings/all?email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/ratings/all`;
     return this.http
       .get<any>(url)
       .pipe(
@@ -122,9 +124,11 @@ export class RatingsService {
       );
   }
 
-  // GET single track rating
+  // GET caller's rating for a single track. The `email` arg is retained for
+  // call-site compatibility but is no longer forwarded — caller identity comes
+  // from the JWT context on the backend (1e). `trackId` is the target.
   getTrackRating(
-    email: string,
+    _email: string,
     trackId: string,
   ): Observable<TrackRating | null> {
     // Check local cache first
@@ -134,7 +138,7 @@ export class RatingsService {
       return of(existing);
     }
 
-    const url = `${this.xomifyApiUrl}/ratings/track/?trackId=${trackId}&email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/ratings/track/?trackId=${trackId}`;
     return this.http
       .get<any>(url)
       .pipe(
@@ -143,7 +147,9 @@ export class RatingsService {
       );
   }
 
-  // POST/PUT rating
+  // POST/PUT rating. The `email` arg is retained for call-site compatibility
+  // and to populate the local cache record, but it is no longer forwarded —
+  // caller identity comes from the JWT context on the backend (1e).
   rateTrack(
     email: string,
     trackId: string,
@@ -156,7 +162,6 @@ export class RatingsService {
   ): Observable<TrackRating> {
     const url = `${this.xomifyApiUrl}/ratings/publish`;
     const body = {
-      email,
       trackId,
       rating,
       trackName,
@@ -219,9 +224,11 @@ export class RatingsService {
       );
   }
 
-  // DELETE rating
-  deleteRating(email: string, trackId: string): Observable<void> {
-    const url = `${this.xomifyApiUrl}/ratings/remove?trackId=${trackId}&email=${encodeURIComponent(email)}`;
+  // DELETE rating. The `email` arg is retained for call-site compatibility but
+  // is no longer forwarded — caller identity comes from the JWT context on the
+  // backend (1e). `trackId` is the target.
+  deleteRating(_email: string, trackId: string): Observable<void> {
+    const url = `${this.xomifyApiUrl}/ratings/remove?trackId=${trackId}`;
     return this.http.delete<void>(url).pipe(
       tap(() => {
         // Remove from local cache
@@ -244,12 +251,14 @@ export class RatingsService {
     );
   }
 
-  // GET friends' ratings for a specific track
+  // GET friends' ratings for a specific track. The `email` arg is retained for
+  // call-site compatibility but is no longer forwarded — caller identity comes
+  // from the JWT context on the backend (1e). `trackId` is the target.
   getFriendsRatings(
-    email: string,
+    _email: string,
     trackId: string,
   ): Observable<FriendRating[]> {
-    const url = `${this.xomifyApiUrl}/ratings/track?trackId=${trackId}&email=${encodeURIComponent(email)}`;
+    const url = `${this.xomifyApiUrl}/ratings/track?trackId=${trackId}`;
     return this.http
       .get<FriendRating[]>(url)
       .pipe(catchError(() => of([])));

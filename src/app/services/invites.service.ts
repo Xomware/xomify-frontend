@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -56,11 +56,14 @@ export class InvitesService {
 
   constructor(private http: HttpClient) {}
 
-  /** POST /invites/create — mint a new invite code for the caller. */
+  /** POST /invites/create — mint a new invite code for the caller.
+   *  The `email` arg is retained for call-site compatibility and to populate
+   *  the optimistic local cache record, but is no longer sent — caller
+   *  identity comes from the JWT context on the backend (1d). */
   createInvite(email: string): Observable<CreateInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/create`;
     return this.http
-      .post<CreateInviteResponse>(url, { email })
+      .post<CreateInviteResponse>(url, {})
       .pipe(
         tap((resp) => {
           // Optimistically prepend the new invite to the cache if it's populated.
@@ -77,21 +80,24 @@ export class InvitesService {
       );
   }
 
-  /** POST /invites/accept — redeem an invite code, creating a friendship. */
+  /** POST /invites/accept — redeem an invite code, creating a friendship.
+   *  The `email` arg is retained for call-site compatibility but is no longer
+   *  sent — caller identity comes from the JWT context (1d). */
   acceptInvite(
-    email: string,
+    _email: string,
     inviteCode: string,
   ): Observable<AcceptInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/accept`;
-    return this.http.post<AcceptInviteResponse>(url, { email, inviteCode });
+    return this.http.post<AcceptInviteResponse>(url, { inviteCode });
   }
 
-  /** GET /invites/pending — list outstanding invites minted by the caller. */
-  listPending(email: string): Observable<PendingInvitesResponse> {
+  /** GET /invites/pending — list outstanding invites minted by the caller.
+   *  The `email` arg is retained for call-site compatibility but is no longer
+   *  sent — caller identity comes from the JWT context (1d). */
+  listPending(_email: string): Observable<PendingInvitesResponse> {
     const url = `${this.xomifyApiUrl}/invites/pending`;
-    const params = new HttpParams().set('email', email);
     return this.http
-      .get<PendingInvitesResponse>(url, { params })
+      .get<PendingInvitesResponse>(url)
       .pipe(
         tap((resp) => {
           this.pendingInvitesSubject.next(resp.invites || []);
@@ -99,13 +105,15 @@ export class InvitesService {
       );
   }
 
-  /** POST /invites/decline — decline an invite you were handed (not your own). */
+  /** POST /invites/decline — decline an invite you were handed (not your own).
+   *  The `email` arg is retained for call-site compatibility but is no longer
+   *  sent — caller identity comes from the JWT context (1d). */
   declineInvite(
-    email: string,
+    _email: string,
     inviteCode: string,
   ): Observable<DeclineInviteResponse> {
     const url = `${this.xomifyApiUrl}/invites/decline`;
-    return this.http.post<DeclineInviteResponse>(url, { email, inviteCode });
+    return this.http.post<DeclineInviteResponse>(url, { inviteCode });
   }
 
   /** Client-only removal from the in-memory cache. Backend has no revoke
