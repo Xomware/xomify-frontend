@@ -111,6 +111,36 @@
       </button>
     </div>
 
+    <!-- Rating (iOS parity #276) -->
+    <div class="field-group rating-field" *ngIf="selectedTrack">
+      <label class="field-label" id="composer-rating-label">Your rating</label>
+      <div class="rating-row" aria-labelledby="composer-rating-label">
+        <app-star-rating
+          [rating]="rating"
+          [readonly]="ratingLoading"
+          (ratingChange)="onRatingChange($event)"
+        ></app-star-rating>
+        <span class="rating-status" *ngIf="ratingLoading" role="status">
+          Loading...
+        </span>
+        <span
+          class="rating-saved"
+          *ngIf="!ratingLoading && existingRating > 0 && rating === existingRating"
+        >
+          Saved
+        </span>
+        <button
+          type="button"
+          class="rating-clear"
+          *ngIf="!ratingLoading && rating > 0"
+          (click)="clearRating()"
+          aria-label="Clear rating"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+
     <!-- Caption -->
     <div class="field-group" *ngIf="selectedTrack">
       <label class="field-label" for="share-caption">Caption</label>
@@ -193,6 +223,75 @@
           </button>
         </li>
       </ul>
+    </div>
+
+    <!-- Targets (iOS parity #276 — shareToPublic + groups) -->
+    <div class="field-group targets-field" *ngIf="selectedTrack">
+      <div class="targets-header">
+        <label class="field-label" id="composer-targets-label">Share to</label>
+        <span class="targets-summary">{{ targetSummary }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="target-toggle"
+        [class.active]="shareToPublic"
+        (click)="toggleShareToPublic()"
+        [attr.aria-pressed]="shareToPublic"
+      >
+        <span class="toggle-checkbox" aria-hidden="true">
+          <svg
+            *ngIf="shareToPublic"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+        <span class="toggle-text">
+          <span class="toggle-title">Friends feed</span>
+          <span class="toggle-sub">Everyone who follows you</span>
+        </span>
+      </button>
+
+      <div
+        class="groups-section"
+        *ngIf="availableGroups.length > 0 || groupsLoading"
+      >
+        <span class="groups-heading">Or specific groups</span>
+
+        <p class="groups-loading" *ngIf="groupsLoading" role="status">
+          Loading groups...
+        </p>
+
+        <ul
+          class="group-chips"
+          *ngIf="!groupsLoading && availableGroups.length > 0"
+          aria-labelledby="composer-targets-label"
+        >
+          <li *ngFor="let group of availableGroups; trackBy: trackByGroupId">
+            <button
+              type="button"
+              class="group-chip"
+              [class.active]="isGroupSelected(group.id)"
+              (click)="toggleGroup(group.id)"
+              [attr.aria-pressed]="isGroupSelected(group.id)"
+            >
+              {{ group.name }}
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <p class="targets-hint" *ngIf="targetState === 'noTargets'" role="alert">
+        Pick at least one target.
+      </p>
     </div>
 
     <!-- Submit -->

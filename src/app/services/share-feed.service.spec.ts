@@ -109,6 +109,80 @@ describe('ShareFeedService', () => {
         createdAt: '2026-04-23T10:00:00Z',
       });
     });
+
+    // Multi-target wire fields (xomify-backend#138 + #276 — composer parity).
+    it('omits public + groupIds from the body when neither is set (legacy shape)', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBeUndefined();
+      expect(req.request.body['groupIds']).toBeUndefined();
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
+
+    it('forwards public=false and groupIds when targeting groups only', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+        isPublic: false,
+        groupIds: ['g1', 'g2'],
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBe(false);
+      expect(req.request.body['groupIds']).toEqual(['g1', 'g2']);
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
+
+    it('forwards public=true alongside groupIds when fanning out to both', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+        isPublic: true,
+        groupIds: ['g1'],
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBe(true);
+      expect(req.request.body['groupIds']).toEqual(['g1']);
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
   });
 
   describe('getFeed', () => {
