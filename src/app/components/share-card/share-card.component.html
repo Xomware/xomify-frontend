@@ -64,34 +64,27 @@
     </div>
   </button>
 
-  <!-- Rating row -->
-  <div class="rating-row">
-    <span class="rating-label">Your rating</span>
+  <!-- Action row: rating + reactions + comment + kebab on a single line.
+       (Was three stacked rows pre-fix — felt cramped + tall.) Queue is in
+       the kebab to mirror iOS; reactions bar is compact mode (smiley + pills
+       only, picker pops over). -->
+  <footer class="card-actions">
     <app-star-rating
+      class="card-rating"
       [rating]="viewerRating"
       [readonly]="ratingPending"
       (ratingChange)="onRatingChange($event)"
     ></app-star-rating>
-    <span class="rated-count" *ngIf="ratedCount > 0">
-      {{ ratedCount }} rated
-    </span>
-  </div>
 
-  <!-- Reactions row (xomify-backend#139). Pills for active emoji + smiley
-       picker. Tied to the share through the parent (see share-feed). -->
-  <app-reactions-bar
-    class="card-reactions"
-    [counts]="reactionCounts"
-    [viewerReactions]="viewerReactions"
-    [inFlight]="reactingSlugs"
-    [compact]="true"
-    (toggle)="onReactionToggle($event)"
-  ></app-reactions-bar>
+    <app-reactions-bar
+      class="card-reactions"
+      [counts]="reactionCounts"
+      [viewerReactions]="viewerReactions"
+      [inFlight]="reactingSlugs"
+      [compact]="true"
+      (toggle)="onReactionToggle($event)"
+    ></app-reactions-bar>
 
-  <!-- Actions: comment chip + kebab menu (Queue moved into the menu, mirroring
-       iOS — the front-of-card Queue button only flipped a DDB flag, never
-       actually queued on Spotify, so it was misleading). -->
-  <footer class="card-actions">
     <button
       type="button"
       class="comment-chip"
