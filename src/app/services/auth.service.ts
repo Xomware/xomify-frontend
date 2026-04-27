@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ToastService } from './toast.service';
 import { XomifyAuthService } from './xomify-auth.service';
@@ -160,6 +160,22 @@ export class AuthService {
           return of(null);
         }),
       );
+  }
+
+  /**
+   * Mint a Xomify JWT for the current session if one is not already present.
+   * Safe to call on every app boot — no-ops when the JWT is already valid.
+   * Returns the existing or freshly-minted JWT, or `null` when the user is
+   * not logged in via Spotify.
+   */
+  ensureXomifyJwt(): Observable<string | null> {
+    if (this.xomifyAuth.hasJwt()) {
+      return of(this.xomifyAuth.getJwt());
+    }
+    if (this.accessToken && this.accessToken.trim().length > 0) {
+      return this.xomifyAuth.mintFromSpotifyAccessToken(this.accessToken);
+    }
+    return of(null);
   }
 
   logout(): void {
