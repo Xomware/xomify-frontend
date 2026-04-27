@@ -167,15 +167,28 @@ export class AuthService {
    * Safe to call on every app boot — no-ops when the JWT is already valid.
    * Returns the existing or freshly-minted JWT, or `null` when the user is
    * not logged in via Spotify.
+   *
+   * On bootstrap of an existing session, the stored Spotify access token is
+   * usually expired (Spotify access tokens last 1h). Minting against a stale
+   * token returns 401 from `/auth/login`. Always refresh Spotify first when
+   * we don't already have a JWT, then mint with the fresh access token.
    */
   ensureXomifyJwt(): Observable<string | null> {
     if (this.xomifyAuth.hasJwt()) {
       return of(this.xomifyAuth.getJwt());
     }
-    if (this.accessToken && this.accessToken.trim().length > 0) {
-      return this.xomifyAuth.mintFromSpotifyAccessToken(this.accessToken);
+    if (!this.refreshToken || this.refreshToken.trim().length === 0) {
+      // No path to a fresh access token — user is not logged in via Spotify.
+      return of(null);
     }
-    return of(null);
+    return this.refreshSpotifyAccessToken().pipe(
+      switchMap((freshAccessToken) => {
+        if (!freshAccessToken || freshAccessToken.trim().length === 0) {
+          return of(null);
+        }
+        return this.xomifyAuth.mintFromSpotifyAccessToken(freshAccessToken);
+      }),
+    );
   }
 
   logout(): void {
