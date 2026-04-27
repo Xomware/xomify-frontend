@@ -452,6 +452,210 @@
   }
 }
 
+// ============================================
+// Rating row (iOS parity #276)
+// ============================================
+.rating-field {
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .rating-status,
+  .rating-saved {
+    font-size: 0.78rem;
+    color: #8a8a9a;
+  }
+
+  .rating-saved {
+    color: #1bdc6f;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .rating-clear {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cfcfdc;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 71, 87, 0.12);
+      color: #ff6b6b;
+      border-color: rgba(255, 71, 87, 0.4);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(156, 10, 191, 0.6);
+      outline-offset: 2px;
+    }
+  }
+}
+
+// ============================================
+// Targets row (iOS parity #276)
+// ============================================
+.targets-field {
+  .targets-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .targets-summary {
+    font-size: 0.75rem;
+    color: #8a8a9a;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .target-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #cfcfdc;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(156, 10, 191, 0.1);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(156, 10, 191, 0.6);
+      outline-offset: 2px;
+    }
+
+    &.active {
+      background: linear-gradient(
+        135deg,
+        rgba(156, 10, 191, 0.18) 0%,
+        rgba(27, 220, 111, 0.14) 100%
+      );
+      border-color: rgba(156, 10, 191, 0.55);
+      color: #fff;
+    }
+
+    .toggle-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #1bdc6f;
+      transition: all 0.2s ease;
+    }
+
+    &.active .toggle-checkbox {
+      background: rgba(27, 220, 111, 0.18);
+      border-color: rgba(27, 220, 111, 0.6);
+    }
+
+    .toggle-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .toggle-title {
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+
+      .toggle-sub {
+        font-size: 0.75rem;
+        color: #8a8a9a;
+      }
+    }
+  }
+
+  .groups-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .groups-heading {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a8a9a;
+  }
+
+  .groups-loading {
+    margin: 0;
+    color: #8a8a9a;
+    font-size: 0.85rem;
+  }
+
+  .group-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .group-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 6px 14px;
+      color: #cfcfdc;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(156, 10, 191, 0.12);
+        color: #fff;
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(156, 10, 191, 0.6);
+        outline-offset: 2px;
+      }
+
+      &.active {
+        background: linear-gradient(
+          135deg,
+          rgba(156, 10, 191, 0.25) 0%,
+          rgba(27, 220, 111, 0.2) 100%
+        );
+        border-color: rgba(156, 10, 191, 0.55);
+        color: #fff;
+      }
+    }
+  }
+
+  .targets-hint {
+    margin: 0;
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+}
+
 @media (max-width: 540px) {
   .modal-content {
     padding: 22px 18px;

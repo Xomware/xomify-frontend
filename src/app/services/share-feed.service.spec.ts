@@ -109,6 +109,80 @@ describe('ShareFeedService', () => {
         createdAt: '2026-04-23T10:00:00Z',
       });
     });
+
+    // Multi-target wire fields (xomify-backend#138 + #276 — composer parity).
+    it('omits public + groupIds from the body when neither is set (legacy shape)', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBeUndefined();
+      expect(req.request.body['groupIds']).toBeUndefined();
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
+
+    it('forwards public=false and groupIds when targeting groups only', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+        isPublic: false,
+        groupIds: ['g1', 'g2'],
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBe(false);
+      expect(req.request.body['groupIds']).toEqual(['g1', 'g2']);
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
+
+    it('forwards public=true alongside groupIds when fanning out to both', (done) => {
+      const request: CreateShareRequest = {
+        trackId: 't',
+        trackUri: 'spotify:track:t',
+        trackName: 'T',
+        artistName: 'A',
+        albumName: 'B',
+        albumArtUrl: 'https://x/y',
+        isPublic: true,
+        groupIds: ['g1'],
+      };
+
+      service.createShare(email, request).subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/create'));
+      expect(req.request.body['public']).toBe(true);
+      expect(req.request.body['groupIds']).toEqual(['g1']);
+      req.flush({
+        shareId: 'x',
+        email,
+        ...request,
+        createdAt: '2026-04-23T10:00:00Z',
+      });
+    });
   });
 
   describe('getFeed', () => {
@@ -224,6 +298,36 @@ describe('ShareFeedService', () => {
       // Caller email must NOT be in the body.
       expect(req.request.body['email']).toBeUndefined();
       req.flush(mockEnrichment);
+    });
+  });
+
+  // ============================================
+  // Delete share (#275)
+  // ============================================
+
+  describe('deleteShare', () => {
+    it('issues DELETE /shares/delete with shareId in the body (not POST)', (done) => {
+      service.deleteShare('s1').subscribe(() => done());
+
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/delete'));
+      // Method must be DELETE — iOS bug-fix lineage swapped POST -> DELETE
+      // and this guards against the same regression on web.
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual({ shareId: 's1' });
+      // Caller email must NOT be in the body — sourced from the JWT.
+      expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
+      req.flush(null, { status: 204, statusText: 'No Content' });
+    });
+
+    it('forwards sharedAt when provided (forward-compat with iOS)', (done) => {
+      service.deleteShare('s1', '2026-04-23T10:00:00Z').subscribe(() => done());
+      const req = httpMock.expectOne((r) => r.url.endsWith('/shares/delete'));
+      expect(req.request.method).toBe('DELETE');
+      expect(req.request.body).toEqual({
+        shareId: 's1',
+        sharedAt: '2026-04-23T10:00:00Z',
+      });
+      req.flush(null, { status: 204, statusText: 'No Content' });
     });
   });
 

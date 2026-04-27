@@ -5,16 +5,20 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { forkJoin, Observable, of, Subject, Subscription } from 'rxjs';
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   switchMap,
   take,
 } from 'rxjs/operators';
+import { Group, GroupsService } from 'src/app/services/groups.service';
 import { PlaylistService } from 'src/app/services/playlist.service';
+import { RatingsService, TrackRating } from 'src/app/services/ratings.service';
 import {
   CreateShareRequest,
+  CreateShareResponse,
   MoodTag,
   Share,
   ShareFeedService,
@@ -39,6 +43,13 @@ interface MoodOption {
   value: MoodTag;
   label: string;
 }
+
+/**
+ * Mirrors `ComposerTargetState` in
+ * `xomify-ios/.../ShareComposerViewModel.swift` — keeps the submit-button
+ * disable + inline-hint logic in one place.
+ */
+export type ComposerTargetState = 'ok' | 'noTargets';
 
 const CAPTION_MAX = 140;
 const GENRE_TAG_MAX = 3;
@@ -78,6 +89,20 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
   genreInput = '';
   genreTags: string[] = [];
 
+  // Rating state — mirrors iOS rating-on-share parity (#276).
+  // `existingRating` is what the backend returned when the track was selected
+  // (used to detect a no-op so we don't re-POST on submit). `rating` is the
+  // current value bound to <app-star-rating>.
+  rating = 0;
+  existingRating = 0;
+  ratingLoading = false;
+
+  // Targets state — mirrors iOS `shareToPublic` + `selectedGroupIds`.
+  shareToPublic = true;
+  selectedGroupIds = new Set<string>();
+  availableGroups: Group[] = [];
+  groupsLoading = false;
+
   submitting = false;
 
   constructor(
@@ -85,6 +110,8 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
     private shareFeedService: ShareFeedService,
     private toastService: ToastService,
     private userService: UserService,
+    private ratingsService: RatingsService,
+    private groupsService: GroupsService,
   ) {}
 
   ngOnInit(): void {
@@ -114,6 +141,8 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
         },
       });
     this.subscriptions.push(searchSub);
+
+    this.loadGroups();
   }
 
   ngOnDestroy(): void {
@@ -131,6 +160,28 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
   }
 
   // ============================================
+  // Groups bootstrap (iOS parity — `availableGroups`)
+  // ============================================
+
+  private loadGroups(): void {
+    this.groupsLoading = true;
+    const sub = this.groupsService
+      .getGroups(this.currentEmail)
+      .pipe(take(1))
+      .subscribe({
+        next: (groups) => {
+          this.availableGroups = groups || [];
+          this.groupsLoading = false;
+        },
+        error: () => {
+          this.availableGroups = [];
+          this.groupsLoading = false;
+        },
+      });
+    this.subscriptions.push(sub);
+  }
+
+  // ============================================
   // Search
   // ============================================
 
@@ -144,12 +195,49 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
   selectTrack(track: SearchTrack): void {
     this.selectedTrack = track;
     this.searchResults = [];
+    this.loadExistingRating(track.id);
   }
 
   clearSelection(): void {
     this.selectedTrack = null;
     this.searchQuery = '';
     this.searchResults = [];
+    this.rating = 0;
+    this.existingRating = 0;
+  }
+
+  // ============================================
+  // Rating (iOS parity — pre-load + persist on submit)
+  // ============================================
+
+  /** Pre-load the caller's existing rating for the just-picked track. */
+  private loadExistingRating(trackId: string): void {
+    this.ratingLoading = true;
+    this.rating = 0;
+    this.existingRating = 0;
+    const sub = this.ratingsService
+      .getTrackRating(this.currentEmail, trackId)
+      .pipe(take(1))
+      .subscribe({
+        next: (rating) => {
+          const value = rating?.rating ?? 0;
+          this.existingRating = value;
+          this.rating = value;
+          this.ratingLoading = false;
+        },
+        error: () => {
+          this.ratingLoading = false;
+        },
+      });
+    this.subscriptions.push(sub);
+  }
+
+  onRatingChange(value: number): void {
+    this.rating = value;
+  }
+
+  clearRating(): void {
+    this.rating = 0;
   }
 
   // ============================================
@@ -190,6 +278,47 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
   }
 
   // ============================================
+  // Targets (iOS parity — `shareToPublic` + groups)
+  // ============================================
+
+  toggleShareToPublic(): void {
+    this.shareToPublic = !this.shareToPublic;
+  }
+
+  toggleGroup(groupId: string): void {
+    if (this.selectedGroupIds.has(groupId)) {
+      this.selectedGroupIds.delete(groupId);
+    } else {
+      this.selectedGroupIds.add(groupId);
+    }
+    // Re-assign so `*ngFor` change-detection picks up the membership flip.
+    this.selectedGroupIds = new Set(this.selectedGroupIds);
+  }
+
+  isGroupSelected(groupId: string): boolean {
+    return this.selectedGroupIds.has(groupId);
+  }
+
+  /** Mirrors iOS `ComposerTargetState`. */
+  get targetState(): ComposerTargetState {
+    if (!this.shareToPublic && this.selectedGroupIds.size === 0) {
+      return 'noTargets';
+    }
+    return 'ok';
+  }
+
+  get targetSummary(): string {
+    const n = this.selectedGroupIds.size;
+    const groupWord = (count: number) => (count === 1 ? 'group' : 'groups');
+    if (this.shareToPublic && n === 0) return 'Friends feed';
+    if (this.shareToPublic && n > 0) {
+      return `Friends feed + ${n} ${groupWord(n)}`;
+    }
+    if (!this.shareToPublic && n === 0) return 'No targets';
+    return `${n} ${groupWord(n)}`;
+  }
+
+  // ============================================
   // Submit
   // ============================================
 
@@ -198,6 +327,7 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
     if (!this.selectedTrack) return false;
     if (!this.currentEmail) return false;
     if ((this.caption?.length ?? 0) > CAPTION_MAX) return false;
+    if (this.targetState !== 'ok') return false;
     return true;
   }
 
@@ -207,6 +337,7 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
     const track = this.selectedTrack;
     const albumArt = track.album?.images?.[0]?.url || '';
     const artistName = (track.artists || []).map((a) => a.name).join(', ');
+    const groupIds = Array.from(this.selectedGroupIds);
 
     const request: CreateShareRequest = {
       trackId: track.id,
@@ -215,6 +346,7 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
       artistName,
       albumName: track.album?.name || '',
       albumArtUrl: albumArt,
+      isPublic: this.shareToPublic,
     };
     if (this.caption.trim()) {
       request.caption = this.caption.trim();
@@ -225,36 +357,44 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
     if (this.genreTags.length > 0) {
       request.genreTags = this.genreTags;
     }
+    if (groupIds.length > 0) {
+      request.groupIds = groupIds;
+    }
 
     this.submitting = true;
 
-    this.shareFeedService
-      .createShare(this.currentEmail, request)
+    // If the user touched the rating, publish it in parallel with the share.
+    // Treat 0 as "no rating" — only publish when value > 0 AND it changed.
+    const ratingChanged =
+      this.rating > 0 && this.rating !== this.existingRating;
+    const ratingPublish$: Observable<TrackRating | null> = ratingChanged
+      ? this.ratingsService
+          .rateTrack(
+            this.currentEmail,
+            track.id,
+            this.rating,
+            track.name,
+            artistName,
+            albumArt,
+            track.album?.id,
+          )
+          .pipe(catchError(() => of(null)))
+      : of(null);
+
+    const share$ = this.shareFeedService.createShare(
+      this.currentEmail,
+      request,
+    );
+
+    const sub = forkJoin({
+      share: share$,
+      rating: ratingPublish$,
+    })
       .pipe(take(1))
       .subscribe({
-        next: (created) => {
+        next: ({ share: created }) => {
           this.submitting = false;
-          const share: Share = {
-            shareId: created.shareId,
-            email: created.email || this.currentEmail,
-            trackId: created.trackId || request.trackId,
-            trackUri: created.trackUri || request.trackUri,
-            trackName: created.trackName || request.trackName,
-            artistName: created.artistName || request.artistName,
-            albumName: created.albumName || request.albumName,
-            albumArtUrl: created.albumArtUrl || request.albumArtUrl,
-            caption: created.caption ?? request.caption,
-            moodTag: (created.moodTag as MoodTag | undefined) ?? request.moodTag,
-            genreTags: created.genreTags ?? request.genreTags,
-            createdAt: created.createdAt || new Date().toISOString(),
-            sharedAt: created.sharedAt || created.createdAt,
-            queuedCount: 0,
-            ratedCount: 0,
-            viewerHasQueued: false,
-            viewerRating: null,
-            sharerRating: null,
-          };
-          this.shared.emit(share);
+          this.shared.emit(this.toShare(created, request));
         },
         error: (err) => {
           console.error('Error creating share:', err);
@@ -262,6 +402,37 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
           this.toastService.showNegativeToast('Could not share');
         },
       });
+    this.subscriptions.push(sub);
+  }
+
+  /**
+   * Build the `Share` we emit upward from the create-share response. Pulled
+   * out of `submit()` to keep the forkJoin handler small.
+   */
+  private toShare(
+    created: CreateShareResponse,
+    request: CreateShareRequest,
+  ): Share {
+    return {
+      shareId: created.shareId,
+      email: created.email || this.currentEmail,
+      trackId: created.trackId || request.trackId,
+      trackUri: created.trackUri || request.trackUri,
+      trackName: created.trackName || request.trackName,
+      artistName: created.artistName || request.artistName,
+      albumName: created.albumName || request.albumName,
+      albumArtUrl: created.albumArtUrl || request.albumArtUrl,
+      caption: created.caption ?? request.caption,
+      moodTag: (created.moodTag as MoodTag | undefined) ?? request.moodTag,
+      genreTags: created.genreTags ?? request.genreTags,
+      createdAt: created.createdAt || new Date().toISOString(),
+      sharedAt: created.sharedAt || created.createdAt,
+      queuedCount: 0,
+      ratedCount: 0,
+      viewerHasQueued: false,
+      viewerRating: this.rating > 0 ? this.rating : null,
+      sharerRating: this.rating > 0 ? this.rating : null,
+    };
   }
 
   // ============================================
@@ -278,5 +449,9 @@ export class ShareComposerComponent implements OnInit, OnDestroy {
 
   getDefaultArt(): string {
     return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%239c0abf"%3E%3Cpath d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/%3E%3C/svg%3E';
+  }
+
+  trackByGroupId(_index: number, group: Group): string {
+    return group.id;
   }
 }

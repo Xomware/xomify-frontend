@@ -111,6 +111,18 @@ export interface CreateShareRequest {
   caption?: string;
   moodTag?: MoodTag;
   genreTags?: string[];
+  /**
+   * Multi-target routing (xomify-backend#138). When omitted the backend
+   * defaults to `true` for legacy single-target compatibility. Set to
+   * `false` to suppress the public friends feed when targeting only groups.
+   */
+  isPublic?: boolean;
+  /**
+   * Group ids to also fan out to. Backend rejects `isPublic=false` with an
+   * empty / missing `groupIds` (no target). Omitted from the wire body when
+   * empty so the legacy single-target shape is preserved.
+   */
+  groupIds?: string[];
 }
 
 export interface CreateShareResponse {
@@ -256,6 +268,17 @@ export class ShareFeedService {
     if (track.genreTags && track.genreTags.length > 0) {
       body['genreTags'] = track.genreTags;
     }
+    // Multi-target routing — only forward when the caller explicitly opts
+    // out of the public default or names at least one group, so the legacy
+    // single-target wire shape is preserved when neither was set.
+    if (track.isPublic === false) {
+      body['public'] = false;
+    } else if (track.isPublic === true) {
+      body['public'] = true;
+    }
+    if (track.groupIds && track.groupIds.length > 0) {
+      body['groupIds'] = track.groupIds;
+    }
     return this.http.post<CreateShareResponse>(url, body);
   }
 
@@ -279,6 +302,24 @@ export class ShareFeedService {
       params = params.set('before', opts.before);
     }
     return this.http.get<FeedResponse>(url, { params });
+  }
+
+  /**
+   * DELETE /shares/delete
+   * Hard-delete a share by id. Owner-only — backend reads caller identity
+   * from the JWT and returns 403 otherwise. Body-on-DELETE matches the
+   * deployed lambda contract (`lambdas/shares_delete/handler.py:_extract_share_id`)
+   * which reads `shareId` from the JSON body, falling back to query params.
+   * `sharedAt` is accepted for forward compat but unused server-side.
+   *
+   * iOS counterpart was POST -> DELETE method swap; the web service uses
+   * DELETE explicitly so we don't repeat that bug.
+   */
+  deleteShare(shareId: string, sharedAt?: string): Observable<void> {
+    const url = `${this.xomifyApiUrl}/shares/delete`;
+    const body: Record<string, unknown> = { shareId };
+    if (sharedAt) body['sharedAt'] = sharedAt;
+    return this.http.request<void>('DELETE', url, { body });
   }
 
   /**
