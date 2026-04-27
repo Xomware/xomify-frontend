@@ -125,9 +125,62 @@ export class XomifyAuthService {
     }
   }
 
-  /** Convenience: true iff a non-empty JWT is present in sessionStorage. */
+  /**
+   * True iff sessionStorage holds a JWT that is:
+   *   1. structurally valid (decodes as `header.payload.signature`)
+   *   2. carries both `email` and `userId` claims (sub-feature 0a contract)
+   *   3. is not expired or within 60s of expiring.
+   *
+   * Anything else is wiped as a side-effect so the bootstrap mint flow
+   * doesn't short-circuit on a token the backend will then reject.
+   *
+   * Notably this rejects the legacy static `apiAuthToken` if it ever ends
+   * up in this slot — it decodes but has no `email`/`userId` claims, and
+   * the backend handler then 401s on every authorized call.
+   */
   hasJwt(): boolean {
     const token = this.getJwt();
-    return token !== null && token.trim().length > 0;
+    if (!token || token.trim().length === 0) {
+      return false;
+    }
+    const claims = decodeJwtPayload(token);
+    if (!claims || !claims.email || !claims.userId) {
+      // Token doesn't have the per-user claims this app requires. Wipe so
+      // the next bootstrap re-mints from a fresh Spotify access token.
+      this.clear();
+      return false;
+    }
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (typeof claims.exp === 'number' && claims.exp - nowSec < 60) {
+      this.clear();
+      return false;
+    }
+    // Belt-and-suspenders: also honor the persisted ISO `expiresAt` field.
+    const expiresAt = this.getExpiresAt();
+    if (expiresAt) {
+      const expiryMs = Date.parse(expiresAt);
+      if (!isNaN(expiryMs) && expiryMs - Date.now() < 60_000) {
+        this.clear();
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+/** Best-effort base64url-decode of a JWT payload. Returns `null` on any failure. */
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  try {
+    // base64url -> base64
+    let b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4 !== 0) {
+      b64 += '=';
+    }
+    const json = atob(b64);
+    return JSON.parse(json);
+  } catch {
+    return null;
   }
 }
