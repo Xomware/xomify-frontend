@@ -4,6 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { LikesService, LikePushItem } from './likes.service';
 import { SongService } from './song.service';
 import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 
 const PUSHED_AT_KEY = 'xomify_likes_pushed_at';
 const PUSH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -16,6 +17,7 @@ export class LikesPushCoordinatorService {
     private likesService: LikesService,
     private songService: SongService,
     private authService: AuthService,
+    private userService: UserService,
   ) {}
 
   /**
@@ -27,8 +29,14 @@ export class LikesPushCoordinatorService {
       return EMPTY;
     }
 
+    const email = this.userService.getEmail();
+    if (!email) {
+      // No session yet — nothing to push for. Don't mark pushed.
+      return EMPTY;
+    }
+
     return this.fetchAllSavedTracks().pipe(
-      switchMap((tracks) => this.likesService.pushUserLikes(tracks)),
+      switchMap((tracks) => this.likesService.pushUserLikes(email, tracks)),
       map(() => {
         this.markPushed();
       }),

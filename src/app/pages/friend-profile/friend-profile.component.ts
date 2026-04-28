@@ -57,6 +57,17 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
   friendsCount = 0;
   statsLoaded = false;
 
+  // Caller's own top items — hydrated from TopItemsService when needed for
+  // the compatibility calculation. Kept local (do NOT write into the
+  // shared SongService/ArtistService caches — partial-term writes poison
+  // those caches and re-trigger fetches on the Music Taste pages).
+  private callerTopArtistsShort: any[] = [];
+  private callerTopArtistsMed: any[] = [];
+  private callerTopArtistsLong: any[] = [];
+  private callerTopSongsShort: any[] = [];
+  private callerTopSongsMed: any[] = [];
+  private callerTopSongsLong: any[] = [];
+
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -111,8 +122,12 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
             (r.email === this.friendEmail || r.friendEmail === this.friendEmail)
           );
 
-          // Calculate compatibility
-          this.calculateCompatibility();
+          // Calculate compatibility — hydrate the caller's top items from
+          // TopItemsService first so the calc has data to compare against.
+          // Without this, the local SongService/ArtistService caches are
+          // empty until the user visits the Music Taste pages, leaving
+          // compatibility stuck at 0%.
+          this.hydrateCallerTopItemsAndCompare();
 
           // Load Spotify stats for this friend
           this.loadFriendStats();
@@ -536,17 +551,89 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Pull the caller's top items from /user/top-items and stash them locally
+   * before running the compatibility calculation. Fast-path: if both
+   * SongService and ArtistService caches already have short-term data
+   * (Music Taste pages were visited this session), reuse those and skip
+   * the round-trip.
+   *
+   * NOTE: do NOT write the response back into SongService/ArtistService —
+   * writing partial per-term arrays poisons those caches and re-triggers
+   * duplicate fetches on the Music Taste pages. TopItemsService owns the
+   * source of truth for that surface; we keep our copy local.
+   */
+  private hydrateCallerTopItemsAndCompare(): void {
+    const haveArtists =
+      (this.artistService.getShortTermTopArtists()?.length || 0) > 0;
+    const haveSongs =
+      (this.songService.getShortTermTopTracks()?.length || 0) > 0;
+
+    if (haveArtists && haveSongs) {
+      this.calculateCompatibility();
+      return;
+    }
+
+    this.topItemsService
+      .getTopItems()
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          const data = response?.data;
+          if (data) {
+            this.callerTopArtistsShort = data.artists?.short_term || [];
+            this.callerTopArtistsMed = data.artists?.medium_term || [];
+            this.callerTopArtistsLong = data.artists?.long_term || [];
+            this.callerTopSongsShort = data.tracks?.short_term || [];
+            this.callerTopSongsMed = data.tracks?.medium_term || [];
+            this.callerTopSongsLong = data.tracks?.long_term || [];
+          }
+          this.calculateCompatibility();
+        },
+        error: () => {
+          // Even on failure run the calc — it'll just compare against
+          // whatever was already cached and produce a partial / zero score.
+          this.calculateCompatibility();
+        },
+      });
+  }
+
   // Compatibility calculation
   calculateCompatibility(): void {
     if (!this.profile || this.compatibilityCalculated) return;
 
-    // Collect data from ALL time periods for a more comprehensive comparison
-    const myArtistsShort = this.artistService.getShortTermTopArtists() || [];
-    const myArtistsMedium = this.artistService.getMedTermTopArtists() || [];
-    const myArtistsLong = this.artistService.getLongTermTopArtists() || [];
-    const mySongsShort = this.songService.getShortTermTopTracks() || [];
-    const mySongsMedium = this.songService.getMediumTermTopTracks() || [];
-    const mySongsLong = this.songService.getLongTermTopTracks() || [];
+    // Collect caller data from ALL time periods. Prefer the shared
+    // SongService/ArtistService caches when populated (set by Music Taste
+    // pages); fall back to our local copy hydrated from TopItemsService
+    // (set by `hydrateCallerTopItemsAndCompare`). Without the fallback,
+    // visiting a friend profile cold returned 0% Match every time.
+    const pick = <T>(primary: T[], fallback: T[]): T[] =>
+      primary && primary.length > 0 ? primary : fallback;
+
+    const myArtistsShort = pick(
+      this.artistService.getShortTermTopArtists() || [],
+      this.callerTopArtistsShort,
+    );
+    const myArtistsMedium = pick(
+      this.artistService.getMedTermTopArtists() || [],
+      this.callerTopArtistsMed,
+    );
+    const myArtistsLong = pick(
+      this.artistService.getLongTermTopArtists() || [],
+      this.callerTopArtistsLong,
+    );
+    const mySongsShort = pick(
+      this.songService.getShortTermTopTracks() || [],
+      this.callerTopSongsShort,
+    );
+    const mySongsMedium = pick(
+      this.songService.getMediumTermTopTracks() || [],
+      this.callerTopSongsMed,
+    );
+    const mySongsLong = pick(
+      this.songService.getLongTermTopTracks() || [],
+      this.callerTopSongsLong,
+    );
 
     // Combine all my artists and songs (deduplicated by ID)
     const myArtistIds = new Set<string>();
