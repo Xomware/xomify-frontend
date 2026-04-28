@@ -18,6 +18,7 @@ import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
 import { SearchComponent } from './pages/search/search.component';
+import { ShareDeeplinkComponent } from './pages/share-deeplink/share-deeplink.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -90,6 +91,11 @@ const routes: Routes = [
   {
     path: 'search',
     component: SearchComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'share',
+    component: ShareDeeplinkComponent,
     canActivate: [AuthGuard],
   },
   // Lazy-loaded feature modules

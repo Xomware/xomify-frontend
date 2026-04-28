@@ -37,6 +37,7 @@ import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
 import { SearchComponent } from './pages/search/search.component';
+import { ShareDeeplinkComponent } from './pages/share-deeplink/share-deeplink.component';
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -64,6 +65,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     ReleaseRadarComponent,
     RatingsComponent,
     SearchComponent,
+    ShareDeeplinkComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
