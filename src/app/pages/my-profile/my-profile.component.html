@@ -51,6 +51,16 @@
               <span class="stat-value">{{ likesCount | number }}</span>
               <span class="stat-label">Likes</span>
             </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item clickable" routerLink="/ratings">
+              <span class="stat-value">{{ ratingsCount | number }}</span>
+              <span class="stat-label">Ratings</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-value">{{ sharesCount | number }}</span>
+              <span class="stat-label">Posts</span>
+            </div>
           </div>
 
           <a [href]="spotifyProfileUrl" target="_blank" class="spotify-btn">
@@ -76,6 +86,16 @@
         (click)="selectTab('overview')"
       >
         Overview
+      </button>
+      <button
+        type="button"
+        class="profile-tab"
+        role="tab"
+        [class.active]="activeTab === 'recent'"
+        [attr.aria-selected]="activeTab === 'recent'"
+        (click)="selectTab('recent')"
+      >
+        Recent
       </button>
       <button
         type="button"
@@ -312,6 +332,51 @@
     </section>
     </ng-container>
     <!-- /overview tab -->
+
+    <!-- Recent tab -->
+    <ng-container *ngIf="activeTab === 'recent'">
+      <section class="section recent-section">
+        <div class="section-header">
+          <h2 class="section-title">Recently Played</h2>
+          <span class="section-subtitle">
+            Your last 50 tracks from Spotify
+          </span>
+        </div>
+
+        <div class="recent-loading" *ngIf="recentLoading">
+          Loading recent plays...
+        </div>
+
+        <div class="recent-empty" *ngIf="!recentLoading && recentLoaded && recentItems.length === 0">
+          No recent plays yet — start listening on Spotify and they'll show up here.
+        </div>
+
+        <div class="recent-error" *ngIf="recentError">
+          Couldn't load recent plays. Try refreshing the page.
+        </div>
+
+        <ul class="recent-list" *ngIf="recentItems.length > 0">
+          <li
+            class="recent-item"
+            *ngFor="let item of recentItems; trackBy: trackByPlayedAt"
+            (click)="openRecentTrack(item)"
+          >
+            <img
+              *ngIf="recentTrackImage(item)"
+              [src]="recentTrackImage(item)"
+              [alt]="item.track.name"
+              class="recent-art"
+            />
+            <div class="recent-meta">
+              <span class="recent-title">{{ item.track.name }}</span>
+              <span class="recent-artist">{{ recentTrackArtists(item) }}</span>
+            </div>
+            <span class="recent-time">{{ recentTrackPlayedLabel(item) }}</span>
+          </li>
+        </ul>
+      </section>
+    </ng-container>
+    <!-- /recent tab -->
 
     <!-- Settings tab -->
     <ng-container *ngIf="activeTab === 'settings'">

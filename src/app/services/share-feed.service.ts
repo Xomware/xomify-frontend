@@ -305,6 +305,29 @@ export class ShareFeedService {
   }
 
   /**
+   * GET /shares/user?targetEmail=&limit=&before=
+   * Returns shares authored by `targetEmail`, newest first. Used for the
+   * Posts tab on profile pages (own + friend). Backend hides group-only
+   * shares automatically — public + accepted-friends-only shares come back.
+   * Caller identity is on the JWT context; only `targetEmail` (the author
+   * being viewed) goes on the wire.
+   */
+  getSharesByUser(
+    targetEmail: string,
+    opts: { limit?: number; before?: string } = {},
+  ): Observable<FeedResponse> {
+    const url = `${this.xomifyApiUrl}/shares/user`;
+    let params = new HttpParams().set('targetEmail', targetEmail);
+    if (opts.limit !== undefined) {
+      params = params.set('limit', String(opts.limit));
+    }
+    if (opts.before) {
+      params = params.set('before', opts.before);
+    }
+    return this.http.get<FeedResponse>(url, { params });
+  }
+
+  /**
    * DELETE /shares/delete
    * Hard-delete a share by id. Owner-only — backend reads caller identity
    * from the JWT and returns 403 otherwise. Body-on-DELETE matches the
