@@ -7,6 +7,12 @@ import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { TopItemsService } from 'src/app/services/top-items.service';
+import { RatingsService } from 'src/app/services/ratings.service';
+import { ShareFeedService, Share } from 'src/app/services/share-feed.service';
+import {
+  ListeningHistoryService,
+  RecentlyPlayedItem,
+} from 'src/app/services/listening-history.service';
 import { forkJoin, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
@@ -54,6 +60,8 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   friendsCount = 0;
   playlistCount = 0;
   likesCount = 0;
+  ratingsCount = 0;
+  sharesCount = 0;
   likesPublic = false;
   likesPublicSaving = false;
   country = '';
@@ -65,8 +73,14 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   wrappedEnrolled = false;
   releaseRadarEnrolled = false;
 
-  /** In-page tab: `overview` (default) or `settings`. Synced to `?tab=` query. */
-  activeTab: 'overview' | 'settings' = 'overview';
+  /** In-page tab: `overview` (default), `recent`, or `settings`. Synced to `?tab=` query. */
+  activeTab: 'overview' | 'recent' | 'settings' = 'overview';
+
+  // Recent tab state — lazy-loaded the first time the tab opens.
+  recentLoading = false;
+  recentLoaded = false;
+  recentItems: RecentlyPlayedItem[] = [];
+  recentError = false;
   maxEnrollAttempts = 5;
   enrollAttempts = 0;
   disableEnrollButtons = false;
@@ -93,6 +107,9 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     private artistService: ArtistService,
     private friendsService: FriendsService,
     private topItemsService: TopItemsService,
+    private ratingsService: RatingsService,
+    private shareFeedService: ShareFeedService,
+    private listeningHistoryService: ListeningHistoryService,
     private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
@@ -105,7 +122,14 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     // Drive tab selection from the URL so /my-profile?tab=settings is a deep link.
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const tab = params.get('tab');
-      this.activeTab = tab === 'settings' ? 'settings' : 'overview';
+      if (tab === 'settings') {
+        this.activeTab = 'settings';
+      } else if (tab === 'recent') {
+        this.activeTab = 'recent';
+        this.ensureRecentLoaded();
+      } else {
+        this.activeTab = 'overview';
+      }
     });
 
     this.friendsService.friendsList$
@@ -137,14 +161,17 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectTab(tab: 'overview' | 'settings'): void {
+  selectTab(tab: 'overview' | 'recent' | 'settings'): void {
     this.activeTab = tab;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: tab === 'overview' ? {} : { tab: 'settings' },
+      queryParams: tab === 'overview' ? {} : { tab },
       queryParamsHandling: '',
       replaceUrl: true,
     });
+    if (tab === 'recent') {
+      this.ensureRecentLoaded();
+    }
   }
 
   logout(): void {
@@ -309,6 +336,89 @@ export class MyProfileComponent implements OnInit, OnDestroy {
           // Silently fall back to whatever was cached.
         },
       });
+
+    // Ratings count — `/ratings/all` returns every rating the caller has made;
+    // the chip just shows .length. RatingsService caches the array, so
+    // subsequent visits to this page or the Ratings page reuse it.
+    this.ratingsService
+      .getAllRatings(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (ratings) => {
+          this.ratingsCount = Array.isArray(ratings) ? ratings.length : 0;
+        },
+        error: () => {
+          // Silent — chip just stays at 0.
+        },
+      });
+
+    // Posts (shares) count — backend has no dedicated count endpoint, but
+    // `/shares/user?limit=100` returns the most recent page; for the vast
+    // majority of users this is the entire history. If a user has 100+
+    // shares we under-count slightly — acceptable for a profile chip.
+    this.shareFeedService
+      .getSharesByUser(email, { limit: 100 })
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.sharesCount = response?.shares?.length ?? 0;
+        },
+        error: () => {
+          // Silent.
+        },
+      });
+  }
+
+  /**
+   * Lazy-load the Recent tab's listening history. We use Spotify's
+   * `/me/player/recently-played` (last 50 plays) directly through
+   * ListeningHistoryService. The service has its own 10-min sessionStorage
+   * cache so opening + closing the tab in the same session is instant.
+   */
+  private ensureRecentLoaded(): void {
+    if (this.recentLoaded || this.recentLoading) return;
+    this.recentLoading = true;
+    this.recentError = false;
+
+    this.listeningHistoryService
+      .getRecentlyPlayed()
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.recentItems = response?.items ?? [];
+          this.recentLoaded = true;
+          this.recentLoading = false;
+        },
+        error: () => {
+          this.recentError = true;
+          this.recentLoading = false;
+        },
+      });
+  }
+
+  trackByPlayedAt(_index: number, item: RecentlyPlayedItem): string {
+    return `${item.played_at}-${item.track.id}`;
+  }
+
+  recentTrackImage(item: RecentlyPlayedItem): string {
+    const images = item.track.album?.images ?? [];
+    if (images.length === 0) return '';
+    return images[images.length - 1]?.url || images[0]?.url || '';
+  }
+
+  recentTrackArtists(item: RecentlyPlayedItem): string {
+    return (item.track.artists ?? []).map((a) => a.name).join(', ');
+  }
+
+  recentTrackPlayedLabel(item: RecentlyPlayedItem): string {
+    return this.listeningHistoryService.getRelativeTime(item.played_at);
+  }
+
+  openRecentTrack(item: RecentlyPlayedItem): void {
+    const albumId = item.track.album?.id;
+    if (albumId) {
+      this.router.navigate(['/album', albumId]);
+    }
   }
 
   /**
