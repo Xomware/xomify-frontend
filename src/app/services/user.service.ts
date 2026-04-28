@@ -72,8 +72,8 @@ export class UserService implements OnInit {
               this.activeWrapped = xomifyData?.activeWrapped ?? false;
               this.activeReleaseRadar =
                 xomifyData?.activeReleaseRadar ?? false;
-              this.likesCount = xomifyData?.likesCount ?? 0;
-              this.likesPublic = xomifyData?.likesPublic ?? false;
+              this.likesCount = xomifyData?.likes_count ?? xomifyData?.likesCount ?? 0;
+              this.likesPublic = xomifyData?.likes_public ?? xomifyData?.likesPublic ?? false;
             }),
             catchError(() => of(null)),
             map(() => void 0),
