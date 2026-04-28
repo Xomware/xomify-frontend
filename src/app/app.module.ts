@@ -36,6 +36,7 @@ import { QueueBuilderComponent } from './pages/queue-builder/queue-builder.compo
 import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
+import { SearchComponent } from './pages/search/search.component';
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -62,6 +63,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     WrappedComponent,
     ReleaseRadarComponent,
     RatingsComponent,
+    SearchComponent,
   ],
   bootstrap: [AppComponent],
   imports: [
