@@ -51,10 +51,19 @@ export class LikesService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Push liked tracks to the backend. Splits into batches of 100 and sends
-   * sequentially so we don't hammer the API with huge payloads.
+   * Push liked tracks to the backend. Splits into BATCH_SIZE batches and
+   * sends sequentially so we don't hammer the API with huge payloads.
+   *
+   * Backend (`lambdas/likes_push/handler.py`) requires `email`, `total`,
+   * AND `tracks` on every batch — `email` must match the caller for an
+   * authorization check, `total` is the user's full-library size used for
+   * the throttle decision and to populate `likes_count` in DynamoDB.
+   * Sending only `tracks` was failing every batch with 400, which left
+   * `likes_count` permanently 0 for every web user (and made
+   * /likes/by-user return empty for any friend who only used the web).
    */
-  pushUserLikes(tracks: LikePushItem[]): Observable<void[]> {
+  pushUserLikes(email: string, tracks: LikePushItem[]): Observable<void[]> {
+    const total = tracks.length;
     const batches: LikePushItem[][] = [];
     for (let i = 0; i < tracks.length; i += BATCH_SIZE) {
       batches.push(tracks.slice(i, i + BATCH_SIZE));
@@ -64,7 +73,11 @@ export class LikesService {
     }
     return from(batches).pipe(
       concatMap((batch) =>
-        this.http.post<void>(`${this.apiUrl}/likes/push`, { tracks: batch }),
+        this.http.post<void>(`${this.apiUrl}/likes/push`, {
+          email,
+          total,
+          tracks: batch,
+        }),
       ),
       toArray(),
     );

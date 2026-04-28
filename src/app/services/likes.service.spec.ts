@@ -32,11 +32,14 @@ describe('LikesService', () => {
         { trackId: 't2', addedAt: '2026-01-02T00:00:00Z' },
       ];
 
-      service.pushUserLikes(tracks).subscribe(() => done());
+      service.pushUserLikes('dom@example.com', tracks).subscribe(() => done());
 
       const req = httpMock.expectOne(`${API}/likes/push`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body.tracks.length).toBe(2);
+      // Backend (`lambdas/likes_push`) requires email + total on every batch.
+      expect(req.request.body.email).toBe('dom@example.com');
+      expect(req.request.body.total).toBe(2);
       req.flush(null);
     });
 
@@ -48,23 +51,28 @@ describe('LikesService', () => {
         addedAt: '2026-01-01T00:00:00Z',
       }));
 
-      service.pushUserLikes(tracks).subscribe(() => done());
+      service.pushUserLikes('dom@example.com', tracks).subscribe(() => done());
 
       const req1 = httpMock.expectOne(`${API}/likes/push`);
       expect(req1.request.body.tracks.length).toBe(25);
+      // `total` is the FULL library size — same on every batch, not the batch count.
+      expect(req1.request.body.total).toBe(60);
+      expect(req1.request.body.email).toBe('dom@example.com');
       req1.flush(null);
 
       const req2 = httpMock.expectOne(`${API}/likes/push`);
       expect(req2.request.body.tracks.length).toBe(25);
+      expect(req2.request.body.total).toBe(60);
       req2.flush(null);
 
       const req3 = httpMock.expectOne(`${API}/likes/push`);
       expect(req3.request.body.tracks.length).toBe(10);
+      expect(req3.request.body.total).toBe(60);
       req3.flush(null);
     });
 
     it('completes immediately with empty array when no tracks', (done) => {
-      service.pushUserLikes([]).subscribe((result) => {
+      service.pushUserLikes('dom@example.com', []).subscribe((result) => {
         expect(result).toEqual([]);
         done();
       });

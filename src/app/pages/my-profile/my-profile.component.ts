@@ -316,24 +316,26 @@ export class MyProfileComponent implements OnInit, OnDestroy {
         },
       });
 
-    // Refresh the likes count from the live source (`/likes/by-user`).
-    // The cached value on UserService comes from the post-OAuth /user/data
-    // pull and goes stale fast; the chip on the profile then shows 0
-    // even when the user has thousands of likes. Ask the server for the
-    // current `total` and update the chip + cache.
-    this.likesService
-      .getLikesByUser(email, { limit: 1, offset: 0 })
+    // Refresh the likes count from Spotify directly. We previously called
+    // `/likes/by-user?targetEmail=self&limit=1` for the chip, but that hit
+    // the backend likes-cache table which stays empty until a successful
+    // /likes/push. The web push has been failing on every batch (missing
+    // body fields — fixed in this branch), so most users had a 0 cache.
+    // `/me/tracks?limit=1` returns `total` in O(1) and matches what iOS
+    // does for its own count.
+    this.songService
+      .getUserTracks(0, 1)
       .pipe(take(1))
       .subscribe({
-        next: (response) => {
-          const fresh = response?.total ?? 0;
+        next: (resp: { total?: number } | null) => {
+          const fresh = resp?.total ?? 0;
           if (fresh > 0) {
             this.likesCount = fresh;
             this.userService.setLikesCount(fresh);
           }
         },
         error: () => {
-          // Silently fall back to whatever was cached.
+          // Silent — cached value (if any) stays on screen.
         },
       });
 
