@@ -10,6 +10,7 @@ import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
 import { RatingsService } from 'src/app/services/ratings.service';
+import { TopItemsService } from 'src/app/services/top-items.service';
 import {
   SongDetailModalComponent,
   SongDetailTrack,
@@ -66,7 +67,8 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private songService: SongService,
     private artistService: ArtistService,
-    private ratingsService: RatingsService
+    private ratingsService: RatingsService,
+    private topItemsService: TopItemsService
   ) {}
 
   ngOnInit(): void {
@@ -138,17 +140,26 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Friend's friendsCount comes from the /friends/profile payload
+    // (xomify-backend#175). The previous getFriendsList(friendEmail) call
+    // was returning the CALLER's friends because Track 1 stripped the
+    // target-email param — silently wrong since (1a) shipped.
+    if (this.profile?.friendsCount != null) {
+      this.friendsCount = this.profile.friendsCount;
+    }
+
     // Build the requests
     const requests: any = {};
 
     // Only fetch Spotify stats if we have a userId
     if (this.profile?.userId) {
       requests.spotifyProfile = this.userService.getUserProfile(this.profile.userId);
+      // Backend already returns the slim public-playlists shape on the
+      // profile payload; this Spotify-direct call is a redundant fallback.
+      // Keep it for now — it ALSO populates followersCount which the
+      // backend doesn't.
       requests.playlists = this.userService.getUserPublicPlaylists(this.profile.userId, 50);
     }
-
-    // Fetch friend's friends count
-    requests.friendsList = this.friendsService.getFriendsList(this.friendEmail);
 
     forkJoin(requests)
       .pipe(take(1))
@@ -160,15 +171,12 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
           }
           if (data.playlists) {
             this.playlistCount = data.playlists?.total || 0;
-            // Store playlists if profile doesn't have them
+            // Only used as a fallback when the backend returned nothing —
+            // backend's slim shape is preferred (see template + diagnostic
+            // issue 2 in FRIEND_PROFILE_DIAGNOSTICS.md).
             if ((!this.profile.playlists || this.profile.playlists.length === 0) && data.playlists?.items) {
               this.profile.playlists = data.playlists.items;
             }
-          }
-
-          // Friend's friends count
-          if (data.friendsList) {
-            this.friendsCount = data.friendsList.acceptedCount || 0;
           }
 
           this.statsLoaded = true;

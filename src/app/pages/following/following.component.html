@@ -24,28 +24,16 @@
       <p class="page-subtitle">Artists you follow on Spotify</p>
     </header>
 
-    <!-- View Mode Tabs -->
-    <div class="view-tabs">
-      <button
-        class="tab-btn"
-        [class.active]="viewMode === 'artists'"
-        (click)="setViewMode('artists')"
-      >
-        <span class="tab-icon">👥</span>
-        Artists ({{ allArtists.length }})
-      </button>
-      <button
-        class="tab-btn"
-        [class.active]="viewMode === 'activity'"
-        (click)="setViewMode('activity')"
-      >
-        <span class="tab-icon">📅</span>
-        Recent Activity
-      </button>
-    </div>
+    <!-- View tabs removed: 'Recent Activity' was a slower duplicate of
+         /release-radar (per FRIEND_PROFILE_DIAGNOSTICS.md issue 6). The
+         release-radar page is now the canonical surface. -->
+    <p class="release-radar-hint">
+      Looking for new releases from artists you follow?
+      <a routerLink="/release-radar">See Release Radar →</a>
+    </p>
 
     <!-- Artists View -->
-    <div *ngIf="viewMode === 'artists'">
+    <div>
       <!-- Search & Filter -->
       <div class="controls-bar">
       <div class="search-box">
@@ -195,9 +183,5 @@
       </div>
     </div>
 
-    <!-- Activity Timeline View -->
-    <div *ngIf="viewMode === 'activity'" class="activity-view">
-      <app-activity-timeline></app-activity-timeline>
-    </div>
   </div>
 </div>

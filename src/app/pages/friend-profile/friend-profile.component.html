@@ -556,16 +556,24 @@
           (click)="goToPlaylist(playlist.id)"
         >
           <div class="playlist-image">
+            <!-- Backend (friends_profile_helper.get_user_public_playlists) returns
+                 the slim shape { imageUrl, trackCount }. Spotify-direct fallback
+                 returns the full shape { images: [...], tracks: { total } }.
+                 Tolerate both. -->
             <img
               [src]="
-                playlist.images?.[0]?.url || 'assets/img/no-image.png'
+                playlist.imageUrl ||
+                playlist.images?.[0]?.url ||
+                'assets/img/no-image.png'
               "
               [alt]="playlist.name"
             />
           </div>
           <div class="playlist-info">
             <h4 class="playlist-name">{{ playlist.name }}</h4>
-            <p class="playlist-meta">{{ playlist.tracks?.total || 0 }} tracks</p>
+            <p class="playlist-meta">
+              {{ playlist.trackCount ?? playlist.tracks?.total ?? 0 }} tracks
+            </p>
           </div>
         </div>
       </div>

@@ -21,9 +21,6 @@ export class FollowingComponent implements OnInit {
   searchQuery = '';
   sortBy = 'name';
 
-  // View mode
-  viewMode: 'artists' | 'activity' = 'artists';
-
   // Cache settings
   private readonly CACHE_KEY = 'xomify_following';
   private readonly CACHE_TTL = 30 * 60 * 1000; // 30 minutes
@@ -212,7 +209,4 @@ export class FollowingComponent implements OnInit {
     return num.toString();
   }
 
-  setViewMode(mode: 'artists' | 'activity'): void {
-    this.viewMode = mode;
-  }
 }
