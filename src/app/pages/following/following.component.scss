@@ -451,3 +451,20 @@
     }
   }
 }
+
+.release-radar-hint {
+  margin: 8px 0 16px;
+  font-size: 0.9rem;
+  color: #cfcfdc;
+
+  a {
+    color: #d07bec;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+
+    &:hover {
+      color: #1bdc6f;
+    }
+  }
+}
