@@ -9,7 +9,14 @@ import { environment } from 'src/environments/environment';
 // ============================================
 
 export interface Group {
+  /** Mirrored from `groupId` by `normalizeGroup` so templates / consumers can
+   *  use either. iOS does the same with `var id: String { groupId }` on
+   *  `XomifyGroup` (`SocialModels.swift`). */
   id: string;
+  /** Canonical wire field returned by the backend (`/groups/list`,
+   *  `/groups/create`, `/groups/update`). Kept on the model so callers that
+   *  need the raw value don't have to reach for `id`. */
+  groupId: string;
   name: string;
   description?: string;
   imageUrl?: string;
@@ -19,6 +26,24 @@ export interface Group {
   memberCount: number;
   songCount: number;
   unlistenedCount?: number;
+}
+
+/**
+ * Map a raw `/groups/*` response onto the `Group` shape consumers expect.
+ *
+ * Backend keys group rows by `groupId` (see
+ * `xomify-backend/lambdas/common/groups_dynamo.py`). The Angular code base
+ * was written against `id`, so without this normalization every `group.id`
+ * read at runtime is `undefined` — which silently broke the feed group
+ * filter (selectGroup(undefined) -> no `groupId` query param -> backend
+ * returns the full friends feed) and the groups page nav (`/group/undefined`).
+ *
+ * Returns the same object with both `id` and `groupId` populated so existing
+ * call sites keep working unchanged.
+ */
+function normalizeGroup<T extends Partial<Group>>(raw: T): T & { id: string; groupId: string } {
+  const groupId = raw.groupId ?? raw.id ?? '';
+  return { ...raw, id: groupId, groupId };
 }
 
 export interface GroupMember {
@@ -206,7 +231,7 @@ export class GroupsService {
     return this.http
       .get<GroupListResponse>(url)
       .pipe(
-        map((response) => response.groups || []),
+        map((response) => (response.groups || []).map(normalizeGroup)),
         tap((groups) => {
           this.groupsListSubject.next(groups);
           this.setCache(this.CACHE_KEY_GROUPS, groups);
@@ -258,6 +283,7 @@ export class GroupsService {
     return this.http
       .post<Group>(url, body)
       .pipe(
+        map(normalizeGroup),
         tap((newGroup) => {
           const current = this.groupsListSubject.getValue();
           this.groupsListSubject.next([newGroup, ...current]);
@@ -282,6 +308,7 @@ export class GroupsService {
     const body = { groupId, ...updates };
 
     return this.http.put<Group>(url, body).pipe(
+      map(normalizeGroup),
       tap((updatedGroup) => {
         const current = this.groupsListSubject.getValue();
         const index = current.findIndex((g) => g.id === groupId);
