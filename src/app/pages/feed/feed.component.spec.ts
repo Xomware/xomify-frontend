@@ -44,6 +44,7 @@ describe('FeedComponent', () => {
 
   const mkGroup = (id: string, name: string): Group => ({
     id,
+    groupId: id,
     name,
     createdBy: 'dom@example.com',
     createdAt: '2026-04-01T00:00:00Z',

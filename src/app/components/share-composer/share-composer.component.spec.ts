@@ -46,6 +46,7 @@ describe('ShareComposerComponent', () => {
   const sampleGroups: Group[] = [
     {
       id: 'g1',
+      groupId: 'g1',
       name: 'Vinyl Club',
       createdBy: VIEWER_EMAIL,
       createdAt: '2026-04-01T00:00:00Z',
@@ -54,6 +55,7 @@ describe('ShareComposerComponent', () => {
     },
     {
       id: 'g2',
+      groupId: 'g2',
       name: 'Roadtrip Bangers',
       createdBy: VIEWER_EMAIL,
       createdAt: '2026-04-01T00:00:00Z',
