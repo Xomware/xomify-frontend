@@ -105,11 +105,15 @@ describe('ReleaseRadarService', () => {
       req.flush(mockHistoryResponse);
     });
 
-    it('should handle API errors gracefully', (done) => {
-      service.getHistory('test@example.com').subscribe((response) => {
-        expect(response.weeks.length).toBe(0);
-        expect(response.email).toBe('test@example.com');
-        done();
+    it('should propagate API errors to caller', (done) => {
+      service.getHistory('test@example.com').subscribe({
+        next: () => {
+          fail('Expected error to be thrown');
+        },
+        error: (error) => {
+          expect(error).toBeTruthy();
+          done();
+        },
       });
 
       const req = httpMock.expectOne(
