@@ -470,11 +470,8 @@ export class GroupsService {
 
   // The `email` arg is retained for call-site compatibility but is no longer
   // forwarded — caller identity comes from the JWT context (1b).
-  // NOTE: The original URL had a pre-existing typo around `songId${songId}=` —
-  // preserving that here so this PR is a strict caller-email sweep, no behavior
-  // change beyond the email drop.
   removeSong(groupId: string, _email: string, songId: string): Observable<void> {
-    const url = `${this.xomifyApiUrl}/groups/remove-song?groupId=${groupId}&songId${songId}=`;
+    const url = `${this.xomifyApiUrl}/groups/remove-song?groupId=${groupId}&songId=${songId}`;
 
     return this.http.delete<void>(url).pipe(
       tap(() => {

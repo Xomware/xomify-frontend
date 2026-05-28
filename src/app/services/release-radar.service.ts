@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -103,14 +103,11 @@ export class ReleaseRadarService {
           // history loaded
         }),
         catchError((err) => {
+          // Do NOT swallow the error into an empty response — that renders a
+          // misleading "No Releases" empty state. Propagate so the component's
+          // error handler can surface a real error state to the user.
           console.error('Error fetching release radar history:', err);
-          return of({
-            email,
-            weeks: [],
-            count: 0,
-            currentWeek: this.getCurrentWeekKey(),
-            currentWeekDisplay: '',
-          });
+          return throwError(() => err);
         })
       );
   }

@@ -321,7 +321,13 @@ export class ReleaseRadarComponent implements OnInit {
     date: Date,
     releases: ReleaseRadarRelease[]
   ): ReleaseRadarRelease[] {
-    const dateStr = date.toISOString().split('T')[0];
+    // Format the calendar cell's LOCAL date as YYYY-MM-DD. Using
+    // toISOString() here converts to UTC and shifts the day backward/forward
+    // for users west/east of UTC, causing releases to land on the wrong cell.
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     return releases.filter((release) => {
       const releaseStr = release.releaseDate;
       return releaseStr === dateStr;

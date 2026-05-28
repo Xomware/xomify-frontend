@@ -138,7 +138,7 @@ export class RatingsService {
       return of(existing);
     }
 
-    const url = `${this.xomifyApiUrl}/ratings/track/?trackId=${trackId}`;
+    const url = `${this.xomifyApiUrl}/ratings/track?trackId=${trackId}`;
     return this.http
       .get<any>(url)
       .pipe(
