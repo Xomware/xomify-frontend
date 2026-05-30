@@ -198,7 +198,11 @@ export class UserService implements OnInit {
     const url = `${this.xomifyApiUrl}/user/update`;
     // Caller email comes from JWT context on the backend (1i). `userId` and
     // `refreshToken` are token-persistence fields — these stay.
+    // NOTE: `email` is included as a safety fallback for the race condition
+    // where the authorizer context isn't yet populated on the first call
+    // after login (see #433).
     const body = {
+      email: this.user.email,
       userId: this.id,
       displayName: this.user.display_name || this.user.email,
       refreshToken: this.refreshToken,
