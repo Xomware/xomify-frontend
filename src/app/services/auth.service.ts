@@ -27,7 +27,7 @@ export class AuthService {
   private readonly clientSecret = environment.spotifyClientSecret;
   private readonly redirectUri = `${environment.baseCallbackUrl}/callback`;
   private readonly scope =
-    'user-read-private user-read-email user-library-read user-top-read playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-playback-state streaming';
+    'user-read-private user-read-email user-library-read user-top-read playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-playback-state user-read-recently-played streaming';
   private readonly spotifyTokenUrl = 'https://accounts.spotify.com/api/token';
   accessToken: string = '';
   refreshToken: string = '';
