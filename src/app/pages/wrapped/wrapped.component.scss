@@ -107,13 +107,13 @@
 .enrollment-card {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   max-width: 700px;
-  margin: 0 auto 32px;
-  padding: 24px;
+  margin: 0 auto 20px;
+  padding: 12px 16px;
   background: linear-gradient(135deg, rgba(27, 220, 111, 0.1) 0%, rgba(27, 220, 111, 0.05) 100%);
   border: 1px solid rgba(27, 220, 111, 0.2);
-  border-radius: 20px;
+  border-radius: 14px;
   transition: all 0.3s ease;
 
   &.enrolled {
@@ -127,16 +127,18 @@
 
   .enrollment-icon {
     flex-shrink: 0;
-    width: 64px;
-    height: 64px;
+    width: 40px;
+    height: 40px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
 
     svg {
       color: #1bdc6f;
+      width: 24px;
+      height: 24px;
     }
   }
 
@@ -144,17 +146,17 @@
     flex: 1;
 
     h3 {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 600;
       color: #fff;
-      margin: 0 0 6px 0;
+      margin: 0 0 2px 0;
     }
 
     p {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: #8a8a9a;
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.35;
     }
   }
 
@@ -163,13 +165,13 @@
     background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
     color: #fff;
     border: none;
-    padding: 12px 28px;
-    border-radius: 25px;
-    font-size: 0.95rem;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 120px;
+    min-width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -389,87 +391,75 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  background: linear-gradient(135deg, rgba(29, 185, 84, 0.12) 0%, rgba(30, 215, 96, 0.06) 100%);
-  border: 1px solid rgba(29, 185, 84, 0.25);
-  border-radius: 16px;
-  padding: 14px 20px;
-  margin-bottom: 16px;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(30, 215, 96, 0.05) 100%);
+  border: 1px solid rgba(29, 185, 84, 0.2);
+  border-radius: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 
   .generate-playlist-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 0.9rem;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.82rem;
 
     svg {
       color: #1db954;
       flex-shrink: 0;
+      width: 16px;
+      height: 16px;
     }
   }
 
   .generate-playlist-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .open-playlist-btn {
+  .add-all-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
-    background: rgba(29, 185, 84, 0.15);
-    border: 1px solid rgba(29, 185, 84, 0.4);
-    border-radius: 20px;
-    color: #1db954;
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background: rgba(29, 185, 84, 0.25);
-      border-color: #1db954;
-    }
-  }
-
-  .generate-playlist-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 18px;
+    padding: 6px 14px;
     background: #1db954;
     border: none;
-    border-radius: 20px;
+    border-radius: 16px;
     color: #000;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
 
-    &:hover:not(:disabled) {
+    &:hover {
       background: #1ed760;
       transform: translateY(-1px);
     }
+  }
 
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
 
-    .spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(0, 0, 0, 0.3);
-      border-top-color: #000;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #fff;
     }
   }
 }

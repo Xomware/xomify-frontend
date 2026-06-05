@@ -439,6 +439,36 @@ export class WrappedComponent implements OnInit {
     }
   }
 
+  addAllToPlaylistBuilder(): void {
+    if (this.displayTracks.length === 0) {
+      return;
+    }
+
+    let added = 0;
+    this.displayTracks.forEach(track => {
+      const queueTrack: QueueTrack = {
+        id: track.id,
+        name: track.name,
+        artists: track.artists || [],
+        album: track.album || { id: '', name: '', images: [] },
+        duration_ms: track.duration_ms,
+        external_urls: undefined,
+      };
+
+      if (this.queueService.addToQueue(queueTrack)) {
+        added++;
+      }
+    });
+
+    if (added > 0) {
+      this.toastService.showPositiveToast(
+        `Added ${added} track${added !== 1 ? 's' : ''} to playlist builder`
+      );
+    } else {
+      this.toastService.showPositiveToast('All tracks already in playlist builder');
+    }
+  }
+
   isInQueue(trackId: string): boolean {
     return this.queueService.isInQueue(trackId);
   }
