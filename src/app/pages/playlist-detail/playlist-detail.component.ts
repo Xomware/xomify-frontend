@@ -5,6 +5,7 @@ import { PlayerService } from 'src/app/services/player.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { RatingsService } from 'src/app/services/ratings.service';
+import { ShareService } from 'src/app/services/share.service';
 import {
   SongDetailModalComponent,
   SongDetailTrack,
@@ -39,7 +40,8 @@ export class PlaylistDetailComponent implements OnInit {
     private playerService: PlayerService,
     private queueService: QueueService,
     private toastService: ToastService,
-    private ratingsService: RatingsService
+    private ratingsService: RatingsService,
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -192,6 +194,60 @@ export class PlaylistDetailComponent implements OnInit {
 
   isInQueue(trackId: string): boolean {
     return this.queueService.isInQueue(trackId);
+  }
+
+  get playableTrackCount(): number {
+    return this.tracks.filter((item) => item.track?.id).length;
+  }
+
+  addAllToPlaylistBuilder(): void {
+    const playable = this.tracks
+      .map((item) => item.track)
+      .filter((track) => track && track.id);
+
+    if (playable.length === 0) {
+      this.toastService.showNegativeToast('No tracks available to add');
+      return;
+    }
+
+    let added = 0;
+    playable.forEach((track) => {
+      if (this.queueService.isInQueue(track.id)) return;
+
+      const queueTrack: QueueTrack = {
+        id: track.id,
+        name: track.name,
+        artists: track.artists || [],
+        album: track.album || { id: '', name: '', images: [] },
+        duration_ms: track.duration_ms,
+        external_urls: track.external_urls,
+      };
+      this.queueService.addToQueue(queueTrack);
+      added++;
+    });
+
+    if (added === 0) {
+      this.toastService.showPositiveToast(
+        'All tracks are already in your playlist builder'
+      );
+    } else {
+      this.toastService.showPositiveToast(
+        `Added ${added} track${added === 1 ? '' : 's'} to playlist builder`
+      );
+    }
+  }
+
+  async sharePlaylist(): Promise<void> {
+    if (!this.playlist) return;
+
+    const shared = await this.shareService.share({
+      title: this.playlist.name,
+      text: `Check out "${this.playlist.name}" on Spotify`,
+      url: this.playlist.external_urls?.spotify || window.location.href,
+    });
+    this.toastService.showPositiveToast(
+      shared ? 'Shared!' : 'Link copied to clipboard'
+    );
   }
 
   // Rating methods
