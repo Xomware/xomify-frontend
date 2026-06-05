@@ -624,6 +624,68 @@ export class ReleaseRadarComponent implements OnInit {
       });
   }
 
+  /**
+   * Add every track from the currently filtered releases to the Playlist Builder.
+   */
+  addAllToPlaylistBuilder(): void {
+    if (this.filteredReleases.length === 0) {
+      this.toastService.showNegativeToast('No releases to add');
+      return;
+    }
+
+    this.toastService.showPositiveToast(
+      `Adding tracks from ${this.filteredReleases.length} release(s) to Playlist Builder…`
+    );
+
+    const releases = [...this.filteredReleases];
+    const albumRequests = releases.map(release =>
+      this.albumService
+        .getAlbumTracks(release.albumId)
+        .pipe(catchError(() => of({ items: [] })))
+    );
+
+    forkJoin(albumRequests)
+      .pipe(take(1))
+      .subscribe({
+        next: (albumResponses: any[]) => {
+          let addedCount = 0;
+          albumResponses.forEach((response, index) => {
+            const release = releases[index];
+            (response?.items || []).forEach((track: any) => {
+              const queueTrack: QueueTrack = {
+                id: track.id,
+                name: track.name,
+                artists: track.artists || [],
+                album: {
+                  id: release.albumId,
+                  name: release.albumName,
+                  images: release.imageUrl ? [{ url: release.imageUrl }] : [],
+                },
+                duration_ms: track.duration_ms,
+                external_urls: track.external_urls,
+              };
+
+              if (this.queueService.addToQueue(queueTrack)) {
+                addedCount++;
+              }
+            });
+          });
+
+          if (addedCount > 0) {
+            this.toastService.showPositiveToast(
+              `Added ${addedCount} track${addedCount !== 1 ? 's' : ''} to Playlist Builder`
+            );
+          } else {
+            this.toastService.showPositiveToast('Tracks already in Playlist Builder');
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching album tracks:', err);
+          this.toastService.showNegativeToast('Failed to add tracks. Please try again.');
+        },
+      });
+  }
+
   // ============================================
   // Playlist Generation
   // ============================================
