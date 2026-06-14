@@ -14,6 +14,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # required for `gh release create`
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -32,10 +34,32 @@ jobs:
 
       - name: Retrieve SSM Parameters
         run: |
-          echo "SPOTIFY_CLIENT_ID=$(aws ssm get-parameter --name "/xomify/spotify/CLIENT_ID" --with-decryption --query "Parameter.Value" --output text)" >> spotify_credentials.env
-          echo "SPOTIFY_CLIENT_SECRET=$(aws ssm get-parameter --name "/xomify/spotify/CLIENT_SECRET" --with-decryption --query "Parameter.Value" --output text)" >> spotify_credentials.env
-          echo "API_AUTH_TOKEN=$(aws ssm get-parameter --name "/xomify/api/API_AUTH_TOKEN" --with-decryption --query "Parameter.Value" --output text)" >> spotify_credentials.env
-          echo "API_ID=$(aws ssm get-parameter --name "/xomify/api/API_ID" --with-decryption --query "Parameter.Value" --output text)" >> spotify_credentials.env
+          set -euo pipefail
+          # Fetch a single SSM parameter and fail the job if it is empty or
+          # missing. The previous `echo "VAR=$(aws ...)"` form swallowed aws
+          # failures (echo exits 0), which shipped empty credentials to prod
+          # on a transient SSM timeout (#296). Capturing into a variable lets
+          # `set -e` abort on a hard aws failure, and the explicit check
+          # catches the aws-exits-0-but-empty case.
+          fetch() {
+            local name="$1" value
+            value="$(aws ssm get-parameter --name "$name" --with-decryption --query "Parameter.Value" --output text)"
+            if [ -z "$value" ] || [ "$value" = "None" ]; then
+              echo "::error::SSM parameter $name is empty or missing — aborting to avoid deploying broken credentials."
+              return 1
+            fi
+            printf '%s' "$value"
+          }
+          CLIENT_ID="$(fetch /xomify/spotify/CLIENT_ID)"
+          CLIENT_SECRET="$(fetch /xomify/spotify/CLIENT_SECRET)"
+          API_AUTH_TOKEN="$(fetch /xomify/api/API_AUTH_TOKEN)"
+          API_ID="$(fetch /xomify/api/API_ID)"
+          {
+            echo "SPOTIFY_CLIENT_ID=$CLIENT_ID"
+            echo "SPOTIFY_CLIENT_SECRET=$CLIENT_SECRET"
+            echo "API_AUTH_TOKEN=$API_AUTH_TOKEN"
+            echo "API_ID=$API_ID"
+          } >> spotify_credentials.env
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,6 +84,16 @@ jobs:
           sed -i "s|spotifyClientSecret: '---'|spotifyClientSecret: '$(grep 'SPOTIFY_CLIENT_SECRET' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
           sed -i "s|apiAuthToken: '---'|apiAuthToken: '$(grep 'API_AUTH_TOKEN' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
           sed -i "s|apiId: '---'|apiId: '$(grep 'API_ID' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
+
+      - name: Verify injected environment values
+        run: |
+          # Belt-and-suspenders: fail before building if any credential is
+          # still the '---' placeholder or empty after injection (#296).
+          if grep -nE "(spotifyClientId|spotifyClientSecret|apiAuthToken|apiId): *'(---)?'" src/environments/environment.ts; then
+            echo "::error::environment.ts still contains placeholder or empty credentials after injection — aborting build."
+            exit 1
+          fi
+          echo "Environment injection verified — no placeholder/empty credentials remain."
 
       - name: Build the project
         run: npm run build:prod
@@ -105,26 +139,20 @@ jobs:
 
       - name: Create GitHub Release
         if: success()
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.package-version.outputs.version }}
-          release_name: Release v${{ steps.package-version.outputs.version }}
-          body: |
-            ## Xomify Frontend v${{ steps.package-version.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ steps.package-version.outputs.version }}" \
+            --title "Release v${{ steps.package-version.outputs.version }}" \
+            --notes "## Xomify Frontend v${{ steps.package-version.outputs.version }}
 
-            Deployed to production on $(date +'%Y-%m-%d at %H:%M UTC')
+          Deployed to production from \`${{ github.sha }}\` on \`${{ github.ref_name }}\`.
 
-            ### Changes
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
 
-            ### Deployment Info
-            - Commit: ${{ github.sha }}
-            - Branch: ${{ github.ref_name }}
-            - Workflow: ${{ github.run_id }}
-          draft: false
-          prerelease: false
+          - Commit: ${{ github.sha }}
+          - Workflow run: ${{ github.run_id }}" \
+            || echo "Release creation skipped (tag may already exist)."
         continue-on-error: true
 
       - name: Deployment Summary
