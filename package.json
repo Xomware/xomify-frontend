@@ -23,7 +23,7 @@
     "@angular/platform-browser": "^18.2.14",
     "@angular/platform-browser-dynamic": "^18.2.14",
     "@angular/router": "^18.2.14",
-    "angular-oauth2-oidc": "~17.0.2",
+    "angular-oauth2-oidc": "~22.0.0",
     "gsap": "^3.15.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
