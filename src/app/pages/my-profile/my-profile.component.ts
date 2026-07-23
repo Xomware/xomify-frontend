@@ -72,6 +72,8 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   accessToken = '';
   wrappedEnrolled = false;
   releaseRadarEnrolled = false;
+  wrappedSaving = false;
+  releaseRadarSaving = false;
 
   /** In-page tab: `overview` (default), `recent`, or `settings`. Synced to `?tab=` query. */
   activeTab: 'overview' | 'recent' | 'settings' = 'overview';
@@ -81,10 +83,6 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   recentLoaded = false;
   recentItems: RecentlyPlayedItem[] = [];
   recentError = false;
-  maxEnrollAttempts = 5;
-  enrollAttempts = 0;
-  disableEnrollButtons = false;
-  maxReached = false;
 
   // Ticker state
   tickerItems: TickerItem[] = [];
@@ -608,64 +606,69 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       });
   }
 
-  toggleWrapped(): void {
-    this.wrappedEnrolled = !this.wrappedEnrolled;
-    this.toggleEnrollments();
-  }
-
-  toggleReleaseRadar(): void {
-    this.releaseRadarEnrolled = !this.releaseRadarEnrolled;
-    this.toggleEnrollments();
-  }
-
-  toggleEnrollments(): void {
-    if (this.maxReached) return;
-
-    this.disableEnrollButtons = true;
-    this.enrollAttempts++;
+  /**
+   * Toggle Monthly Wrapped enrollment. Sends a TARGETED single-flag update so
+   * it can never clobber the Release Radar flag (the double-flag clobber bug).
+   * Optimistic UI with rollback on error, mirroring toggleLikesPublic.
+   */
+  toggleWrapped(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const previous = this.wrappedEnrolled;
+    this.wrappedEnrolled = checked;
+    this.wrappedSaving = true;
 
     this.userService
-      .updateUserTableEnrollments(
-        this.wrappedEnrolled,
-        this.releaseRadarEnrolled
-      )
+      .updateWrappedEnrollment(checked)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.userService.setReleaseRadarEnrollment(
-            this.releaseRadarEnrolled
+          this.userService.setWrappedEnrollment(checked);
+          this.wrappedSaving = false;
+          this.toastService.showPositiveToast(
+            checked
+              ? 'Enrolled in Monthly Wrapped.'
+              : 'Unenrolled from Monthly Wrapped.'
           );
-          this.userService.setWrappedEnrollment(this.wrappedEnrolled);
         },
         error: () => {
-          this.toastService.showNegativeToast('Error Updating User Table');
-          if (
-            this.wrappedEnrolled !== this.userService.getWrappedEnrollment()
-          ) {
-            this.wrappedEnrolled = !this.wrappedEnrolled;
-          }
-          if (
-            this.releaseRadarEnrolled !==
-            this.userService.getReleaseRadarEnrollment()
-          ) {
-            this.releaseRadarEnrolled = !this.releaseRadarEnrolled;
-          }
-          this.disableEnrollButtons = false;
-        },
-        complete: () => {
-          this.toastService.showPositiveToast(
-            'Preferences updated successfully!'
+          this.wrappedEnrolled = previous;
+          this.wrappedSaving = false;
+          this.toastService.showNegativeToast(
+            'Could not update Monthly Wrapped.'
           );
-          if (this.enrollAttempts >= this.maxEnrollAttempts) {
-            this.maxReached = true;
-            this.disableEnrollButtons = true;
-          } else {
-            setTimeout(() => {
-              if (!this.maxReached) {
-                this.disableEnrollButtons = false;
-              }
-            }, 1000);
-          }
+        },
+      });
+  }
+
+  /**
+   * Toggle Release Radar enrollment (targeted single-flag update — leaves the
+   * Wrapped flag untouched). See {@link toggleWrapped}.
+   */
+  toggleReleaseRadar(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const previous = this.releaseRadarEnrolled;
+    this.releaseRadarEnrolled = checked;
+    this.releaseRadarSaving = true;
+
+    this.userService
+      .updateReleaseRadarEnrollment(checked)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.userService.setReleaseRadarEnrollment(checked);
+          this.releaseRadarSaving = false;
+          this.toastService.showPositiveToast(
+            checked
+              ? 'Enrolled in Release Radar.'
+              : 'Unenrolled from Release Radar.'
+          );
+        },
+        error: () => {
+          this.releaseRadarEnrolled = previous;
+          this.releaseRadarSaving = false;
+          this.toastService.showNegativeToast(
+            'Could not update Release Radar.'
+          );
         },
       });
   }

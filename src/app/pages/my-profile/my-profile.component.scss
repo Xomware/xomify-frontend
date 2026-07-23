@@ -466,105 +466,6 @@
   }
 }
 
-// Enrollment Grid
-.enrollment-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-.enrollment-card {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-
-  &:hover {
-    border-color: rgba(156, 10, 191, 0.4);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-
-    .card-arrow {
-      transform: translateX(4px);
-      color: #1bdc6f;
-    }
-  }
-
-  &.enrolled {
-    border-color: rgba(27, 220, 111, 0.3);
-    background: linear-gradient(
-      135deg,
-      rgba(27, 220, 111, 0.05) 0%,
-      rgba(27, 220, 111, 0.02) 100%
-    );
-  }
-
-  .card-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    &.wrapped {
-      background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(27, 220, 111, 0.3);
-    }
-    &.radar {
-      background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(156, 10, 191, 0.3);
-    }
-  }
-
-  .card-content {
-    flex: 1;
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #fff;
-      margin: 0 0 6px 0;
-    }
-    .card-description {
-      font-size: 0.85rem;
-      color: #8a8a9a;
-      line-height: 1.4;
-      margin: 0;
-    }
-    .card-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 10px;
-      padding: 4px 10px;
-      background: rgba(27, 220, 111, 0.15);
-      border-radius: 16px;
-      color: #1bdc6f;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-  }
-
-  .card-arrow {
-    color: #6a6a7a;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-  }
-}
-
 // Account Card
 .account-card {
   background: linear-gradient(
@@ -793,10 +694,6 @@
   .quick-stats-grid {
     grid-template-columns: 1fr;
   }
-
-  .enrollment-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 768px) {
@@ -832,22 +729,6 @@
 
     .stat-label {
       font-size: 0.75rem;
-    }
-  }
-
-  .enrollment-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
-
-    .card-content {
-      .card-title {
-        font-size: 1.1rem;
-      }
-    }
-
-    .card-arrow {
-      display: none;
     }
   }
 

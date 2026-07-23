@@ -58,7 +58,9 @@ export class WrappedComponent implements OnInit {
   loadingDetails = false;
   error: string | null = null;
   
-  // Enrollment state
+  // Enrollment state. Drives the content-aware opt-in prompt only — the
+  // enrollment toggle itself lives in Settings (my-profile). We show the
+  // inline "turn on" prompt on this page ONLY when the user has no content.
   isEnrolled = false;
   enrollmentLoading = false;
   
@@ -103,34 +105,47 @@ export class WrappedComponent implements OnInit {
     this.userService
       .ensureLoaded()
       .pipe(take(1))
-      .subscribe(() => {
-        this.isEnrolled = this.userService.getWrappedEnrollment();
-        this.loadWrappedData();
+      .subscribe({
+        next: () => {
+          this.isEnrolled = this.userService.getWrappedEnrollment();
+          this.loadWrappedData();
+        },
+        error: (err) => {
+          // ensureLoaded now surfaces a genuine enrollment-load failure
+          // instead of silently defaulting to "not enrolled." Show an error
+          // + retry rather than lying to an enrolled user.
+          console.error('Error loading enrollment state:', err);
+          this.error = 'Failed to load your Wrapped. Please try again.';
+          this.loading = false;
+        },
       });
   }
 
-  toggleEnrollment(): void {
+  /**
+   * On-page opt-in used only from the empty/no-content prompt. Enrolls in
+   * Monthly Wrapped via a targeted single-flag update (cannot clobber Release
+   * Radar). The persistent toggle lives in Settings.
+   */
+  enableWrapped(): void {
+    if (this.enrollmentLoading) return;
     this.enrollmentLoading = true;
-    const newStatus = !this.isEnrolled;
-    
-    this.userService.updateUserTableEnrollments(
-      newStatus,
-      this.userService.getReleaseRadarEnrollment()
-    ).pipe(take(1)).subscribe({
-      next: () => {
-        this.isEnrolled = newStatus;
-        this.userService.setWrappedEnrollment(newStatus);
-        this.toastService.showPositiveToast(
-          newStatus ? 'Enrolled in Monthly Wrapped!' : 'Unenrolled from Monthly Wrapped'
-        );
-        this.enrollmentLoading = false;
-      },
-      error: (err) => {
-        console.error('Error updating enrollment:', err);
-        this.toastService.showNegativeToast('Failed to update enrollment');
-        this.enrollmentLoading = false;
-      }
-    });
+
+    this.userService
+      .updateWrappedEnrollment(true)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.isEnrolled = true;
+          this.userService.setWrappedEnrollment(true);
+          this.toastService.showPositiveToast('Enrolled in Monthly Wrapped!');
+          this.enrollmentLoading = false;
+        },
+        error: (err) => {
+          console.error('Error updating enrollment:', err);
+          this.toastService.showNegativeToast('Failed to update enrollment');
+          this.enrollmentLoading = false;
+        },
+      });
   }
 
   loadWrappedData(): void {

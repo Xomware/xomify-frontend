@@ -80,8 +80,7 @@ describe('ReleaseRadarComponent', () => {
       'getUser',
       'getReleaseRadarEnrollment',
       'setReleaseRadarEnrollment',
-      'updateUserTableEnrollments',
-      'getWrappedEnrollment',
+      'updateReleaseRadarEnrollment',
       'ensureLoaded',
     ]);
 
@@ -452,24 +451,28 @@ describe('ReleaseRadarComponent', () => {
       expect(component.isEnrolled).toBe(true);
     });
 
-    it('should toggle enrollment on/off', (done) => {
-      userService.updateUserTableEnrollments.and.returnValue(of({}));
-      userService.getWrappedEnrollment.and.returnValue(true as any);
+    it('should enroll via the on-page opt-in with a targeted single-flag update', (done) => {
+      userService.updateReleaseRadarEnrollment.and.returnValue(of({}));
 
-      component.toggleEnrollment();
+      component.enableReleaseRadar();
 
       setTimeout(() => {
-        expect(userService.updateUserTableEnrollments).toHaveBeenCalled();
+        // Targeted update — only the Release Radar flag is sent, so it can't
+        // clobber the Wrapped enrollment.
+        expect(userService.updateReleaseRadarEnrollment).toHaveBeenCalledWith(
+          true
+        );
+        expect(component.isEnrolled).toBe(true);
         done();
       }, 100);
     });
 
     it('should show enrollment error message', (done) => {
-      userService.updateUserTableEnrollments.and.returnValue(
+      userService.updateReleaseRadarEnrollment.and.returnValue(
         throwError(() => new Error('Enrollment failed'))
       );
 
-      component.toggleEnrollment();
+      component.enableReleaseRadar();
 
       setTimeout(() => {
         expect(toastService.showNegativeToast).toHaveBeenCalledWith(

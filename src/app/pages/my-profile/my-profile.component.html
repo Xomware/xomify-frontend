@@ -196,108 +196,6 @@
       </div>
     </section>
 
-    <!-- Enrollment Cards Section -->
-    <section class="section enrollment-section">
-      <div class="section-header">
-        <h2 class="section-title">Features</h2>
-        <span class="section-subtitle">Enhance your Xomify experience</span>
-      </div>
-
-      <div class="enrollment-grid">
-        <!-- Wrapped Card -->
-        <div
-          class="enrollment-card"
-          [class.enrolled]="wrappedEnrolled"
-          routerLink="/wrapped"
-        >
-          <div class="card-icon wrapped">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
-              />
-            </svg>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">Monthly Wrapped</h3>
-            <p class="card-description">
-              Get monthly insights about your listening habits and track your
-              music taste over time.
-            </p>
-            <div class="card-status" *ngIf="wrappedEnrolled">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                />
-              </svg>
-              <span>Enrolled</span>
-            </div>
-          </div>
-          <svg
-            class="card-arrow"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-        </div>
-
-        <!-- Release Radar Card -->
-        <div
-          class="enrollment-card"
-          [class.enrolled]="releaseRadarEnrolled"
-          routerLink="/release-radar"
-        >
-          <div class="card-icon radar">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
-              />
-            </svg>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">Release Radar</h3>
-            <p class="card-description">
-              Stay updated with new releases from your favorite artists. Never
-              miss a drop.
-            </p>
-            <div class="card-status" *ngIf="releaseRadarEnrolled">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                />
-              </svg>
-              <span>Enrolled</span>
-            </div>
-          </div>
-          <svg
-            class="card-arrow"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-        </div>
-      </div>
-    </section>
-
     <!-- Account Info Section -->
     <section class="section account-section">
       <div class="section-header">
@@ -425,6 +323,51 @@
           <a class="settings-cta-btn" routerLink="/settings/notifications">
             Manage devices
           </a>
+        </div>
+      </section>
+
+      <section class="section settings-section">
+        <div class="section-header">
+          <h2 class="section-title">Features</h2>
+          <span class="section-subtitle">Enroll in optional Xomify features</span>
+        </div>
+
+        <div class="settings-toggle-card">
+          <div class="settings-toggle-body">
+            <p class="settings-cta-title">Monthly Wrapped</p>
+            <p class="settings-cta-desc">
+              Save your monthly listening stats and track how your taste evolves over time.
+            </p>
+          </div>
+          <label class="toggle-switch" [class.saving]="wrappedSaving">
+            <input
+              type="checkbox"
+              [checked]="wrappedEnrolled"
+              [disabled]="wrappedSaving"
+              (change)="toggleWrapped($event)"
+              aria-label="Enroll in Monthly Wrapped"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-toggle-card">
+          <div class="settings-toggle-body">
+            <p class="settings-cta-title">Release Radar</p>
+            <p class="settings-cta-desc">
+              Get a weekly email every Saturday when artists you follow release new music.
+            </p>
+          </div>
+          <label class="toggle-switch" [class.saving]="releaseRadarSaving">
+            <input
+              type="checkbox"
+              [checked]="releaseRadarEnrolled"
+              [disabled]="releaseRadarSaving"
+              (change)="toggleReleaseRadar($event)"
+              aria-label="Enroll in Release Radar"
+            />
+            <span class="toggle-slider"></span>
+          </label>
         </div>
       </section>
 
