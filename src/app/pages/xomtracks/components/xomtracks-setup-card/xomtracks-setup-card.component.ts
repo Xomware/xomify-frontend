@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {
   XomtracksIngestTokensService,
 } from '../../services/xomtracks-ingest-tokens.service';
+import { XomifyAuthService } from '../../../../services/xomify-auth.service';
+import { ADMIN_EMAIL } from '../../config/xomtracks-admin';
 
 type XtSetupState = 'idle' | 'minting' | 'minted' | 'error';
 
@@ -23,6 +25,11 @@ const STORAGE_KEY_LABEL = 'xt.ingest.label';
  * The token hash (non-secret) is cached in localStorage so a revoke button
  * can appear on return visits — there is no `GET` list endpoint yet, so this
  * is the only way the UI can know "you already have one" after a refresh.
+ *
+ * Renders as a small, collapsed-by-default strip (`expanded`/`toggleExpanded`)
+ * rather than an always-open card — it's a secondary affordance, not the
+ * main point of the page. Hidden entirely for the admin account (`isAdmin`),
+ * whose shares are always-on for everyone and never need self-serve setup.
  */
 @Component({
   selector: 'app-xomtracks-setup-card',
@@ -38,10 +45,27 @@ export class XomtracksSetupCardComponent implements OnInit {
   errorMessage = '';
   copied = false;
 
-  constructor(private ingestTokens: XomtracksIngestTokensService) {}
+  /** Collapsed by default — expands to reveal the mint form. */
+  expanded = false;
+
+  constructor(
+    private ingestTokens: XomtracksIngestTokensService,
+    private auth: XomifyAuthService,
+  ) {}
 
   ngOnInit(): void {
     this.restoreExisting();
+  }
+
+  /** True for the admin account — their shares are always-on for everyone,
+   * so this affordance never applies and stays hidden. */
+  get isAdmin(): boolean {
+    const email = this.auth.getEmail();
+    return !!email && email.toLowerCase() === ADMIN_EMAIL;
+  }
+
+  toggleExpanded(): void {
+    this.expanded = !this.expanded;
   }
 
   get keychainCommand(): string {

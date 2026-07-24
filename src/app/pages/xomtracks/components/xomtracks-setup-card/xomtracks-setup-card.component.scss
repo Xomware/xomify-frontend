@@ -1,23 +1,69 @@
+// Compact, understated strip by default — expands in place to the mint
+// form/token card. Deliberately NOT a big always-open card (see PR notes).
 .xt-setup {
+  margin-bottom: 4px;
+}
+
+.xt-setup-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a6a6b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.3);
+    color: #fff;
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.xt-setup-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(156, 10, 191, 0.3);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.xt-setup-body {
+  margin-top: 12px;
   padding: 24px;
   border-radius: 16px;
   background: linear-gradient(180deg, #1a1a26 0%, #14141e 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: xtSetupReveal 0.18s ease;
 }
 
-.xt-setup-head {
-  margin-bottom: 16px;
-}
-
-.xt-setup-title {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #fff;
+@keyframes xtSetupReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .xt-setup-sub {
-  margin: 0;
+  margin: 0 0 16px;
   font-size: 0.85rem;
   color: #a6a6b8;
   line-height: 1.5;
@@ -240,5 +286,11 @@
   .xt-code-row {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xt-setup-body {
+    animation: none;
   }
 }

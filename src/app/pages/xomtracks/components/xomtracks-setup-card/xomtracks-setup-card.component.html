@@ -1,89 +1,99 @@
-<section class="xt-setup" aria-labelledby="xt-setup-title">
-  <header class="xt-setup-head">
-    <h2 class="xt-setup-title" id="xt-setup-title">Set up your own</h2>
+<section class="xt-setup" *ngIf="!isAdmin">
+  <button
+    type="button"
+    class="xt-setup-toggle"
+    [attr.aria-expanded]="expanded"
+    aria-controls="xt-setup-body"
+    (click)="toggleExpanded()"
+  >
+    <span class="xt-setup-toggle-icon" aria-hidden="true">{{ expanded ? '−' : '+' }}</span>
+    Set up your own
+  </button>
+
+  <div class="xt-setup-body" id="xt-setup-body" *ngIf="expanded">
     <p class="xt-setup-sub">
-      Run Xomtracks on your own iMessage history — a small local extractor
-      scans for music links and pushes them here, stamped as yours.
+      Run your own local extractor over your iMessage history — it scans for
+      music links and pushes them here, stamped as yours.
     </p>
-  </header>
 
-  <!-- Minted: show the plaintext token ONCE + the install steps. -->
-  <ng-container *ngIf="state === 'minted' && plaintextToken as token">
-    <div class="xt-setup-warning" role="alert">
-      <strong>Copy this now</strong> — it's shown once and can't be recovered.
-    </div>
+    <!-- Minted: show the plaintext token ONCE + the install steps. -->
+    <ng-container *ngIf="state === 'minted' && plaintextToken as token">
+      <div class="xt-setup-warning" role="alert">
+        <strong>Copy this now</strong> — it's shown once and can't be recovered.
+      </div>
 
-    <div class="xt-token-row">
-      <code class="xt-token">{{ token }}</code>
-      <button type="button" class="xt-copy-btn" (click)="copyToken()">
-        {{ copied ? 'Copied' : 'Copy' }}
-      </button>
-    </div>
+      <div class="xt-token-row">
+        <code class="xt-token">{{ token }}</code>
+        <button type="button" class="xt-copy-btn" (click)="copyToken()">
+          {{ copied ? 'Copied' : 'Copy' }}
+        </button>
+      </div>
 
-    <ol class="xt-steps">
-      <li>
-        <p>Store it in your login Keychain:</p>
-        <div class="xt-code-row">
-          <code class="xt-code">{{ keychainCommand }}</code>
-          <button type="button" class="xt-copy-btn" (click)="copyKeychainCommand()">Copy</button>
-        </div>
-      </li>
-      <li>
-        <p>
-          Grant Full Disk Access to Terminal (and the extractor's Python
-          binary) under
-          <strong>System Settings → Privacy &amp; Security → Full Disk Access</strong>
-          — the extractor reads
-          <code>chat.db</code> locally and read-only, never sends messages.
-        </p>
-      </li>
-      <li>
-        <p>
-          Clone
-          <code>xomtracks-backend</code> and follow
-          <code>extractor/README.md</code> to run a scan. A guided
-          <code>curl&nbsp;|&nbsp;bash</code> installer (with the launchd
-          scheduler baked in) is on the way — for now this is a short manual
-          step.
-        </p>
-      </li>
-    </ol>
+      <ol class="xt-steps">
+        <li>
+          <p>Store it in your login Keychain:</p>
+          <div class="xt-code-row">
+            <code class="xt-code">{{ keychainCommand }}</code>
+            <button type="button" class="xt-copy-btn" (click)="copyKeychainCommand()">Copy</button>
+          </div>
+        </li>
+        <li>
+          <p>
+            Grant Full Disk Access to Terminal (and the extractor's Python
+            binary) under
+            <strong>System Settings → Privacy &amp; Security → Full Disk Access</strong>
+            — the extractor reads
+            <code>chat.db</code> locally and read-only, never sends messages.
+          </p>
+        </li>
+        <li>
+          <p>
+            Clone
+            <code>xomtracks-backend</code> and follow
+            <code>extractor/README.md</code> to run a scan. A guided
+            <code>curl&nbsp;|&nbsp;bash</code> installer (with the launchd
+            scheduler baked in) is on the way — for now this is a short manual
+            step.
+          </p>
+        </li>
+      </ol>
 
-    <button type="button" class="xt-done-btn" (click)="dismissMinted()">Done</button>
-  </ng-container>
+      <button type="button" class="xt-done-btn" (click)="dismissMinted()">Done</button>
+    </ng-container>
 
-  <!-- Idle / minting / error: the mint form. -->
-  <ng-container *ngIf="state !== 'minted'">
-    <div class="xt-existing" *ngIf="existingTokenHash">
-      <span>
-        You already have a token{{ existingLabel ? ' — ' + existingLabel : '' }} set up.
-      </span>
-      <button type="button" class="xt-revoke-btn" (click)="revoke()">Revoke it</button>
-    </div>
+    <!-- Idle / minting / error: the mint form. -->
+    <ng-container *ngIf="state !== 'minted'">
+      <div class="xt-existing" *ngIf="existingTokenHash">
+        <span>
+          You already have a token{{ existingLabel ? ' — ' + existingLabel : '' }} set up.
+        </span>
+        <button type="button" class="xt-revoke-btn" (click)="revoke()">Revoke it</button>
+      </div>
 
-    <form class="xt-mint-form" (ngSubmit)="mint()" *ngIf="!existingTokenHash || state === 'error'">
-      <label class="xt-label" for="xt-token-label">
-        Label
-        <span
-          class="xt-label-hint"
-          appTooltip="Optional — a name for this device, e.g. “MacBook Pro”, so you can tell tokens apart later"
-        >?</span>
-      </label>
-      <input
-        id="xt-token-label"
-        class="xt-input"
-        type="text"
-        [(ngModel)]="label"
-        name="label"
-        maxlength="100"
-        placeholder="e.g. MacBook Pro"
-        [disabled]="state === 'minting'"
-      />
-      <button type="submit" class="xt-mint-btn" [disabled]="state === 'minting'">
-        {{ state === 'minting' ? 'Minting…' : 'Generate my token' }}
-      </button>
-    </form>
+      <form class="xt-mint-form" (ngSubmit)="mint()" *ngIf="!existingTokenHash || state === 'error'">
+        <label class="xt-label" for="xt-token-label">
+          Label
+          <span
+            class="xt-label-hint"
+            appTooltip="Optional — a name for this device, e.g. “MacBook Pro”, so you can tell tokens apart later"
+          >?</span>
+        </label>
+        <input
+          id="xt-token-label"
+          class="xt-input"
+          type="text"
+          [(ngModel)]="label"
+          name="label"
+          maxlength="100"
+          placeholder="e.g. MacBook Pro"
+          [disabled]="state === 'minting'"
+        />
+        <button type="submit" class="xt-mint-btn" [disabled]="state === 'minting'">
+          {{ state === 'minting' ? 'Minting…' : 'Generate my token' }}
+        </button>
+      </form>
 
-    <p class="xt-error" role="alert" *ngIf="state === 'error'">{{ errorMessage }}</p>
-  </ng-container>
+      <p class="xt-error" role="alert" *ngIf="state === 'error'">{{ errorMessage }}</p>
+    </ng-container>
+  </div>
 </section>

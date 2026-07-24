@@ -8,22 +8,15 @@
 
 .xt-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 20px;
-}
-
-.xt-title {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 800;
-  color: #fff;
+  margin-bottom: 16px;
 }
 
 .xt-sub {
-  margin: 6px 0 0;
+  margin: 0;
   font-size: 0.88rem;
   color: #8a8a9a;
 }
@@ -459,9 +452,9 @@
   }
 }
 
-.xt-setup-section {
+.xt-setup-banner {
   display: block;
-  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
 @media (max-width: 900px) {
