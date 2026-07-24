@@ -2,34 +2,29 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../../shared/shared.module';
 
 import { FriendsComponent } from '../friends/friends.component';
 import { FriendProfileComponent } from '../friend-profile/friend-profile.component';
-import { GroupsComponent } from '../groups/groups.component';
-import { GroupDetailComponent } from '../group-detail/group-detail.component';
-import { FeedComponent } from '../feed/feed.component';
 import { InvitesComponent } from '../invites/invites.component';
 import { NotificationSettingsComponent } from '../notification-settings/notification-settings.component';
 import { LikesComponent } from '../likes/likes.component';
 import { ShareDetailComponent } from '../share-detail/share-detail.component';
-import { AddSongModalComponent } from '../../components/add-song-modal/add-song-modal.component';
-import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { ShareCardComponent } from '../../components/share-card/share-card.component';
-import { ShareComposerComponent } from '../../components/share-composer/share-composer.component';
 import { ReactionsBarComponent } from '../../components/reactions-bar/reactions-bar.component';
 import { CommentThreadComponent } from '../../components/comment-thread/comment-thread.component';
 import { FriendsRatedListComponent } from '../../components/friends-rated-list/friends-rated-list.component';
 import { FriendsQueuedListComponent } from '../../components/friends-queued-list/friends-queued-list.component';
 import { TruncatePipe } from '../../pipes/truncate.pipe';
 
+// NOTE: the old "feed" (post/browse track shares among Xomify friends) and
+// "groups" (shared song queues) features were removed here — the Xomtracks
+// feature (`pages/xomtracks`) replaces this space. `ShareCardComponent` and
+// `ShareFeedService` are KEPT: both still back `share-detail` below and the
+// Posts tab on `my-profile`. See docs/features/xomtracks-xomify-merge/PLAN.md.
 const routes: Routes = [
-  { path: 'feed', component: FeedComponent },
   { path: 'friends', component: FriendsComponent },
   { path: 'friend/:email', component: FriendProfileComponent },
-  { path: 'groups', component: GroupsComponent },
-  { path: 'group/:id', component: GroupDetailComponent },
   { path: 'invites', component: InvitesComponent },
   {
     path: 'settings/notifications',
@@ -44,19 +39,13 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    FeedComponent,
     FriendsComponent,
     FriendProfileComponent,
-    GroupsComponent,
-    GroupDetailComponent,
     InvitesComponent,
     NotificationSettingsComponent,
     LikesComponent,
     ShareDetailComponent,
-    AddSongModalComponent,
-    AddMemberModalComponent,
     ShareCardComponent,
-    ShareComposerComponent,
     ReactionsBarComponent,
     CommentThreadComponent,
     FriendsRatedListComponent,
@@ -66,7 +55,6 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
-    DragDropModule,
     SharedModule,
     RouterModule.forChild(routes),
   ],

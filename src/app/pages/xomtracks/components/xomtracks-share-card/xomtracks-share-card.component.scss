@@ -1,0 +1,273 @@
+.xt-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #1a1a26 0%, #14141e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(156, 10, 191, 0.35);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  // Direction accent — a thin top band, mirrors the rolling-playlist cover
+  // color-by-direction decision (docs/features/xomtracks-xomify-merge/PLAN.md).
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #1bdc6f;
+    z-index: 1;
+  }
+  &[data-direction='out']::before {
+    background: #9c0abf;
+  }
+
+  &--heard {
+    opacity: 0.72;
+  }
+}
+
+.xt-card-trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  cursor: pointer;
+}
+
+.xt-cover {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #0f0f18;
+}
+
+.xt-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.xt-cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.25);
+  background: radial-gradient(circle at 30% 20%, rgba(156, 10, 191, 0.25), transparent 60%);
+}
+
+.xt-platform-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+
+  &[data-platform='spotify'] {
+    background: rgba(29, 185, 84, 0.85);
+  }
+  &[data-platform='soundcloud'] {
+    background: rgba(255, 55, 80, 0.85);
+  }
+  &[data-platform='apple'] {
+    background: rgba(252, 61, 90, 0.85);
+  }
+}
+
+.xt-count-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(156, 10, 191, 0.85);
+}
+
+.xt-heard-toggle {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #e4e4ec;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(27, 220, 111, 0.5);
+  }
+
+  &--on {
+    background: rgba(27, 220, 111, 0.25);
+    border-color: rgba(27, 220, 111, 0.6);
+    color: #b9f7d3;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.xt-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  pointer-events: none; // let the whole-card trigger own clicks…
+
+  > * {
+    pointer-events: auto; // …except real controls inside.
+  }
+}
+
+.xt-titles {
+  min-width: 0;
+}
+
+.xt-track-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xt-track-artist {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #a6a6b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--empty {
+    opacity: 0.4;
+  }
+}
+
+.xt-status-chip {
+  align-self: flex-start;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  &[data-kind='unmatched'] {
+    background: rgba(255, 55, 80, 0.15);
+    color: #ff8fa0;
+  }
+  &[data-kind='pending'] {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fcd97a;
+  }
+}
+
+.xt-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #8a8a9a;
+}
+
+.xt-sharer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+
+  span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.xt-sharer-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+  flex-shrink: 0;
+}
+
+.xt-dot-sep {
+  opacity: 0.6;
+}
+
+.xt-card-rating {
+  margin-top: 2px;
+}
+
+.xt-card-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1bdc6f;
+
+  &:hover {
+    color: #5df399;
+  }
+}
+
+.xt-view-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8a8a9a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xt-card {
+    transition: none;
+    &:hover {
+      transform: none;
+    }
+  }
+}

@@ -43,7 +43,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
-    { kind: 'link', link: { route: '/feed', label: 'Feed' } },
+    { kind: 'link', link: { route: '/xomtracks', label: 'Xomtracks' } },
     { kind: 'link', link: { route: '/likes', label: 'Likes' } },
     {
       kind: 'group',
@@ -80,12 +80,11 @@ export class ToolbarComponent implements OnInit, OnDestroy {
       kind: 'group',
       group: {
         label: 'Social',
-        activeRoutes: ['/friends', '/invites', '/groups'],
+        activeRoutes: ['/friends', '/invites'],
         badge$: 'friends',
         links: [
           { route: '/friends', label: 'Friends', badge$: 'friends' },
           { route: '/invites', label: 'Invites' },
-          { route: '/groups', label: 'Groups' },
         ],
       },
     },

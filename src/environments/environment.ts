@@ -15,4 +15,10 @@ export const environment = {
   get xomifyApiUrl(): string {
     return `https://${this.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
   },
+  // xomtracks-backend — the Xomtracks feature's data/API layer (separate host
+  // from xomifyApiUrl). It validates xomify's own HS256 JWT in-handler
+  // (WS-AUTH re-base), so the AuthInterceptor attaches the same Bearer token
+  // here as it does for Xomify calls — see auth.interceptor.ts's
+  // `isXomifyApiRequest`.
+  xomtracksApiUrl: 'https://api.xomtracks.xomware.com',
 };

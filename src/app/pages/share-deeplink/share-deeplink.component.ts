@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 /**
  * Deep-link landing page for `/share?trackId=<id>`.
@@ -8,12 +8,11 @@ import { ActivatedRoute, Router } from '@angular/router';
  * It is reached when a user opens a Spotify-to-Xomify share link on desktop
  * (e.g. after tapping "Copy Link" in Spotify Web and pasting it in a browser).
  *
- * Strategy: redirect to `/feed` with a `trackId` query param so `FeedComponent`
- * can open the composer pre-populated. The feed page reads the param on init
- * and triggers the composer if present.
- *
- * This is intentionally simple — no track resolution here. The share composer
- * already has a search flow; pre-populating the search query is enough.
+ * Strategy: redirect to `/my-profile`. The old target — `/feed`, which opened
+ * the share composer pre-populated with `trackId` — was removed along with
+ * the "feed" feature (docs/features/xomtracks-xomify-merge/PLAN.md); there is
+ * no composer to hand `trackId` to anymore, so it's dropped and this just
+ * lands the user somewhere sensible instead of a dead route.
  */
 @Component({
   selector: 'app-share-deeplink',
@@ -35,17 +34,9 @@ import { ActivatedRoute, Router } from '@angular/router';
   `],
 })
 export class ShareDeeplinkComponent implements OnInit {
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    const trackId = this.route.snapshot.queryParamMap.get('trackId');
-    if (trackId) {
-      this.router.navigate(['/feed'], { queryParams: { shareTrackId: trackId } });
-    } else {
-      this.router.navigate(['/feed']);
-    }
+    this.router.navigate(['/my-profile']);
   }
 }

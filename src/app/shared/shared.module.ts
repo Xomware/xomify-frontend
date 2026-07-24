@@ -7,6 +7,7 @@ import { AddToQueueButtonComponent } from '../components/add-to-queue-button/add
 import { StarRatingComponent } from '../components/star-rating/star-rating.component';
 import { SongDetailModalComponent } from '../components/song-detail-modal/song-detail-modal.component';
 import { ActivityTimelineComponent } from '../components/activity-timeline/activity-timeline.component';
+import { TooltipDirective } from '../directives/tooltip.directive';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { ActivityTimelineComponent } from '../components/activity-timeline/activ
     StarRatingComponent,
     SongDetailModalComponent,
     ActivityTimelineComponent,
+    TooltipDirective,
   ],
   imports: [CommonModule, FormsModule],
   exports: [
@@ -25,6 +27,7 @@ import { ActivityTimelineComponent } from '../components/activity-timeline/activ
     StarRatingComponent,
     SongDetailModalComponent,
     ActivityTimelineComponent,
+    TooltipDirective,
   ],
 })
 export class SharedModule {}

@@ -1,0 +1,32 @@
+<div class="xt-rating" [class.xt-rating--md]="size === 'md'">
+  <div
+    class="xt-stars"
+    role="radiogroup"
+    [attr.aria-label]="ariaLabel"
+    (mouseleave)="onLeave()"
+  >
+    <button
+      *ngFor="let star of stars; let i = index"
+      type="button"
+      class="xt-star"
+      [class.xt-star--on]="starState(star) === 'on'"
+      [class.xt-star--avg]="starState(star) === 'avg'"
+      role="radio"
+      [attr.aria-checked]="myRating === star"
+      [attr.aria-label]="starAriaLabel(star)"
+      [disabled]="disabled"
+      (mouseenter)="onEnter(star)"
+      (click)="select(star)"
+      (keydown)="onKeydown($event, i)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        />
+      </svg>
+    </button>
+  </div>
+  <span class="xt-rating-summary" *ngIf="showSummary && count > 0">
+    {{ avgLabel }} <span class="xt-rating-count">({{ count }})</span>
+  </span>
+</div>

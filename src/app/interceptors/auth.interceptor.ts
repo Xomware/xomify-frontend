@@ -5,17 +5,22 @@
 //
 // Responsibilities:
 //   1. Attach `Authorization: Bearer <jwt>` to every outgoing call to the
-//      Xomify backend (`environment.xomifyApiUrl`).
+//      Xomify backend (`environment.xomifyApiUrl`) AND the Xomtracks backend
+//      (`environment.xomtracksApiUrl`). The two are separate hosts, but
+//      xomtracks-backend now validates xomify's own HS256 token in-handler
+//      (the WS-AUTH re-base — see `docs/features/xomtracks-xomify-merge/PLAN.md`),
+//      so the same Bearer token is correct for both.
 //   2. Source the JWT from sessionStorage via XomifyAuthService. If the JWT
 //      is missing, fall back to `environment.apiAuthToken` so the legacy
 //      static-token path keeps working until the dual-mode authorizer is
 //      retired (sub-feature 1l).
 //   3. Skip the header for `POST /auth/login` itself (public route).
-//   4. Skip non-Xomify hosts (Spotify Web API, Spotify accounts, etc.) — those
-//      requests carry their own user-bound Spotify access token.
-//   5. On a 401 from a Xomify call: refresh the Spotify access token, mint a
-//      fresh JWT via `/auth/login`, and retry the original request ONCE.
-//      A second 401 is propagated to the caller (no infinite loop).
+//   4. Skip non-Xomify/Xomtracks hosts (Spotify Web API, Spotify accounts,
+//      etc.) — those requests carry their own user-bound Spotify access token.
+//   5. On a 401 from a Xomify/Xomtracks call: refresh the Spotify access
+//      token, mint a fresh JWT via `/auth/login`, and retry the original
+//      request ONCE. A second 401 is propagated to the caller (no infinite
+//      loop).
 
 import { Injectable } from '@angular/core';
 import {
@@ -88,10 +93,15 @@ export class AuthInterceptor implements HttpInterceptor {
   private isXomifyApiRequest(req: HttpRequest<unknown>): boolean {
     // The `xomifyApiUrl` getter returns e.g.
     //   https://abc123.execute-api.us-east-1.amazonaws.com/dev
-    // Any request whose URL begins with that prefix is ours.
-    const base = environment.xomifyApiUrl;
-    if (!base) return false;
-    return req.url.startsWith(base);
+    // `xomtracksApiUrl` is the separate Xomtracks backend host
+    // (api.xomtracks.xomware.com). Any request whose URL begins with either
+    // prefix is ours — do NOT widen this to arbitrary hosts.
+    const xomifyBase = environment.xomifyApiUrl;
+    const xomtracksBase = environment.xomtracksApiUrl;
+    return (
+      (!!xomifyBase && req.url.startsWith(xomifyBase)) ||
+      (!!xomtracksBase && req.url.startsWith(xomtracksBase))
+    );
   }
 
   private isAuthLoginRequest(req: HttpRequest<unknown>): boolean {

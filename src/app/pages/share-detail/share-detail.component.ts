@@ -25,9 +25,11 @@ const MOOD_LABELS: Record<string, string> = {
 };
 
 /**
- * Detail screen for a single feed share — pushed when the user taps a card
- * in the feed. Hero art + track header + sharer block + stats + reactions +
- * comments.
+ * Detail screen for a single share (`ShareFeedService` — xomify's own
+ * friend-to-friend track shares, unrelated to the Xomtracks feature; see
+ * `docs/features/xomtracks-xomify-merge/PLAN.md`). Reached from the Posts
+ * tab on a profile (the old "feed" page that also linked here was removed).
+ * Hero art + track header + sharer block + stats + reactions + comments.
  *
  * Mirrors `Xomify-iOS/Views/Feed/ShareDetailView.swift`. Loads `/shares/detail`
  * on init so listener + friend-rating lists are always fresh; render shows a
@@ -58,10 +60,9 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
 
   /**
    * Resolved display-name + avatar for every author this page might surface.
-   * Built from the viewer's own profile + accepted friends — same map shape
-   * the feed cards use (`pages/feed/feed.component.ts:loadIdentities`). When
-   * an entry is missing, `authorLabel` falls back to the email local-part
-   * and the avatar falls back to the letter chip.
+   * Built from the viewer's own profile + accepted friends. When an entry is
+   * missing, `authorLabel` falls back to the email local-part and the avatar
+   * falls back to the letter chip.
    */
   identitiesByEmail: Record<string, ShareCardIdentity> = {};
 
@@ -89,9 +90,8 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
 
   /**
    * Build `identitiesByEmail` from the viewer's own profile + their accepted
-   * friends. Mirrors `FeedComponent.loadIdentities` so the same author shows
-   * the same display name + avatar across feed and detail. Best-effort —
-   * a failure here just means the header falls back to email-as-label.
+   * friends. Best-effort — a failure here just means the header falls back
+   * to email-as-label.
    */
   private loadIdentities(): void {
     const map: Record<string, ShareCardIdentity> = {};
@@ -163,12 +163,13 @@ export class ShareDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    // Prefer browser-history back when available so we land on the right feed
-    // tab; fallback to the feed root for direct deep-links.
+    // Prefer browser-history back when available; fall back to the profile
+    // for direct deep-links (the old fallback — `/feed` — was removed along
+    // with the "feed" feature: docs/features/xomtracks-xomify-merge/PLAN.md).
     if (window.history.length > 1) {
       window.history.back();
     } else {
-      this.router.navigate(['/feed']);
+      this.router.navigate(['/my-profile']);
     }
   }
 

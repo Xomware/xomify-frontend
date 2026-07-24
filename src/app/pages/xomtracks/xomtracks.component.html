@@ -1,0 +1,254 @@
+<main class="xt-page">
+  <div class="xt-head">
+    <div class="xt-titles">
+      <h1 class="xt-title">Xomtracks</h1>
+      <p class="xt-sub" *ngIf="state === 'loaded'">
+        {{ groupedShares.length }}
+        {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
+          *ngIf="isFiltered"
+        > matching "{{ search.trim() }}"</ng-container>
+        <ng-container *ngIf="!isFiltered && matchedCount"> · {{ matchedCount }} on Spotify</ng-container>
+      </p>
+    </div>
+
+    <label class="xt-search">
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        [(ngModel)]="search"
+        placeholder="Search title, artist, sharer…"
+        aria-label="Search the Xomtracks feed"
+      />
+      <button
+        *ngIf="isFiltered"
+        type="button"
+        class="xt-search-clear"
+        (click)="clearSearch()"
+        aria-label="Clear search"
+      >×</button>
+    </label>
+  </div>
+
+  <div class="xt-controls">
+    <div class="xt-controls-left">
+      <label class="xt-lite-field">
+        <span>Source</span>
+        <select
+          [ngModel]="mode"
+          (ngModelChange)="setMode($event)"
+          aria-label="Feed source"
+          appTooltip="Shared with me / by me are the two iMessage directions. My rated shows every track you've rated, across both."
+        >
+          <option *ngFor="let s of sources" [ngValue]="s.value">{{ s.label }}</option>
+        </select>
+      </label>
+
+      <label class="xt-lite-field" *ngIf="genreEnabled">
+        <span>Genre</span>
+        <select [ngModel]="genre" (ngModelChange)="setGenre($event)" aria-label="Filter by genre">
+          <option [ngValue]="null">All genres</option>
+          <option *ngFor="let g of genres" [ngValue]="g">{{ g }}</option>
+        </select>
+      </label>
+
+      <div class="xt-segmented" role="group" aria-label="Time window" *ngIf="showWindow">
+        <button
+          *ngFor="let w of windows"
+          type="button"
+          class="xt-segmented-btn"
+          [class.xt-segmented-btn--active]="window === w.value"
+          [attr.aria-pressed]="window === w.value"
+          (click)="setWindow(w.value)"
+        >
+          {{ w.label }}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="xt-unheard-toggle"
+        [class.xt-unheard-toggle--on]="unheardOnly"
+        [attr.aria-pressed]="unheardOnly"
+        appTooltip="Hide tracks you've already marked heard"
+        (click)="toggleUnheard()"
+      >
+        <span aria-hidden="true"></span>
+        Unheard
+      </button>
+    </div>
+
+    <div class="xt-segmented xt-segmented--view" role="group" aria-label="Layout">
+      <button
+        type="button"
+        class="xt-segmented-btn"
+        [class.xt-segmented-btn--active]="view === 'tile'"
+        [attr.aria-pressed]="view === 'tile'"
+        (click)="setView('tile')"
+      >
+        <span aria-hidden="true">▦</span> Tiles
+      </button>
+      <button
+        type="button"
+        class="xt-segmented-btn"
+        [class.xt-segmented-btn--active]="view === 'list'"
+        [attr.aria-pressed]="view === 'list'"
+        (click)="setView('list')"
+      >
+        <span aria-hidden="true">≡</span> List
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading skeletons -->
+  <div class="xt-grid" *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading shares">
+    <div class="xt-skeleton" *ngFor="let s of skeletons">
+      <div class="xt-skeleton-cover"></div>
+      <div class="xt-skeleton-line xt-skeleton-line--title"></div>
+      <div class="xt-skeleton-line xt-skeleton-line--sub"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="xt-state-block xt-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load the feed</h2>
+    <p>Something went wrong reaching the Xomtracks API.</p>
+    <button type="button" class="xt-state-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <ng-container *ngIf="groupedShares.length; else empty">
+      <!-- TILE view -->
+      <div class="xt-grid" *ngIf="view === 'tile'">
+        <app-xomtracks-share-card
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
+          [share]="share"
+          [shareCount]="groupCount(share)"
+          [sharerSummary]="sharerSummaryFor(share)"
+          [trackKey]="keyFor(share)"
+          [heard]="heardFor(share)"
+          (open)="openDetail($event)"
+          (rate)="onRate(share, $event)"
+          (toggleHeard)="onToggleHeard(share)"
+        ></app-xomtracks-share-card>
+      </div>
+
+      <!-- LIST view -->
+      <div class="xt-list" *ngIf="view === 'list'">
+        <div class="xt-list-head" aria-hidden="true">
+          <span></span>
+          <span>Track</span>
+          <span>Platform</span>
+          <span>Sharer</span>
+          <span>Shared</span>
+        </div>
+        <div
+          class="xt-row"
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
+          [class.xt-row--unmatched]="share.matchStatus === 'unmatched'"
+          [class.xt-row--heard]="heardFor(share)"
+        >
+          <button
+            type="button"
+            class="xt-row-trigger"
+            [attr.aria-label]="'View details for ' + rowTitle(share)"
+            (click)="openDetail(share)"
+          ></button>
+
+          <span class="xt-col-cover">
+            <img
+              *ngIf="hasArt(share); else rowNoArt"
+              [src]="share.albumArtUrl"
+              [alt]="''"
+              loading="lazy"
+              decoding="async"
+            />
+            <ng-template #rowNoArt>
+              <span class="xt-row-thumb-fallback" [attr.data-platform]="share.platform" aria-hidden="true">♪</span>
+            </ng-template>
+          </span>
+          <span class="xt-col-track">
+            <span class="xt-row-title-line">
+              <span class="xt-row-title">{{ rowTitle(share) }}</span>
+              <span
+                class="xt-count-badge xt-count-badge--inline"
+                *ngIf="groupCount(share) > 1"
+                [attr.aria-label]="'shared ' + groupCount(share) + ' times'"
+              >×{{ groupCount(share) }}</span>
+            </span>
+            <span class="xt-row-artist">{{ rowArtist(share) }}</span>
+            <app-xomtracks-rating-stars
+              class="xt-row-rating"
+              [rating]="share.rating"
+              [trackKey]="keyFor(share)"
+              [showSummary]="false"
+              (rate)="onRate(share, $event)"
+            ></app-xomtracks-rating-stars>
+          </span>
+          <span class="xt-col-platform">
+            <span class="xt-platform-badge" [attr.data-platform]="share.platform">
+              {{ platformLabel(share.platform) }}
+            </span>
+          </span>
+          <span class="xt-col-sharer">
+            <span class="xt-sharer-avatar" aria-hidden="true">{{ sharerInitial(share) }}</span>
+            <span>{{ rowSharerLabel(share) }}</span>
+          </span>
+          <span class="xt-col-actions">
+            <button
+              type="button"
+              class="xt-heard-toggle-row"
+              [class.xt-heard-toggle-row--on]="heardFor(share)"
+              [attr.aria-pressed]="heardFor(share)"
+              [attr.aria-label]="(heardFor(share) ? 'Mark unheard: ' : 'Mark heard: ') + rowTitle(share)"
+              (click)="onToggleHeard(share)"
+            >
+              <span aria-hidden="true">{{ heardFor(share) ? '✓' : '○' }}</span>
+              {{ heardFor(share) ? 'Heard' : 'Heard?' }}
+            </button>
+            <span class="xt-col-date">{{ relativeDate(share) }}</span>
+            <a
+              *ngIf="showOpenLink(share)"
+              class="xt-row-open"
+              [href]="openUrl(share)"
+              target="_blank"
+              rel="noopener noreferrer"
+              [attr.aria-label]="openLinkLabel(share) + ' — ' + rowTitle(share)"
+            >
+              {{ openLinkLabel(share) }}
+              <span aria-hidden="true">↗</span>
+            </a>
+          </span>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #empty>
+      <div class="xt-state-block">
+        <div aria-hidden="true">{{ isFiltered ? '🔍' : '🎧' }}</div>
+        <h2>{{ isFiltered ? 'No matches' : 'Nothing here yet' }}</h2>
+        <p *ngIf="isFiltered">No shares match "{{ search.trim() }}" in this window.</p>
+        <p *ngIf="!isFiltered">{{ emptyText }} Try a wider range.</p>
+        <button type="button" class="xt-state-btn" *ngIf="isFiltered" (click)="clearSearch()">
+          Clear search
+        </button>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <app-xomtracks-setup-card class="xt-setup-section"></app-xomtracks-setup-card>
+</main>
+
+<app-xomtracks-playlists-panel></app-xomtracks-playlists-panel>
+
+<app-xomtracks-track-detail-modal
+  *ngIf="selected as share"
+  [share]="share"
+  [sharedTimes]="selectedSharedTimes"
+  [otherSharers]="selectedOtherSharers"
+  [occurrences]="selectedOccurrences"
+  [trackKey]="keyFor(share)"
+  (rate)="onRate(share, $event)"
+  (closed)="closeDetail()"
+></app-xomtracks-track-detail-modal>

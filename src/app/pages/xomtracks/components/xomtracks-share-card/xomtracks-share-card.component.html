@@ -1,0 +1,101 @@
+<article
+  class="xt-card"
+  [class.xt-card--unmatched]="share.matchStatus === 'unmatched'"
+  [class.xt-card--heard]="heard"
+  [attr.data-direction]="share.direction"
+>
+  <!-- Whole-card trigger: a real button (native keyboard support). Sits
+       under the "Open" link so that link stays independently clickable. -->
+  <button
+    type="button"
+    class="xt-card-trigger"
+    [attr.aria-label]="'View details for ' + title + (artist ? ' by ' + artist : '')"
+    (click)="activate()"
+  ></button>
+
+  <div class="xt-cover">
+    <img
+      *ngIf="hasArt; else noArt"
+      class="xt-cover-img"
+      [src]="share.albumArtUrl"
+      [alt]="'Cover art for ' + title"
+      loading="lazy"
+      decoding="async"
+      (error)="onArtError()"
+    />
+    <ng-template #noArt>
+      <div class="xt-cover-fallback" [attr.data-platform]="share.platform" aria-hidden="true">
+        <span>♪</span>
+      </div>
+    </ng-template>
+
+    <span class="xt-platform-badge" [attr.data-platform]="share.platform">
+      {{ platformLabel }}
+    </span>
+
+    <span
+      class="xt-count-badge"
+      *ngIf="showCount"
+      [attr.aria-label]="'shared ' + shareCount + ' times'"
+    >×{{ shareCount }}</span>
+
+    <button
+      type="button"
+      class="xt-heard-toggle"
+      [class.xt-heard-toggle--on]="heard"
+      [attr.aria-pressed]="heard"
+      [attr.aria-label]="(heard ? 'Mark unheard: ' : 'Mark heard: ') + title"
+      appTooltip="Whole-group listen tracking — mark this heard for everyone to see"
+      (click)="toggleHeard.emit()"
+    >
+      <span aria-hidden="true">{{ heard ? '✓' : '○' }}</span>
+      {{ heard ? 'Heard' : 'Heard?' }}
+    </button>
+  </div>
+
+  <div class="xt-body">
+    <div class="xt-titles">
+      <h3 class="xt-track-title" [title]="title">{{ title }}</h3>
+      <p class="xt-track-artist" *ngIf="artist" [title]="artist">{{ artist }}</p>
+      <p class="xt-track-artist xt-track-artist--empty" *ngIf="!artist">—</p>
+    </div>
+
+    <span class="xt-status-chip" *ngIf="statusChip as chip" [attr.data-kind]="chip.kind">
+      {{ chip.label }}
+    </span>
+
+    <div class="xt-meta">
+      <span class="xt-sharer">
+        <span class="xt-sharer-avatar" aria-hidden="true">{{ sharerInitial }}</span>
+        <span>{{ sharerDisplay }}</span>
+      </span>
+      <span class="xt-dot-sep" aria-hidden="true">·</span>
+      <span>{{ dateLabel }}</span>
+    </div>
+
+    <app-xomtracks-rating-stars
+      class="xt-card-rating"
+      [rating]="share.rating"
+      [trackKey]="trackKey"
+      (rate)="rate.emit($event)"
+    ></app-xomtracks-rating-stars>
+
+    <a
+      *ngIf="showOpenLink; else viewHint"
+      class="xt-card-open"
+      [attr.data-platform]="share.platform"
+      [href]="openUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {{ openLinkLabel }}
+      <span aria-hidden="true">↗</span>
+    </a>
+    <ng-template #viewHint>
+      <span class="xt-view-hint">
+        View details
+        <span aria-hidden="true">→</span>
+      </span>
+    </ng-template>
+  </div>
+</article>

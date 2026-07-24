@@ -369,3 +369,36 @@ textarea:focus-visible {
     font-size: 0.85rem;
   }
 }
+
+/* Tooltip — [appTooltip] directive (src/app/directives/tooltip.directive.ts).
+   Global because the directive appends the tooltip to document.body (so it
+   never clips inside overflow:hidden cards/modals), which sits outside any
+   component's view-encapsulated styles. */
+.app-tooltip {
+  position: fixed;
+  z-index: 3000;
+  max-width: 240px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #1c1c28;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  &--no-motion {
+    transition: none;
+  }
+}

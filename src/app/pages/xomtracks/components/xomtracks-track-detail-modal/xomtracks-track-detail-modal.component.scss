@@ -1,0 +1,357 @@
+.xt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: xtFadeIn 0.2s ease;
+}
+
+@keyframes xtFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes xtSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.xt-dialog {
+  position: relative;
+  background: linear-gradient(180deg, #282828 0%, #181818 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  animation: xtSlideUp 0.3s ease;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #3a3a4a;
+    border-radius: 3px;
+  }
+}
+
+.xt-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.3rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.xt-hero {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.xt-hero-cover {
+  flex-shrink: 0;
+  width: 128px;
+  height: 128px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f0f18;
+}
+
+.xt-hero-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.xt-hero-cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  color: rgba(255, 255, 255, 0.25);
+  background: radial-gradient(circle at 30% 20%, rgba(156, 10, 191, 0.25), transparent 60%);
+}
+
+.xt-hero-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.xt-platform-badge {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+
+  &[data-platform='spotify'] { background: rgba(29, 185, 84, 0.85); }
+  &[data-platform='soundcloud'] { background: rgba(255, 55, 80, 0.85); }
+  &[data-platform='apple'] { background: rgba(252, 61, 90, 0.85); }
+}
+
+.xt-detail-title {
+  margin: 4px 0 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.xt-detail-artist {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #d8d8e2;
+}
+
+.xt-detail-album {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #8a8a9a;
+}
+
+.xt-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.xt-stat-pill {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(156, 10, 191, 0.3);
+
+  &--muted {
+    background: rgba(255, 255, 255, 0.08);
+    color: #b8b8c6;
+    font-weight: 500;
+  }
+}
+
+.xt-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.xt-rate-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #8a8a9a;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.25);
+  cursor: help;
+}
+
+.xt-play-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  align-self: flex-start;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
+  box-shadow: 0 4px 15px rgba(27, 220, 111, 0.3);
+
+  &:hover {
+    color: #fff;
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.xt-embed {
+  margin: 0 0 20px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.xt-embed-frame {
+  display: block;
+  border: none;
+}
+
+.xt-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 20px;
+  margin: 0 0 20px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+
+  dt {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6d6d7d;
+    margin-bottom: 3px;
+  }
+  dd {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.xt-fact-sharer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.xt-sharer-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+  flex-shrink: 0;
+}
+
+.xt-match-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff8fa0;
+  margin-right: 4px;
+
+  &--ok {
+    background: #1bdc6f;
+  }
+}
+
+.xt-breakdown-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.xt-count-badge {
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(156, 10, 191, 0.6);
+}
+
+.xt-breakdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.xt-breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.82rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.xt-breakdown-sharer {
+  flex: 1;
+  min-width: 0;
+  color: #d8d8e2;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xt-breakdown-date {
+  color: #6d6d7d;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .xt-dialog {
+    padding: 20px;
+  }
+  .xt-hero {
+    flex-direction: column;
+  }
+  .xt-hero-cover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+  .xt-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xt-modal-backdrop,
+  .xt-dialog {
+    animation: none;
+  }
+}
