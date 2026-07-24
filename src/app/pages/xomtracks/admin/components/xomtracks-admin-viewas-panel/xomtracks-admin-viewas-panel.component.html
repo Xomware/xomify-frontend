@@ -1,0 +1,116 @@
+<div>
+  <form class="xta-viewas-form" (ngSubmit)="submit()">
+    <label class="xta-field">
+      <span>User email</span>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="emailInput"
+        placeholder="someone@example.com"
+        required
+        aria-label="Email of the user to view as"
+      />
+    </label>
+
+    <div class="xta-segmented" role="group" aria-label="Direction">
+      <button
+        *ngFor="let d of directions"
+        type="button"
+        class="xta-segmented-btn"
+        [class.xta-segmented-btn--active]="direction === d.value"
+        [attr.aria-pressed]="direction === d.value"
+        (click)="setDirection(d.value)"
+      >
+        {{ d.label }}
+      </button>
+    </div>
+
+    <label class="xta-field xta-field--select">
+      <span>Window</span>
+      <select [ngModel]="window" name="window" (ngModelChange)="setWindow($event)" aria-label="Time window">
+        <option *ngFor="let w of windows" [ngValue]="w.value">{{ w.label }}</option>
+      </select>
+    </label>
+
+    <button type="submit" class="xta-btn" [disabled]="!emailInput.trim()">View</button>
+  </form>
+
+  <!-- Read-only banner — shown any time a feed is loaded or loading -->
+  <div class="xta-viewas-banner" *ngIf="viewingEmail || state === 'loading'" role="status">
+    <span *ngIf="viewingEmail">
+      Viewing as <strong>{{ viewingEmail }}</strong> (read-only)
+    </span>
+    <span *ngIf="!viewingEmail && state === 'loading'">Loading…</span>
+    <button type="button" class="xta-viewas-exit" (click)="exit()" *ngIf="viewingEmail">Exit</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <div aria-hidden="true">⏳</div>
+    <p>Loading {{ emailInput }}'s feed…</p>
+  </div>
+
+  <!-- Not found -->
+  <div class="xta-state-block" *ngIf="state === 'not-found'" role="alert">
+    <div aria-hidden="true">🔎</div>
+    <h2>Unknown user</h2>
+    <p>"{{ emailInput }}" hasn't signed into Xomtracks.</p>
+  </div>
+
+  <!-- Error -->
+  <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load that feed</h2>
+    <button type="button" class="xta-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Idle (nothing loaded yet) -->
+  <div class="xta-state-block" *ngIf="state === 'idle'">
+    <div aria-hidden="true">🕵️</div>
+    <h2>No user selected</h2>
+    <p>Enter an email above, or use "View as" from the Users tab.</p>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <div class="xta-state-block" *ngIf="!shares.length">
+      <div aria-hidden="true">🎧</div>
+      <h2>Nothing here</h2>
+      <p>{{ viewingEmail }} has no shares in this window/direction.</p>
+    </div>
+
+    <ul class="xta-viewas-list" *ngIf="shares.length" aria-label="Their feed">
+      <li class="xta-viewas-row" *ngFor="let share of shares; trackBy: trackByShareId">
+        <img
+          *ngIf="share.albumArtUrl"
+          class="xta-viewas-art"
+          [src]="share.albumArtUrl"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="xta-viewas-art xta-viewas-art--fallback" *ngIf="!share.albumArtUrl" aria-hidden="true">♪</span>
+
+        <span class="xta-viewas-meta">
+          <span class="xta-viewas-title">{{ title(share) }}</span>
+          <span class="xta-viewas-sub">{{ artist(share) }} · {{ platformLabel(share) }} · shared by {{ sharer(share) }}</span>
+          <span class="xta-viewas-sub" *ngIf="genresLabel(share)">{{ genresLabel(share) }}</span>
+        </span>
+
+        <span class="xta-viewas-rating">{{ ratingLabel(share) }}</span>
+        <span class="xta-badge" [class.xta-badge--on]="share.heard">{{ heardLabel(share) }}</span>
+        <span class="xta-viewas-date">{{ relativeDate(share) }}</span>
+
+        <a
+          *ngIf="hasOpenTarget(share); else noOpen"
+          class="xta-viewas-open"
+          [href]="openUrl(share)"
+          target="_blank"
+          rel="noopener noreferrer"
+          [attr.aria-label]="openLabel(share) + ' — ' + title(share)"
+        >↗</a>
+        <ng-template #noOpen><span class="xta-viewas-open xta-viewas-open--disabled" aria-hidden="true">↗</span></ng-template>
+      </li>
+    </ul>
+  </ng-container>
+</div>
