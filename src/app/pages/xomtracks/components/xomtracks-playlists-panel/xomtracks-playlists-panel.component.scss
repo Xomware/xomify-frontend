@@ -1,14 +1,32 @@
-.xt-panel-tab {
+// Wrapper positions + vertically centers the pair of edge tabs as a unit and
+// owns the open/close slide — each button below only handles its own
+// rotation, so the two-tab split doesn't have to duplicate the fixed
+// positioning math.
+.xt-panel-tabs {
   position: fixed;
   top: 50%;
   right: 0;
   z-index: 500;
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  transform: translateY(-50%);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &--hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(20px);
+  }
+}
+
+.xt-panel-tab {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 14px 8px;
-  // The tab is flipped 180deg below (so its vertical-rl text reads correctly
+  // Flipped 180deg below (so its vertical-rl text reads correctly
   // top-to-bottom) which visually mirrors the corners: rounding the LEFT
   // side here (facing into the page, pre-rotation) is what actually renders
   // rounded on the right — the side flush against the viewport edge. Setting
@@ -16,27 +34,28 @@
   // rounding only on the inner side, so the tab reads as attached to the
   // edge instead of floating.
   border-radius: 0 12px 12px 0;
-  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  // Green = shared-with-me, matching the direction convention used on the
+  // feed's card accent bar and the playlist card's top border.
+  background: linear-gradient(135deg, #1bdc6f 0%, #159e57 100%);
   color: #fff;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   writing-mode: vertical-rl;
-  transform: translateY(-50%) rotate(180deg);
+  transform: rotate(180deg);
   box-shadow: -4px 4px 18px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: filter 0.15s ease;
 
   &:hover {
     filter: brightness(1.1);
   }
   &:focus-visible {
-    outline: 2px solid #1bdc6f;
+    outline: 2px solid #fff;
     outline-offset: 2px;
   }
 
-  &--hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) rotate(180deg) translateX(20px);
+  // Purple = shared-by-me, same convention as the "out" direction elsewhere.
+  &--out {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   }
 }
 
@@ -168,21 +187,27 @@
   .xt-panel-drawer {
     width: 100%;
   }
-  // Bottom-right pill FAB on phones — icon + label stay horizontal and both
-  // remain in the accessible name (no display:none on the label).
-  .xt-panel-tab {
+  // Stacked bottom-right pill FABs on phones — icon + label stay horizontal
+  // and both remain in the accessible name (no display:none on the label).
+  .xt-panel-tabs {
     top: auto;
     bottom: 84px;
     right: 12px;
+    align-items: flex-end;
+    gap: 8px;
+    transform: none;
+
+    &--hidden {
+      transform: translateX(20px);
+    }
+  }
+
+  .xt-panel-tab {
     flex-direction: row;
     border-radius: 24px;
     writing-mode: horizontal-tb;
     transform: none;
     padding: 12px 18px;
-
-    &--hidden {
-      transform: translateX(20px);
-    }
   }
 
   .xt-panel-tab-icon {
@@ -194,6 +219,7 @@
   .xt-panel-drawer {
     animation: none;
   }
+  .xt-panel-tabs,
   .xt-panel-tab {
     transition: none;
   }

@@ -138,6 +138,40 @@
   }
 }
 
+// Uniform "open in platform" control — bottom-left of the cover, the one
+// corner not already claimed by the platform badge (top-left), count badge
+// (top-right), or heard toggle (bottom-right). Same spot on every card.
+.xt-cover-open {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+  font-size: 0.85rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &[data-platform='spotify'] { border-color: rgba(29, 185, 84, 0.6); color: #4be089; }
+  &[data-platform='soundcloud'] { border-color: rgba(255, 55, 80, 0.6); color: #ff8fa0; }
+  &[data-platform='apple'] { border-color: rgba(252, 61, 90, 0.6); color: #ff8fa0; }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.72);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
 .xt-body {
   position: relative;
   z-index: 2;
@@ -237,20 +271,6 @@
 
 .xt-card-rating {
   margin-top: 2px;
-}
-
-.xt-card-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #1bdc6f;
-
-  &:hover {
-    color: #5df399;
-  }
 }
 
 .xt-view-hint {

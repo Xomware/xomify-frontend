@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { XtShare } from '../../models/xomtracks-share.model';
 import {
   xtDisplayTitle,
-  xtIsMatched,
   xtOpenLabel,
   xtPlatformLabel,
   xtPrimaryUrl,
@@ -11,10 +10,9 @@ import {
 
 /**
  * Presentational card for a single share. Renders cover art + metadata,
- * opens the detail modal when its trigger is activated, and — for shares
- * with no Spotify match (SoundCloud / Apple / unresolved) — surfaces a
- * prominent link straight to the original `sourceUrl` so a card is never a
- * dead end.
+ * opens the detail modal when its trigger is activated, and surfaces a
+ * uniform "open in platform" icon-button in a fixed corner of the cover art
+ * — same spot on every card, matched or not — so a card is never a dead end.
  */
 @Component({
   selector: 'app-xomtracks-share-card',
@@ -70,18 +68,18 @@ export class XomtracksShareCardComponent {
     return this.share.trackArtist?.trim() || '';
   }
 
-  /** Only unmatched shares get an inline outbound link; matched tracks play
-   * from inside the modal. */
-  get showOpenLink(): boolean {
-    return !xtIsMatched(this.share);
-  }
-
   get openUrl(): string {
     return xtPrimaryUrl(this.share);
   }
 
   get openLinkLabel(): string {
     return xtOpenLabel(this.share);
+  }
+
+  /** Guards the corner open-button against a share with no derivable URL at
+   * all (no Spotify id AND no source URL) rather than rendering a dead link. */
+  get hasOpenTarget(): boolean {
+    return !!this.openUrl?.trim();
   }
 
   get sharer(): string {

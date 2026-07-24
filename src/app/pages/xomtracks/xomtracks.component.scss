@@ -30,19 +30,42 @@
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: rgba(156, 10, 191, 0.55);
+    box-shadow: 0 0 0 3px rgba(156, 10, 191, 0.18);
+  }
 
   span:first-child {
     color: #8a8a9a;
   }
 
+  // Reset the browser's own `type="search"` chrome (Chrome/Safari render a
+  // second, native rounded/bordered box for search inputs) so this collapses
+  // to the single wrapper box above instead of a nested "box in box" — same
+  // pattern as the app-wide `.search-input` in pages/search.
   input {
     flex: 1;
+    min-width: 0;
     background: transparent;
+    border: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
     color: #fff;
     font-size: 0.88rem;
 
     &::placeholder {
       color: #6d6d7d;
+    }
+
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+      -webkit-appearance: none;
+      display: none;
     }
   }
 }
@@ -216,7 +239,7 @@
 
 .xt-list-head {
   display: grid;
-  grid-template-columns: 48px 1fr 110px 160px 200px;
+  grid-template-columns: 48px 1fr 110px 160px 160px 44px;
   gap: 12px;
   padding: 10px 16px;
   font-size: 0.7rem;
@@ -230,7 +253,7 @@
 .xt-row {
   position: relative;
   display: grid;
-  grid-template-columns: 48px 1fr 110px 160px 200px;
+  grid-template-columns: 48px 1fr 110px 160px 160px 44px;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
@@ -401,14 +424,46 @@
   white-space: nowrap;
 }
 
-.xt-row-open {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #1bdc6f;
-  white-space: nowrap;
+// Uniform "open in platform" control — its own fixed trailing column so it
+// renders in the exact same spot on every row, matched or not (previously
+// only unmatched rows got an inline link jammed next to the date).
+.xt-col-open {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xt-row-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+  &[data-platform='spotify'] { border-color: rgba(29, 185, 84, 0.55); color: #4be089; }
+  &[data-platform='soundcloud'] { border-color: rgba(255, 55, 80, 0.55); color: #ff8fa0; }
+  &[data-platform='apple'] { border-color: rgba(252, 61, 90, 0.55); color: #ff8fa0; }
 
   &:hover {
-    color: #5df399;
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateY(-1px);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+
+  &--disabled {
+    opacity: 0.3;
+    pointer-events: none;
   }
 }
 
@@ -460,7 +515,7 @@
 @media (max-width: 900px) {
   .xt-list-head,
   .xt-row {
-    grid-template-columns: 40px 1fr 90px;
+    grid-template-columns: 40px 1fr 90px 130px 36px;
   }
   .xt-col-sharer,
   .xt-list-head span:nth-child(4) {
@@ -481,7 +536,7 @@
   }
   .xt-list-head,
   .xt-row {
-    grid-template-columns: 36px 1fr;
+    grid-template-columns: 36px 1fr 36px;
   }
   .xt-col-platform,
   .xt-list-head span:nth-child(3) {
@@ -491,6 +546,10 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
+  }
+  .xt-row-open-btn {
+    width: 28px;
+    height: 28px;
   }
 }
 
