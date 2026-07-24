@@ -102,6 +102,13 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  // Matches the "Shared With Me" tab/card accent (green) by default; the
+  // header swaps to purple when opened from the "Shared By Me" tab, so the
+  // drawer's own header always echoes the direction that opened it.
+  color: #1bdc6f;
+}
+
+.xt-panel-head--out .xt-panel-eyebrow {
   color: #9c0abf;
 }
 
@@ -149,13 +156,6 @@
   &[data-direction='out'] {
     border-top-color: #9c0abf;
   }
-}
-
-.xt-playlist-title {
-  margin: 0 0 4px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #fff;
 }
 
 .xt-playlist-blurb {

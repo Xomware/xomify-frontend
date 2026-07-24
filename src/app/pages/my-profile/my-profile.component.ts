@@ -1,4 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  OnDestroy,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -77,6 +86,21 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
   /** In-page tab: `overview` (default), `recent`, or `settings`. Synced to `?tab=` query. */
   activeTab: 'overview' | 'recent' | 'settings' = 'overview';
+
+  /** Tab options for the name dropdown, in display order. */
+  readonly tabOptions: { id: 'overview' | 'recent' | 'settings'; label: string }[] = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'recent', label: 'Recent' },
+    { id: 'settings', label: 'Settings' },
+  ];
+
+  /** Tabs are chosen from a dropdown opened off the profile name/heading
+   * (rather than an always-visible tab bar) — `false` until the trigger is
+   * clicked. */
+  tabsMenuOpen = false;
+
+  @ViewChild('tabsMenuTrigger') tabsMenuTriggerRef?: ElementRef<HTMLButtonElement>;
+  @ViewChildren('tabsMenuItem') tabsMenuItemRefs?: QueryList<ElementRef<HTMLButtonElement>>;
 
   // Recent tab state — lazy-loaded the first time the tab opens.
   recentLoading = false;
@@ -169,6 +193,104 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     });
     if (tab === 'recent') {
       this.ensureRecentLoaded();
+    }
+  }
+
+  /** Label shown next to the profile name for the currently active tab. */
+  get activeTabLabel(): string {
+    return this.tabOptions.find((t) => t.id === this.activeTab)?.label ?? 'Overview';
+  }
+
+  /**
+   * Tabs live in a dropdown opened off the profile name/heading rather than
+   * an always-visible tab bar. `selectTab` (query-param sync + lazy loads)
+   * is unchanged — this dropdown is just a different control wired to it.
+   */
+  toggleTabsMenu(event: Event): void {
+    event.stopPropagation();
+    if (this.tabsMenuOpen) {
+      this.closeTabsMenu();
+    } else {
+      this.openTabsMenu();
+    }
+  }
+
+  openTabsMenu(): void {
+    this.tabsMenuOpen = true;
+    // Wait for the *ngIf'd menu to render before moving focus into it.
+    queueMicrotask(() => this.focusActiveMenuItem());
+  }
+
+  closeTabsMenu(refocusTrigger = false): void {
+    if (!this.tabsMenuOpen) return;
+    this.tabsMenuOpen = false;
+    if (refocusTrigger) {
+      this.tabsMenuTriggerRef?.nativeElement.focus();
+    }
+  }
+
+  selectTabFromMenu(tab: 'overview' | 'recent' | 'settings'): void {
+    this.selectTab(tab);
+    this.closeTabsMenu(true);
+  }
+
+  /** Opening the menu from the trigger button: Down/Enter/Space open it and
+   * move focus to the active tab's item (native `click` already handles
+   * mouse/touch and Enter/Space on the button itself). */
+  onTriggerKeydown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowDown' && !this.tabsMenuOpen) {
+      event.preventDefault();
+      this.openTabsMenu();
+    }
+  }
+
+  /** Roving arrow-key navigation + Home/End/Escape inside the open menu. */
+  onMenuKeydown(event: KeyboardEvent): void {
+    const items = this.tabsMenuItemRefs?.toArray().map((r) => r.nativeElement) ?? [];
+    if (items.length === 0) return;
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        items[(currentIndex + 1 + items.length) % items.length]?.focus();
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        items[(currentIndex - 1 + items.length) % items.length]?.focus();
+        break;
+      case 'Home':
+        event.preventDefault();
+        items[0]?.focus();
+        break;
+      case 'End':
+        event.preventDefault();
+        items[items.length - 1]?.focus();
+        break;
+      case 'Escape':
+        event.preventDefault();
+        this.closeTabsMenu(true);
+        break;
+      case 'Tab':
+        // Let focus leave naturally, just collapse the menu behind it.
+        this.closeTabsMenu();
+        break;
+    }
+  }
+
+  private focusActiveMenuItem(): void {
+    const items = this.tabsMenuItemRefs?.toArray() ?? [];
+    const activeIndex = this.tabOptions.findIndex((t) => t.id === this.activeTab);
+    (items[activeIndex]?.nativeElement ?? items[0]?.nativeElement)?.focus();
+  }
+
+  /** Click-outside-to-close, mirroring the toolbar's nav-group dropdown pattern. */
+  @HostListener('document:click', ['$event'])
+  onDocumentClickForTabsMenu(event: MouseEvent): void {
+    if (!this.tabsMenuOpen) return;
+    const target = event.target as HTMLElement;
+    if (!target.closest('.profile-name-control')) {
+      this.closeTabsMenu();
     }
   }
 
