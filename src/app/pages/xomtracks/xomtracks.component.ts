@@ -15,7 +15,7 @@ import {
 } from './models/xomtracks-share.model';
 import {
   xtDisplayTitle,
-  xtIsMatched,
+  xtHasRealTitle,
   xtOpenLabel,
   xtPlatformLabel,
   xtPrimaryUrl,
@@ -237,11 +237,19 @@ export class XomtracksComponent implements OnInit, OnDestroy {
 
   /** Client-side dedup: drops only exact same-message repeats — keyed on
    * `messageGuid`, else a composite of resolved Spotify id + sharer +
-   * timestamp. The same track shared by a different person/date stays. */
+   * timestamp. The same track shared by a different person/date stays.
+   *
+   * Also excludes any share that never resolved to a real track title (the
+   * "Untitled track" fallback) — unmatched shares with no usable metadata
+   * are dropped from the feed entirely (list, tiles, AND the count) rather
+   * than rendered as a dead row. Filtering here means every other getter
+   * that derives from `dedupedShares` (grouping, occurrences, counts)
+   * inherits the exclusion for free. */
   get dedupedShares(): XtShare[] {
     const seen = new Set<string>();
     const out: XtShare[] = [];
     for (const s of this.allShares) {
+      if (!xtHasRealTitle(s)) continue;
       const key = this.dedupKey(s);
       if (seen.has(key)) continue;
       seen.add(key);
@@ -411,12 +419,16 @@ export class XomtracksComponent implements OnInit, OnDestroy {
     return xtDisplayTitle(share);
   }
 
-  showOpenLink(share: XtShare): boolean {
-    return !xtIsMatched(share);
-  }
-
   openUrl(share: XtShare): string {
     return xtPrimaryUrl(share);
+  }
+
+  /** Every row gets the uniform "open in platform" control in the same
+   * trailing spot; this only guards against a share with no derivable URL
+   * at all (e.g. a "My rated" entry with neither a Spotify id nor a stored
+   * source URL) so the button renders disabled rather than dead-linking. */
+  hasOpenTarget(share: XtShare): boolean {
+    return !!this.openUrl(share)?.trim();
   }
 
   openLinkLabel(share: XtShare): string {

@@ -51,6 +51,21 @@
       <span aria-hidden="true">{{ heard ? '✓' : '○' }}</span>
       {{ heard ? 'Heard' : 'Heard?' }}
     </button>
+
+    <!-- Uniform "open in platform" control — same corner on every card,
+         matched or not (previously only unmatched cards got an inline link
+         down in the body, inconsistent with matched cards). -->
+    <a
+      *ngIf="hasOpenTarget"
+      class="xt-cover-open"
+      [attr.data-platform]="share.platform"
+      [href]="openUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      [attr.aria-label]="openLinkLabel + ' — ' + title"
+    >
+      <span aria-hidden="true">↗</span>
+    </a>
   </div>
 
   <div class="xt-body">
@@ -80,22 +95,9 @@
       (rate)="rate.emit($event)"
     ></app-xomtracks-rating-stars>
 
-    <a
-      *ngIf="showOpenLink; else viewHint"
-      class="xt-card-open"
-      [attr.data-platform]="share.platform"
-      [href]="openUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {{ openLinkLabel }}
-      <span aria-hidden="true">↗</span>
-    </a>
-    <ng-template #viewHint>
-      <span class="xt-view-hint">
-        View details
-        <span aria-hidden="true">→</span>
-      </span>
-    </ng-template>
+    <span class="xt-view-hint">
+      View details
+      <span aria-hidden="true">→</span>
+    </span>
   </div>
 </article>

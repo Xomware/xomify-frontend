@@ -47,6 +47,18 @@ function looksLikeRawId(value: string): boolean {
   );
 }
 
+/**
+ * True when a share resolved to a real, human track title — not the generic
+ * "Untitled track" fallback `xtDisplayTitle` falls back to when neither the
+ * metadata nor the source URL yielded anything usable. Shares that fail this
+ * predicate couldn't be matched to real track info and must be excluded from
+ * the feed entirely (list, tiles, AND the count) rather than rendered as a
+ * dead "Untitled track / —" row.
+ */
+export function xtHasRealTitle(share: XtShare): boolean {
+  return xtDisplayTitle(share) !== 'Untitled track';
+}
+
 /** Best outbound URL: the Spotify track when matched, else the original share. */
 export function xtPrimaryUrl(share: XtShare): string {
   if (xtIsMatched(share)) return `https://open.spotify.com/track/${share.resolvedSpotifyId}`;

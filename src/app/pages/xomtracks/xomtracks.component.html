@@ -141,6 +141,7 @@
           <span>Platform</span>
           <span>Sharer</span>
           <span>Shared</span>
+          <span></span>
         </div>
         <div
           class="xt-row"
@@ -207,17 +208,23 @@
               {{ heardFor(share) ? 'Heard' : 'Heard?' }}
             </button>
             <span class="xt-col-date">{{ relativeDate(share) }}</span>
+          </span>
+
+          <span class="xt-col-open">
             <a
-              *ngIf="showOpenLink(share)"
-              class="xt-row-open"
+              *ngIf="hasOpenTarget(share); else openDisabled"
+              class="xt-row-open-btn"
+              [attr.data-platform]="share.platform"
               [href]="openUrl(share)"
               target="_blank"
               rel="noopener noreferrer"
               [attr.aria-label]="openLinkLabel(share) + ' — ' + rowTitle(share)"
             >
-              {{ openLinkLabel(share) }}
               <span aria-hidden="true">↗</span>
             </a>
+            <ng-template #openDisabled>
+              <span class="xt-row-open-btn xt-row-open-btn--disabled" aria-hidden="true">↗</span>
+            </ng-template>
           </span>
         </div>
       </div>

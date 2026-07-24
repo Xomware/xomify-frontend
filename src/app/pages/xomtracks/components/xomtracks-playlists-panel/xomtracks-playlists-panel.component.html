@@ -1,15 +1,27 @@
-<button
-  type="button"
-  class="xt-panel-tab"
-  [class.xt-panel-tab--hidden]="open"
-  [attr.aria-expanded]="open"
-  aria-controls="xt-playlists-panel"
-  appTooltip="The rolling playlists kept in sync on Spotify"
-  (click)="openPanel()"
->
-  <span class="xt-panel-tab-icon" aria-hidden="true">♪</span>
-  <span class="xt-panel-tab-label">Playlists</span>
-</button>
+<div class="xt-panel-tabs" [class.xt-panel-tabs--hidden]="open">
+  <button
+    type="button"
+    class="xt-panel-tab xt-panel-tab--in"
+    [attr.aria-expanded]="open"
+    aria-controls="xt-playlists-panel"
+    appTooltip="Rolling playlist of what's been shared with you"
+    (click)="openFor('in')"
+  >
+    <span class="xt-panel-tab-icon" aria-hidden="true">♪</span>
+    <span class="xt-panel-tab-label">Shared With Me</span>
+  </button>
+  <button
+    type="button"
+    class="xt-panel-tab xt-panel-tab--out"
+    [attr.aria-expanded]="open"
+    aria-controls="xt-playlists-panel"
+    appTooltip="Rolling playlist of what you've shared out"
+    (click)="openFor('out')"
+  >
+    <span class="xt-panel-tab-icon" aria-hidden="true">♪</span>
+    <span class="xt-panel-tab-label">Shared By Me</span>
+  </button>
+</div>
 
 <div
   class="xt-panel-scrim"
