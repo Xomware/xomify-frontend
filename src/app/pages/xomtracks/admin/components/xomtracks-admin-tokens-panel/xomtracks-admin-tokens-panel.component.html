@@ -1,0 +1,65 @@
+<div>
+  <!-- Loading -->
+  <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <div aria-hidden="true">⏳</div>
+    <p>Loading ingest tokens…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load tokens</h2>
+    <button type="button" class="xta-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded'">
+    <div class="xta-state-block" *ngIf="!count">
+      <div aria-hidden="true">🔑</div>
+      <h2>No ingest tokens yet</h2>
+      <p>Nobody has minted a self-serve extractor token.</p>
+    </div>
+
+    <p class="xta-inline-error" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="xta-owner-group" *ngFor="let group of groups; trackBy: trackByOwner">
+      <h2 class="xta-owner-heading">{{ group.owner }}</h2>
+      <div class="xta-table-wrap">
+        <table class="xta-table">
+          <caption class="sr-only">Ingest tokens for {{ group.owner }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Label</th>
+              <th scope="col">Created</th>
+              <th scope="col">Last used</th>
+              <th scope="col">Status</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let token of group.tokens; trackBy: trackByHash">
+              <td>{{ token.label || '—' }}</td>
+              <td>{{ humanDate(token.createdAt) }}</td>
+              <td>{{ humanDate(token.lastUsedAt) }}</td>
+              <td>
+                <span class="xta-badge" [class.xta-badge--revoked]="token.revoked">
+                  {{ token.revoked ? 'Revoked' : 'Active' }}
+                </span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="xta-btn xta-btn--sm xta-btn--danger"
+                  [disabled]="token.revoked || revokingHash === token.tokenHash"
+                  [attr.aria-label]="'Revoke ' + (token.label || 'token') + ' for ' + group.owner"
+                  (click)="revoke(token)"
+                >
+                  {{ revokingHash === token.tokenHash ? 'Revoking…' : (token.revoked ? 'Revoked' : 'Revoke') }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>

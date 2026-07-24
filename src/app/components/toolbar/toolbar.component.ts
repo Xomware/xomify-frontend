@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { QueueService } from '../../services/queue.service';
 import { FriendsService } from '../../services/friends.service';
 import { UserService } from '../../services/user.service';
+import { XomtracksMeService } from '../../pages/xomtracks/services/xomtracks-me.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -40,6 +41,10 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   isMobile = false;
   queueCount = 0;
   pendingFriendsCount = 0;
+  /** True only for the admin (Dom) — server-authoritative, from `GET
+   * /me/get`. Gates the "Admin" nav link; false (hidden) for everyone else,
+   * including while the check is still in flight. */
+  isAdmin = false;
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
@@ -103,7 +108,8 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private queueService: QueueService,
     private friendsService: FriendsService,
-    private userService: UserService
+    private userService: UserService,
+    private meService: XomtracksMeService,
   ) {
     this.checkIfMobile();
     window.addEventListener('resize', this.checkIfMobile.bind(this));
@@ -124,7 +130,22 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
     if (this.authService.isLoggedIn()) {
       this.loadFriendsData();
+      this.loadAdminStatus();
     }
+  }
+
+  /** Fetches the server-authoritative admin flag once per toolbar load. A
+   * failure (or simply not being the admin) just leaves the nav link
+   * hidden — never surfaced as an error, since this is a routine 403 for
+   * every non-admin user. */
+  loadAdminStatus(): void {
+    this.meService
+      .get()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (me) => (this.isAdmin = me.isAdmin),
+        error: () => (this.isAdmin = false),
+      });
   }
 
   loadFriendsData(): void {

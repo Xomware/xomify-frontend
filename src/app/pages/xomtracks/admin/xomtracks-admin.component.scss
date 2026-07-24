@@ -1,0 +1,95 @@
+// Admin Portal shell — same dark gradient + purple/green design language as
+// the Shares feed (`xomtracks.component.scss`), scoped with an `xta-` prefix
+// so nothing collides with the feed's `xt-` classes.
+
+.xta-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
+  padding: 70px 24px 120px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.xta-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #fff;
+    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.xta-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #8a8a9a;
+}
+
+.xta-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.xta-tab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8a8a9a;
+  padding: 9px 18px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.3);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(156, 10, 191, 0.4);
+  }
+}
+
+@media (max-width: 640px) {
+  .xta-page {
+    padding: 70px 16px 100px;
+  }
+  .xta-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .xta-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+  .xta-tab {
+    flex-shrink: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xta-tab {
+    transition: none;
+  }
+}

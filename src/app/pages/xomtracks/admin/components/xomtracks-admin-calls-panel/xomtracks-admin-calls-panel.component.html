@@ -1,0 +1,109 @@
+<div>
+  <div class="xta-segmented" role="group" aria-label="Window">
+    <button
+      *ngFor="let w of windowOptions"
+      type="button"
+      class="xta-segmented-btn"
+      [class.xta-segmented-btn--active]="windowDays === w.value"
+      [attr.aria-pressed]="windowDays === w.value"
+      (click)="setWindow(w.value)"
+    >
+      {{ w.label }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <div aria-hidden="true">⏳</div>
+    <p>Loading call metrics…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load call metrics</h2>
+    <button type="button" class="xta-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded' && summary as s">
+    <div class="xta-summary-cards">
+      <div class="xta-summary-card">
+        <span class="xta-summary-label">Total calls</span>
+        <span class="xta-summary-value">{{ s.totalCalls }}</span>
+      </div>
+      <div class="xta-summary-card">
+        <span class="xta-summary-label">Errors</span>
+        <span class="xta-summary-value xta-summary-value--warn">{{ s.errorCount }}</span>
+      </div>
+      <div class="xta-summary-card">
+        <span class="xta-summary-label">Error rate</span>
+        <span class="xta-summary-value">{{ errorRatePct }}</span>
+      </div>
+      <div class="xta-summary-card">
+        <span class="xta-summary-label">Window</span>
+        <span class="xta-summary-value">{{ s.windowDays }}d</span>
+      </div>
+    </div>
+
+    <div *ngIf="s.totalCalls === 0" class="xta-state-block">
+      <div aria-hidden="true">📭</div>
+      <h2>No calls logged</h2>
+      <p>Nothing recorded in the last {{ s.windowDays }} day{{ s.windowDays === 1 ? '' : 's' }}.</p>
+    </div>
+
+    <ng-container *ngIf="s.totalCalls > 0">
+      <section class="xta-subsection" *ngIf="s.byPath.length">
+        <h2>By path</h2>
+        <div class="xta-table-wrap">
+          <table class="xta-table">
+            <caption class="sr-only">Calls grouped by path</caption>
+            <thead>
+              <tr>
+                <th scope="col">Path</th>
+                <th scope="col">Calls</th>
+                <th scope="col">Errors</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of s.byPath; trackBy: trackByPath">
+                <td class="xta-cell-mono">{{ row.path }}</td>
+                <td>{{ row.count }}</td>
+                <td [class.xta-cell-warn]="row.errors > 0">{{ row.errors }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="xta-subsection" *ngIf="statusEntries.length">
+        <h2>By status</h2>
+        <div class="xta-status-chips">
+          <span
+            class="xta-status-chip"
+            *ngFor="let entry of statusEntries"
+            [class.xta-status-chip--error]="isErrorStatus(entry.status)"
+          >
+            {{ entry.status }} <strong>{{ entry.count }}</strong>
+          </span>
+        </div>
+      </section>
+
+      <section class="xta-subsection">
+        <h2>Recent errors</h2>
+        <div class="xta-state-block" *ngIf="!s.recentErrors.length">
+          <div aria-hidden="true">✅</div>
+          <p>No errors in this window.</p>
+        </div>
+        <ul class="xta-error-list" *ngIf="s.recentErrors.length" aria-label="Recent errors">
+          <li class="xta-error-row" *ngFor="let e of s.recentErrors; trackBy: trackByErrorId">
+            <span class="xta-error-ts">{{ humanTs(e.ts) }}</span>
+            <span class="xta-error-status">{{ e.status }}</span>
+            <span class="xta-error-path">{{ e.method }} {{ e.path }}</span>
+            <span class="xta-error-email">{{ e.email || '—' }}</span>
+            <span class="xta-error-msg">{{ e.error || '—' }}</span>
+          </li>
+        </ul>
+      </section>
+    </ng-container>
+  </ng-container>
+</div>

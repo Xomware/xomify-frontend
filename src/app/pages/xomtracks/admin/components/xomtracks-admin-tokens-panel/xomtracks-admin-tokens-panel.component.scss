@@ -1,0 +1,142 @@
+.xta-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+  color: #8a8a9a;
+
+  div:first-child {
+    font-size: 2.2rem;
+  }
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 1.05rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+  }
+}
+
+.xta-btn {
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  margin-top: 10px;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  &--sm {
+    margin-top: 0;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+  }
+
+  &--danger {
+    background: linear-gradient(135deg, #ff3750 0%, #b91c3b 100%);
+  }
+}
+
+.xta-inline-error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 55, 80, 0.12);
+  border: 1px solid rgba(255, 55, 80, 0.4);
+  color: #ff8fa0;
+  font-size: 0.82rem;
+}
+
+.xta-owner-group {
+  margin-bottom: 24px;
+}
+
+.xta-owner-heading {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.xta-table-wrap {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.xta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th,
+  td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  thead th {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6d6d7d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+}
+
+.xta-badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b9f7d3;
+  background: rgba(27, 220, 111, 0.15);
+  border: 1px solid rgba(27, 220, 111, 0.4);
+
+  &--revoked {
+    color: #8a8a9a;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media (max-width: 640px) {
+  .xta-table {
+    font-size: 0.78rem;
+
+    th,
+    td {
+      padding: 8px 10px;
+    }
+  }
+}

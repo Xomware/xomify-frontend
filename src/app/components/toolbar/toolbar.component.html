@@ -81,6 +81,19 @@
     </ng-container>
   </div>
 
+  <!-- Admin link — only rendered for the admin (server-verified isAdmin from
+       GET /me/get); everyone else never sees this in the DOM. -->
+  <a
+    class="admin-link"
+    *ngIf="isLoggedIn() && isAdmin"
+    routerLink="/xomtracks/admin"
+    routerLinkActive="active"
+    aria-label="Admin portal"
+    appTooltip="Admin portal"
+  >
+    <span aria-hidden="true">⚙️</span>
+  </a>
+
   <!-- Profile avatar chip — visible on both desktop and mobile when logged in. -->
   <a
     class="avatar-chip"
@@ -158,6 +171,16 @@
         </a>
       </div>
     </ng-container>
+
+    <a
+      class="mobile-admin-link"
+      *ngIf="isAdmin"
+      routerLink="/xomtracks/admin"
+      (click)="selectItem('/xomtracks/admin')"
+      role="menuitem"
+    >
+      <span aria-hidden="true">⚙️</span> Admin
+    </a>
 
     <a class="logout-link" (click)="logout()" role="menuitem">Logout</a>
   </div>

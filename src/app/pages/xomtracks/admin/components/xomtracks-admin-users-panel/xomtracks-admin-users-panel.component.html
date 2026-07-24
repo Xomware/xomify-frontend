@@ -1,0 +1,94 @@
+<div>
+  <!-- Loading -->
+  <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <div aria-hidden="true">⏳</div>
+    <p>Loading the user directory…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load the user directory</h2>
+    <button type="button" class="xta-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded'">
+    <!-- Empty -->
+    <div class="xta-state-block" *ngIf="!users.length">
+      <div aria-hidden="true">🧑‍🤝‍🧑</div>
+      <h2>No users yet</h2>
+      <p>Nobody has signed into Xomtracks yet.</p>
+    </div>
+
+    <div class="xta-table-wrap" *ngIf="users.length">
+      <p class="xta-count">{{ users.length }} {{ users.length === 1 ? 'user' : 'users' }}</p>
+      <table class="xta-table">
+        <caption class="sr-only">Xomtracks user directory</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+              <button
+                type="button"
+                class="xta-sort-btn"
+                [attr.aria-sort]="sortAriaSort('email')"
+                (click)="setSort('email')"
+              >
+                Email <span aria-hidden="true">{{ sortKey === 'email' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+              </button>
+            </th>
+            <th scope="col">
+              <button
+                type="button"
+                class="xta-sort-btn"
+                [attr.aria-sort]="sortAriaSort('firstSeen')"
+                (click)="setSort('firstSeen')"
+              >
+                First seen <span aria-hidden="true">{{ sortKey === 'firstSeen' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+              </button>
+            </th>
+            <th scope="col">
+              <button
+                type="button"
+                class="xta-sort-btn"
+                [attr.aria-sort]="sortAriaSort('lastSeen')"
+                (click)="setSort('lastSeen')"
+              >
+                Last seen <span aria-hidden="true">{{ sortKey === 'lastSeen' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+              </button>
+            </th>
+            <th scope="col">Own ingest</th>
+            <th scope="col">Spotify</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of sortedUsers; trackBy: trackByEmail">
+            <td class="xta-cell-email">{{ user.email }}</td>
+            <td>{{ humanDate(user.firstSeen) }}</td>
+            <td>{{ humanDate(user.lastSeen) }}</td>
+            <td>
+              <span class="xta-badge" [class.xta-badge--on]="user.ownIngest">
+                {{ user.ownIngest ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td>
+              <span class="xta-badge" [class.xta-badge--on]="user.spotifyConnected">
+                {{ user.spotifyConnected ? 'Connected' : 'No' }}
+              </span>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="xta-btn xta-btn--sm"
+                (click)="viewAs.emit(user.email)"
+                [attr.aria-label]="'View as ' + user.email"
+              >
+                View as
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

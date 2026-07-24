@@ -165,6 +165,49 @@
   }
 }
 
+// Small gear icon link to the Admin Portal — only rendered for the admin,
+// sits just left of the avatar chip.
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: 2px solid rgba(27, 220, 111, 0.4);
+  background: rgba(27, 220, 111, 0.08);
+  text-decoration: none;
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #1bdc6f;
+    background: rgba(27, 220, 111, 0.18);
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: #1bdc6f;
+    box-shadow: 0 0 0 3px rgba(27, 220, 111, 0.45);
+  }
+
+  &.active {
+    border-color: #1bdc6f;
+    background: rgba(27, 220, 111, 0.25);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-link {
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+  }
+}
+
 // Right-aligned profile avatar chip. Sits between the nav tabs and the
 // desktop Logout button so Logout stays the rightmost element. On mobile
 // it sits between the (hidden) tabs and the hamburger.
@@ -262,6 +305,13 @@
     &.selected {
       background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
       color: #fff;
+    }
+
+    &.mobile-admin-link {
+      color: #1bdc6f;
+      margin-top: 8px;
+      border-top: 1px solid rgba(27, 220, 111, 0.3);
+      padding-top: 12px;
     }
 
     &.logout-link {

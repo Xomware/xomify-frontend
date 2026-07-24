@@ -1,0 +1,62 @@
+<main class="xta-page">
+  <header class="xta-head">
+    <div>
+      <h1>Admin</h1>
+      <p class="xta-sub">Xomtracks operations — visible to Dom only.</p>
+    </div>
+
+    <nav class="xta-tabs" role="tablist" aria-label="Admin sections">
+      <button
+        *ngFor="let tab of tabs"
+        type="button"
+        role="tab"
+        class="xta-tab"
+        [class.xta-tab--active]="activeTab === tab.value"
+        [attr.aria-selected]="activeTab === tab.value"
+        [id]="'xta-tab-' + tab.value"
+        [attr.aria-controls]="'xta-panel-' + tab.value"
+        (click)="setTab(tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    </nav>
+  </header>
+
+  <div [ngSwitch]="activeTab">
+    <section
+      *ngSwitchCase="'users'"
+      id="xta-panel-users"
+      role="tabpanel"
+      aria-labelledby="xta-tab-users"
+    >
+      <app-xomtracks-admin-users-panel (viewAs)="viewAs($event)"></app-xomtracks-admin-users-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'viewas'"
+      id="xta-panel-viewas"
+      role="tabpanel"
+      aria-labelledby="xta-tab-viewas"
+    >
+      <app-xomtracks-admin-viewas-panel [presetEmail]="viewAsPresetEmail"></app-xomtracks-admin-viewas-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'calls'"
+      id="xta-panel-calls"
+      role="tabpanel"
+      aria-labelledby="xta-tab-calls"
+    >
+      <app-xomtracks-admin-calls-panel></app-xomtracks-admin-calls-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'tokens'"
+      id="xta-panel-tokens"
+      role="tabpanel"
+      aria-labelledby="xta-tab-tokens"
+    >
+      <app-xomtracks-admin-tokens-panel></app-xomtracks-admin-tokens-panel>
+    </section>
+  </div>
+</main>
