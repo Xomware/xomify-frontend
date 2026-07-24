@@ -36,7 +36,12 @@ export class XomtracksRatingsService {
         trackKey,
         rating,
       })
-      .pipe(map((res) => res.data.rating));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data.rating;
+        })
+      );
   }
 
   /** GET /ratings/list — every track the caller has rated, across BOTH
@@ -44,6 +49,11 @@ export class XomtracksRatingsService {
   list(): Observable<XtRatedListResponse> {
     return this.http
       .get<XtApiEnvelope<XtRatedListResponse>>(`${this.baseUrl}/list`)
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        })
+      );
   }
 }

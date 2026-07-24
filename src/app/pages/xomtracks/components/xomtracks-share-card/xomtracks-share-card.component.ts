@@ -71,9 +71,11 @@ export class XomtracksShareCardComponent {
   }
 
   /** Only unmatched shares get an inline outbound link; matched tracks play
-   * from inside the modal. */
+   * from inside the modal. Also requires a non-empty openUrl — some
+   * reconstructed "My rated" shares (keyed as `ta:title|artist`) have no
+   * sourceUrl, and an empty href would open a blank duplicate tab. */
   get showOpenLink(): boolean {
-    return !xtIsMatched(this.share);
+    return !xtIsMatched(this.share) && !!this.openUrl;
   }
 
   get openUrl(): string {

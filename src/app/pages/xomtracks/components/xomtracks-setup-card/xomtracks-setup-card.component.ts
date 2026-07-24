@@ -52,8 +52,16 @@ export class XomtracksSetupCardComponent implements OnInit {
       '-a "$USER" ' +
       '-T /usr/bin/security ' +
       '-U ' +
-      `-w "${token}"`
+      `-w "${this.shellEscapeForDoubleQuotes(token)}"`
     );
+  }
+
+  /** Escapes chars that are special inside a double-quoted shell string
+   * (`\`, `$`, `` ` ``, `"`) so a token containing them can't break out of
+   * the quotes or inject a command when the copied snippet is pasted into a
+   * terminal. */
+  private shellEscapeForDoubleQuotes(value: string): string {
+    return value.replace(/([\\$`"])/g, '\\$1');
   }
 
   mint(): void {

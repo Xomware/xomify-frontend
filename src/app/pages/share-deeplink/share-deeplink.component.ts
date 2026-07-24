@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+
+/** Spotify track ids are 22-char base62 (`[0-9A-Za-z]`) strings. */
+const SPOTIFY_TRACK_ID_RE = /^[0-9A-Za-z]{22}$/;
 
 /**
  * Deep-link landing page for `/share?trackId=<id>`.
@@ -8,11 +11,13 @@ import { Router } from '@angular/router';
  * It is reached when a user opens a Spotify-to-Xomify share link on desktop
  * (e.g. after tapping "Copy Link" in Spotify Web and pasting it in a browser).
  *
- * Strategy: redirect to `/my-profile`. The old target — `/feed`, which opened
- * the share composer pre-populated with `trackId` — was removed along with
- * the "feed" feature (docs/features/xomtracks-xomify-merge/PLAN.md); there is
- * no composer to hand `trackId` to anymore, so it's dropped and this just
- * lands the user somewhere sensible instead of a dead route.
+ * Strategy: the old target — `/feed`, which opened the share composer
+ * pre-populated with `trackId` — was removed along with the "feed" feature
+ * (docs/features/xomtracks-xomify-merge/PLAN.md), so there is no in-app
+ * composer to hand `trackId` to anymore. If a plausible `trackId` is present,
+ * send the user straight to the track on open.spotify.com instead of
+ * dropping it — that's still useful and isn't a dead end. Otherwise fall
+ * back to `/my-profile`.
  */
 @Component({
   selector: 'app-share-deeplink',
@@ -34,9 +39,17 @@ import { Router } from '@angular/router';
   `],
 })
 export class ShareDeeplinkComponent implements OnInit {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    const trackId = this.route.snapshot.queryParamMap.get('trackId');
+    if (trackId && SPOTIFY_TRACK_ID_RE.test(trackId)) {
+      window.location.href = `https://open.spotify.com/track/${trackId}`;
+      return;
+    }
     this.router.navigate(['/my-profile']);
   }
 }

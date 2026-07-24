@@ -47,13 +47,23 @@ export class XomtracksIngestTokensService {
     const body = label?.trim() ? { label: label.trim() } : {};
     return this.http
       .post<XtApiEnvelope<XtIngestToken>>(`${this.baseUrl}/create`, body)
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        })
+      );
   }
 
   /** POST /ingest-tokens/revoke — revoke a token by its (non-secret) hash. */
   revoke(tokenHash: string): Observable<XtIngestTokenRevokeResult> {
     return this.http
       .post<XtApiEnvelope<XtIngestTokenRevokeResult>>(`${this.baseUrl}/revoke`, { tokenHash })
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        })
+      );
   }
 }

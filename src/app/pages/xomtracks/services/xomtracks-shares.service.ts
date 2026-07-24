@@ -33,6 +33,11 @@ export class XomtracksSharesService {
     const params = new HttpParams().set('direction', direction).set('window', window);
     return this.http
       .get<XtApiEnvelope<XtSharesListResponse>>(`${this.baseUrl}/list`, { params })
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        })
+      );
   }
 }

@@ -32,6 +32,11 @@ export class XomtracksHeardService {
   set(trackKey: string, heard: boolean): Observable<XtHeardState> {
     return this.http
       .post<XtApiEnvelope<XtHeardState>>(`${this.baseUrl}/set`, { trackKey, heard })
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          if (res.error) throw res.error;
+          return res.data;
+        })
+      );
   }
 }
