@@ -8,7 +8,14 @@
   align-items: center;
   gap: 8px;
   padding: 14px 8px;
-  border-radius: 12px 0 0 12px;
+  // The tab is flipped 180deg below (so its vertical-rl text reads correctly
+  // top-to-bottom) which visually mirrors the corners: rounding the LEFT
+  // side here (facing into the page, pre-rotation) is what actually renders
+  // rounded on the right — the side flush against the viewport edge. Setting
+  // it the other way keeps the screen-edge side flat/square and puts the
+  // rounding only on the inner side, so the tab reads as attached to the
+  // edge instead of floating.
+  border-radius: 0 12px 12px 0;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
   font-size: 0.78rem;

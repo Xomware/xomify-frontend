@@ -1,15 +1,12 @@
 <main class="xt-page">
   <div class="xt-head">
-    <div class="xt-titles">
-      <h1 class="xt-title">Xomtracks</h1>
-      <p class="xt-sub" *ngIf="state === 'loaded'">
-        {{ groupedShares.length }}
-        {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
-          *ngIf="isFiltered"
-        > matching "{{ search.trim() }}"</ng-container>
-        <ng-container *ngIf="!isFiltered && matchedCount"> · {{ matchedCount }} on Spotify</ng-container>
-      </p>
-    </div>
+    <p class="xt-sub" *ngIf="state === 'loaded'">
+      {{ groupedShares.length }}
+      {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
+        *ngIf="isFiltered"
+      > matching "{{ search.trim() }}"</ng-container>
+      <ng-container *ngIf="!isFiltered && matchedCount"> · {{ matchedCount }} on Spotify</ng-container>
+    </p>
 
     <label class="xt-search">
       <span aria-hidden="true">⌕</span>
@@ -17,7 +14,7 @@
         type="search"
         [(ngModel)]="search"
         placeholder="Search title, artist, sharer…"
-        aria-label="Search the Xomtracks feed"
+        aria-label="Search your shares"
       />
       <button
         *ngIf="isFiltered"
@@ -28,6 +25,8 @@
       >×</button>
     </label>
   </div>
+
+  <app-xomtracks-setup-card class="xt-setup-banner"></app-xomtracks-setup-card>
 
   <div class="xt-controls">
     <div class="xt-controls-left">
@@ -112,7 +111,7 @@
   <div class="xt-state-block xt-state-block--error" *ngIf="state === 'error'" role="alert">
     <div aria-hidden="true">⚠️</div>
     <h2>Couldn't load the feed</h2>
-    <p>Something went wrong reaching the Xomtracks API.</p>
+    <p>Something went wrong reaching the feed.</p>
     <button type="button" class="xt-state-btn" (click)="retry()">Try again</button>
   </div>
 
@@ -236,8 +235,6 @@
       </div>
     </ng-template>
   </ng-container>
-
-  <app-xomtracks-setup-card class="xt-setup-section"></app-xomtracks-setup-card>
 </main>
 
 <app-xomtracks-playlists-panel></app-xomtracks-playlists-panel>

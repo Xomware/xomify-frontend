@@ -128,6 +128,18 @@ export class XomifyAuthService {
     }
   }
 
+  /**
+   * The `email` claim from the current JWT, or `null` if there is no JWT, it
+   * fails to decode, or the claim is missing/non-string.
+   */
+  getEmail(): string | null {
+    const token = this.getJwt();
+    if (!token) return null;
+    const claims = decodeJwtPayload(token);
+    const email = claims?.['email'];
+    return typeof email === 'string' ? email : null;
+  }
+
   /** Wipe the JWT (+ expiry). Called on logout and when re-mint fails. */
   clear(): void {
     try {
