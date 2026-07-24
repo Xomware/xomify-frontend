@@ -23,7 +23,46 @@
         </div>
 
         <div class="profile-details">
-          <h1 class="user-name">{{ userName }}</h1>
+          <div class="profile-name-control">
+            <button
+              #tabsMenuTrigger
+              type="button"
+              class="user-name-trigger"
+              id="profile-tabs-trigger"
+              [attr.aria-expanded]="tabsMenuOpen"
+              aria-haspopup="true"
+              aria-controls="profile-tabs-menu"
+              (click)="toggleTabsMenu($event)"
+              (keydown)="onTriggerKeydown($event)"
+            >
+              <h1 class="user-name">{{ userName }}</h1>
+              <span class="user-name-chevron" [class.open]="tabsMenuOpen" aria-hidden="true">▾</span>
+            </button>
+            <span class="active-tab-pill">{{ activeTabLabel }}</span>
+
+            <div
+              class="profile-tabs-menu"
+              id="profile-tabs-menu"
+              role="menu"
+              aria-labelledby="profile-tabs-trigger"
+              *ngIf="tabsMenuOpen"
+              (keydown)="onMenuKeydown($event)"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                *ngFor="let tab of tabOptions"
+                #tabsMenuItem
+                type="button"
+                role="menuitem"
+                class="profile-tabs-menu-item"
+                [class.active]="activeTab === tab.id"
+                [attr.aria-current]="activeTab === tab.id ? 'true' : null"
+                (click)="selectTabFromMenu(tab.id)"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+          </div>
           <p class="user-email">{{ email }}</p>
 
           <div class="profile-stats">
@@ -73,40 +112,6 @@
           </a>
         </div>
       </div>
-    </div>
-
-    <!-- Tab switcher: Overview | Settings -->
-    <div class="profile-tabs" role="tablist" aria-label="Profile sections">
-      <button
-        type="button"
-        class="profile-tab"
-        role="tab"
-        [class.active]="activeTab === 'overview'"
-        [attr.aria-selected]="activeTab === 'overview'"
-        (click)="selectTab('overview')"
-      >
-        Overview
-      </button>
-      <button
-        type="button"
-        class="profile-tab"
-        role="tab"
-        [class.active]="activeTab === 'recent'"
-        [attr.aria-selected]="activeTab === 'recent'"
-        (click)="selectTab('recent')"
-      >
-        Recent
-      </button>
-      <button
-        type="button"
-        class="profile-tab"
-        role="tab"
-        [class.active]="activeTab === 'settings'"
-        [attr.aria-selected]="activeTab === 'settings'"
-        (click)="selectTab('settings')"
-      >
-        Settings
-      </button>
     </div>
 
     <!-- Overview tab -->
