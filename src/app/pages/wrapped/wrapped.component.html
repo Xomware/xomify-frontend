@@ -42,42 +42,37 @@
       <p class="page-subtitle">Your listening history, month by month</p>
     </div>
 
-    <!-- Enrollment Card -->
-    <div class="enrollment-card" [class.enrolled]="isEnrolled">
-      <div class="enrollment-icon">
-        <svg *ngIf="!isEnrolled" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+    <!-- Opt-in prompt: shown ONLY when the user has no content and isn't
+         enrolled. Once there's Wrapped data the opt-in lives in Settings. -->
+    <div class="optin-prompt" *ngIf="!isEnrolled && availableWraps.length === 0">
+      <div class="optin-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
         </svg>
-        <svg *ngIf="isEnrolled" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-        </svg>
       </div>
-      <div class="enrollment-content">
-        <h3>{{ isEnrolled ? 'You\'re Enrolled!' : 'Track Your Progress' }}</h3>
-        <p *ngIf="!isEnrolled">Enroll to save your monthly listening stats and see how your taste evolves over time.</p>
-        <p *ngIf="isEnrolled">Your listening stats are saved at the end of each month. Check back to see your history!</p>
+      <div class="optin-content">
+        <h3>Turn on Monthly Wrapped</h3>
+        <p>Save your monthly listening stats and see how your taste evolves over time. You can turn this off anytime in Settings.</p>
       </div>
-      <button 
-        class="enrollment-btn" 
-        [class.enrolled]="isEnrolled"
+      <button
+        class="optin-btn"
         [disabled]="enrollmentLoading"
-        (click)="toggleEnrollment()"
+        (click)="enableWrapped()"
       >
         <span *ngIf="enrollmentLoading" class="spinner"></span>
-        <span *ngIf="!enrollmentLoading">{{ isEnrolled ? 'Unenroll' : 'Enroll' }}</span>
+        <span *ngIf="!enrollmentLoading">Turn on</span>
       </button>
     </div>
 
-    <!-- No Data State -->
-    <div class="empty-state" *ngIf="availableWraps.length === 0">
+    <!-- Enrolled but no data yet -->
+    <div class="empty-state" *ngIf="isEnrolled && availableWraps.length === 0">
       <div class="empty-icon">
         <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
         </svg>
       </div>
       <h3>No Wrapped Data Yet</h3>
-      <p *ngIf="isEnrolled">Your first Wrapped will be ready at the end of this month. Check back soon!</p>
-      <p *ngIf="!isEnrolled">Enroll above to start tracking your monthly listening stats!</p>
+      <p>Your first Wrapped will be ready at the end of this month. Check back soon!</p>
     </div>
 
     <!-- Monthly Wrapped Content -->

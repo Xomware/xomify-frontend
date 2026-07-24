@@ -1,7 +1,7 @@
 // user.service.ts
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, forkJoin } from 'rxjs';
+import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
@@ -21,6 +21,11 @@ export class UserService implements OnInit {
   followingCount: number = 0;
   likesCount: number = 0;
   likesPublic: boolean = false;
+  // True only once the Xomify enrollment row has actually been fetched.
+  // `user?.email` alone proves the Spotify profile loaded, NOT the enrollment
+  // row — gating on it made enrolled users see "not enrolled" (issue: flaky
+  // opt-in). ensureLoaded() gates on this flag instead.
+  private enrollmentLoaded = false;
   private bootstrap$: Observable<void> | null = null;
   private baseUrl = 'https://api.spotify.com/v1';
   private xomifyApiUrl: string = `https://${environment.apiId}.execute-api.us-east-1.amazonaws.com/dev`;
@@ -57,32 +62,66 @@ export class UserService implements OnInit {
    * row have been fetched (or failed gracefully).
    */
   ensureLoaded(): Observable<void> {
-    if (this.user?.email) {
+    // Gate on the ENROLLMENT row, not the Spotify profile. A populated
+    // `user.email` only proves the Spotify /me call succeeded; the enrollment
+    // flags may still be at their default `false`. Early-returning here was
+    // the root cause of enrolled users seeing "not enrolled."
+    if (this.enrollmentLoaded) {
       return of(void 0);
     }
     if (!this.bootstrap$) {
       this.bootstrap$ = this.getUserData().pipe(
         tap((data) => this.setUser(data)),
-        catchError(() => of(null)),
         switchMap((data: any) => {
           const email = data?.email;
-          if (!email) return of(void 0);
+          if (!email) {
+            return throwError(
+              () => new Error('Spotify profile returned no email'),
+            );
+          }
           return this.getUserTableData(email).pipe(
-            tap((xomifyData: any) => {
-              this.activeWrapped = xomifyData?.activeWrapped ?? false;
-              this.activeReleaseRadar =
-                xomifyData?.activeReleaseRadar ?? false;
-              this.likesCount = xomifyData?.likes_count ?? xomifyData?.likesCount ?? 0;
-              this.likesPublic = xomifyData?.likes_public ?? xomifyData?.likesPublic ?? false;
-            }),
-            catchError(() => of(null)),
+            tap((xomifyData: any) => this.applyEnrollmentRow(xomifyData)),
             map(() => void 0),
+            catchError((err: any) => {
+              // A brand-new user has no Xomify row yet (404). That is a
+              // legitimate "not enrolled" state, not a failure — apply
+              // defaults and mark loaded.
+              if (err?.status === 404) {
+                this.applyEnrollmentRow(null);
+                return of(void 0);
+              }
+              // Any other error is a genuine load failure. Surface it (so the
+              // page can show an error / retry) instead of silently defaulting
+              // to `false`, and drop the shared pipeline so the next call
+              // re-fetches rather than replaying the cached error.
+              this.bootstrap$ = null;
+              return throwError(() => err);
+            }),
           );
+        }),
+        catchError((err: any) => {
+          this.bootstrap$ = null;
+          return throwError(() => err);
         }),
         shareReplay(1),
       );
     }
     return this.bootstrap$;
+  }
+
+  /**
+   * Apply a fetched Xomify user row (or `null` for a brand-new user with no
+   * row yet) to the in-memory enrollment/likes state and mark the enrollment
+   * as authoritatively loaded.
+   */
+  private applyEnrollmentRow(xomifyData: any): void {
+    this.activeWrapped = xomifyData?.activeWrapped ?? false;
+    this.activeReleaseRadar = xomifyData?.activeReleaseRadar ?? false;
+    this.likesCount =
+      xomifyData?.likes_count ?? xomifyData?.likesCount ?? 0;
+    this.likesPublic =
+      xomifyData?.likes_public ?? xomifyData?.likesPublic ?? false;
+    this.enrollmentLoaded = true;
   }
 
   // Get user's playlists (limit=1 to just get total count, or higher for actual list)
@@ -211,18 +250,25 @@ export class UserService implements OnInit {
     return this.http.post(url, body);
   }
 
-  updateUserTableEnrollments(
-    wrappedEnrolled: boolean,
-    releaseRadarEnrolled: boolean,
-  ): Observable<any> {
-    this.refreshToken = this.AuthService.getRefreshToken();
+  /**
+   * Update ONLY the Monthly Wrapped enrollment flag. Sends a partial body so
+   * the backend leaves the Release Radar flag untouched — this is the fix for
+   * the double-flag clobber where toggling one enrollment overwrote the other
+   * from possibly-stale in-memory state.
+   */
+  updateWrappedEnrollment(wrappedEnrolled: boolean): Observable<any> {
     const url = `${this.xomifyApiUrl}/user/update`;
     // Caller email comes from JWT context on the backend (1i).
-    const body = {
-      wrappedEnrolled: wrappedEnrolled,
-      releaseRadarEnrolled: releaseRadarEnrolled,
-    };
-    return this.http.post(url, body);
+    return this.http.post(url, { wrappedEnrolled });
+  }
+
+  /**
+   * Update ONLY the Release Radar enrollment flag (partial body — leaves the
+   * Wrapped flag untouched). See {@link updateWrappedEnrollment}.
+   */
+  updateReleaseRadarEnrollment(releaseRadarEnrolled: boolean): Observable<any> {
+    const url = `${this.xomifyApiUrl}/user/update`;
+    return this.http.post(url, { releaseRadarEnrolled });
   }
 
   // The `email` arg is retained for call-site compatibility but is no longer

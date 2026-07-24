@@ -98,9 +98,18 @@ export class ReleaseRadarComponent implements OnInit {
     this.userService
       .ensureLoaded()
       .pipe(take(1))
-      .subscribe(() => {
-        this.isEnrolled = this.userService.getReleaseRadarEnrollment();
-        this.loadUserAndReleases();
+      .subscribe({
+        next: () => {
+          this.isEnrolled = this.userService.getReleaseRadarEnrollment();
+          this.loadUserAndReleases();
+        },
+        error: (err) => {
+          // ensureLoaded now surfaces a genuine enrollment-load failure
+          // instead of silently defaulting to "not enrolled."
+          console.error('Error loading enrollment state:', err);
+          this.error = 'Failed to load Release Radar. Please try again.';
+          this.loading = false;
+        },
       });
   }
 
@@ -338,25 +347,23 @@ export class ReleaseRadarComponent implements OnInit {
   // Enrollment
   // ============================================
 
-  toggleEnrollment(): void {
+  /**
+   * On-page opt-in used only from the empty/no-content prompt. Enrolls in
+   * Release Radar via a targeted single-flag update (cannot clobber Monthly
+   * Wrapped). The persistent toggle lives in Settings.
+   */
+  enableReleaseRadar(): void {
+    if (this.enrollmentLoading) return;
     this.enrollmentLoading = true;
-    const newStatus = !this.isEnrolled;
 
     this.userService
-      .updateUserTableEnrollments(
-        this.userService.getWrappedEnrollment(),
-        newStatus
-      )
+      .updateReleaseRadarEnrollment(true)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.isEnrolled = newStatus;
-          this.userService.setReleaseRadarEnrollment(newStatus);
-          this.toastService.showPositiveToast(
-            newStatus
-              ? 'Enrolled in Release Radar!'
-              : 'Unenrolled from Release Radar'
-          );
+          this.isEnrolled = true;
+          this.userService.setReleaseRadarEnrollment(true);
+          this.toastService.showPositiveToast('Enrolled in Release Radar!');
           this.enrollmentLoading = false;
         },
         error: (err) => {
