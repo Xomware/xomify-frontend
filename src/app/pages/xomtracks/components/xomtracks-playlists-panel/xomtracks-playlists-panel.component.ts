@@ -21,17 +21,18 @@ interface XtPlaylistView extends XtRollingPlaylist {
 /**
  * The rolling playlists, tucked into a sticky slide-out. TWO vertical tabs —
  * one per rolling playlist direction ("Shared With Me" / "Shared By Me") —
- * are stacked on the right screen edge (stacked FAB pills on phones).
- * Clicking either opens the SAME shared drawer, scrolled/focused to that
- * playlist's card. Surfaces Xomtracks' live, rolling Spotify playlists via
- * the official embed iframe — cover + tracklist + play button, saveable/
- * likeable natively on Spotify. A plain "Open in Spotify" link is provided
- * per playlist as a no-iframe fallback.
+ * are stacked on the right screen edge (stacked FAB pills on phones). Each
+ * tab opens the SAME drawer component instance, but the drawer renders ONLY
+ * that direction's playlist — "Shared With Me" never shows the "Shared By
+ * Me" embed and vice versa. Surfaces Xomtracks' live, rolling Spotify
+ * playlist via the official embed iframe — cover + tracklist + play button,
+ * saveable/likeable natively on Spotify. A plain "Open in Spotify" link is
+ * provided as a no-iframe fallback.
  *
  * Accessible: the panel is a focus-trapped `role="dialog"` (aria-modal),
  * opened from a button with `aria-expanded`/`aria-controls`. Esc and
- * backdrop close it; focus moves into the panel (at the requested playlist)
- * on open and returns to the trigger that opened it on close.
+ * backdrop close it; focus moves into the panel on open and returns to the
+ * trigger that opened it on close.
  */
 @Component({
   selector: 'app-xomtracks-playlists-panel',
@@ -43,8 +44,8 @@ export class XomtracksPlaylistsPanelComponent {
 
   readonly playlists: XtPlaylistView[];
 
-  /** Which playlist's tab was used to open the drawer — drives where focus
-   * and scroll land once it's open. Null when opened some other way. */
+  /** Which playlist's tab was used to open the drawer — the drawer renders
+   * ONLY this direction's playlist. Null when closed. */
   requestedDirection: XtDirection | null = null;
 
   @ViewChild('panel') panelRef?: ElementRef<HTMLElement>;
@@ -61,18 +62,25 @@ export class XomtracksPlaylistsPanelComponent {
     }));
   }
 
-  /** Opens the drawer scrolled/focused to one specific playlist — the
-   * handler for both edge tabs ("Shared With Me" passes 'in', "Shared By
-   * Me" passes 'out'). */
+  /** Opens the drawer showing ONLY one direction's playlist — the handler
+   * for both edge tabs ("Shared With Me" passes 'in', "Shared By Me" passes
+   * 'out'). If the drawer is already open on the other direction, this
+   * swaps its content rather than opening a second drawer. */
   openFor(direction: XtDirection): void {
     this.requestedDirection = direction;
     if (this.open) {
-      queueMicrotask(() => this.focusRequested());
+      queueMicrotask(() => this.focusFirst());
       return;
     }
     this.previouslyFocused = document.activeElement as HTMLElement | null;
     this.open = true;
-    queueMicrotask(() => this.focusRequested());
+    queueMicrotask(() => this.focusFirst());
+  }
+
+  /** The single playlist to render for the currently requested direction,
+   * or null when nothing's requested (drawer isn't open). */
+  get requestedPlaylist(): XtPlaylistView | null {
+    return this.playlists.find((p) => p.direction === this.requestedDirection) ?? null;
   }
 
   close(): void {
@@ -111,25 +119,10 @@ export class XomtracksPlaylistsPanelComponent {
     }
   }
 
-  /** Scrolls the requested playlist's card into view and focuses its first
-   * control, falling back to "just focus the first focusable thing" when no
-   * specific direction was requested (or its card isn't found). */
-  private focusRequested(): void {
-    const root = this.panelRef?.nativeElement;
-    const card = this.requestedDirection
-      ? root?.querySelector<HTMLElement>(`[data-direction="${this.requestedDirection}"]`)
-      : null;
-
-    if (card) {
-      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      card.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
-      const target = card.querySelector<HTMLElement>('a[href], button:not([disabled])');
-      if (target) {
-        target.focus?.();
-        return;
-      }
-    }
-
+  /** Focuses the drawer's first focusable control (the panel itself only
+   * ever renders the one requested playlist now, so there's nothing to
+   * scroll to — just move focus in). */
+  private focusFirst(): void {
     const focusables = this.focusableElements();
     (focusables[0] ?? this.panelRef?.nativeElement)?.focus?.();
   }
