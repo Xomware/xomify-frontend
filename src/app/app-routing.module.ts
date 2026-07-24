@@ -100,6 +100,12 @@ const routes: Routes = [
   },
   // Lazy-loaded feature modules
   {
+    path: 'xomtracks',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/xomtracks/xomtracks.module').then((m) => m.XomtracksModule),
+  },
+  {
     path: '',
     canActivate: [AuthGuard],
     loadChildren: () =>

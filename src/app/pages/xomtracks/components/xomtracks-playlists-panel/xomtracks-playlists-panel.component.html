@@ -1,0 +1,60 @@
+<button
+  type="button"
+  class="xt-panel-tab"
+  [class.xt-panel-tab--hidden]="open"
+  [attr.aria-expanded]="open"
+  aria-controls="xt-playlists-panel"
+  appTooltip="The rolling playlists Xomtracks keeps in sync on Spotify"
+  (click)="openPanel()"
+>
+  <span class="xt-panel-tab-icon" aria-hidden="true">♪</span>
+  <span class="xt-panel-tab-label">Playlists</span>
+</button>
+
+<div
+  class="xt-panel-scrim"
+  *ngIf="open"
+  (click)="onBackdropClick($event)"
+  (keydown)="onKeydown($event)"
+>
+  <aside
+    #panel
+    id="xt-playlists-panel"
+    class="xt-panel-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="xt-playlists-panel-title"
+    tabindex="-1"
+  >
+    <header class="xt-panel-head">
+      <div>
+        <span class="xt-panel-eyebrow">Rolling</span>
+        <h2 class="xt-panel-title" id="xt-playlists-panel-title">Playlists</h2>
+      </div>
+      <button type="button" class="xt-panel-close" (click)="close()" aria-label="Close playlists">
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div class="xt-panel-body">
+      <article class="xt-playlist" *ngFor="let p of playlists" [attr.data-direction]="p.direction">
+        <h3 class="xt-playlist-title">{{ p.title }}</h3>
+        <p class="xt-playlist-blurb">{{ p.blurb }}</p>
+        <iframe
+          class="xt-playlist-embed"
+          [src]="p.embedUrl"
+          [title]="p.title + ' — Spotify embed'"
+          width="100%"
+          height="352"
+          frameborder="0"
+          loading="lazy"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        ></iframe>
+        <a class="xt-playlist-open" [href]="p.openUrl" target="_blank" rel="noopener noreferrer">
+          Open in Spotify
+          <span aria-hidden="true">↗</span>
+        </a>
+      </article>
+    </div>
+  </aside>
+</div>

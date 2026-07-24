@@ -1,0 +1,130 @@
+<div
+  class="xt-modal-backdrop"
+  (click)="onBackdropClick($event)"
+  (keydown)="onKeydown($event)"
+>
+  <div
+    #dialog
+    class="xt-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="xt-detail-title"
+    tabindex="-1"
+  >
+    <button type="button" class="xt-close-btn" (click)="requestClose()" aria-label="Close details">
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <div class="xt-hero">
+      <div class="xt-hero-cover">
+        <img
+          *ngIf="hasArt; else noArt"
+          class="xt-hero-cover-img"
+          [src]="share.albumArtUrl"
+          [alt]="'Cover art for ' + title"
+          decoding="async"
+          (error)="onArtError()"
+        />
+        <ng-template #noArt>
+          <div class="xt-hero-cover-fallback" [attr.data-platform]="share.platform" aria-hidden="true">
+            <span>♪</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="xt-hero-body">
+        <span class="xt-platform-badge" [attr.data-platform]="share.platform">
+          {{ platformLabel }}
+        </span>
+        <h2 class="xt-detail-title" id="xt-detail-title">{{ title }}</h2>
+        <p class="xt-detail-artist" *ngIf="artist">{{ artist }}</p>
+        <p class="xt-detail-album" *ngIf="album">{{ album }}</p>
+
+        <div class="xt-stats" *ngIf="sharedTimes > 1 || otherSharers.length">
+          <span class="xt-stat-pill">{{ sharedTimesLabel }}</span>
+          <span class="xt-stat-pill xt-stat-pill--muted" *ngIf="otherSharersLabel">
+            {{ otherSharersLabel }}
+          </span>
+        </div>
+
+        <div class="xt-rate-row">
+          <span
+            class="xt-rate-label"
+            appTooltip="Whole-group rating — any signed-in Xomify member can rate this track"
+          >Rate this track</span>
+          <app-xomtracks-rating-stars
+            size="md"
+            [rating]="share.rating"
+            [trackKey]="trackKey"
+            (rate)="rate.emit($event)"
+          ></app-xomtracks-rating-stars>
+        </div>
+
+        <a class="xt-play-link" [href]="primaryUrl" target="_blank" rel="noopener noreferrer">
+          {{ primaryLinkLabel }}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="xt-embed" *ngIf="embedUrl as src" [attr.data-kind]="embedKind">
+      <iframe
+        class="xt-embed-frame"
+        [src]="src"
+        [title]="title + ' — inline player'"
+        width="100%"
+        [height]="embedKind === 'soundcloud' ? 166 : 152"
+        frameborder="0"
+        loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      ></iframe>
+    </div>
+
+    <dl class="xt-facts">
+      <div class="xt-fact">
+        <dt>Direction</dt>
+        <dd>{{ directionLabel }}</dd>
+      </div>
+      <div class="xt-fact">
+        <dt>{{ share.direction === 'in' ? 'From' : 'Sharer' }}</dt>
+        <dd class="xt-fact-sharer">
+          <span class="xt-sharer-avatar" aria-hidden="true">{{ sharerInitial }}</span>
+          {{ sharer }}
+        </dd>
+      </div>
+      <div class="xt-fact">
+        <dt>Platform</dt>
+        <dd>{{ platformLabel }}</dd>
+      </div>
+      <div class="xt-fact">
+        <dt>Shared on</dt>
+        <dd>{{ dateLabel }}</dd>
+      </div>
+      <div class="xt-fact" *ngIf="album">
+        <dt>Album</dt>
+        <dd>{{ album }}</dd>
+      </div>
+      <div class="xt-fact">
+        <dt>Match status</dt>
+        <dd>
+          <span class="xt-match-dot" [class.xt-match-dot--ok]="isMatched" aria-hidden="true"></span>
+          {{ matchStatusLabel }}
+        </dd>
+      </div>
+    </dl>
+
+    <section class="xt-breakdown" *ngIf="showBreakdown">
+      <h3 class="xt-breakdown-head">
+        Shared
+        <span class="xt-count-badge">×{{ occurrences.length }}</span>
+      </h3>
+      <ul class="xt-breakdown-list">
+        <li class="xt-breakdown-item" *ngFor="let occ of occurrences; trackBy: trackByShareId">
+          <span class="xt-sharer-avatar" aria-hidden="true">{{ occurrenceInitial(occ) }}</span>
+          <span class="xt-breakdown-sharer">{{ occurrenceSharer(occ) }}</span>
+          <span class="xt-breakdown-date">{{ occurrenceDate(occ) }}</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>

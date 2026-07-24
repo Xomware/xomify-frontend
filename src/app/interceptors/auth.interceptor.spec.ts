@@ -38,6 +38,10 @@ describe('AuthInterceptor', () => {
   const xomifyUrl = `${xomifyBase}/friends/list?email=test@example.com`;
   const loginUrl = `${xomifyBase}/auth/login`;
   const spotifyUrl = 'https://api.spotify.com/v1/me';
+  // The Xomtracks feature calls a separate host — the interceptor must treat
+  // it like a Xomify call (see `isXomifyApiRequest`).
+  const xomtracksBase = environment.xomtracksApiUrl;
+  const xomtracksUrl = `${xomtracksBase}/shares/list?direction=in&window=month`;
 
   beforeEach(() => {
     sessionStorage.clear();
@@ -83,6 +87,18 @@ describe('AuthInterceptor', () => {
       'Bearer jwt-from-session',
     );
     req.flush({});
+  });
+
+  it('attaches the per-user JWT from sessionStorage as Bearer on Xomtracks calls', () => {
+    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+
+    httpClient.get(xomtracksUrl).subscribe();
+
+    const req = httpMock.expectOne(xomtracksUrl);
+    expect(req.request.headers.get('Authorization')).toBe(
+      'Bearer jwt-from-session',
+    );
+    req.flush({ data: {}, error: null, meta: {} });
   });
 
   it('falls back to environment.apiAuthToken when sessionStorage has no JWT', () => {
