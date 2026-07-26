@@ -5,12 +5,12 @@ import { catchError, map } from 'rxjs/operators';
 import { XomtracksMeService } from '../../services/xomtracks-me.service';
 
 /**
- * Gates `/xomtracks/admin` to the admin (Dom) only. Reads the
+ * Gates `/shares/admin` to the admin (Dom) only. Reads the
  * server-authoritative `isAdmin` flag from `GET /me/get` (never the JWT
  * client-side) — anything else (non-admin, or the `/me/get` call itself
  * failing) redirects to the Shares feed rather than rendering a 403 page.
  *
- * `AuthGuard` already gates the parent `/xomtracks` route, so by the time
+ * `AuthGuard` already gates the parent `/shares` route, so by the time
  * this guard runs the caller is guaranteed to be logged in.
  */
 @Injectable({ providedIn: 'root' })
@@ -22,8 +22,8 @@ export class XomtracksAdminGuard implements CanActivate {
 
   canActivate(): Observable<boolean | UrlTree> {
     return this.me.get().pipe(
-      map((me) => (me.isAdmin ? true : this.router.parseUrl('/xomtracks'))),
-      catchError(() => of(this.router.parseUrl('/xomtracks'))),
+      map((me) => (me.isAdmin ? true : this.router.parseUrl('/shares'))),
+      catchError(() => of(this.router.parseUrl('/shares'))),
     );
   }
 }

@@ -100,11 +100,14 @@ const routes: Routes = [
   },
   // Lazy-loaded feature modules
   {
-    path: 'xomtracks',
+    path: 'shares',
     canActivate: [AuthGuard],
     loadChildren: () =>
       import('./pages/xomtracks/xomtracks.module').then((m) => m.XomtracksModule),
   },
+  // Legacy route — the Shares feature used to live at `/xomtracks`. Keep a
+  // redirect so old links/bookmarks (incl. `/xomtracks/admin`) still land.
+  { path: 'xomtracks', redirectTo: 'shares', pathMatch: 'prefix' },
   {
     path: '',
     canActivate: [AuthGuard],

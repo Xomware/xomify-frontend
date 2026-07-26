@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { XT_ADMIN_TABS, XtAdminTab } from '../models/xomtracks-admin.model';
 
 /**
- * The Dom-only Admin Portal (`/xomtracks/admin`, gated by `XomtracksAdminGuard`
+ * The Dom-only Admin Portal (`/shares/admin`, gated by `XomtracksAdminGuard`
  * off the server-authoritative `isAdmin` flag on `GET /me/get`). Four
  * read-mostly panels over the `xomtracks-backend` `/admin/*` surface:
  * user directory, read-only "view as" impersonation, a calls/errors

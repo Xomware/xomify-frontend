@@ -86,7 +86,7 @@
   <a
     class="admin-link"
     *ngIf="isLoggedIn() && isAdmin"
-    routerLink="/xomtracks/admin"
+    routerLink="/shares/admin"
     routerLinkActive="active"
     aria-label="Admin portal"
     appTooltip="Admin portal"
@@ -175,8 +175,8 @@
     <a
       class="mobile-admin-link"
       *ngIf="isAdmin"
-      routerLink="/xomtracks/admin"
-      (click)="selectItem('/xomtracks/admin')"
+      routerLink="/shares/admin"
+      (click)="selectItem('/shares/admin')"
       role="menuitem"
     >
       <span aria-hidden="true">⚙️</span> Admin
