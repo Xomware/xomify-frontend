@@ -48,7 +48,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
-    { kind: 'link', link: { route: '/xomtracks', label: 'Shares' } },
+    { kind: 'link', link: { route: '/shares', label: 'Shares' } },
     { kind: 'link', link: { route: '/likes', label: 'Likes' } },
     {
       kind: 'group',

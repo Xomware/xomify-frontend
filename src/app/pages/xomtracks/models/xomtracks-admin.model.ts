@@ -1,7 +1,7 @@
 import { XtDirection, XtShare, XtTimeWindow } from './xomtracks-share.model';
 
 /**
- * Types for the Dom-only Admin Portal (`/xomtracks/admin`) — mirrors the five
+ * Types for the Dom-only Admin Portal (`/shares/admin`) — mirrors the five
  * `xomtracks-backend` `/admin/*` handlers (all `require_admin`-gated
  * in-handler: 401 unauthenticated, 403 non-admin). See
  * `xomtracks-backend/lambdas/admin_*` and

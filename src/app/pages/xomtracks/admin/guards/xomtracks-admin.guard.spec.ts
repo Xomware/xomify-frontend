@@ -45,22 +45,22 @@ describe('XomtracksAdminGuard', () => {
     });
   });
 
-  it('redirects to /xomtracks when the caller is not the admin', (done) => {
+  it('redirects to /shares when the caller is not the admin', (done) => {
     meSpy.get.and.returnValue(of({ ...baseMe, isAdmin: false }));
 
     guard.canActivate().subscribe((result) => {
       expect(result instanceof UrlTree).toBe(true);
-      expect(router.serializeUrl(result as UrlTree)).toBe('/xomtracks');
+      expect(router.serializeUrl(result as UrlTree)).toBe('/shares');
       done();
     });
   });
 
-  it('redirects to /xomtracks when the /me/get call fails', (done) => {
+  it('redirects to /shares when the /me/get call fails', (done) => {
     meSpy.get.and.returnValue(throwError(() => new Error('boom')));
 
     guard.canActivate().subscribe((result) => {
       expect(result instanceof UrlTree).toBe(true);
-      expect(router.serializeUrl(result as UrlTree)).toBe('/xomtracks');
+      expect(router.serializeUrl(result as UrlTree)).toBe('/shares');
       done();
     });
   });
