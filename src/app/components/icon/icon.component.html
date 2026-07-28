@@ -1,0 +1,208 @@
+<ng-container [ngSwitch]="name">
+  <!-- settings / mixer-tune (gear substitute — sliders) -->
+  <svg *ngSwitchCase="'settings'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <line x1="4" y1="6" x2="20" y2="6" /><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none" />
+    <line x1="4" y1="12" x2="20" y2="12" /><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none" />
+    <line x1="4" y1="18" x2="20" y2="18" /><circle cx="10" cy="18" r="2" fill="currentColor" stroke="none" />
+  </svg>
+
+  <svg *ngSwitchCase="'check'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4 12.5 9.5 18 20 6" />
+  </svg>
+
+  <svg *ngSwitchCase="'check-circle'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+    <polyline points="7.5 12.5 10.5 15.5 16.5 9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'close-circle'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <circle cx="12" cy="12" r="9" stroke-width="1.6" />
+    <line x1="8.5" y1="8.5" x2="15.5" y2="15.5" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="15.5" y1="8.5" x2="8.5" y2="15.5" stroke-width="1.8" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'warning'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <polygon points="12,3 22,20 2,20" stroke-width="1.6" stroke-linejoin="round" />
+    <line x1="12" y1="9.5" x2="12" y2="14.5" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="12" cy="17.3" r="1" fill="currentColor" stroke="none" />
+  </svg>
+
+  <svg *ngSwitchCase="'flame'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 2C9 6 6 9 6 13a6 6 0 0 0 12 0c0-2-1-4-3-6 .3 2-.7 4-2 4s-2-1.5-1-3c-1 0-1-3 0-6z" />
+  </svg>
+
+  <svg *ngSwitchCase="'music-note'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+  </svg>
+
+  <svg *ngSwitchCase="'clock'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <polyline points="12 7 12 12 16 14" />
+  </svg>
+
+  <svg *ngSwitchCase="'calendar'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <rect x="3" y="4" width="18" height="17" rx="2" stroke-width="1.6" />
+    <line x1="3" y1="9" x2="21" y2="9" stroke-width="1.6" />
+    <line x1="8" y1="2" x2="8" y2="6" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="16" y1="2" x2="16" y2="6" stroke-width="1.8" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'play'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <polygon points="6,4 20,12 6,20" fill="currentColor" />
+  </svg>
+
+  <svg *ngSwitchCase="'headphones'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 14a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.8" />
+    <rect x="2" y="14" width="4.5" height="7" rx="2" fill="currentColor" />
+    <rect x="17.5" y="14" width="4.5" height="7" rx="2" fill="currentColor" />
+  </svg>
+
+  <svg *ngSwitchCase="'copy'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+    <rect x="8" y="8" width="12" height="12" rx="1.5" />
+    <rect x="4" y="4" width="12" height="12" rx="1.5" />
+  </svg>
+
+  <svg *ngSwitchCase="'bell'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 3c-2.2 0-4 1.8-4 4v4l-2 4h16l-2-4V7c0-2.2-1.8-4-4-4z" />
+    <rect x="10" y="18" width="4" height="1.6" rx="0.8" fill="currentColor" />
+  </svg>
+
+  <svg *ngSwitchCase="'bell-off'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 3c-2.2 0-4 1.8-4 4v4l-2 4h16l-2-4V7c0-2.2-1.8-4-4-4z" />
+    <rect x="10" y="18" width="4" height="1.6" rx="0.8" fill="currentColor" />
+    <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'ticket'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <rect x="2" y="6" width="20" height="12" rx="2" stroke-width="1.6" />
+    <line x1="12" y1="6" x2="12" y2="18" stroke-width="1.4" stroke-dasharray="2,2" />
+  </svg>
+
+  <svg *ngSwitchCase="'pin'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="none" stroke="currentColor" stroke-width="1.7" d="M12 21c-4-4.5-7-8-7-11a7 7 0 0 1 14 0c0 3-3 6.5-7 11z" />
+    <circle cx="12" cy="10" r="2.4" fill="currentColor" stroke="none" />
+  </svg>
+
+  <svg *ngSwitchCase="'search'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="10" cy="10" r="6" />
+    <line x1="15" y1="15" x2="21" y2="21" />
+  </svg>
+
+  <svg *ngSwitchCase="'eye'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <ellipse cx="12" cy="12" rx="9" ry="5.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+    <circle cx="12" cy="12" r="2.6" fill="currentColor" />
+  </svg>
+
+  <svg *ngSwitchCase="'key'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <circle cx="8" cy="8" r="4" />
+    <line x1="11" y1="11" x2="19" y2="19" />
+    <line x1="16" y1="16" x2="16" y2="19" />
+    <line x1="18.5" y1="18.5" x2="18.5" y2="20.5" />
+  </svg>
+
+  <svg *ngSwitchCase="'inbox'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+    <rect x="3" y="8" width="18" height="11" rx="1" />
+    <polyline points="3 8 8 8 9.5 12 14.5 12 16 8 21 8" />
+  </svg>
+
+  <svg *ngSwitchCase="'sparkle'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 2 14 10 22 12 14 14 12 22 10 14 2 12 10 10 Z" />
+  </svg>
+
+  <svg *ngSwitchCase="'leaf'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <path stroke-width="1.7" d="M4 20C4 10 12 4 20 4c0 8-6 16-16 16z" />
+    <line x1="6" y1="18" x2="14" y2="10" stroke-width="1.4" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'droplet'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M12 3c3 5 6 9 6 12a6 6 0 0 1-12 0c0-3 3-7 6-12z" />
+  </svg>
+
+  <svg *ngSwitchCase="'wave'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M2 14c1.5-3 3.5-3 5 0s3.5 3 5 0 3.5-3 5 0 3.5 3 5 0" />
+  </svg>
+
+  <svg *ngSwitchCase="'sun'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="12" cy="12" r="4.5" />
+    <line x1="12" y1="2" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="22" />
+    <line x1="2" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="22" y2="12" />
+    <line x1="4.5" y1="4.5" x2="6.5" y2="6.5" /><line x1="17.5" y1="17.5" x2="19.5" y2="19.5" />
+    <line x1="17.5" y1="6.5" x2="19.5" y2="4.5" /><line x1="4.5" y1="19.5" x2="6.5" y2="17.5" />
+  </svg>
+
+  <svg *ngSwitchCase="'bolt'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M13 2 3 14 12 14 11 22 21 10 12 10 Z" />
+  </svg>
+
+  <svg *ngSwitchCase="'moon'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+
+  <svg *ngSwitchCase="'scale'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <line x1="12" y1="3" x2="12" y2="20" />
+    <line x1="4" y1="7" x2="20" y2="7" />
+    <circle cx="4" cy="11" r="2.2" stroke-width="1.5" />
+    <circle cx="20" cy="11" r="2.2" stroke-width="1.5" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+  </svg>
+
+  <svg *ngSwitchCase="'smiley'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6" />
+    <circle cx="8.5" cy="10" r="1.1" fill="currentColor" />
+    <circle cx="15.5" cy="10" r="1.1" fill="currentColor" />
+    <path d="M7.5 14.5c1.2 1.8 3 2.6 4.5 2.6s3.3-.8 4.5-2.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'people'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <circle cx="8.5" cy="8" r="3" stroke-width="1.6" />
+    <circle cx="16" cy="9.5" r="2.4" stroke-width="1.5" />
+    <path d="M3 20c0-3.5 2.5-6 5.5-6s5.5 2.5 5.5 6" stroke-width="1.6" stroke-linecap="round" />
+    <path d="M14 20c0-2.5 1.8-4.5 4-4.5s4 2 4 4.5" stroke-width="1.5" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'mic'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M6 11a6 6 0 0 0 12 0" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+  </svg>
+
+  <svg *ngSwitchCase="'trending-up'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="3 17 9 11 13 15 21 6" />
+    <polyline points="15 6 21 6 21 12" />
+  </svg>
+
+  <svg *ngSwitchCase="'chart'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="4" y="12" width="3.5" height="8" fill="currentColor" />
+    <rect x="10.2" y="7" width="3.5" height="13" fill="currentColor" />
+    <rect x="16.5" y="3" width="3.5" height="17" fill="currentColor" />
+  </svg>
+
+  <svg *ngSwitchCase="'refresh'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12a8 8 0 0 1 13.66-5.66" />
+    <polyline points="17.5 2.5 17.66 6.34 13.82 6.5" />
+    <path d="M20 12a8 8 0 0 1-13.66 5.66" />
+    <polyline points="6.5 21.5 6.34 17.66 10.18 17.5" />
+  </svg>
+
+  <svg *ngSwitchCase="'spinner'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" class="icon-spin" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="9" stroke-dasharray="42 100" opacity="0.9" />
+  </svg>
+
+  <svg *ngSwitchCase="'megaphone'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true">
+    <polygon points="4,9 4,15 9,15 16,19 16,5 9,9" fill="currentColor" />
+    <rect x="2" y="10" width="2" height="4" fill="currentColor" />
+    <line x1="19" y1="9" x2="19" y2="15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+  </svg>
+
+  <svg *ngSwitchCase="'construction'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+    <polygon points="12 3 18 20 6 20" />
+    <line x1="8.2" y1="14" x2="15.8" y2="14" />
+  </svg>
+
+  <svg *ngSwitchCase="'camera'" [attr.width]="size" [attr.height]="size" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor">
+    <rect x="3" y="7" width="18" height="13" rx="2" stroke-width="1.7" />
+    <polygon points="9 7 10.5 4.5 13.5 4.5 15 7" stroke-width="1.6" stroke-linejoin="round" />
+    <circle cx="12" cy="13.5" r="4" stroke-width="1.7" />
+  </svg>
+</ng-container>

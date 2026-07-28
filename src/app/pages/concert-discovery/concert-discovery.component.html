@@ -13,7 +13,7 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="header-text">
-        <h1 class="page-title">🎤 Concert Discovery</h1>
+        <h1 class="page-title"><app-icon name="mic" [size]="24"></app-icon> Concert Discovery</h1>
         <p class="page-subtitle">Upcoming shows for your top artists</p>
       </div>
       <button class="btn-refresh" (click)="refresh()">↻ Refresh</button>
@@ -22,12 +22,12 @@
     <!-- Stats Row -->
     <div class="stat-cards">
       <div class="stat-card">
-        <span class="card-emoji">🎫</span>
+        <app-icon name="ticket" [size]="24" class="card-emoji"></app-icon>
         <span class="card-value">{{ totalShows }}</span>
         <span class="card-label">Upcoming Shows</span>
       </div>
       <div class="stat-card">
-        <span class="card-emoji">🎤</span>
+        <app-icon name="mic" [size]="24" class="card-emoji"></app-icon>
         <span class="card-value">{{ artistsWithShows }}</span>
         <span class="card-label">Artists Touring</span>
       </div>
@@ -50,7 +50,7 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="allEvents.length === 0">
-      <div class="empty-icon">🎵</div>
+      <app-icon name="music-note" [size]="36" class="empty-icon"></app-icon>
       <p class="empty-title">No upcoming shows found for your top artists</p>
       <p class="empty-subtitle">Try expanding the date range or check back later</p>
     </div>
@@ -83,16 +83,16 @@
             loading="lazy"
             *ngIf="event.artistImage"
           />
-          <div class="event-artist-placeholder" *ngIf="!event.artistImage">🎤</div>
+          <app-icon *ngIf="!event.artistImage" name="mic" [size]="28" class="event-artist-placeholder"></app-icon>
         </div>
         <div class="event-details">
           <h3 class="event-name">{{ event.eventName }}</h3>
           <div class="event-meta">
-            <span class="event-venue">📍 {{ event.venue }}</span>
+            <span class="event-venue"><app-icon name="pin" [size]="13"></app-icon> {{ event.venue }}</span>
             <span class="event-city">{{ event.city }}</span>
           </div>
           <div class="event-date">
-            📅 {{ formatDate(event.date) }}
+            <app-icon name="calendar" [size]="13"></app-icon> {{ formatDate(event.date) }}
             <span class="event-time" *ngIf="event.time">· {{ formatTime(event.time) }}</span>
           </div>
         </div>
@@ -103,14 +103,15 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            🎫 Get Tickets
+            <app-icon name="ticket" [size]="15"></app-icon> Get Tickets
           </a>
           <button
             class="btn-notify"
             [class.active]="event.notifyMe"
             (click)="toggleNotify(event)"
           >
-            {{ event.notifyMe ? '🔔' : '🔕' }} {{ event.notifyMe ? 'Notifying' : 'Notify Me' }}
+            <app-icon [name]="event.notifyMe ? 'bell' : 'bell-off'" [size]="15"></app-icon>
+            {{ event.notifyMe ? 'Notifying' : 'Notify Me' }}
           </button>
         </div>
       </div>

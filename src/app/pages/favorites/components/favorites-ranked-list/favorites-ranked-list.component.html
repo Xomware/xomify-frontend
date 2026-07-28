@@ -82,7 +82,7 @@
           (click)="toggleTimeline(item)"
           [attr.aria-label]="'Toggle rank history for ' + item.name"
         >
-          <span aria-hidden="true">📈</span>
+          <app-icon name="trending-up" [size]="15"></app-icon>
         </button>
 
         <span class="fav-item-actions">
@@ -160,12 +160,25 @@
   </div>
 
   <div class="fav-suggestions" *ngIf="suggestionsOpen">
+    <div class="fav-suggestions-range" role="group" aria-label="Suggestions time period">
+      <button
+        *ngFor="let range of rangeOptions"
+        type="button"
+        class="fav-range-pill"
+        [class.active]="suggestionsRange === range.value"
+        [attr.aria-pressed]="suggestionsRange === range.value"
+        (click)="selectSuggestionsRange(range.value)"
+      >
+        {{ range.label }}
+      </button>
+    </div>
+
     <p class="fav-suggestions-loading" *ngIf="suggestionsLoading" aria-live="polite">
       Loading suggestions…
     </p>
     <ng-container *ngIf="!suggestionsLoading">
       <p class="fav-suggestions-empty" *ngIf="suggestions.length === 0">
-        No suggestions right now — keep listening!
+        No suggestions for this period — try a different range, or keep listening!
       </p>
       <ul class="fav-suggestions-list" *ngIf="suggestions.length > 0">
         <li class="fav-suggestion" *ngFor="let rec of suggestions">

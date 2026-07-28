@@ -35,27 +35,27 @@
       <!-- Summary Cards -->
       <div class="summary-cards">
         <div class="stat-card">
-          <span class="stat-emoji">🎵</span>
+          <app-icon name="music-note" [size]="24" class="stat-emoji"></app-icon>
           <span class="stat-value">{{ analysis.totalTracks }}</span>
           <span class="stat-label">Tracks</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">⏱️</span>
+          <app-icon name="clock" [size]="24" class="stat-emoji"></app-icon>
           <span class="stat-value">{{ formatDuration(analysis.totalDurationMs) }}</span>
           <span class="stat-label">Total Duration</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">🔥</span>
+          <app-icon name="flame" [size]="24" class="stat-emoji"></app-icon>
           <span class="stat-value">{{ analysis.avgPopularity }}</span>
           <span class="stat-label">Avg Popularity</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">👥</span>
+          <app-icon name="people" [size]="24" class="stat-emoji"></app-icon>
           <span class="stat-value">{{ analysis.uniqueArtistCount }}</span>
           <span class="stat-label">Unique Artists</span>
         </div>
         <div class="stat-card">
-          <span class="stat-emoji">🔞</span>
+          <span class="stat-emoji explicit-badge" aria-hidden="true">E</span>
           <span class="stat-value">{{ getExplicitPercent() }}%</span>
           <span class="stat-label">Explicit</span>
         </div>
@@ -65,7 +65,7 @@
       <div class="breakdown-grid">
         <div class="breakdown-block" *ngIf="analysis.topArtists.length > 0">
           <div class="block-header">
-            <span class="block-icon">🎤</span>
+            <app-icon name="mic" [size]="20" class="block-icon"></app-icon>
             <h3 class="block-title">Top Artists</h3>
           </div>
           <ul class="breakdown-list">
@@ -79,7 +79,7 @@
 
         <div class="breakdown-block" *ngIf="analysis.topGenres.length > 0">
           <div class="block-header">
-            <span class="block-icon">🎛️</span>
+            <app-icon name="settings" [size]="20" class="block-icon"></app-icon>
             <h3 class="block-title">Top Genres</h3>
           </div>
           <ul class="breakdown-list">
@@ -93,7 +93,7 @@
 
         <div class="breakdown-block" *ngIf="analysis.decades.length > 0">
           <div class="block-header">
-            <span class="block-icon">📅</span>
+            <app-icon name="calendar" [size]="20" class="block-icon"></app-icon>
             <h3 class="block-title">Decades</h3>
           </div>
           <ul class="breakdown-list">

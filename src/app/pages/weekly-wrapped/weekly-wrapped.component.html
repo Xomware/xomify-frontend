@@ -10,7 +10,7 @@
 
   <!-- Empty State -->
   <div class="empty-state" *ngIf="!loading && !error && isEmpty">
-    <div class="empty-icon">🎧</div>
+    <app-icon name="headphones" [size]="40" class="empty-icon"></app-icon>
     <h2>Listen more this week to see your Wrapped!</h2>
     <p>Once you've played some tracks, your weekly stats will appear here.</p>
   </div>
@@ -24,7 +24,8 @@
         <p class="page-subtitle">{{ currentSnapshot.weekLabel }}</p>
       </div>
       <button class="btn-download" (click)="downloadAsImage()" [disabled]="exporting">
-        {{ exporting ? 'Exporting…' : '📸 Download as Image' }}
+        <app-icon *ngIf="!exporting" name="camera" [size]="16"></app-icon>
+        {{ exporting ? 'Exporting…' : 'Download as Image' }}
       </button>
     </div>
 
@@ -38,7 +39,7 @@
       <div class="wrapped-card" #wrappedCard @cardReveal>
         <!-- Branding -->
         <div class="card-brand reveal-item">
-          <span class="brand-logo">🎵 Xomify</span>
+          <span class="brand-logo">Xomify</span>
           <span class="brand-week">This Week</span>
         </div>
 
@@ -80,7 +81,7 @@
             <span class="mini-label">tracks</span>
           </div>
           <div class="mini-stat">
-            <span class="mini-value">🔥 {{ currentSnapshot.listeningStreak }}</span>
+            <span class="mini-value"><app-icon name="flame" [size]="15"></app-icon> {{ currentSnapshot.listeningStreak }}</span>
             <span class="mini-label">day streak</span>
           </div>
         </div>

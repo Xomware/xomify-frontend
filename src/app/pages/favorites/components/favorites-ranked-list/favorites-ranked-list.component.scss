@@ -324,6 +324,35 @@
   padding-top: 10px;
 }
 
+.fav-suggestions-range {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.fav-range-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8a8a9a;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #fff;
+    border-color: rgba(156, 10, 191, 0.3);
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+    border-color: transparent;
+    color: #fff;
+  }
+}
+
 .fav-suggestions-loading,
 .fav-suggestions-empty {
   margin: 0;

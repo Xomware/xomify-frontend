@@ -9,7 +9,7 @@
         [disabled]="refreshing"
         title="Refresh timeline"
       >
-        <span class="icon">🔄</span>
+        <app-icon name="refresh" [size]="16"></app-icon>
       </button>
     </div>
 
@@ -112,7 +112,7 @@
     <!-- Link to Release Radar -->
     <div class="release-radar-link">
       <p>
-        <strong>📻 Tip:</strong> Check out
+        <strong>Tip:</strong> Check out
         <a routerLink="/release-radar" class="link">Release Radar</a>
         for curated weekly releases from your followed artists.
       </p>
@@ -176,7 +176,9 @@
               [alt]="activity.title"
               class="album-cover"
             />
-            <div *ngIf="!activity.imageUrl" class="no-image">🎵</div>
+            <div *ngIf="!activity.imageUrl" class="no-image">
+              <app-icon name="music-note" [size]="22"></app-icon>
+            </div>
 
             <!-- Activity Badge -->
             <span class="activity-badge" [style.backgroundColor]="getActivityColor(activity.type)">
@@ -214,7 +216,7 @@
               (click)="openInSpotify(activity.uri, $event)"
               title="Open in Spotify"
             >
-              🎵
+              <app-icon name="play" [size]="15"></app-icon>
             </button>
           </div>
         </div>

@@ -70,8 +70,8 @@ export class ConcertDiscoveryComponent implements OnInit {
   toggleNotify(event: ConcertEvent): void {
     event.notifyMe = this.concertService.toggleNotification(event.id);
     const msg = event.notifyMe
-      ? `🔔 You'll be notified about ${event.eventName}`
-      : `🔕 Notification removed for ${event.eventName}`;
+      ? `You'll be notified about ${event.eventName}`
+      : `Notification removed for ${event.eventName}`;
     this.toastService.showPositiveToast(msg);
   }
 
