@@ -7,13 +7,15 @@
     (click)="toggleExpanded()"
   >
     <span class="xt-setup-toggle-icon" aria-hidden="true">{{ expanded ? '−' : '+' }}</span>
-    Set up your own
+    Toggle in your own shares
   </button>
 
   <div class="xt-setup-body" id="xt-setup-body" *ngIf="expanded">
     <p class="xt-setup-sub">
-      Run your own local extractor over your iMessage history — it scans for
-      music links and pushes them here, stamped as yours.
+      You're seeing the shared feed. Want your own iMessage music links in
+      here too? Generate a token below and run the extractor on your Mac —
+      it scans your message history locally for music links and pushes them
+      here, stamped as yours.
     </p>
 
     <!-- Minted: show the plaintext token ONCE + the install steps. -->
@@ -39,22 +41,17 @@
         </li>
         <li>
           <p>
-            Grant Full Disk Access to Terminal (and the extractor's Python
-            binary) under
-            <strong>System Settings → Privacy &amp; Security → Full Disk Access</strong>
-            — the extractor reads
-            <code>chat.db</code> locally and read-only, never sends messages.
+            Run the guided installer in Terminal — it walks you through
+            granting Full Disk Access (so the extractor can read
+            <code>chat.db</code> locally, read-only, and never send
+            messages) and schedules a recurring scan for you. It'll also ask
+            you to paste this token directly, if you'd rather skip the
+            Keychain command above.
           </p>
-        </li>
-        <li>
-          <p>
-            Clone
-            <code>xomtracks-backend</code> and follow
-            <code>extractor/README.md</code> to run a scan. A guided
-            <code>curl&nbsp;|&nbsp;bash</code> installer (with the launchd
-            scheduler baked in) is on the way — for now this is a short manual
-            step.
-          </p>
+          <div class="xt-code-row">
+            <code class="xt-code">{{ installCommand }}</code>
+            <button type="button" class="xt-copy-btn" (click)="copyInstallCommand()">Copy</button>
+          </div>
         </li>
       </ol>
 

@@ -38,36 +38,61 @@
     aria-labelledby="xt-playlists-panel-title"
     tabindex="-1"
   >
-    <ng-container *ngIf="requestedPlaylist as p">
-      <header class="xt-panel-head" [class.xt-panel-head--out]="p.direction === 'out'">
-        <div>
-          <span class="xt-panel-eyebrow">Rolling</span>
-          <h2 class="xt-panel-title" id="xt-playlists-panel-title">{{ p.title }}</h2>
-        </div>
-        <button type="button" class="xt-panel-close" (click)="close()" aria-label="Close playlist">
-          <span aria-hidden="true">×</span>
-        </button>
-      </header>
+    <header class="xt-panel-head" [class.xt-panel-head--out]="requestedDirection === 'out'">
+      <div>
+        <span class="xt-panel-eyebrow">Rolling</span>
+        <h2 class="xt-panel-title" id="xt-playlists-panel-title">
+          {{ requestedTitle || (requestedDirection === 'out' ? 'Shared By Me' : 'Shared With Me') }}
+        </h2>
+      </div>
+      <button type="button" class="xt-panel-close" (click)="close()" aria-label="Close playlist">
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
 
-      <div class="xt-panel-body">
-        <article class="xt-playlist" [attr.data-direction]="p.direction">
-          <p class="xt-playlist-blurb">{{ p.blurb }}</p>
+    <div class="xt-panel-body">
+      <!-- Loading -->
+      <div class="xt-panel-state" *ngIf="state === 'loading'" aria-busy="true">
+        <p>Loading playlists…</p>
+      </div>
+
+      <!-- Error -->
+      <div class="xt-panel-state xt-panel-state--error" *ngIf="state === 'error'" role="alert">
+        <p>Couldn't load the playlists.</p>
+        <button type="button" class="xt-panel-retry-btn" (click)="retry()">Try again</button>
+      </div>
+
+      <!-- Empty (rare — neither baseline nor own has a playlist yet) -->
+      <div class="xt-panel-state" *ngIf="requestedEmpty">
+        <p>No rolling playlist here yet.</p>
+      </div>
+
+      <!-- Loaded -->
+      <ng-container *ngIf="state === 'loaded'">
+        <article
+          class="xt-playlist"
+          *ngFor="let card of requestedCards"
+          [attr.data-direction]="requestedDirection"
+          [attr.data-scope]="card.scope"
+        >
+          <span class="xt-playlist-scope-badge" *ngIf="requestedCards.length > 1">{{ card.label }}</span>
+          <p class="xt-playlist-blurb">{{ card.blurb }}</p>
           <iframe
             class="xt-playlist-embed"
-            [src]="p.embedUrl"
-            [title]="p.title + ' — Spotify embed'"
+            [src]="card.embedUrl"
+            [title]="requestedTitle + ' — ' + card.label + ' — Spotify embed'"
             width="100%"
             height="352"
             frameborder="0"
             loading="lazy"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           ></iframe>
-          <a class="xt-playlist-open" [href]="p.openUrl" target="_blank" rel="noopener noreferrer">
+          <a class="xt-playlist-open" [href]="card.openUrl" target="_blank" rel="noopener noreferrer">
             Open in Spotify
             <span aria-hidden="true">↗</span>
           </a>
         </article>
-      </div>
-    </ng-container>
+      </ng-container>
+    </div>
   </aside>
 </div>
