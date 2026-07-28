@@ -61,13 +61,13 @@
   }
 
   .star-empty {
-    color: #3a3a4a;
+    color: var(--gray-600);
     opacity: 1;
   }
 
   .star-full,
   .star-half {
-    color: #1db954;
+    color: var(--accent-green);
     opacity: 0;
   }
 
@@ -101,7 +101,7 @@
 }
 
 .rating-text {
-  color: #b3b3b3;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 

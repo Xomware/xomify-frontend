@@ -6,27 +6,39 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
   z-index: 10000;
   min-width: 300px;
   max-width: 90vw;
   backdrop-filter: blur(10px);
-  
+  color: var(--text-primary);
+
   &.positive {
-    background: linear-gradient(135deg, rgba(27, 220, 111, 0.95) 0%, rgba(23, 183, 91, 0.95) 100%);
-    color: white;
+    border-color: rgba(52, 199, 123, 0.4);
+
+    .toast-icon {
+      color: var(--positive);
+    }
   }
-  
+
   &.negative {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(235, 87, 87, 0.95) 100%);
-    color: white;
+    border-color: rgba(240, 89, 107, 0.4);
+
+    .toast-icon {
+      color: var(--negative);
+    }
   }
-  
+
   &.info {
-    background: linear-gradient(135deg, rgba(156, 10, 191, 0.95) 0%, rgba(122, 8, 150, 0.95) 100%);
-    color: white;
+    border-color: rgba(156, 10, 191, 0.4);
+
+    .toast-icon {
+      color: var(--accent-purple-text);
+    }
   }
 }
 

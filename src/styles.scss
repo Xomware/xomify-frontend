@@ -1,5 +1,6 @@
 /* Global Styles - XOMIFY */
 /* Purple: #9c0abf | Green: #1bdc6f */
+@use "styles/theme";
 
 /* Reset & Base */
 *,
@@ -16,10 +17,9 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #0a0a14;
-  color: #ffffff;
-  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto",
-    "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -44,13 +44,13 @@ p {
 }
 
 a {
-  color: #9c0abf;
+  color: var(--accent-purple);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition);
 }
 
 a:hover {
-  color: #1bdc6f;
+  color: var(--accent-purple-hover);
 }
 
 /* Buttons */
@@ -79,9 +79,32 @@ textarea,
 select {
   font-family: inherit;
   font-size: inherit;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--border-strong);
+  }
+
+  &:focus-visible {
+    border-color: var(--accent-purple);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
-/* Custom Scrollbar - Purple accent */
+/* Custom Scrollbar - muted accent */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -92,23 +115,23 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 10, 191, 0.5);
-  border-radius: 4px;
+  background: rgba(156, 10, 191, 0.35);
+  border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 10, 191, 0.7);
+  background: rgba(156, 10, 191, 0.5);
 }
 
-/* Selection - Purple accent */
+/* Selection - muted accent */
 ::selection {
-  background: rgba(156, 10, 191, 0.3);
-  color: #fff;
+  background: rgba(156, 10, 191, 0.28);
+  color: var(--text-primary);
 }
 
 ::-moz-selection {
-  background: rgba(156, 10, 191, 0.3);
-  color: #fff;
+  background: rgba(156, 10, 191, 0.28);
+  color: var(--text-primary);
 }
 
 /* App Container */
@@ -146,7 +169,7 @@ app-footer {
 }
 
 .text-muted {
-  color: #8a8a9a;
+  color: var(--text-tertiary);
 }
 
 .sr-only {
@@ -174,9 +197,9 @@ app-footer {
     overflow: visible;
     clip: auto;
     white-space: nowrap;
-    background: #9c0abf;
+    background: var(--accent-purple);
     color: #fff;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     z-index: 10000;
     font-size: 1rem;
     font-weight: 600;
@@ -190,7 +213,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #9c0abf;
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -233,40 +256,49 @@ textarea:focus-visible {
   animation: slideUp 0.4s ease-out;
 }
 
-/* Card Styles (shared across pages) */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .slide-up {
+    animation: none;
+  }
+}
+
+/* Card Styles (shared across pages) — flat surface, hairline border, small
+   radius, subtle elevation on hover instead of a heavy resting shadow. */
 .card {
-  background-color: #1a1a2e;
-  border-radius: 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition), box-shadow var(--transition);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
   }
 }
 
 /* Primary Button */
 .btn-primary {
-  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
-  color: white;
+  background: var(--accent-purple);
+  color: #fff;
   border: none;
-  border-radius: 25px;
-  padding: 12px 24px;
-  font-size: 1rem;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(156, 10, 191, 0.3);
+  transition: background var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow-xs);
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(156, 10, 191, 0.4);
+    background: var(--accent-purple-hover);
+    box-shadow: var(--shadow-sm);
   }
 
   &:disabled {
-    background: #4a4a5a;
+    background: var(--gray-600);
     cursor: not-allowed;
     box-shadow: none;
   }
@@ -274,38 +306,39 @@ textarea:focus-visible {
 
 /* Secondary Button */
 .btn-secondary {
-  background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
-  color: white;
+  background: var(--accent-green);
+  color: #05130a;
   border: none;
-  border-radius: 25px;
-  padding: 12px 24px;
-  font-size: 1rem;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(27, 220, 111, 0.3);
+  transition: background var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow-xs);
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(27, 220, 111, 0.4);
+    background: var(--accent-green-hover);
+    box-shadow: var(--shadow-sm);
   }
 }
 
 /* Outline Button */
 .btn-outline {
   background: transparent;
-  border: 2px solid #9c0abf;
-  color: #9c0abf;
-  border-radius: 25px;
-  padding: 10px 22px;
-  font-size: 1rem;
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 9px 19px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 
   &:hover:not(:disabled) {
-    background: #9c0abf;
-    color: white;
+    background: var(--accent-purple-muted);
+    border-color: var(--accent-purple);
+    color: var(--text-primary);
   }
 }
 
@@ -313,32 +346,32 @@ textarea:focus-visible {
 .term-buttons {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
 .term-button {
-  background: rgba(255, 255, 255, 0.1);
-  color: #b0b0b0;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 8px 18px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
   white-space: nowrap;
 
   &:hover {
-    background: rgba(156, 10, 191, 0.2);
-    color: #fff;
+    border-color: var(--border-strong);
+    color: var(--text-primary);
   }
 
   &.selected {
-    background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(27, 220, 111, 0.3);
+    background: var(--accent-purple-muted);
+    border-color: var(--accent-purple);
+    color: var(--text-primary);
   }
 }
 
@@ -365,8 +398,8 @@ textarea:focus-visible {
   }
 
   .term-button {
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    padding: 7px 14px;
+    font-size: 0.8rem;
   }
 }
 
@@ -379,16 +412,16 @@ textarea:focus-visible {
   z-index: 3000;
   max-width: 240px;
   padding: 6px 10px;
-  border-radius: 8px;
-  background: #1c1c28;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
   font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.35;
   text-align: center;
   pointer-events: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
   opacity: 0;
   transform: translateY(2px);
   transition: opacity 0.15s ease, transform 0.15s ease;
