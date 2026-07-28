@@ -186,29 +186,6 @@ export class TopGenresComponent implements OnInit {
       .join(' ');
   }
 
-  // Get icon for genre group
-  getGroupIcon(groupName: string): string {
-    const icons: { [key: string]: string } = {
-      rock: '🎸',
-      pop: '🎤',
-      'hip-hop': '🎧',
-      'r&b': '🎹',
-      electronic: '🎛️',
-      metal: '🤘',
-      country: '🤠',
-      jazz: '🎷',
-      classical: '🎻',
-      folk: '🪕',
-      latin: '💃',
-      punk: '⚡',
-      reggae: '🌴',
-      funk: '🕺',
-      blues: '🎺',
-      world: '🌍',
-      other: '🎵',
-    };
-    return icons[groupName] || '🎵';
-  }
 
   // Get artists text (truncated if too many)
   getArtistsPreview(artists: string[], max: number = 3): string {

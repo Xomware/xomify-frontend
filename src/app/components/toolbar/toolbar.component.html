@@ -117,7 +117,7 @@
       <ng-container *ngIf="isAdmin">
         <div class="avatar-menu-divider" role="separator"></div>
         <a class="avatar-menu-admin" routerLink="/admin" role="menuitem" (click)="selectAvatarItem()">
-          <span aria-hidden="true">⚙️</span> Admin
+          <app-icon name="settings" [size]="16"></app-icon> Admin
         </a>
       </ng-container>
     </div>

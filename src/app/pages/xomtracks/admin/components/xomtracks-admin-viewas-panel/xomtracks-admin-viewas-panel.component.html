@@ -46,27 +46,27 @@
 
   <!-- Loading -->
   <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <div aria-hidden="true">⏳</div>
+    <app-icon name="spinner" [size]="36"></app-icon>
     <p>Loading {{ emailInput }}'s feed…</p>
   </div>
 
   <!-- Not found -->
   <div class="xta-state-block" *ngIf="state === 'not-found'" role="alert">
-    <div aria-hidden="true">🔎</div>
+    <app-icon name="search" [size]="36"></app-icon>
     <h2>Unknown user</h2>
     <p>"{{ emailInput }}" hasn't signed into Xomtracks.</p>
   </div>
 
   <!-- Error -->
   <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load that feed</h2>
     <button type="button" class="xta-btn" (click)="retry()">Try again</button>
   </div>
 
   <!-- Idle (nothing loaded yet) -->
   <div class="xta-state-block" *ngIf="state === 'idle'">
-    <div aria-hidden="true">🕵️</div>
+    <app-icon name="eye" [size]="36"></app-icon>
     <h2>No user selected</h2>
     <p>Enter an email above, or use "View as" from the Users tab.</p>
   </div>
@@ -74,7 +74,7 @@
   <!-- Loaded -->
   <ng-container *ngIf="state === 'loaded'">
     <div class="xta-state-block" *ngIf="!shares.length">
-      <div aria-hidden="true">🎧</div>
+      <app-icon name="headphones" [size]="36"></app-icon>
       <h2>Nothing here</h2>
       <p>{{ viewingEmail }} has no shares in this window/direction.</p>
     </div>

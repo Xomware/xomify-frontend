@@ -5,6 +5,7 @@ import {
   OnDestroy,
   SimpleChanges,
 } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { NavigationExtras, Router } from '@angular/router';
 import { ReducedMotionService } from 'src/app/services/reduced-motion.service';
 
@@ -34,6 +35,22 @@ const ROTATE_MS = 8_000;
   selector: 'app-home-spotlight',
   templateUrl: './spotlight-rotator.component.html',
   styleUrls: ['./spotlight-rotator.component.scss'],
+  animations: [
+    // Crossfade + slight rise whenever the bound value changes (works on a
+    // persistent element, not just *ngIf enter/leave — see
+    // https://angular.dev/guide/animations, "any state change" transitions).
+    trigger('crossfade', [
+      transition('* => *', [
+        style({ opacity: 0, transform: 'translateY(6px)' }),
+        animate('280ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
+  ],
+  host: {
+    // Skip the animation entirely under prefers-reduced-motion — content
+    // still swaps instantly (no hard-cut flash), just without the motion.
+    '[@.disabled]': 'reducedMotion.prefersReducedMotion()',
+  },
 })
 export class SpotlightRotatorComponent implements OnChanges, OnDestroy {
   @Input() slides: SpotlightSlide[] = [];
@@ -45,7 +62,8 @@ export class SpotlightRotatorComponent implements OnChanges, OnDestroy {
 
   constructor(
     private router: Router,
-    private reducedMotion: ReducedMotionService,
+    // Public — read directly from the `[@.disabled]` host binding above.
+    public reducedMotion: ReducedMotionService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {

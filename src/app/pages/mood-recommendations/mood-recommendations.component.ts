@@ -76,7 +76,7 @@ export class MoodRecommendationsComponent implements OnInit {
     }
 
     const uris = this.tracks.map((t) => t.uri);
-    const name = `${this.selectedMood.emoji} ${this.selectedMood.name} Vibes — Xomify`;
+    const name = `${this.selectedMood.name} Vibes — Xomify`;
     const description = `${this.selectedMood.description} — Created with Xomify Mood Picks`;
 
     this.playlistService

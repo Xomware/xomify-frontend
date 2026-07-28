@@ -14,13 +14,13 @@
 
   <!-- Loading -->
   <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <div aria-hidden="true">⏳</div>
+    <app-icon name="spinner" [size]="36"></app-icon>
     <p>Loading call metrics…</p>
   </div>
 
   <!-- Error -->
   <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load call metrics</h2>
     <button type="button" class="xta-btn" (click)="retry()">Try again</button>
   </div>
@@ -46,7 +46,7 @@
     </div>
 
     <div *ngIf="s.totalCalls === 0" class="xta-state-block">
-      <div aria-hidden="true">📭</div>
+      <app-icon name="inbox" [size]="36"></app-icon>
       <h2>No calls logged</h2>
       <p>Nothing recorded in the last {{ s.windowDays }} day{{ s.windowDays === 1 ? '' : 's' }}.</p>
     </div>
@@ -91,7 +91,7 @@
       <section class="xta-subsection">
         <h2>Recent errors</h2>
         <div class="xta-state-block" *ngIf="!s.recentErrors.length">
-          <div aria-hidden="true">✅</div>
+          <app-icon name="check-circle" [size]="30"></app-icon>
           <p>No errors in this window.</p>
         </div>
         <ul class="xta-error-list" *ngIf="s.recentErrors.length" aria-label="Recent errors">

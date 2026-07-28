@@ -466,7 +466,7 @@ export class ReleaseRadarComponent implements OnInit {
 
     const shared = await this.shareService.share({
       title: `Xomify Release Radar — ${label}`,
-      text: `🎧 New this week on my Xomify Release Radar (${label}):\n${topFive}`,
+      text: `New this week on my Xomify Release Radar (${label}):\n${topFive}`,
       url: window.location.href,
     });
     this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');
@@ -779,7 +779,7 @@ export class ReleaseRadarComponent implements OnInit {
               this.isGeneratingPlaylist = false;
               this.generatedPlaylistUrl = playlist?.external_urls?.spotify || null;
               this.toastService.showPositiveToast(
-                `Playlist "${playlistName}" created with ${trackUris.length} tracks! 🎵`
+                `Playlist "${playlistName}" created with ${trackUris.length} tracks!`
               );
             },
             error: (err) => {

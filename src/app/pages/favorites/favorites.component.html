@@ -23,7 +23,7 @@
 
   <!-- Error -->
   <div class="fav-state-block fav-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load your favorites</h2>
     <p>Something went wrong reaching the favorites service.</p>
     <button type="button" class="fav-retry-btn" (click)="retry()">Try again</button>

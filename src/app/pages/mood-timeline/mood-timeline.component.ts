@@ -47,11 +47,12 @@ export class MoodTimelineComponent implements OnInit {
     { hour: 21, label: '9pm' },
   ];
 
-  readonly moodEmojis: Record<MoodQuadrant, string> = {
-    Euphoric: '🎉',
-    Intense: '🔥',
-    Peaceful: '😌',
-    Melancholy: '🌧️',
+  /** `app-icon` names — see `components/icon/icon.component.html`. */
+  readonly moodIcons: Record<MoodQuadrant, string> = {
+    Euphoric: 'sparkle',
+    Intense: 'flame',
+    Peaceful: 'leaf',
+    Melancholy: 'droplet',
   };
 
   readonly moodColors: Record<MoodQuadrant, string> = {

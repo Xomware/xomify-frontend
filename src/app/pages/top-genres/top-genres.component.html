@@ -76,9 +76,7 @@
           <!-- Second Place -->
           <div class="podium-item second" *ngIf="groupedGenres[1]">
             <div class="genre-circle silver">
-              <span class="genre-emoji">{{
-                getGroupIcon(groupedGenres[1].name)
-              }}</span>
+              <app-icon name="music-note" [size]="26" class="genre-emoji"></app-icon>
             </div>
             <h3 class="genre-name">
               {{ formatGenreName(groupedGenres[1].name) }}
@@ -94,9 +92,7 @@
           <!-- First Place -->
           <div class="podium-item first" *ngIf="groupedGenres[0]">
             <div class="genre-circle gold">
-              <span class="genre-emoji">{{
-                getGroupIcon(groupedGenres[0].name)
-              }}</span>
+              <app-icon name="music-note" [size]="26" class="genre-emoji"></app-icon>
             </div>
             <h3 class="genre-name">
               {{ formatGenreName(groupedGenres[0].name) }}
@@ -112,9 +108,7 @@
           <!-- Third Place -->
           <div class="podium-item third" *ngIf="groupedGenres[2]">
             <div class="genre-circle bronze">
-              <span class="genre-emoji">{{
-                getGroupIcon(groupedGenres[2].name)
-              }}</span>
+              <app-icon name="music-note" [size]="26" class="genre-emoji"></app-icon>
             </div>
             <h3 class="genre-name">
               {{ formatGenreName(groupedGenres[2].name) }}
@@ -142,7 +136,7 @@
           >
             <div class="group-header" (click)="toggleGroupExpand(group.name)">
               <span class="genre-rank">{{ i + 1 }}</span>
-              <span class="group-icon">{{ getGroupIcon(group.name) }}</span>
+              <app-icon name="music-note" [size]="18" class="group-icon"></app-icon>
               <span class="genre-name">{{ formatGenreName(group.name) }}</span>
               <div class="genre-bar-container">
                 <div class="genre-bar">
@@ -194,7 +188,7 @@
           <!-- Second Place -->
           <div class="podium-item second" *ngIf="genreList[1]">
             <div class="genre-circle silver">
-              <span class="genre-emoji">🥈</span>
+              <span class="genre-emoji genre-emoji--rank">2</span>
             </div>
             <h3 class="genre-name">{{ formatGenreName(genreList[1].name) }}</h3>
             <p class="genre-count">{{ genreList[1].artists.length }} artists</p>
@@ -203,7 +197,7 @@
           <!-- First Place -->
           <div class="podium-item first" *ngIf="genreList[0]">
             <div class="genre-circle gold">
-              <span class="genre-emoji">🥇</span>
+              <span class="genre-emoji genre-emoji--rank">1</span>
             </div>
             <h3 class="genre-name">{{ formatGenreName(genreList[0].name) }}</h3>
             <p class="genre-count">{{ genreList[0].artists.length }} artists</p>
@@ -212,7 +206,7 @@
           <!-- Third Place -->
           <div class="podium-item third" *ngIf="genreList[2]">
             <div class="genre-circle bronze">
-              <span class="genre-emoji">🥉</span>
+              <span class="genre-emoji genre-emoji--rank">3</span>
             </div>
             <h3 class="genre-name">{{ formatGenreName(genreList[2].name) }}</h3>
             <p class="genre-count">{{ genreList[2].artists.length }} artists</p>

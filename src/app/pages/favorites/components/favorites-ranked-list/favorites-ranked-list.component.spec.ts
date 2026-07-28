@@ -165,7 +165,7 @@ describe('FavoritesRankedListComponent', () => {
     expect(component.movementFor(mkItem(4, 'a'))).toEqual({ direction: 'down', delta: 3 });
   });
 
-  it('toggleSuggestions lazily fetches recommendations exactly once', () => {
+  it('toggleSuggestions lazily fetches recommendations exactly once, defaulting to short_term', () => {
     favoritesService.getRecommendations.and.returnValue(
       of([{ spotifyId: 'x', name: 'X', artist: 'Y' }]),
     );
@@ -173,11 +173,47 @@ describe('FavoritesRankedListComponent', () => {
 
     component.toggleSuggestions();
     expect(component.suggestionsOpen).toBeTrue();
-    expect(favoritesService.getRecommendations).toHaveBeenCalledWith(2026, 'songs', 'l1');
+    expect(favoritesService.getRecommendations).toHaveBeenCalledWith(
+      2026,
+      'songs',
+      'l1',
+      'short_term',
+    );
     expect(component.suggestions.length).toBe(1);
 
     component.toggleSuggestions(); // close
     component.toggleSuggestions(); // reopen — should NOT re-fetch, already cached
     expect(favoritesService.getRecommendations).toHaveBeenCalledTimes(1);
+  });
+
+  it('selectSuggestionsRange refetches with the new range while the strip is open', () => {
+    favoritesService.getRecommendations.and.returnValue(
+      of([{ spotifyId: 'x', name: 'X', artist: 'Y' }]),
+    );
+    init();
+
+    component.toggleSuggestions();
+    expect(favoritesService.getRecommendations).toHaveBeenCalledTimes(1);
+
+    component.selectSuggestionsRange('long_term');
+    expect(component.suggestionsRange).toBe('long_term');
+    expect(favoritesService.getRecommendations).toHaveBeenCalledTimes(2);
+    expect(favoritesService.getRecommendations).toHaveBeenCalledWith(
+      2026,
+      'songs',
+      'l1',
+      'long_term',
+    );
+  });
+
+  it('selectSuggestionsRange clears the cache but does NOT refetch while the strip is closed', () => {
+    favoritesService.getRecommendations.and.returnValue(
+      of([{ spotifyId: 'x', name: 'X', artist: 'Y' }]),
+    );
+    init();
+
+    component.selectSuggestionsRange('medium_term');
+    expect(component.suggestionsRange).toBe('medium_term');
+    expect(favoritesService.getRecommendations).not.toHaveBeenCalled();
   });
 });

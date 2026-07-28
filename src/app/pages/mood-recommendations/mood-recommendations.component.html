@@ -18,7 +18,7 @@
           [class.selected]="selectedMood?.name === mood.name"
           (click)="selectMood(mood)"
         >
-          <span class="mood-emoji">{{ mood.emoji }}</span>
+          <app-icon [name]="mood.icon" [size]="28" class="mood-emoji"></app-icon>
           <span class="mood-name">{{ mood.name }}</span>
           <span class="mood-desc">{{ mood.description }}</span>
         </div>
@@ -32,7 +32,7 @@
         (click)="getRecommendations()"
         [disabled]="loading"
       >
-        <span *ngIf="!loading">✨ Get {{ selectedMood.name }} Recommendations</span>
+        <span *ngIf="!loading"><app-icon name="sparkle" [size]="15"></app-icon> Get {{ selectedMood.name }} Recommendations</span>
         <span *ngIf="loading">Loading...</span>
       </button>
     </div>
@@ -52,7 +52,8 @@
     <div class="results-section" *ngIf="tracks.length > 0 && !loading">
       <div class="results-header">
         <h2 class="section-title">
-          {{ selectedMood?.emoji }} {{ selectedMood?.name }} Tracks
+          <app-icon *ngIf="selectedMood" [name]="selectedMood.icon" [size]="20"></app-icon>
+          {{ selectedMood?.name }} Tracks
           <span class="track-count">({{ tracks.length }})</span>
         </h2>
         <button
@@ -60,7 +61,7 @@
           (click)="saveAsPlaylist()"
           [disabled]="savingPlaylist"
         >
-          <span *ngIf="!savingPlaylist">💾 Save as Playlist</span>
+          <span *ngIf="!savingPlaylist">Save as Playlist</span>
           <span *ngIf="savingPlaylist">Saving...</span>
         </button>
       </div>

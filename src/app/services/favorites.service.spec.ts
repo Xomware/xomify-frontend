@@ -150,6 +150,24 @@ describe('FavoritesService', () => {
     req.flush({ message: 'boom' }, { status: 500, statusText: 'Server Error' });
   });
 
+  it('defaults the recommendations range to short_term when not passed', (done) => {
+    service.getRecommendations(2026, 'songs', 'l1').subscribe(() => done());
+
+    const req = httpMock.expectOne(
+      (r) => r.url.endsWith('/favorites/recommendations') && r.params.get('range') === 'short_term',
+    );
+    req.flush({ recommendations: [] });
+  });
+
+  it('passes the caller-selected range through to the recommendations request', (done) => {
+    service.getRecommendations(2026, 'songs', 'l1', 'long_term').subscribe(() => done());
+
+    const req = httpMock.expectOne(
+      (r) => r.url.endsWith('/favorites/recommendations') && r.params.get('range') === 'long_term',
+    );
+    req.flush({ recommendations: [] });
+  });
+
   it('DELETEs /favorites/list-delete with listId + year query params', (done) => {
     service.deleteList(2026, 'l1').subscribe(() => done());
 

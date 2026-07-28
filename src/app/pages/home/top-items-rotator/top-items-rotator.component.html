@@ -56,7 +56,12 @@
     Showing top {{ activeCategory }}, {{ activeRangeLabel }}
   </div>
 
-  <ul class="items-grid" *ngIf="items.length > 0" role="tabpanel">
+  <ul
+    class="items-grid"
+    *ngIf="items.length > 0"
+    role="tabpanel"
+    [@crossfade]="activeCategory + '|' + activeRange"
+  >
     <li *ngFor="let item of items; trackBy: trackById">
       <button type="button" class="item-card" (click)="onItemActivate(item)">
         <span class="item-rank">#{{ item.rank }}</span>

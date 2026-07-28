@@ -1,13 +1,13 @@
 <div>
   <!-- Loading -->
   <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <div aria-hidden="true">⏳</div>
+    <app-icon name="spinner" [size]="36"></app-icon>
     <p>Loading the user directory…</p>
   </div>
 
   <!-- Error -->
   <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load the user directory</h2>
     <button type="button" class="xta-btn" (click)="retry()">Try again</button>
   </div>
@@ -15,7 +15,7 @@
   <ng-container *ngIf="state === 'loaded'">
     <!-- Empty -->
     <div class="xta-state-block" *ngIf="!users.length">
-      <div aria-hidden="true">🧑‍🤝‍🧑</div>
+      <app-icon name="people" [size]="36"></app-icon>
       <h2>No users yet</h2>
       <p>Nobody has signed into Xomtracks yet.</p>
     </div>

@@ -85,7 +85,7 @@ export class ShareService {
       .map((a, i) => `${i + 1}. ${a.name}`)
       .join('\n');
 
-    return `🎵 My Top Songs (Xomify):\n${songs}\n\n🎤 My Top Artists:\n${artists}\n\nDiscover yours at xomify!`;
+    return `My Top Songs (Xomify):\n${songs}\n\nMy Top Artists:\n${artists}\n\nDiscover yours at xomify!`;
   }
 
   getTopItems(): Observable<ShareableStats> {

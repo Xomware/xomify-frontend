@@ -4,7 +4,9 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">This Week's Goals</h1>
-        <p class="page-subtitle" *ngIf="streakLabel">{{ streakLabel }}</p>
+        <p class="page-subtitle" *ngIf="streakLabel">
+          <app-icon name="flame" [size]="15"></app-icon> {{ streakLabel }}
+        </p>
         <p class="page-subtitle" *ngIf="!streakLabel">Set targets &amp; build consistency</p>
       </div>
       <button class="btn-create" (click)="showCreateSheet = true">+ Create Goal</button>
@@ -33,7 +35,7 @@
           ></div>
         </div>
 
-        <div class="goal-icon">{{ goal.icon }}</div>
+        <div class="goal-icon"><app-icon [name]="goal.icon" [size]="24"></app-icon></div>
         <div class="goal-info">
           <span class="goal-label">{{ goal.label }}</span>
           <span class="goal-progress-text">{{ goal.current }} / {{ goal.target }}</span>
@@ -55,7 +57,8 @@
         <div *ngFor="let entry of history" class="history-row">
           <span class="history-week">Week of {{ formatWeekLabel(entry.weekStart) }}</span>
           <span class="history-result" [class.all-met]="entry.allMet">
-            {{ entry.allMet ? '✅ All Met' : '❌ ' + entry.metCount + '/' + entry.totalCount + ' goals met' }}
+            <app-icon [name]="entry.allMet ? 'check-circle' : 'close-circle'" [size]="14"></app-icon>
+            {{ entry.allMet ? 'All Met' : entry.metCount + '/' + entry.totalCount + ' goals met' }}
           </span>
         </div>
       </div>

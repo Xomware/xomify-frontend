@@ -1,6 +1,6 @@
 <div class="mood-timeline-page">
   <div class="page-header">
-    <h1>🎵 Mood Timeline</h1>
+    <h1>Mood Timeline</h1>
     <p class="subtitle">See how your music energy and vibes shift throughout the day</p>
   </div>
 
@@ -144,7 +144,7 @@
             font-size="10"
             font-weight="bold"
           >
-            ⚡ Peak: {{ formatHour(summary!.peakEnergyHour) }}
+            Peak: {{ formatHour(summary!.peakEnergyHour) }}
           </text>
         </g>
 
@@ -159,7 +159,7 @@
             font-size="10"
             font-weight="bold"
           >
-            😊 Positive: {{ formatHour(summary!.mostPositiveHour) }}
+            Positive: {{ formatHour(summary!.mostPositiveHour) }}
           </text>
         </g>
 
@@ -198,7 +198,7 @@
           {{ hd.trackCount }} track{{ hd.trackCount !== 1 ? 's' : '' }}
         </div>
         <div class="tooltip-track" *ngIf="hd.topTracks.length > 0">
-          🎵 {{ hd.topTracks[0].name }} — {{ hd.topTracks[0].artist }}
+          {{ hd.topTracks[0].name }} — {{ hd.topTracks[0].artist }}
         </div>
       </div>
     </div>
@@ -217,24 +217,28 @@
   <!-- Mood Summary Cards -->
   <div class="summary-cards" *ngIf="!loading && !error && summary">
     <div class="summary-card">
-      <div class="card-icon">⚡</div>
+      <app-icon name="bolt" [size]="28" class="card-icon"></app-icon>
       <div class="card-label">Peak Energy Hour</div>
       <div class="card-value">{{ formatHour(summary.peakEnergyHour) }}</div>
     </div>
     <div class="summary-card">
-      <div class="card-icon">😊</div>
+      <app-icon name="smiley" [size]="28" class="card-icon"></app-icon>
       <div class="card-label">Most Positive Hour</div>
       <div class="card-value">{{ formatHour(summary.mostPositiveHour) }}</div>
     </div>
     <div class="summary-card">
-      <div class="card-icon">{{ moodEmojis[summary.overallMood] }}</div>
+      <app-icon [name]="moodIcons[summary.overallMood]" [size]="28" class="card-icon"></app-icon>
       <div class="card-label">Music Mood</div>
       <div class="card-value" [style.color]="moodColors[summary.overallMood]">
         {{ summary.overallMood }}
       </div>
     </div>
     <div class="summary-card">
-      <div class="card-icon">{{ summary.chronotype === 'Night Owl' ? '🦉' : summary.chronotype === 'Morning Person' ? '🌅' : '⚖️' }}</div>
+      <app-icon
+        [name]="summary.chronotype === 'Night Owl' ? 'moon' : summary.chronotype === 'Morning Person' ? 'sun' : 'scale'"
+        [size]="28"
+        class="card-icon"
+      ></app-icon>
       <div class="card-label">Listening Style</div>
       <div class="card-value">{{ summary.chronotype }}</div>
     </div>
@@ -246,7 +250,7 @@
     <div class="quadrant-grid">
       <div class="quadrant-card" *ngFor="let quad of ['Euphoric', 'Intense', 'Peaceful', 'Melancholy']">
         <div class="quadrant-header" [style.border-color]="moodColors[quad]">
-          <span class="quadrant-emoji">{{ moodEmojis[quad] }}</span>
+          <app-icon [name]="moodIcons[quad]" [size]="18" class="quadrant-emoji"></app-icon>
           <span class="quadrant-name">{{ quad }}</span>
         </div>
         <div class="quadrant-desc">
