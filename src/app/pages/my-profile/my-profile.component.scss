@@ -583,6 +583,102 @@
 }
 
 // ========================================
+// MY FAVORITES SUMMARY CARD
+// ========================================
+.favorites-card {
+  background: linear-gradient(
+    135deg,
+    rgba(156, 10, 191, 0.1) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(156, 10, 191, 0.25);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.favorites-mini-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  &:not(:last-of-type) {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+.favorites-mini-label {
+  flex-shrink: 0;
+  width: 64px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding-top: 2px;
+}
+
+.favorites-mini-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.favorites-mini-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.favorites-mini-rank {
+  color: #9c0abf;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.favorites-mini-name {
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorites-mini-none {
+  color: #6a6a7a;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.favorites-empty-text {
+  margin: 0;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+.favorites-cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1bdc6f;
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  &:hover {
+    color: #9c0abf;
+  }
+}
+
+// ========================================
 // ROTATING TICKER
 // ========================================
 .profile-ticker {

@@ -17,6 +17,11 @@ import { ArtistService } from 'src/app/services/artist.service';
 import { FriendsService } from 'src/app/services/friends.service';
 import { TopItemsService } from 'src/app/services/top-items.service';
 import { RatingsService } from 'src/app/services/ratings.service';
+import {
+  FavoriteItem,
+  FavoritesOverall,
+  FavoritesService,
+} from 'src/app/services/favorites.service';
 import { ShareFeedService, Share } from 'src/app/services/share-feed.service';
 import {
   ListeningHistoryService,
@@ -115,6 +120,13 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   tickerPaused = false;
   tickerLoaded = false;
 
+  // My Favorites summary card (curated best-of — separate from the derived
+  // ticker above). Loaded independently and non-blocking: a slow/unmerged
+  // favorites endpoint should never hold up the rest of the profile.
+  readonly favoritesYear = new Date().getFullYear();
+  favoritesOverall: FavoritesOverall = { songs: [], albums: [], artists: [] };
+  favoritesLoaded = false;
+
   private topSongs: SpotifyTrackRef[] = [];
   private topArtists: SpotifyArtistRef2[] = [];
   private topGenres: { name: string; count: number }[] = [];
@@ -130,6 +142,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     private friendsService: FriendsService,
     private topItemsService: TopItemsService,
     private ratingsService: RatingsService,
+    private favoritesService: FavoritesService,
     private shareFeedService: ShareFeedService,
     private listeningHistoryService: ListeningHistoryService,
     private toastService: ToastService,
@@ -173,6 +186,8 @@ export class MyProfileComponent implements OnInit, OnDestroy {
       this.populateUserData();
       this.loadAdditionalData();
     }
+
+    this.loadFavoritesSummary();
   }
 
   ngOnDestroy(): void {
@@ -587,6 +602,45 @@ export class MyProfileComponent implements OnInit, OnDestroy {
           // toasts already shown by other surfaces that share this endpoint.
         },
       });
+  }
+
+  /**
+   * Compact "My Favorites" summary — the curated Overall top-5s for the
+   * current year, plus a link into the full `/favorites` page. `getFavorites`
+   * already resolves a 404 (no favorites saved yet) to an empty envelope
+   * rather than erroring, so this never needs its own error state — an empty
+   * result just renders the "set up your favorites" prompt.
+   */
+  private loadFavoritesSummary(): void {
+    this.favoritesService
+      .getFavorites(this.favoritesYear)
+      .pipe(take(1))
+      .subscribe({
+        next: (resp) => {
+          this.favoritesOverall = resp.overall;
+          this.favoritesLoaded = true;
+        },
+        error: () => {
+          // Non-critical card — leave it showing the "set up" prompt.
+          this.favoritesLoaded = true;
+        },
+      });
+  }
+
+  get hasAnyFavorites(): boolean {
+    return (
+      this.favoritesOverall.songs.length > 0 ||
+      this.favoritesOverall.albums.length > 0 ||
+      this.favoritesOverall.artists.length > 0
+    );
+  }
+
+  get favoritesSummaryGroups(): { label: string; items: FavoriteItem[] }[] {
+    return [
+      { label: 'Songs', items: this.favoritesOverall.songs },
+      { label: 'Albums', items: this.favoritesOverall.albums },
+      { label: 'Artists', items: this.favoritesOverall.artists },
+    ];
   }
 
   private extractTopGenres(

@@ -105,6 +105,14 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/xomtracks/xomtracks.module').then((m) => m.XomtracksModule),
   },
+  // My Favorites — user-curated best-of lists (WS-D, distinct from the
+  // Spotify-derived Music Taste pages above).
+  {
+    path: 'favorites',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/favorites/favorites.module').then((m) => m.FavoritesModule),
+  },
   // Legacy route — the Shares feature used to live at `/xomtracks`. Keep a
   // redirect so old links/bookmarks (incl. `/xomtracks/admin`) still land.
   { path: 'xomtracks', redirectTo: 'shares', pathMatch: 'prefix' },

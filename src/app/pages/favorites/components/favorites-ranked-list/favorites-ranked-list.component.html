@@ -1,0 +1,200 @@
+<section class="fav-list" [class.fav-list--overall]="!deletable">
+  <header class="fav-list-head">
+    <div class="fav-list-head-text">
+      <h3 class="fav-list-title">{{ title }}</h3>
+      <p class="fav-list-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+    <div class="fav-list-head-actions">
+      <span class="fav-list-count" [attr.aria-label]="localItems.length + ' of ' + maxRank + ' ranked'"
+        >{{ localItems.length }}/{{ maxRank }}</span
+      >
+      <button
+        *ngIf="deletable"
+        type="button"
+        class="fav-icon-btn fav-icon-btn--danger"
+        [disabled]="deleting"
+        (click)="confirmDelete()"
+        [attr.aria-label]="'Delete list ' + (title || subtitle)"
+      >
+        <span aria-hidden="true">✕</span>
+      </button>
+    </div>
+  </header>
+
+  <ol class="fav-items" *ngIf="!isEmpty; else emptyBlock" aria-label="Ranked items">
+    <li class="fav-item" *ngFor="let item of localItems; let i = index; trackBy: trackByRank">
+      <div class="fav-item-row">
+        <span class="fav-rank-badge">{{ item.rank }}</span>
+
+        <span class="fav-item-art">
+          <img
+            *ngIf="item.imageUrl; else noArt"
+            [src]="item.imageUrl"
+            [alt]="''"
+            loading="lazy"
+            decoding="async"
+          />
+          <ng-template #noArt>
+            <span class="fav-item-art-fallback" aria-hidden="true">♪</span>
+          </ng-template>
+        </span>
+
+        <span class="fav-item-text">
+          <span class="fav-item-name">{{ item.name }}</span>
+          <span class="fav-item-artist">{{ item.artist }}</span>
+        </span>
+
+        <span
+          class="fav-movement"
+          *ngIf="movementFor(item) as m"
+          [class.fav-movement--up]="m.direction === 'up'"
+          [class.fav-movement--down]="m.direction === 'down'"
+          [class.fav-movement--new]="m.direction === 'new'"
+          [attr.aria-label]="
+            m.direction === 'up'
+              ? ('Up ' + m.delta + ' spots since last change')
+              : m.direction === 'down'
+                ? ('Down ' + m.delta + ' spots since last change')
+                : m.direction === 'new'
+                  ? 'New to this list'
+                  : 'No change since last update'
+          "
+        >
+          <ng-container [ngSwitch]="m.direction">
+            <ng-container *ngSwitchCase="'up'"
+              ><span aria-hidden="true">▲</span>{{ m.delta }}</ng-container
+            >
+            <ng-container *ngSwitchCase="'down'"
+              ><span aria-hidden="true">▼</span>{{ m.delta }}</ng-container
+            >
+            <ng-container *ngSwitchCase="'new'">NEW</ng-container>
+            <ng-container *ngSwitchCase="'same'"><span aria-hidden="true">–</span></ng-container>
+          </ng-container>
+        </span>
+
+        <button
+          *ngIf="hasTimeline(item)"
+          type="button"
+          class="fav-history-toggle"
+          [class.fav-history-toggle--open]="timelineOpenFor === item.spotifyId"
+          [attr.aria-expanded]="timelineOpenFor === item.spotifyId"
+          appTooltip="Rank history"
+          (click)="toggleTimeline(item)"
+          [attr.aria-label]="'Toggle rank history for ' + item.name"
+        >
+          <span aria-hidden="true">📈</span>
+        </button>
+
+        <span class="fav-item-actions">
+          <button
+            type="button"
+            class="fav-icon-btn"
+            [disabled]="i === 0 || saving"
+            (click)="moveUp(i)"
+            [attr.aria-label]="'Move ' + item.name + ' up in rank'"
+          >
+            <span aria-hidden="true">↑</span>
+          </button>
+          <button
+            type="button"
+            class="fav-icon-btn"
+            [disabled]="i === localItems.length - 1 || saving"
+            (click)="moveDown(i)"
+            [attr.aria-label]="'Move ' + item.name + ' down in rank'"
+          >
+            <span aria-hidden="true">↓</span>
+          </button>
+          <button
+            type="button"
+            class="fav-icon-btn fav-icon-btn--danger"
+            [disabled]="saving"
+            (click)="removeItem(item)"
+            [attr.aria-label]="'Remove ' + item.name + ' from this list'"
+          >
+            <span aria-hidden="true">✕</span>
+          </button>
+        </span>
+      </div>
+
+      <div
+        class="fav-timeline"
+        *ngIf="timelineOpenFor === item.spotifyId"
+        role="group"
+        [attr.aria-label]="'Rank history for ' + item.name"
+      >
+        <span class="fav-timeline-entry" *ngFor="let entry of timelineFor(item)">
+          <span class="fav-timeline-rank">#{{ entry.rank }}</span>
+          <span class="fav-timeline-date">{{ timelineMonthLabel(entry.ts) }}</span>
+        </span>
+      </div>
+    </li>
+  </ol>
+
+  <ng-template #emptyBlock>
+    <p class="fav-empty">
+      No picks yet — add your first
+      {{ category === 'songs' ? 'song' : category === 'albums' ? 'album' : 'artist' }}.
+    </p>
+  </ng-template>
+
+  <div class="fav-list-footer">
+    <button
+      type="button"
+      class="fav-add-btn"
+      [disabled]="isFull"
+      (click)="openPicker()"
+      [attr.aria-label]="isFull ? 'List full — remove a track to add another' : 'Add to ' + title"
+    >
+      <span aria-hidden="true">+</span> {{ isFull ? 'List full' : 'Add' }}
+    </button>
+
+    <button
+      type="button"
+      class="fav-suggest-toggle"
+      [attr.aria-expanded]="suggestionsOpen"
+      (click)="toggleSuggestions()"
+    >
+      Suggested from your listening
+      <span aria-hidden="true">{{ suggestionsOpen ? '▾' : '▸' }}</span>
+    </button>
+  </div>
+
+  <div class="fav-suggestions" *ngIf="suggestionsOpen">
+    <p class="fav-suggestions-loading" *ngIf="suggestionsLoading" aria-live="polite">
+      Loading suggestions…
+    </p>
+    <ng-container *ngIf="!suggestionsLoading">
+      <p class="fav-suggestions-empty" *ngIf="suggestions.length === 0">
+        No suggestions right now — keep listening!
+      </p>
+      <ul class="fav-suggestions-list" *ngIf="suggestions.length > 0">
+        <li class="fav-suggestion" *ngFor="let rec of suggestions">
+          <span class="fav-item-art fav-item-art--sm">
+            <img *ngIf="rec.imageUrl" [src]="rec.imageUrl" [alt]="''" loading="lazy" decoding="async" />
+            <span *ngIf="!rec.imageUrl" class="fav-item-art-fallback" aria-hidden="true">♪</span>
+          </span>
+          <span class="fav-item-text">
+            <span class="fav-item-name">{{ rec.name }}</span>
+            <span class="fav-item-artist">{{ rec.artist }}</span>
+          </span>
+          <button
+            type="button"
+            class="fav-icon-btn fav-icon-btn--accent"
+            [disabled]="isFull"
+            (click)="addFromSuggestion(rec)"
+            [attr.aria-label]="'Add ' + rec.name + ' to ' + title"
+          >
+            <span aria-hidden="true">+</span>
+          </button>
+        </li>
+      </ul>
+    </ng-container>
+  </div>
+
+  <app-favorites-search-picker
+    *ngIf="pickerOpen"
+    [category]="category"
+    (picked)="addItem($event)"
+    (closed)="closePicker()"
+  ></app-favorites-search-picker>
+</section>
