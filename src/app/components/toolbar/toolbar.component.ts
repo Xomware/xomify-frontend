@@ -4,7 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { QueueService } from '../../services/queue.service';
 import { FriendsService } from '../../services/friends.service';
 import { UserService } from '../../services/user.service';
-import { XomtracksMeService } from '../../pages/xomtracks/services/xomtracks-me.service';
+import { XomifyAuthService } from '../../services/xomify-auth.service';
+import { isAdminEmail } from '../../config/admin.config';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -38,27 +39,25 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
   /** Desktop group dropdowns — keyed by group label; only one open at a time. */
   openGroupLabel: string | null = null;
+  /** Top-right user-avatar dropdown (username/email header + Profile, My
+   * Ratings, My Favorites, Settings, Log out, and — admin only — Admin). */
+  avatarMenuOpen = false;
   isMobile = false;
   queueCount = 0;
   pendingFriendsCount = 0;
-  /** True only for the admin (Dom) — server-authoritative, from `GET
-   * /me/get`. Gates the "Admin" nav link; false (hidden) for everyone else,
-   * including while the check is still in flight. */
-  isAdmin = false;
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
-    { kind: 'link', link: { route: '/shares', label: 'Shares' } },
-    { kind: 'link', link: { route: '/likes', label: 'Likes' } },
     {
       kind: 'group',
       group: {
         label: 'Music Taste',
-        activeRoutes: ['/top-songs', '/top-artists', '/top-genres'],
+        activeRoutes: ['/top-songs', '/top-artists', '/top-genres', '/likes'],
         links: [
           { route: '/top-songs', label: 'Songs' },
           { route: '/top-artists', label: 'Artists' },
           { route: '/top-genres', label: 'Genres' },
+          { route: '/likes', label: 'Likes' },
         ],
       },
     },
@@ -85,17 +84,17 @@ export class ToolbarComponent implements OnInit, OnDestroy {
       kind: 'group',
       group: {
         label: 'Social',
-        activeRoutes: ['/friends', '/invites'],
+        activeRoutes: ['/friends', '/invites', '/shares'],
         badge$: 'friends',
         links: [
           { route: '/friends', label: 'Friends', badge$: 'friends' },
           { route: '/invites', label: 'Invites' },
+          { route: '/shares', label: 'Shares' },
         ],
       },
     },
     { kind: 'link', link: { route: '/release-radar', label: 'Release Radar' } },
     { kind: 'link', link: { route: '/wrapped', label: 'Wrapped' } },
-    { kind: 'link', link: { route: '/ratings', label: 'Ratings' } },
   ];
 
   /** Flat list for the mobile dropdown — groups render as headers. */
@@ -109,7 +108,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     private queueService: QueueService,
     private friendsService: FriendsService,
     private userService: UserService,
-    private meService: XomtracksMeService,
+    private xomifyAuthService: XomifyAuthService,
   ) {
     this.checkIfMobile();
     window.addEventListener('resize', this.checkIfMobile.bind(this));
@@ -130,22 +129,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
     if (this.authService.isLoggedIn()) {
       this.loadFriendsData();
-      this.loadAdminStatus();
     }
-  }
-
-  /** Fetches the server-authoritative admin flag once per toolbar load. A
-   * failure (or simply not being the admin) just leaves the nav link
-   * hidden — never surfaced as an error, since this is a routine 403 for
-   * every non-admin user. */
-  loadAdminStatus(): void {
-    this.meService
-      .get()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (me) => (this.isAdmin = me.isAdmin),
-        error: () => (this.isAdmin = false),
-      });
   }
 
   loadFriendsData(): void {
@@ -199,6 +183,20 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.router.navigate([route]);
   }
 
+  toggleAvatarMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.avatarMenuOpen = !this.avatarMenuOpen;
+  }
+
+  closeAvatarMenu(): void {
+    this.avatarMenuOpen = false;
+  }
+
+  /** Avatar menu item click — close the menu, let routerLink handle nav. */
+  selectAvatarItem(): void {
+    this.avatarMenuOpen = false;
+  }
+
   @HostListener('document:click', ['$event'])
   handleDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -208,6 +206,18 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     if (!target.closest('.nav-group')) {
       this.openGroupLabel = null;
     }
+    if (!target.closest('.avatar-menu-wrap')) {
+      this.avatarMenuOpen = false;
+    }
+  }
+
+  /** Esc closes whichever menu is open — group dropdown, avatar dropdown,
+   * or the mobile nav. */
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    this.openGroupLabel = null;
+    this.avatarMenuOpen = false;
+    this.dropdownVisible = false;
   }
 
   checkIfMobile(): void {
@@ -228,6 +238,30 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     return this.userService.getProfilePic();
   }
 
+  /** Username shown in the avatar dropdown header. */
+  get displayName(): string {
+    return this.userService.getUserName() || 'Xomify user';
+  }
+
+  /**
+   * Email shown in the avatar dropdown header. Prefers the xomify JWT's
+   * `email` claim (the identity xomify's own backend — and the admin gate —
+   * actually authorizes against); falls back to the Spotify profile email if
+   * the JWT hasn't minted yet.
+   */
+  get userEmail(): string {
+    return this.xomifyAuthService.getEmail() || this.userService.getEmail() || '';
+  }
+
+  /**
+   * True only for the admin (Dom). Client-side check against `ADMIN_EMAIL`
+   * — gates the "Admin" avatar-dropdown entry only; the `/admin` route
+   * itself is independently enforced by `AdminGuard`.
+   */
+  get isAdmin(): boolean {
+    return isAdminEmail(this.xomifyAuthService.getEmail());
+  }
+
   isSelected(route: string): boolean {
     return this.router.url === route || this.router.url.startsWith(route + '?');
   }
@@ -236,6 +270,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     this.authService.logout();
     this.dropdownVisible = false;
     this.openGroupLabel = null;
+    this.avatarMenuOpen = false;
     this.router.navigate(['/home']);
   }
 }
