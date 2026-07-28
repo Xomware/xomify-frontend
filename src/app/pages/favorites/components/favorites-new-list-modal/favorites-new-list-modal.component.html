@@ -1,0 +1,67 @@
+<div class="fav-modal-backdrop" (click)="onBackdropClick($event)" (keydown)="onKeydown($event)">
+  <div
+    #dialog
+    class="fav-dialog fav-dialog--sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fav-new-list-title"
+    tabindex="-1"
+  >
+    <button
+      type="button"
+      class="fav-modal-close"
+      [disabled]="saving"
+      (click)="requestClose()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <h2 class="fav-modal-title" id="fav-new-list-title">New list</h2>
+
+    <form (ngSubmit)="submit()">
+      <fieldset class="fav-field">
+        <legend>Category</legend>
+        <div class="fav-category-options" role="radiogroup" aria-label="List category">
+          <label class="fav-category-option" [class.fav-category-option--active]="category === 'songs'">
+            <input type="radio" name="fav-category" value="songs" [(ngModel)]="category" [ngModelOptions]="{ standalone: true }" />
+            Songs
+          </label>
+          <label class="fav-category-option" [class.fav-category-option--active]="category === 'albums'">
+            <input type="radio" name="fav-category" value="albums" [(ngModel)]="category" [ngModelOptions]="{ standalone: true }" />
+            Albums
+          </label>
+          <label class="fav-category-option" [class.fav-category-option--active]="category === 'artists'">
+            <input type="radio" name="fav-category" value="artists" [(ngModel)]="category" [ngModelOptions]="{ standalone: true }" />
+            Artists
+          </label>
+        </div>
+      </fieldset>
+
+      <label class="fav-field">
+        <span class="fav-field-label">List name</span>
+        <input
+          #labelInput
+          type="text"
+          [(ngModel)]="genreLabel"
+          [ngModelOptions]="{ standalone: true }"
+          [maxlength]="maxLabelLength"
+          placeholder="e.g. Top Rap Albums"
+          aria-describedby="fav-new-list-hint"
+        />
+        <span class="fav-field-hint" id="fav-new-list-hint"
+          >{{ genreLabel.length }}/{{ maxLabelLength }}</span
+        >
+      </label>
+
+      <div class="fav-modal-actions">
+        <button type="button" class="fav-btn-secondary" [disabled]="saving" (click)="requestClose()">
+          Cancel
+        </button>
+        <button type="submit" class="fav-btn-primary" [disabled]="!isValid || saving">
+          {{ saving ? 'Creating…' : 'Create list' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

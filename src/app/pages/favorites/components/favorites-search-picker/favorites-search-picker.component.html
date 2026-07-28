@@ -1,0 +1,64 @@
+<div class="fav-modal-backdrop" (click)="onBackdropClick($event)" (keydown)="onKeydown($event)">
+  <div
+    #dialog
+    class="fav-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="fav-picker-title"
+    tabindex="-1"
+  >
+    <button type="button" class="fav-modal-close" (click)="requestClose()" aria-label="Close search">
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <h2 class="fav-modal-title" id="fav-picker-title">Add {{ categoryLabel }}</h2>
+
+    <label class="fav-search-field">
+      <span class="sr-only">Search {{ categoryLabel }} on Spotify</span>
+      <span aria-hidden="true" class="fav-search-icon">⌕</span>
+      <input
+        #searchInput
+        type="search"
+        [ngModel]="query"
+        (ngModelChange)="onQueryChange($event)"
+        [placeholder]="'Search ' + categoryLabel + '…'"
+      />
+      <button
+        *ngIf="query"
+        type="button"
+        class="fav-search-clear"
+        (click)="clearSearch()"
+        aria-label="Clear search"
+      >×</button>
+    </label>
+
+    <p class="fav-search-hint" *ngIf="!hasSearched && !loading && query.trim().length < 2">
+      Type at least 2 characters to search.
+    </p>
+    <p class="fav-search-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+    <p class="fav-search-loading" *ngIf="loading" aria-live="polite">Searching…</p>
+
+    <ul
+      class="fav-search-results"
+      *ngIf="!loading && hasSearched"
+      [attr.aria-label]="categoryLabel + ' search results'"
+    >
+      <li *ngIf="results.length === 0" class="fav-search-empty">
+        No {{ categoryLabel }} found for "{{ query.trim() }}".
+      </li>
+      <li class="fav-search-result" *ngFor="let r of results; trackBy: trackByResultId">
+        <button type="button" class="fav-search-result-btn" (click)="select(r)">
+          <span class="fav-result-art">
+            <img *ngIf="r.imageUrl; else noArt" [src]="r.imageUrl" [alt]="''" loading="lazy" decoding="async" />
+            <ng-template #noArt><span aria-hidden="true">♪</span></ng-template>
+          </span>
+          <span class="fav-result-text">
+            <span class="fav-result-name">{{ r.name }}</span>
+            <span class="fav-result-artist">{{ r.artist }}</span>
+          </span>
+          <span class="fav-result-add" aria-hidden="true">+</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
