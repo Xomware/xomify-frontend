@@ -2,18 +2,28 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { XtDirection } from '../../models/xomtracks-share.model';
 import {
-  XT_ROLLING_PLAYLISTS,
-  XtRollingPlaylist,
+  XtMePlaylistsResponse,
+  XtPlaylistEntry,
+  xtHasOwnPlaylist,
   xtSpotifyEmbedUrl,
-  xtSpotifyPlaylistUrl,
-} from '../../config/xomtracks-playlists.config';
+} from '../../models/xomtracks-playlists.model';
+import { XomtracksPlaylistsService } from '../../services/xomtracks-playlists.service';
 
-interface XtPlaylistView extends XtRollingPlaylist {
+type XtPlaylistScope = 'baseline' | 'own';
+type XtPanelLoadState = 'loading' | 'loaded' | 'error';
+
+interface XtPlaylistCardView {
+  scope: XtPlaylistScope;
+  /** Only shown when a direction has more than one card — hidden for the
+   * common (baseline-only) case so it doesn't clutter every visitor's view. */
+  label: 'Shared feed' | 'Your playlist';
+  blurb: string;
   embedUrl: SafeResourceUrl;
   openUrl: string;
 }
@@ -23,11 +33,15 @@ interface XtPlaylistView extends XtRollingPlaylist {
  * one per rolling playlist direction ("Shared With Me" / "Shared By Me") —
  * are stacked on the right screen edge (stacked FAB pills on phones). Each
  * tab opens the SAME drawer component instance, but the drawer renders ONLY
- * that direction's playlist — "Shared With Me" never shows the "Shared By
- * Me" embed and vice versa. Surfaces Xomtracks' live, rolling Spotify
- * playlist via the official embed iframe — cover + tracklist + play button,
- * saveable/likeable natively on Spotify. A plain "Open in Spotify" link is
- * provided as a no-iframe fallback.
+ * that direction's playlist(s) — "Shared With Me" never shows the "Shared By
+ * Me" embed and vice versa.
+ *
+ * Sourced from `GET /me/playlists` (`XomtracksPlaylistsService`) rather than
+ * a hardcoded id — every signed-in caller always sees the app's `baseline`
+ * (Dom's) rolling playlist for a direction; if the caller has ALSO opted in
+ * and run their own extractor, their `own` playlist (once the cron has built
+ * it) renders as a second, clearly labeled card in the same drawer. The
+ * common case (no `own` yet) renders exactly one card, same as before.
  *
  * Accessible: the panel is a focus-trapped `role="dialog"` (aria-modal),
  * opened from a button with `aria-expanded`/`aria-controls`. Esc and
@@ -39,33 +53,50 @@ interface XtPlaylistView extends XtRollingPlaylist {
   templateUrl: './xomtracks-playlists-panel.component.html',
   styleUrls: ['./xomtracks-playlists-panel.component.scss'],
 })
-export class XomtracksPlaylistsPanelComponent {
+export class XomtracksPlaylistsPanelComponent implements OnInit {
   open = false;
+  state: XtPanelLoadState = 'loading';
 
-  readonly playlists: XtPlaylistView[];
-
-  /** Which playlist's tab was used to open the drawer — the drawer renders
-   * ONLY this direction's playlist. Null when closed. */
+  /** Which direction's tab was used to open the drawer — the drawer renders
+   * ONLY this direction's card(s). Null when closed. */
   requestedDirection: XtDirection | null = null;
 
   @ViewChild('panel') panelRef?: ElementRef<HTMLElement>;
 
+  private data: XtMePlaylistsResponse | null = null;
   private previouslyFocused: HTMLElement | null = null;
 
-  constructor(sanitizer: DomSanitizer) {
-    // Embed URLs point only at open.spotify.com — trusted, so we bypass
-    // Angular's resource-url guard to let them load in the iframe.
-    this.playlists = XT_ROLLING_PLAYLISTS.map((p) => ({
-      ...p,
-      embedUrl: sanitizer.bypassSecurityTrustResourceUrl(xtSpotifyEmbedUrl(p.id)),
-      openUrl: xtSpotifyPlaylistUrl(p.id),
-    }));
+  constructor(
+    private sanitizer: DomSanitizer,
+    private playlistsService: XomtracksPlaylistsService,
+  ) {}
+
+  ngOnInit(): void {
+    this.load();
   }
 
-  /** Opens the drawer showing ONLY one direction's playlist — the handler
-   * for both edge tabs ("Shared With Me" passes 'in', "Shared By Me" passes
-   * 'out'). If the drawer is already open on the other direction, this
-   * swaps its content rather than opening a second drawer. */
+  load(): void {
+    this.state = 'loading';
+    this.playlistsService.get().subscribe({
+      next: (res) => {
+        this.data = res;
+        this.state = 'loaded';
+      },
+      error: () => {
+        this.data = null;
+        this.state = 'error';
+      },
+    });
+  }
+
+  retry(): void {
+    this.load();
+  }
+
+  /** Opens the drawer showing ONLY one direction's card(s) — the handler for
+   * both edge tabs ("Shared With Me" passes 'in', "Shared By Me" passes
+   * 'out'). If the drawer is already open on the other direction, this swaps
+   * its content rather than opening a second drawer. */
   openFor(direction: XtDirection): void {
     this.requestedDirection = direction;
     if (this.open) {
@@ -77,10 +108,42 @@ export class XomtracksPlaylistsPanelComponent {
     queueMicrotask(() => this.focusFirst());
   }
 
-  /** The single playlist to render for the currently requested direction,
-   * or null when nothing's requested (drawer isn't open). */
-  get requestedPlaylist(): XtPlaylistView | null {
-    return this.playlists.find((p) => p.direction === this.requestedDirection) ?? null;
+  /** The drawer's title for the currently requested direction — sourced
+   * straight from the backend's `name` (identical text for `own`/`baseline`
+   * on a direction; only the underlying playlist id differs). */
+  get requestedTitle(): string {
+    const direction = this.requestedDirection;
+    if (!direction || !this.data) return '';
+    return (this.data.baseline[direction] ?? this.data.own[direction])?.name ?? '';
+  }
+
+  /** True when the requested direction has neither a baseline nor an own
+   * playlist yet (e.g. baseline SSM param unreadable) — a rare, honest empty
+   * state rather than a blank drawer. */
+  get requestedEmpty(): boolean {
+    return this.state === 'loaded' && this.requestedCards.length === 0;
+  }
+
+  /** One or two cards for the currently requested direction: always the
+   * baseline (shared feed) card when present, PLUS the caller's own card
+   * only when it's a real, different playlist (they've opted in and their
+   * extractor has run at least once). */
+  get requestedCards(): XtPlaylistCardView[] {
+    const direction = this.requestedDirection;
+    if (!direction || !this.data) return [];
+
+    const cards: XtPlaylistCardView[] = [];
+    const baseline = this.data.baseline[direction];
+    const hasOwn = xtHasOwnPlaylist(this.data, direction);
+
+    if (baseline) {
+      cards.push(this.toCard(baseline, 'baseline', direction, hasOwn));
+    }
+    if (hasOwn) {
+      const own = this.data.own[direction] as XtPlaylistEntry;
+      cards.push(this.toCard(own, 'own', direction, hasOwn));
+    }
+    return cards;
   }
 
   close(): void {
@@ -119,9 +182,7 @@ export class XomtracksPlaylistsPanelComponent {
     }
   }
 
-  /** Focuses the drawer's first focusable control (the panel itself only
-   * ever renders the one requested playlist now, so there's nothing to
-   * scroll to — just move focus in). */
+  /** Focuses the drawer's first focusable control. */
   private focusFirst(): void {
     const focusables = this.focusableElements();
     (focusables[0] ?? this.panelRef?.nativeElement)?.focus?.();
@@ -135,5 +196,38 @@ export class XomtracksPlaylistsPanelComponent {
     return Array.from(root.querySelectorAll<HTMLElement>(selector)).filter(
       (el) => el.offsetParent !== null || el === document.activeElement,
     );
+  }
+
+  private toCard(
+    entry: XtPlaylistEntry,
+    scope: XtPlaylistScope,
+    direction: XtDirection,
+    multiple: boolean,
+  ): XtPlaylistCardView {
+    return {
+      scope,
+      label: scope === 'own' ? 'Your playlist' : 'Shared feed',
+      blurb: this.blurbFor(scope, direction, multiple),
+      // Embed URLs point only at open.spotify.com — trusted, so we bypass
+      // Angular's resource-url guard to let them load in the iframe.
+      embedUrl: this.sanitizer.bypassSecurityTrustResourceUrl(xtSpotifyEmbedUrl(entry.playlistId)),
+      openUrl: entry.url,
+    };
+  }
+
+  private blurbFor(scope: XtPlaylistScope, direction: XtDirection, multiple: boolean): string {
+    const feed = multiple ? 'the shared feed' : 'your way';
+    if (direction === 'in') {
+      return scope === 'own'
+        ? 'What your own extractor has picked up over the past month.'
+        : multiple
+          ? "What's landed in the shared feed over the past month."
+          : `Everything sent ${feed} over the past month.`;
+    }
+    return scope === 'own'
+      ? "What you've shared out, tracked by your own extractor."
+      : multiple
+        ? "What's gone out in the shared feed over the past month."
+        : 'Everything you shared out over the past month.';
   }
 }

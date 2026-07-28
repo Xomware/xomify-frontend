@@ -11,16 +11,18 @@ const STORAGE_KEY_TOKEN_HASH = 'xt.ingest.tokenHash';
 const STORAGE_KEY_LABEL = 'xt.ingest.label';
 
 /**
- * "Set up your own" onboarding card — mints a per-user extractor ingest
- * token (`POST /ingest-tokens/create`), shows the returned PLAINTEXT token
- * exactly once (it's never recoverable after this response —
+ * The opt-in "run your own" card. Everyone signed in sees Dom's shared feed
+ * by default (the `baseline` playlists/shares — no setup required); this
+ * card is the toggle-in path for a caller who wants their OWN iMessage music
+ * links layered on top. Mints a per-user extractor ingest token
+ * (`POST /ingest-tokens/create`), shows the returned PLAINTEXT token exactly
+ * once (it's never recoverable after this response —
  * xomtracks-backend/lambdas/ingesttokens_create/handler.py), plus the
- * Keychain store command and a short explainer.
- *
- * The `install.sh` guided installer (curl | bash + Full Disk Access
- * walkthrough) is a later workstream (WS4) — this card surfaces the token
- * + the manual two-step setup documented in
- * `xomtracks-backend/extractor/README.md` today.
+ * Keychain store command and the live `install.sh` guided installer command
+ * (`xomtracks-backend/extractor/install.sh` — curl | bash; walks the user
+ * through Full Disk Access and schedules a recurring scan on its own, and
+ * can also take the token interactively if they'd rather skip the manual
+ * Keychain command).
  *
  * The token hash (non-secret) is cached in localStorage so a revoke button
  * can appear on return visits — there is no `GET` list endpoint yet, so this
@@ -80,6 +82,13 @@ export class XomtracksSetupCardComponent implements OnInit {
     );
   }
 
+  /** The guided installer — clones/updates the extractor, walks through Full
+   * Disk Access, and schedules a recurring scan via launchd. Lives at
+   * `xomtracks-backend/extractor/install.sh`; fetched straight off `master`
+   * so it always matches the live extractor code. */
+  readonly installCommand =
+    'curl -fsSL https://raw.githubusercontent.com/Xomware/xomtracks-backend/master/extractor/install.sh | bash';
+
   mint(): void {
     if (this.state === 'minting') return;
     this.state = 'minting';
@@ -125,6 +134,14 @@ export class XomtracksSetupCardComponent implements OnInit {
   async copyKeychainCommand(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.keychainCommand);
+    } catch {
+      // Non-fatal — the command stays selectable.
+    }
+  }
+
+  async copyInstallCommand(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(this.installCommand);
     } catch {
       // Non-fatal — the command stays selectable.
     }

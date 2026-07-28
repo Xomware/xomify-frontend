@@ -164,6 +164,65 @@
   color: #8a8a9a;
 }
 
+// Only rendered when a direction has both a baseline AND an own card, so a
+// visitor who's opted in can tell the two apart at a glance without the
+// common (single-card) case ever showing it.
+.xt-playlist-scope-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.xt-playlist[data-scope='own'] .xt-playlist-scope-badge {
+  background: rgba(27, 220, 111, 0.16);
+  color: #1bdc6f;
+}
+
+.xt-playlist[data-direction='out'][data-scope='own'] .xt-playlist-scope-badge {
+  background: rgba(156, 10, 191, 0.16);
+  color: #c46ee0;
+}
+
+.xt-panel-state {
+  padding: 32px 4px;
+  text-align: center;
+  color: #8a8a9a;
+  font-size: 0.85rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.xt-panel-state--error {
+  color: #f28b8b;
+}
+
+.xt-panel-retry-btn {
+  margin-top: 12px;
+  padding: 9px 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
 .xt-playlist-embed {
   display: block;
   border-radius: 12px;
