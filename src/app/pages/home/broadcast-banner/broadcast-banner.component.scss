@@ -1,0 +1,65 @@
+.broadcast-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+  scroll-margin-top: 90px;
+}
+
+.broadcast-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(156, 10, 191, 0.16) 0%, rgba(27, 220, 111, 0.1) 100%);
+  border: 1px solid rgba(156, 10, 191, 0.3);
+}
+
+.broadcast-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(156, 10, 191, 0.25);
+  color: #d68bff;
+}
+
+.broadcast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.broadcast-title {
+  margin: 0 0 2px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.broadcast-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #d0d0da;
+  line-height: 1.4;
+}
+
+.broadcast-dismiss {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: #8a8a9a;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

@@ -1,24 +1,219 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, take, takeUntil } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import {
+  ListeningHistoryService,
+  RecentlyPlayedItem,
+} from 'src/app/services/listening-history.service';
+import { TopItemsData, TopItemsService } from 'src/app/services/top-items.service';
+import { Broadcast, BroadcastsService } from 'src/app/services/broadcasts.service';
+import { SpotlightSlide } from './spotlight-rotator/spotlight-rotator.component';
 
+/**
+ * Home — logged-out visitors get the existing Spotify login CTA; logged-in
+ * users get a real dashboard (this used to just redirect straight to
+ * /my-profile).
+ *
+ * This component owns every network call the dashboard modules need
+ * (recently-played, top-items, broadcasts) and hands the results down as
+ * `@Input`s to presentational child modules, so each service is only ever
+ * called once per page load even though several modules (the spotlight
+ * rotator especially) draw from the same data.
+ */
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   title = 'XOMIFY';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  isLoggedIn = false;
+  userName = '';
+
+  recentItems: RecentlyPlayedItem[] | null = null;
+  recentError = false;
+
+  topItemsData: TopItemsData | null = null;
+  topItemsError = false;
+
+  broadcasts: Broadcast[] = [];
+
+  spotlightSlides: SpotlightSlide[] = [];
+
+  /**
+   * My Favorites (WS-D) is a sibling PR. The merge order in the plan lands
+   * it before this one, but that isn't guaranteed at any given point in
+   * time -- checking the router's registered top-level routes lets the
+   * Favorites quick-link and spotlight teaser degrade gracefully instead of
+   * linking into a 404 if this PR is deployed first.
+   */
+  favoritesAvailable = false;
+
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private listeningHistoryService: ListeningHistoryService,
+    private topItemsService: TopItemsService,
+    private broadcastsService: BroadcastsService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/my-profile']);
-    }
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (!this.isLoggedIn) return;
+
+    this.favoritesAvailable = this.hasTopLevelRoute('favorites');
+    this.loadUserName();
+    this.loadRecentlyPlayed();
+    this.loadTopItems();
+    this.loadBroadcasts();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   login(): void {
     this.authService.login();
+  }
+
+  private hasTopLevelRoute(path: string): boolean {
+    return this.router.config.some((route) => route.path === path);
+  }
+
+  private loadUserName(): void {
+    const cached = this.userService.getUserName();
+    if (cached) {
+      this.userName = cached;
+      return;
+    }
+    this.userService
+      .ensureLoaded()
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.userName = this.userService.getUserName();
+        },
+        error: () => {
+          // Greeting just falls back to the generic title -- non-critical.
+        },
+      });
+  }
+
+  private loadRecentlyPlayed(): void {
+    this.listeningHistoryService
+      .getRecentlyPlayed()
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.recentItems = response?.items ?? [];
+          this.rebuildSpotlightSlides();
+        },
+        error: () => {
+          this.recentItems = [];
+          this.recentError = true;
+          this.rebuildSpotlightSlides();
+        },
+      });
+  }
+
+  private loadTopItems(): void {
+    this.topItemsService
+      .getTopItems()
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.topItemsData = response.data;
+          this.rebuildSpotlightSlides();
+        },
+        error: () => {
+          this.topItemsError = true;
+          this.rebuildSpotlightSlides();
+        },
+      });
+  }
+
+  private loadBroadcasts(): void {
+    this.broadcastsService
+      .getActiveBroadcasts()
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe((broadcasts) => {
+        this.broadcasts = broadcasts;
+        this.rebuildSpotlightSlides();
+      });
+  }
+
+  /**
+   * Recomputed after each independent fetch resolves (success or failure)
+   * so the spotlight can start showing whatever's ready first rather than
+   * waiting on the slowest of three unrelated network calls.
+   */
+  private rebuildSpotlightSlides(): void {
+    const slides: SpotlightSlide[] = [];
+
+    const mostRecent = this.recentItems?.[0];
+    if (mostRecent) {
+      slides.push({
+        id: `recent-${mostRecent.track.id}`,
+        kind: 'recent',
+        eyebrow: 'Just played',
+        title: mostRecent.track.name,
+        subtitle: mostRecent.track.artists?.map((a) => a.name).join(', '),
+        image:
+          mostRecent.track.album?.images?.[mostRecent.track.album.images.length - 1]?.url ||
+          mostRecent.track.album?.images?.[0]?.url,
+        cta: 'View recent activity',
+        link: ['/my-profile'],
+        queryParams: { tab: 'recent' },
+      });
+    }
+
+    const topTrack = this.topItemsData?.tracks.short_term?.[0];
+    if (topTrack) {
+      slides.push({
+        id: `top-${topTrack.id}`,
+        kind: 'top',
+        eyebrow: "This month's #1",
+        title: topTrack.name,
+        subtitle: topTrack.artists?.map((a) => a.name).join(', '),
+        image:
+          topTrack.album?.images?.[topTrack.album.images.length - 1]?.url ||
+          topTrack.album?.images?.[0]?.url,
+        cta: 'See your top songs',
+        link: ['/top-songs'],
+      });
+    }
+
+    slides.push({
+      id: 'favorites-teaser',
+      kind: 'favorites',
+      eyebrow: this.favoritesAvailable ? 'My Favorites' : 'Coming soon',
+      title: 'Build your all-time Favorites',
+      subtitle: 'Curate ranked top songs, albums & artists by year.',
+      cta: this.favoritesAvailable ? 'Open My Favorites' : undefined,
+      link: this.favoritesAvailable ? ['/favorites'] : undefined,
+    });
+
+    // No `link` here -- the full broadcast is already shown in the
+    // dismissible banner at the top of the page (`#app-updates`), so this
+    // slide is informational only rather than duplicating navigation.
+    const broadcast = this.broadcasts[0];
+    if (broadcast) {
+      slides.push({
+        id: `broadcast-${broadcast.id}`,
+        kind: 'broadcast',
+        eyebrow: 'App update',
+        title: broadcast.title,
+        subtitle: broadcast.body,
+      });
+    }
+
+    this.spotlightSlides = slides;
   }
 }

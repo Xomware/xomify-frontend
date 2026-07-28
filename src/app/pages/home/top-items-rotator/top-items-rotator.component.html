@@ -1,0 +1,85 @@
+<section
+  class="dashboard-module top-items-rotator"
+  aria-labelledby="top-items-heading"
+  (mouseenter)="paused = true"
+  (mouseleave)="paused = false"
+  (focusin)="paused = true"
+  (focusout)="paused = false"
+>
+  <div class="module-header">
+    <h2 id="top-items-heading" class="module-title">{{ activeCategoryLabel }}</h2>
+
+    <div class="range-toggle" role="group" aria-label="Time period">
+      <button
+        *ngFor="let range of rangeOptions"
+        type="button"
+        class="range-pill"
+        [class.active]="activeRange === range.value"
+        (click)="selectRange(range.value)"
+      >
+        {{ range.label }}
+      </button>
+    </div>
+  </div>
+
+  <div class="category-tabs" role="tablist" aria-label="Top items category">
+    <button
+      *ngFor="let tab of categoryTabs"
+      type="button"
+      role="tab"
+      class="category-tab"
+      [class.active]="activeCategory === tab.id"
+      [attr.aria-selected]="activeCategory === tab.id"
+      (click)="selectCategory(tab.id)"
+    >
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <div class="module-loading" *ngIf="data === null && !error">
+    <div class="loader">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+  </div>
+
+  <p class="module-error" role="status" *ngIf="error">
+    Couldn't load your top items right now.
+  </p>
+
+  <p class="module-empty" *ngIf="data !== null && !error && items.length === 0">
+    Not enough listening history yet for this period.
+  </p>
+
+  <div class="sr-only" aria-live="polite">
+    Showing top {{ activeCategory }}, {{ activeRangeLabel }}
+  </div>
+
+  <ul class="items-grid" *ngIf="items.length > 0" role="tabpanel">
+    <li *ngFor="let item of items; trackBy: trackById">
+      <button type="button" class="item-card" (click)="onItemActivate(item)">
+        <span class="item-rank">#{{ item.rank }}</span>
+        <img
+          *ngIf="item.image"
+          [src]="item.image"
+          [alt]="''"
+          class="item-image"
+          [class.round]="item.round"
+        />
+        <div class="item-genre-icon" *ngIf="!item.image">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+            />
+          </svg>
+        </div>
+        <span class="item-name">{{ item.name }}</span>
+        <span class="item-subtitle" *ngIf="item.subtitle">{{ item.subtitle }}</span>
+        <span class="item-weight-bar" *ngIf="item.weightPct !== undefined">
+          <span class="item-weight-fill" [style.width.%]="item.weightPct"></span>
+        </span>
+      </button>
+    </li>
+  </ul>
+</section>

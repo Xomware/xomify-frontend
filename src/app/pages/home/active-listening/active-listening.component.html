@@ -1,0 +1,42 @@
+<section class="dashboard-module active-listening" aria-labelledby="active-listening-heading">
+  <div class="module-header">
+    <h2 id="active-listening-heading" class="module-title">Active Listening</h2>
+    <a class="module-link" routerLink="/my-profile" [queryParams]="{ tab: 'recent' }">
+      View all
+    </a>
+  </div>
+
+  <div class="module-loading" *ngIf="items === null && !error">
+    <div class="loader">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+  </div>
+
+  <p class="module-error" role="status" *ngIf="error">
+    Couldn't load your recently played tracks right now.
+  </p>
+
+  <p class="module-empty" *ngIf="items !== null && !error && displayItems.length === 0">
+    Nothing played recently — fire up Spotify and it'll show up here.
+  </p>
+
+  <ul class="listening-strip" *ngIf="displayItems.length > 0">
+    <li *ngFor="let item of displayItems; trackBy: trackByPlayedAt">
+      <button type="button" class="listening-item" (click)="openTrack(item)">
+        <img
+          *ngIf="trackImage(item)"
+          [src]="trackImage(item)"
+          [alt]="''"
+          class="listening-art"
+        />
+        <span class="listening-text">
+          <span class="listening-name">{{ item.track.name }}</span>
+          <span class="listening-artist">{{ trackArtists(item) }}</span>
+          <span class="listening-time">{{ playedLabel(item) }}</span>
+        </span>
+      </button>
+    </li>
+  </ul>
+</section>

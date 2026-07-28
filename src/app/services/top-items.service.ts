@@ -45,6 +45,18 @@ export interface TopItemsArtist {
 /** Genres are returned per-time-range as `{ genreName: weight }` aggregated server-side. */
 export type TopItemsGenres = Record<string, number>;
 
+/**
+ * Top-albums payload (WS-Backend addition) — a simplified, already-flattened
+ * shape (NOT the raw Spotify album object tracks/artists use).
+ */
+export interface TopItemsAlbum {
+  spotifyId: string;
+  name: string;
+  artist: string;
+  imageUrl: string;
+  trackCount: number;
+}
+
 export interface TopItemsByTimeRange<T> {
   short_term: T | null;
   medium_term: T | null;
@@ -55,6 +67,14 @@ export interface TopItemsData {
   tracks: TopItemsByTimeRange<TopItemsTrack[]>;
   artists: TopItemsByTimeRange<TopItemsArtist[]>;
   genres: TopItemsByTimeRange<TopItemsGenres>;
+  /**
+   * Albums dimension — added by a sibling backend PR (WS-Backend, see
+   * `docs/features/xomify-favorites-home-admin/PLAN.md`). Optional because
+   * a backend deployed before that PR lands omits the key entirely; every
+   * consumer must treat `undefined` the same as "no albums available" and
+   * degrade gracefully (e.g. hide an Albums tab) rather than erroring.
+   */
+  albums?: TopItemsByTimeRange<TopItemsAlbum[]>;
   meta?: {
     /** Time ranges that failed upstream at Spotify on this fetch. Empty/omitted on full success. */
     failed_ranges?: TopItemsTimeRange[];
