@@ -1,0 +1,170 @@
+// Notifications panel — `ax-` prefix, matches the rest of the Admin Portal.
+
+.ax-segmented {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ax-segmented-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8a8a9a;
+  padding: 9px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.3);
+    color: #fff;
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+    border-color: transparent;
+    color: #fff;
+  }
+}
+
+.ax-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #8a8a9a;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 1.05rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  &--error {
+    border-color: rgba(255, 55, 80, 0.3);
+  }
+}
+
+.ax-btn {
+  margin-top: 10px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.ax-table-wrap {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.ax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th,
+  td {
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6d6d7d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+.ax-cell-nowrap {
+  white-space: nowrap;
+  color: #c4c4d2;
+}
+
+.ax-cell-preview {
+  max-width: 320px;
+  color: #cfcfdc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ax-cell-error {
+  margin: 4px 0 0;
+  font-size: 0.72rem;
+  color: #ff8fa0;
+  max-width: 220px;
+  white-space: normal;
+}
+
+.ax-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8a8a9a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &--on {
+    background: rgba(27, 220, 111, 0.12);
+    color: #b9f7d3;
+    border-color: rgba(27, 220, 111, 0.35);
+  }
+
+  &--warn {
+    background: rgba(255, 55, 80, 0.12);
+    color: #ff8fa0;
+    border-color: rgba(255, 55, 80, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-segmented-btn,
+  .ax-btn {
+    transition: none;
+  }
+}

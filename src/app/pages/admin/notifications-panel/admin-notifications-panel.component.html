@@ -1,0 +1,76 @@
+<div>
+  <div class="ax-segmented" role="group" aria-label="Result limit">
+    <button
+      *ngFor="let l of limitOptions"
+      type="button"
+      class="ax-segmented-btn"
+      [class.ax-segmented-btn--active]="limit === l.value"
+      [attr.aria-pressed]="limit === l.value"
+      (click)="setLimit(l.value)"
+    >
+      {{ l.label }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <p>Loading notification log…</p>
+  </div>
+
+  <!-- Not live yet -->
+  <div class="ax-state-block" *ngIf="state === 'not-live'">
+    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <h2>Notification log isn't live yet</h2>
+    <p>The backend endpoint hasn't deployed yet.</p>
+    <button type="button" class="ax-btn" (click)="retry()">Check again</button>
+  </div>
+
+  <!-- Error -->
+  <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
+    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <h2>Couldn't load the notification log</h2>
+    <button type="button" class="ax-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded'">
+    <div class="ax-state-block" *ngIf="!notifications.length">
+      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <h2>No notifications sent</h2>
+      <p>Nothing in the send log yet.</p>
+    </div>
+
+    <div class="ax-table-wrap" *ngIf="notifications.length">
+      <table class="ax-table">
+        <caption class="sr-only">Outbound notification log</caption>
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">Channel</th>
+            <th scope="col">Recipient</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Preview</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let n of notifications; trackBy: trackByRow">
+            <td class="ax-cell-nowrap">{{ humanTs(n.ts) }}</td>
+            <td>
+              <span class="ax-badge">{{ n.channel }}</span>
+            </td>
+            <td class="ax-cell-nowrap">{{ n.toEmail }}</td>
+            <td>{{ n.subject || '—' }}</td>
+            <td class="ax-cell-preview">{{ n.bodyPreview || '—' }}</td>
+            <td>
+              <span class="ax-badge" [class.ax-badge--warn]="isFailed(n.status)" [class.ax-badge--on]="!isFailed(n.status)">
+                {{ n.status }}
+              </span>
+              <p class="ax-cell-error" *ngIf="n.error">{{ n.error }}</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,254 @@
+// Health panel — same dark gradient + purple/green design language as the
+// rest of the Admin Portal (`ax-` prefix, matches `admin.component.scss`).
+
+.ax-segmented {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ax-segmented-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #8a8a9a;
+  padding: 9px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(156, 10, 191, 0.15);
+    border-color: rgba(156, 10, 191, 0.3);
+    color: #fff;
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+
+  &--active {
+    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+    border-color: transparent;
+    color: #fff;
+  }
+}
+
+.ax-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #8a8a9a;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 1.05rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  &--compact {
+    padding: 20px;
+  }
+
+  &--error {
+    border-color: rgba(255, 55, 80, 0.3);
+  }
+}
+
+.ax-btn {
+  margin-top: 10px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+// ── Summary cards ─────────────────────────────────────────────────────
+.ax-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.ax-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ax-summary-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6d6d7d;
+}
+
+.ax-summary-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+
+  &--warn {
+    color: #ff8fa0;
+  }
+}
+
+// ── Subsections / table ───────────────────────────────────────────────
+.ax-subsection {
+  margin-bottom: 28px;
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+}
+
+.ax-table-wrap {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.ax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th,
+  td {
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  thead th {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6d6d7d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .ax-cell-mono {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    color: #c4c4d2;
+  }
+
+  .ax-cell-warn {
+    color: #ff8fa0;
+    font-weight: 700;
+  }
+}
+
+// ── Recent errors ─────────────────────────────────────────────────────
+.ax-error-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ax-error-row {
+  display: grid;
+  grid-template-columns: 130px 50px 1fr 1fr 2fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.ax-error-ts {
+  color: #6d6d7d;
+  white-space: nowrap;
+}
+
+.ax-error-status {
+  font-weight: 800;
+  color: #b9f7d3;
+
+  &--warn {
+    color: #ff8fa0;
+  }
+}
+
+.ax-error-path {
+  color: #c4c4d2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, 'SF Mono', monospace;
+}
+
+.ax-error-email {
+  color: #8a8a9a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ax-error-msg {
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .ax-error-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-segmented-btn,
+  .ax-btn {
+    transition: none;
+  }
+}

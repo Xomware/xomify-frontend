@@ -1,0 +1,25 @@
+.ax-icon {
+  display: inline-flex;
+}
+
+.ax-icon-svg {
+  width: 34px;
+  height: 34px;
+  color: #8a8a9a;
+
+  &--spin {
+    animation: ax-icon-spin 0.9s linear infinite;
+  }
+}
+
+@keyframes ax-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-icon-svg--spin {
+    animation: none;
+  }
+}
