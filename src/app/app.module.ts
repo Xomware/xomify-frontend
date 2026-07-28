@@ -23,6 +23,11 @@ import { AmbientBackgroundComponent } from './components/ambient-background/ambi
 
 // Eagerly-loaded pages (core navigation)
 import { HomeComponent } from './pages/home/home.component';
+import { BroadcastBannerComponent } from './pages/home/broadcast-banner/broadcast-banner.component';
+import { ActiveListeningComponent } from './pages/home/active-listening/active-listening.component';
+import { TopItemsRotatorComponent } from './pages/home/top-items-rotator/top-items-rotator.component';
+import { SpotlightRotatorComponent } from './pages/home/spotlight-rotator/spotlight-rotator.component';
+import { QuickLinksComponent } from './pages/home/quick-links/quick-links.component';
 import { MyProfileComponent } from './pages/my-profile/my-profile.component';
 import { TopSongsComponent } from './pages/top-songs/top-songs.component';
 import { TopArtistsComponent } from './pages/top-artists/top-artists.component';
@@ -51,6 +56,11 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     CallbackComponent,
     AmbientBackgroundComponent,
     HomeComponent,
+    BroadcastBannerComponent,
+    ActiveListeningComponent,
+    TopItemsRotatorComponent,
+    SpotlightRotatorComponent,
+    QuickLinksComponent,
     MyProfileComponent,
     TopSongsComponent,
     TopArtistsComponent,

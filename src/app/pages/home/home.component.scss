@@ -1,3 +1,72 @@
+// ---------------------------------------------------------------------------
+// Dashboard (logged-in Home)
+// ---------------------------------------------------------------------------
+.page-container.dashboard {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
+  padding: 90px 24px 100px;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-title {
+  margin: 0 0 6px 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+
+  span {
+    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.dashboard-subtitle {
+  margin: 0;
+  color: #8a8a9a;
+  font-size: 0.95rem;
+}
+
+// Shared "quick links" module shell -- the child components (spotlight,
+// active-listening, top-items-rotator) each carry their own
+// `.dashboard-module` styling since Angular's view encapsulation scopes
+// styles per-component; this copy is for the quick-links wrapper that lives
+// directly in this template.
+.dashboard-module {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+
+  .module-title {
+    margin: 0 0 18px 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-container.dashboard {
+    padding: 76px 16px 80px;
+  }
+
+  .dashboard-title {
+    font-size: 1.4rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Logged-out login CTA (unchanged)
+// ---------------------------------------------------------------------------
 .login-page {
   display: flex;
   flex-direction: column;

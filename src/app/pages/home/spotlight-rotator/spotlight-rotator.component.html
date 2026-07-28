@@ -1,0 +1,64 @@
+<section
+  class="spotlight"
+  *ngIf="slides.length > 0"
+  aria-label="What's happening"
+  (mouseenter)="paused = true"
+  (mouseleave)="paused = false"
+  (focusin)="paused = true"
+  (focusout)="paused = false"
+>
+  <ng-container *ngIf="activeSlide as slide">
+    <div
+      class="spotlight-card"
+      [class.clickable]="!!slide.link"
+      [class.kind-recent]="slide.kind === 'recent'"
+      [class.kind-top]="slide.kind === 'top'"
+      [class.kind-favorites]="slide.kind === 'favorites'"
+      [class.kind-broadcast]="slide.kind === 'broadcast'"
+      [attr.role]="slide.link ? 'link' : null"
+      [attr.tabindex]="slide.link ? 0 : null"
+      (click)="onCardActivate(slide)"
+      (keydown.enter)="onCardActivate(slide)"
+      (keydown.space)="$event.preventDefault(); onCardActivate(slide)"
+    >
+      <img *ngIf="slide.image" [src]="slide.image" alt="" class="spotlight-image" />
+      <div class="spotlight-body">
+        <span class="spotlight-eyebrow">{{ slide.eyebrow }}</span>
+        <h3 class="spotlight-title">{{ slide.title }}</h3>
+        <p class="spotlight-subtitle" *ngIf="slide.subtitle">{{ slide.subtitle }}</p>
+        <span class="spotlight-cta" *ngIf="slide.cta">{{ slide.cta }} →</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="spotlight-controls" *ngIf="slides.length > 1">
+    <button type="button" class="spotlight-nav" (click)="previous()" aria-label="Previous highlight">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+      </svg>
+    </button>
+
+    <div class="spotlight-dots" role="tablist" aria-label="Highlights">
+      <button
+        *ngFor="let s of slides; let i = index"
+        type="button"
+        role="tab"
+        class="spotlight-dot"
+        [class.active]="i === activeIndex"
+        [attr.aria-selected]="i === activeIndex"
+        [attr.aria-label]="'Show highlight ' + (i + 1) + ' of ' + slides.length"
+        (click)="goTo(i)"
+      ></button>
+    </div>
+
+    <button type="button" class="spotlight-nav" (click)="next()" aria-label="Next highlight">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="sr-only" aria-live="polite">
+    {{ activeSlide?.eyebrow }}: {{ activeSlide?.title }}
+  </div>
+</section>
