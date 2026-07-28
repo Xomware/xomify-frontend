@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminHealthPanelComponent } from './admin-health-panel.component';
-import { AdminStateIconComponent } from '../components/admin-state-icon/admin-state-icon.component';
+import { IconComponent } from '../../../components/icon/icon.component';
+import { AxTimestampPipe } from '../pipes/ax-timestamp.pipe';
 import { AdminPortalService } from '../services/admin-portal.service';
 import { AdminHealthSummary } from '../models/admin-portal.model';
 
@@ -26,7 +27,7 @@ describe('AdminHealthPanelComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CommonModule],
-      declarations: [AdminHealthPanelComponent, AdminStateIconComponent],
+      declarations: [AdminHealthPanelComponent, IconComponent, AxTimestampPipe],
       providers: [{ provide: AdminPortalService, useValue: adminSpy }],
     }).compileComponents();
 

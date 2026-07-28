@@ -65,18 +65,6 @@ export class AdminCronsPanelComponent implements OnInit {
     return `${min}m ${sec}s`;
   }
 
-  humanTs(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    const ms = Date.parse(iso);
-    if (Number.isNaN(ms)) return String(iso);
-    return new Date(ms).toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  }
-
   trackByCron(_index: number, cron: AdminCron): string {
     return cron.cronName;
   }

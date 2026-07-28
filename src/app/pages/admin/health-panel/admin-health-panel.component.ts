@@ -62,18 +62,6 @@ export class AdminHealthPanelComponent implements OnInit {
     return this.windowOptions.find((w) => w.value === hours)?.label ?? `${hours}h`;
   }
 
-  humanTs(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    const ms = Date.parse(iso);
-    if (Number.isNaN(ms)) return String(iso);
-    return new Date(ms).toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  }
-
   isErrorStatus(status: number): boolean {
     return status >= 400;
   }

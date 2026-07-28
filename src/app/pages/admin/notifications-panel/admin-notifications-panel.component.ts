@@ -57,16 +57,8 @@ export class AdminNotificationsPanelComponent implements OnInit {
     return s === 'failed' || s === 'error' || s === 'bounced';
   }
 
-  humanTs(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    const ms = Date.parse(iso);
-    if (Number.isNaN(ms)) return String(iso);
-    return new Date(ms).toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
+  get failedCount(): number {
+    return this.notifications.filter((n) => this.isFailed(n.status)).length;
   }
 
   trackByRow(index: number, n: AdminNotification): string {

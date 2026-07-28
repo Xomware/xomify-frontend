@@ -125,12 +125,17 @@ export const AX_NOTIFICATIONS_LIMITS: ReadonlyArray<{ value: number; label: stri
 
 // ── Tab shell ─────────────────────────────────────────────────────────────
 
-export type AdminTab = 'health' | 'users' | 'crons' | 'notifications' | 'broadcasts';
+export type AdminTab = 'overview' | 'health' | 'users' | 'crons' | 'notifications' | 'broadcasts';
 
-export const AX_ADMIN_TABS: ReadonlyArray<{ value: AdminTab; label: string }> = [
-  { value: 'health', label: 'Health' },
-  { value: 'users', label: 'Users' },
-  { value: 'crons', label: 'Crons' },
-  { value: 'notifications', label: 'Notifications' },
-  { value: 'broadcasts', label: 'Broadcasts' },
+/** `icon` is a name from the shared `app-icon` registry (`components/icon/`). */
+export const AX_ADMIN_TABS: ReadonlyArray<{ value: AdminTab; label: string; icon: string }> = [
+  { value: 'overview', label: 'Overview', icon: 'chart' },
+  { value: 'health', label: 'Health', icon: 'trending-up' },
+  { value: 'users', label: 'Users', icon: 'people' },
+  { value: 'crons', label: 'Crons', icon: 'refresh' },
+  { value: 'notifications', label: 'Notifications', icon: 'bell' },
+  { value: 'broadcasts', label: 'Broadcasts', icon: 'megaphone' },
 ];
+
+/** The default landing tab — deep-linkable at `/admin` with no `?tab=`. */
+export const AX_ADMIN_DEFAULT_TAB: AdminTab = 'overview';

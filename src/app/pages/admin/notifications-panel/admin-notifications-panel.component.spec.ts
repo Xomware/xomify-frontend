@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminNotificationsPanelComponent } from './admin-notifications-panel.component';
-import { AdminStateIconComponent } from '../components/admin-state-icon/admin-state-icon.component';
+import { IconComponent } from '../../../components/icon/icon.component';
+import { AxTimestampPipe } from '../pipes/ax-timestamp.pipe';
 import { AdminPortalService } from '../services/admin-portal.service';
 import { AdminNotification } from '../models/admin-portal.model';
 
@@ -30,7 +31,7 @@ describe('AdminNotificationsPanelComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CommonModule],
-      declarations: [AdminNotificationsPanelComponent, AdminStateIconComponent],
+      declarations: [AdminNotificationsPanelComponent, IconComponent, AxTimestampPipe],
       providers: [{ provide: AdminPortalService, useValue: adminSpy }],
     }).compileComponents();
 
@@ -61,5 +62,13 @@ describe('AdminNotificationsPanelComponent', () => {
     expect(component.isFailed('bounced')).toBe(true);
     expect(component.isFailed('sent')).toBe(false);
     expect(component.isFailed(null)).toBe(false);
+  });
+
+  it('failedCount tallies failed notifications', () => {
+    adminSpy.notifications.and.returnValue(
+      of([...notifications, { ...notifications[0], status: 'bounced' }]),
+    );
+    fixture.detectChanges();
+    expect(component.failedCount).toBe(1);
   });
 });

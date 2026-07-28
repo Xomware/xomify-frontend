@@ -1,0 +1,50 @@
+// "macOS pro tool" token seed — System Settings / Linear style dark UI:
+// flat surfaces, hairline separators, small radii, restrained accent color
+// used only for status/selection, information-dense typography.
+//
+// Emitted as CSS custom properties (not Sass variables) so they cascade
+// through the real DOM regardless of Angular's per-component view
+// encapsulation — any component nested under a selector that includes
+// `ax-theme-tokens()` can read `var(--ax-*)` without importing this file
+// itself. Currently only `admin.component.scss` calls this (scoped to the
+// `/admin` portal per the current restyle brief), but the mixin is written
+// to be dropped onto `:root` in `src/styles.scss` later if/when this look
+// goes app-wide — see `.claude/worktrees/agent-add2e9c6d6e17531a` restyle
+// notes. Nothing here should assume it's only ever mounted under `.ax-page`.
+@mixin ax-theme-tokens {
+  // ── Surfaces ────────────────────────────────────────────────────────
+  --ax-bg: #131316;
+  --ax-surface: #18181c;
+  --ax-surface-raised: #1e1e23;
+  --ax-surface-sunken: rgba(0, 0, 0, 0.22);
+  --ax-hairline: rgba(255, 255, 255, 0.08);
+  --ax-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  // ── Text ────────────────────────────────────────────────────────────
+  --ax-text: #f2f2f4;
+  --ax-text-secondary: #a3a3ab;
+  --ax-text-tertiary: #6f6f78;
+
+  // ── Accent — muted for structure, full strength reserved for status
+  // dots/badges and the active nav row indicator ─────────────────────
+  --ax-accent: #a855c9;
+  --ax-accent-muted: rgba(168, 85, 201, 0.14);
+  --ax-accent-text: #d3a4e8;
+  --ax-positive: #34c77b;
+  --ax-positive-muted: rgba(52, 199, 123, 0.14);
+  --ax-negative: #f0596b;
+  --ax-negative-muted: rgba(240, 89, 107, 0.16);
+  --ax-warning: #e0a63f;
+  --ax-warning-muted: rgba(224, 166, 63, 0.14);
+
+  // ── Shape — small radii everywhere, no pills ───────────────────────
+  --ax-radius-sm: 4px;
+  --ax-radius-md: 6px;
+  --ax-radius-lg: 8px;
+
+  // ── Type ────────────────────────────────────────────────────────────
+  --ax-font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  // ── Motion ──────────────────────────────────────────────────────────
+  --ax-transition: 120ms ease;
+}

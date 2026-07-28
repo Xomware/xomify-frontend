@@ -1,13 +1,13 @@
 <div>
   <!-- Loading -->
   <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <app-icon name="spinner" [size]="24"></app-icon>
     <p>Loading cron status…</p>
   </div>
 
   <!-- Not live yet -->
   <div class="ax-state-block" *ngIf="state === 'not-live'">
-    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <app-icon name="inbox" [size]="24"></app-icon>
     <h2>Cron run history isn't live yet</h2>
     <p>The backend endpoint hasn't deployed yet.</p>
     <button type="button" class="ax-btn" (click)="retry()">Check again</button>
@@ -15,14 +15,14 @@
 
   <!-- Error -->
   <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
-    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <app-icon name="warning" [size]="24"></app-icon>
     <h2>Couldn't load cron status</h2>
     <button type="button" class="ax-btn" (click)="retry()">Try again</button>
   </div>
 
   <ng-container *ngIf="state === 'loaded'">
     <div class="ax-state-block" *ngIf="!crons.length">
-      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <app-icon name="inbox" [size]="24"></app-icon>
       <h2>No scheduled crons</h2>
       <p>Nothing has reported a run yet.</p>
     </div>
@@ -44,15 +44,19 @@
           <dl class="ax-cron-meta">
             <div>
               <dt>Started</dt>
-              <dd>{{ humanTs(run.startedAt) }}</dd>
+              <dd>{{ run.startedAt | axTimestamp }}</dd>
             </div>
             <div>
               <dt>Duration</dt>
               <dd>{{ duration(run) }}</dd>
             </div>
             <div>
-              <dt>Items processed</dt>
+              <dt>Items</dt>
               <dd>{{ run.itemsProcessed ?? '—' }}</dd>
+            </div>
+            <div>
+              <dt>Recorded runs</dt>
+              <dd>{{ cron.recentRuns?.length ?? 0 }}</dd>
             </div>
           </dl>
 
@@ -73,7 +77,7 @@
               >
                 {{ run.status }}
               </span>
-              <span class="ax-run-ts">{{ humanTs(run.startedAt) }}</span>
+              <span class="ax-run-ts">{{ run.startedAt | axTimestamp }}</span>
               <span class="ax-run-duration">{{ duration(run) }}</span>
               <span class="ax-run-items">{{ run.itemsProcessed ?? '—' }} items</span>
             </li>

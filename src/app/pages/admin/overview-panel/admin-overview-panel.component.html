@@ -1,0 +1,178 @@
+<div>
+  <header class="ax-ov-head">
+    <h2>Overview</h2>
+    <p>At-a-glance signals pulled from Health, Users, Crons, and Notifications.</p>
+  </header>
+
+  <div class="ax-ov-grid">
+    <!-- Health -->
+    <section class="ax-ov-tile" aria-labelledby="ax-ov-health-h">
+      <header class="ax-ov-tile-head">
+        <app-icon name="trending-up" [size]="16"></app-icon>
+        <h3 id="ax-ov-health-h">Health</h3>
+        <button type="button" class="ax-ov-view-all" (click)="go('health')">View all</button>
+      </header>
+
+      <div class="ax-ov-substate" *ngIf="healthState === 'loading'" aria-busy="true" aria-live="polite">
+        <app-icon name="spinner" [size]="14"></app-icon>
+        <span>Loading…</span>
+      </div>
+      <p class="ax-ov-substate ax-ov-substate--muted" *ngIf="healthState === 'not-live'">Not live yet.</p>
+      <div class="ax-ov-substate ax-ov-substate--error" *ngIf="healthState === 'error'" role="alert">
+        <app-icon name="warning" [size]="14"></app-icon>
+        <span>Couldn't load.</span>
+        <button type="button" class="ax-ov-retry" (click)="retryHealth()">Retry</button>
+      </div>
+
+      <ng-container *ngIf="healthState === 'loaded' && health as h">
+        <div class="ax-ov-stats">
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value">{{ h.totalCalls }}</span>
+            <span class="ax-ov-stat-label">Calls (24h)</span>
+          </div>
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value" [class.ax-ov-stat-value--warn]="h.errorCount > 0">{{ h.errorCount }}</span>
+            <span class="ax-ov-stat-label">Errors</span>
+          </div>
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value">{{ errorRatePct }}</span>
+            <span class="ax-ov-stat-label">Error rate</span>
+          </div>
+        </div>
+
+        <p class="ax-ov-empty" *ngIf="!topErrors.length">
+          <app-icon name="check-circle" [size]="13"></app-icon>
+          No errors in the last 24h.
+        </p>
+        <ul class="ax-ov-list" *ngIf="topErrors.length" aria-label="Most recent errors">
+          <li *ngFor="let e of topErrors; trackBy: trackByPath">
+            <span class="ax-ov-list-mono">{{ e.path }}</span>
+            <span class="ax-ov-list-badge ax-ov-list-badge--warn">{{ e.status }}</span>
+            <span class="ax-ov-list-ts">{{ e.ts | axTimestamp: 'relative' }}</span>
+          </li>
+        </ul>
+      </ng-container>
+    </section>
+
+    <!-- Users -->
+    <section class="ax-ov-tile" aria-labelledby="ax-ov-users-h">
+      <header class="ax-ov-tile-head">
+        <app-icon name="people" [size]="16"></app-icon>
+        <h3 id="ax-ov-users-h">Users</h3>
+        <button type="button" class="ax-ov-view-all" (click)="go('users')">View all</button>
+      </header>
+
+      <div class="ax-ov-substate" *ngIf="usersState === 'loading'" aria-busy="true" aria-live="polite">
+        <app-icon name="spinner" [size]="14"></app-icon>
+        <span>Loading…</span>
+      </div>
+      <p class="ax-ov-substate ax-ov-substate--muted" *ngIf="usersState === 'not-live'">Not live yet.</p>
+      <div class="ax-ov-substate ax-ov-substate--error" *ngIf="usersState === 'error'" role="alert">
+        <app-icon name="warning" [size]="14"></app-icon>
+        <span>Couldn't load.</span>
+        <button type="button" class="ax-ov-retry" (click)="retryUsers()">Retry</button>
+      </div>
+
+      <ng-container *ngIf="usersState === 'loaded'">
+        <div class="ax-ov-stats">
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value">{{ users.length }}</span>
+            <span class="ax-ov-stat-label">Total users</span>
+          </div>
+        </div>
+
+        <p class="ax-ov-empty" *ngIf="!recentUsers.length">No users yet.</p>
+        <ul class="ax-ov-list" *ngIf="recentUsers.length" aria-label="Most recent sign-ins">
+          <li *ngFor="let u of recentUsers; trackBy: trackByEmail">
+            <span class="ax-ov-list-primary">{{ u.email }}</span>
+            <span class="ax-ov-list-ts">{{ u.lastSeen | axTimestamp: 'relative' }}</span>
+          </li>
+        </ul>
+      </ng-container>
+    </section>
+
+    <!-- Crons -->
+    <section class="ax-ov-tile" aria-labelledby="ax-ov-crons-h">
+      <header class="ax-ov-tile-head">
+        <app-icon name="refresh" [size]="16"></app-icon>
+        <h3 id="ax-ov-crons-h">Crons</h3>
+        <button type="button" class="ax-ov-view-all" (click)="go('crons')">View all</button>
+      </header>
+
+      <div class="ax-ov-substate" *ngIf="cronsState === 'loading'" aria-busy="true" aria-live="polite">
+        <app-icon name="spinner" [size]="14"></app-icon>
+        <span>Loading…</span>
+      </div>
+      <p class="ax-ov-substate ax-ov-substate--muted" *ngIf="cronsState === 'not-live'">Not live yet.</p>
+      <div class="ax-ov-substate ax-ov-substate--error" *ngIf="cronsState === 'error'" role="alert">
+        <app-icon name="warning" [size]="14"></app-icon>
+        <span>Couldn't load.</span>
+        <button type="button" class="ax-ov-retry" (click)="retryCrons()">Retry</button>
+      </div>
+
+      <ng-container *ngIf="cronsState === 'loaded'">
+        <div class="ax-ov-stats">
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value">{{ crons.length }}</span>
+            <span class="ax-ov-stat-label">Scheduled</span>
+          </div>
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value" [class.ax-ov-stat-value--warn]="failedCrons.length > 0">{{ failedCrons.length }}</span>
+            <span class="ax-ov-stat-label">Failing</span>
+          </div>
+        </div>
+
+        <p class="ax-ov-empty" *ngIf="!crons.length">No scheduled crons.</p>
+        <ul class="ax-ov-list" *ngIf="crons.length" aria-label="Cron last-run status">
+          <li *ngFor="let c of crons.slice(0, 5); trackBy: trackByCron">
+            <span class="ax-ov-dot" [class.ax-ov-dot--ok]="cronStatusClass(c) === 'ok'" [class.ax-ov-dot--error]="cronStatusClass(c) === 'error'" aria-hidden="true"></span>
+            <span class="ax-ov-list-primary">{{ c.cronName }}</span>
+            <span class="ax-ov-list-ts">{{ c.lastRun?.startedAt ? (c.lastRun?.startedAt | axTimestamp: 'relative') : 'never run' }}</span>
+          </li>
+        </ul>
+      </ng-container>
+    </section>
+
+    <!-- Notifications -->
+    <section class="ax-ov-tile" aria-labelledby="ax-ov-notifs-h">
+      <header class="ax-ov-tile-head">
+        <app-icon name="bell" [size]="16"></app-icon>
+        <h3 id="ax-ov-notifs-h">Notifications</h3>
+        <button type="button" class="ax-ov-view-all" (click)="go('notifications')">View all</button>
+      </header>
+
+      <div class="ax-ov-substate" *ngIf="notificationsState === 'loading'" aria-busy="true" aria-live="polite">
+        <app-icon name="spinner" [size]="14"></app-icon>
+        <span>Loading…</span>
+      </div>
+      <p class="ax-ov-substate ax-ov-substate--muted" *ngIf="notificationsState === 'not-live'">Not live yet.</p>
+      <div class="ax-ov-substate ax-ov-substate--error" *ngIf="notificationsState === 'error'" role="alert">
+        <app-icon name="warning" [size]="14"></app-icon>
+        <span>Couldn't load.</span>
+        <button type="button" class="ax-ov-retry" (click)="retryNotifications()">Retry</button>
+      </div>
+
+      <ng-container *ngIf="notificationsState === 'loaded'">
+        <div class="ax-ov-stats">
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value">{{ notifications.length }}</span>
+            <span class="ax-ov-stat-label">Recent sends</span>
+          </div>
+          <div class="ax-ov-stat">
+            <span class="ax-ov-stat-value" [class.ax-ov-stat-value--warn]="failedNotifications.length > 0">{{ failedNotifications.length }}</span>
+            <span class="ax-ov-stat-label">Failed</span>
+          </div>
+        </div>
+
+        <p class="ax-ov-empty" *ngIf="!recentNotifications.length">Nothing sent yet.</p>
+        <ul class="ax-ov-list" *ngIf="recentNotifications.length" aria-label="Most recent notifications">
+          <li *ngFor="let n of recentNotifications; trackBy: trackByRow">
+            <span class="ax-ov-list-badge" [class.ax-ov-list-badge--warn]="isFailed(n.status)" [class.ax-ov-list-badge--ok]="!isFailed(n.status)">{{ n.channel }}</span>
+            <span class="ax-ov-list-primary">{{ n.toEmail }}</span>
+            <span class="ax-ov-list-ts">{{ n.ts | axTimestamp: 'relative' }}</span>
+          </li>
+        </ul>
+      </ng-container>
+    </section>
+  </div>
+</div>

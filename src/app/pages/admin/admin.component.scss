@@ -1,137 +1,203 @@
-// Admin Portal shell — same dark gradient + purple/green design language as
-// the Shares feed / Shares Admin Portal, scoped `ax-` (xomify Admin) so
-// nothing collides with `xta-` (Xomtracks Admin).
+// Admin Portal shell — macOS System Settings-style left sidebar nav over a
+// flat, hairline-separated dark surface. Tokens come from the shared
+// `ax-theme-tokens` mixin (see `src/styles/_admin-theme.scss`) applied once
+// here at `.ax-page`; every descendant panel (mounted deeper in the DOM)
+// reads the resulting `var(--ax-*)` custom properties without needing to
+// import anything itself.
+@use '../../../styles/admin-theme' as theme;
 
 .ax-page {
+  @include theme.ax-theme-tokens;
+
   min-height: 100vh;
-  background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
-  padding: 70px 24px 120px;
-  max-width: 1300px;
+  background: var(--ax-bg);
+  color: var(--ax-text);
+  padding: 60px 24px 80px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
-.ax-head {
+.ax-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+// ── Sidebar nav ───────────────────────────────────────────────────────
+.ax-nav {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 28px;
+  flex-direction: column;
+  gap: 1px;
+  position: sticky;
+  top: 76px;
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-hairline);
+  border-radius: var(--ax-radius-lg);
+  padding: 6px;
+}
+
+.ax-nav-head {
+  padding: 10px 10px 12px;
 
   h1 {
     margin: 0;
-    font-size: 1.6rem;
-    color: #fff;
-    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ax-text);
   }
 }
 
-.ax-sub {
-  margin: 4px 0 0;
-  font-size: 0.85rem;
-  color: #8a8a9a;
+.ax-nav-sub {
+  margin: 2px 0 0;
+  font-size: 0.72rem;
+  color: var(--ax-text-tertiary);
 }
 
-.ax-shares-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: 20px;
-  background: rgba(27, 220, 111, 0.1);
-  border: 1px solid rgba(27, 220, 111, 0.4);
-  color: #b9f7d3;
-  text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(27, 220, 111, 0.2);
-    color: #fff;
-  }
-
-  &:focus-visible {
-    outline: 2px solid #1bdc6f;
-    outline-offset: 2px;
-  }
-}
-
-.ax-section-title {
-  margin: 0 0 14px;
-  font-size: 1.05rem;
-  color: #fff;
-}
-
-.ax-tabs {
+.ax-nav-item {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 24px;
-}
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: var(--ax-radius-sm);
+  padding: 7px 9px;
+  color: var(--ax-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background var(--ax-transition), color var(--ax-transition);
 
-.ax-tab {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #8a8a9a;
-  padding: 9px 18px;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
+  app-icon {
+    color: var(--ax-text-tertiary);
+    flex-shrink: 0;
+  }
 
   &:hover {
-    background: rgba(156, 10, 191, 0.15);
-    border-color: rgba(156, 10, 191, 0.3);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ax-text);
   }
 
   &:focus-visible {
-    outline: 2px solid #1bdc6f;
-    outline-offset: 2px;
+    outline: 2px solid var(--ax-accent);
+    outline-offset: -2px;
   }
 
   &--active {
-    background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(156, 10, 191, 0.4);
+    background: var(--ax-accent-muted);
+    border-left-color: var(--ax-accent);
+    color: var(--ax-text);
+    font-weight: 600;
+
+    app-icon {
+      color: var(--ax-accent-text);
+    }
   }
+}
+
+.ax-nav-external {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 7px 9px;
+  border-top: 1px solid var(--ax-hairline);
+  border-radius: var(--ax-radius-sm);
+  color: var(--ax-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+
+  app-icon {
+    color: var(--ax-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: var(--ax-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ax-accent);
+    outline-offset: 2px;
+  }
+}
+
+.ax-nav-external-arrow {
+  margin-left: auto;
+  color: var(--ax-text-tertiary);
+}
+
+// ── Content ──────────────────────────────────────────────────────────
+.ax-content {
+  min-width: 0;
 }
 
 [role='tabpanel']:focus-visible {
-  outline: 2px solid #1bdc6f;
+  outline: 2px solid var(--ax-accent);
   outline-offset: 4px;
-  border-radius: 8px;
+  border-radius: var(--ax-radius-md);
 }
 
-@media (max-width: 640px) {
+// ── Responsive: sidebar collapses to a horizontal top scroller below the
+// breakpoint where a persistent 220px rail stops being worth the width ──
+@media (max-width: 860px) {
   .ax-page {
-    padding: 70px 16px 100px;
+    padding: 60px 16px 60px;
   }
-  .ax-head {
-    flex-direction: column;
-    align-items: stretch;
+
+  .ax-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .ax-shares-link {
-    justify-content: center;
-  }
-  .ax-tabs {
+
+  .ax-nav {
+    position: static;
+    flex-direction: row;
+    align-items: center;
     overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
+    gap: 2px;
+    padding: 8px;
   }
-  .ax-tab {
+
+  .ax-nav-head {
+    display: none;
+  }
+
+  .ax-nav-item {
     flex-shrink: 0;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--ax-radius-sm) var(--ax-radius-sm) 0 0;
+
+    span {
+      white-space: nowrap;
+    }
+
+    &--active {
+      border-left-color: transparent;
+      border-bottom-color: var(--ax-accent);
+    }
+  }
+
+  .ax-nav-external {
+    flex-shrink: 0;
+    margin-top: 0;
+    border-top: none;
+    border-left: 1px solid var(--ax-hairline);
+    border-radius: 0;
+    white-space: nowrap;
+  }
+
+  .ax-nav-external-arrow {
+    margin-left: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ax-shares-link,
-  .ax-tab {
+  .ax-nav-item {
     transition: none;
   }
 }
