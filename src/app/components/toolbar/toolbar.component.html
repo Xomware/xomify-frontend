@@ -81,42 +81,47 @@
     </ng-container>
   </div>
 
-  <!-- Admin link — only rendered for the admin (server-verified isAdmin from
-       GET /me/get); everyone else never sees this in the DOM. -->
-  <a
-    class="admin-link"
-    *ngIf="isLoggedIn() && isAdmin"
-    routerLink="/shares/admin"
-    routerLinkActive="active"
-    aria-label="Admin portal"
-    appTooltip="Admin portal"
-  >
-    <span aria-hidden="true">⚙️</span>
-  </a>
+  <!-- Profile avatar chip + dropdown — visible on both desktop and mobile
+       when logged in. Header shows username + email, then Profile, My
+       Ratings, My Favorites, Settings, Log out, and (admin only) Admin. -->
+  <div class="avatar-menu-wrap" *ngIf="isLoggedIn()" [ngClass]="{ open: avatarMenuOpen }">
+    <button
+      type="button"
+      class="avatar-chip"
+      [attr.aria-expanded]="avatarMenuOpen"
+      aria-haspopup="true"
+      aria-label="Account menu"
+      (click)="toggleAvatarMenu($event)"
+    >
+      <img
+        class="avatar-chip-img"
+        [src]="profilePicture || 'assets/img/default-avatar.png'"
+        alt=""
+      />
+    </button>
 
-  <!-- Profile avatar chip — visible on both desktop and mobile when logged in. -->
-  <a
-    class="avatar-chip"
-    *ngIf="isLoggedIn()"
-    routerLink="/my-profile"
-    aria-label="My profile"
-  >
-    <img
-      class="avatar-chip-img"
-      [src]="profilePicture || 'assets/img/default-avatar.png'"
-      alt=""
-    />
-  </a>
+    <div class="avatar-menu" role="menu" aria-label="Account" *ngIf="avatarMenuOpen">
+      <div class="avatar-menu-header">
+        <p class="avatar-menu-name">{{ displayName }}</p>
+        <p class="avatar-menu-email">{{ userEmail }}</p>
+      </div>
 
-  <!-- Logout (Desktop) -->
-  <button
-    class="logout-btn desktop-only"
-    *ngIf="isLoggedIn()"
-    (click)="logout()"
-    aria-label="Log out"
-  >
-    Logout
-  </button>
+      <a routerLink="/my-profile" role="menuitem" (click)="selectAvatarItem()">Profile</a>
+      <a routerLink="/ratings" role="menuitem" (click)="selectAvatarItem()">My Ratings</a>
+      <a routerLink="/favorites" role="menuitem" (click)="selectAvatarItem()">My Favorites</a>
+      <a routerLink="/my-profile" [queryParams]="{ tab: 'settings' }" role="menuitem" (click)="selectAvatarItem()">Settings</a>
+
+      <div class="avatar-menu-divider" role="separator"></div>
+      <button type="button" class="avatar-menu-logout" role="menuitem" (click)="logout()">Log out</button>
+
+      <ng-container *ngIf="isAdmin">
+        <div class="avatar-menu-divider" role="separator"></div>
+        <a class="avatar-menu-admin" routerLink="/admin" role="menuitem" (click)="selectAvatarItem()">
+          <span aria-hidden="true">⚙️</span> Admin
+        </a>
+      </ng-container>
+    </div>
+  </div>
 
   <!-- Dropdown Button (Mobile) -->
   <button
@@ -171,17 +176,5 @@
         </a>
       </div>
     </ng-container>
-
-    <a
-      class="mobile-admin-link"
-      *ngIf="isAdmin"
-      routerLink="/shares/admin"
-      (click)="selectItem('/shares/admin')"
-      role="menuitem"
-    >
-      <span aria-hidden="true">⚙️</span> Admin
-    </a>
-
-    <a class="logout-link" (click)="logout()" role="menuitem">Logout</a>
   </div>
 </nav>

@@ -1,0 +1,104 @@
+<div class="axb">
+  <section class="axb-form-card" aria-labelledby="axb-form-heading">
+    <h2 id="axb-form-heading">New broadcast</h2>
+    <p class="axb-form-sub">Shown to users on Home once WS-C ships.</p>
+
+    <form (ngSubmit)="submit()" #broadcastForm="ngForm">
+      <div class="axb-field">
+        <label for="axb-title">Title</label>
+        <input
+          id="axb-title"
+          type="text"
+          name="title"
+          [(ngModel)]="title"
+          maxlength="120"
+          required
+          [disabled]="submitting"
+          placeholder="e.g. My Favorites is here"
+        />
+      </div>
+
+      <div class="axb-field">
+        <label for="axb-body">Body</label>
+        <textarea
+          id="axb-body"
+          name="body"
+          [(ngModel)]="body"
+          rows="3"
+          maxlength="500"
+          required
+          [disabled]="submitting"
+          placeholder="What changed and why users should care."
+        ></textarea>
+      </div>
+
+      <div class="axb-field axb-field--inline">
+        <label for="axb-active-until">Active until <span class="axb-optional">(optional)</span></label>
+        <input id="axb-active-until" type="datetime-local" name="activeUntil" [(ngModel)]="activeUntil" [disabled]="submitting" />
+      </div>
+
+      <p class="axb-inline-error" role="alert" *ngIf="formError">{{ formError }}</p>
+
+      <button type="submit" class="axb-btn" [disabled]="!canSubmit">
+        {{ submitting ? 'Publishing…' : 'Publish broadcast' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="axb-list-section" aria-labelledby="axb-list-heading">
+    <h2 id="axb-list-heading">Existing broadcasts</h2>
+
+    <!-- Loading -->
+    <div class="axb-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+      <div aria-hidden="true">⏳</div>
+      <p>Loading broadcasts…</p>
+    </div>
+
+    <!-- Not live yet (backend 404) -->
+    <div class="axb-state-block" *ngIf="state === 'not-live'">
+      <div aria-hidden="true">🚧</div>
+      <h3>Broadcasts aren't live yet</h3>
+      <p>The backend endpoint hasn't deployed. You can still draft one above once it has — retry to check again.</p>
+      <button type="button" class="axb-btn axb-btn--sm" (click)="retry()">Check again</button>
+    </div>
+
+    <!-- Error -->
+    <div class="axb-state-block axb-state-block--error" *ngIf="state === 'error'" role="alert">
+      <div aria-hidden="true">⚠️</div>
+      <h3>Couldn't load broadcasts</h3>
+      <button type="button" class="axb-btn axb-btn--sm" (click)="retry()">Try again</button>
+    </div>
+
+    <ng-container *ngIf="state === 'loaded'">
+      <p class="axb-inline-error" role="alert" *ngIf="loadErrorMessage">{{ loadErrorMessage }}</p>
+
+      <div class="axb-state-block" *ngIf="!broadcasts.length">
+        <div aria-hidden="true">📣</div>
+        <h3>No broadcasts yet</h3>
+        <p>Publish one above — it'll show up here.</p>
+      </div>
+
+      <ul class="axb-list" *ngIf="broadcasts.length">
+        <li class="axb-item" *ngFor="let broadcast of broadcasts; trackBy: trackById">
+          <div class="axb-item-main">
+            <h3>{{ broadcast.title }}</h3>
+            <p>{{ broadcast.body }}</p>
+            <div class="axb-item-meta">
+              <span>Posted {{ humanDate(broadcast.createdAt) }}</span>
+              <span *ngIf="broadcast.activeUntil">· Active until {{ humanDate(broadcast.activeUntil) }}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="axb-btn axb-btn--sm axb-btn--danger"
+            [disabled]="deletingId === broadcast.id"
+            [attr.aria-label]="'Delete broadcast: ' + broadcast.title"
+            (click)="remove(broadcast)"
+          >
+            {{ deletingId === broadcast.id ? 'Deleting…' : 'Delete' }}
+          </button>
+        </li>
+      </ul>
+    </ng-container>
+  </section>
+</div>
