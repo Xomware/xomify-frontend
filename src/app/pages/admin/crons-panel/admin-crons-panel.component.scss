@@ -1,0 +1,207 @@
+// Crons panel — `ax-` prefix, matches the rest of the Admin Portal.
+
+.ax-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #8a8a9a;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 1.05rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  &--error {
+    border-color: rgba(255, 55, 80, 0.3);
+  }
+}
+
+.ax-btn {
+  margin-top: 10px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.ax-cron-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ax-cron-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ax-cron-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #fff;
+    word-break: break-word;
+  }
+}
+
+.ax-cron-status {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8a8a9a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &--ok {
+    background: rgba(27, 220, 111, 0.12);
+    color: #b9f7d3;
+    border-color: rgba(27, 220, 111, 0.35);
+  }
+
+  &--error {
+    background: rgba(255, 55, 80, 0.12);
+    color: #ff8fa0;
+    border-color: rgba(255, 55, 80, 0.4);
+  }
+
+  &--sm {
+    font-size: 0.66rem;
+    padding: 2px 8px;
+  }
+}
+
+.ax-cron-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 8px;
+
+  dt {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #6d6d7d;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: #fff;
+  }
+}
+
+.ax-cron-error {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 55, 80, 0.1);
+  border: 1px solid rgba(255, 55, 80, 0.35);
+  color: #ff8fa0;
+  font-size: 0.76rem;
+  word-break: break-word;
+}
+
+.ax-cron-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6d6d7d;
+}
+
+.ax-raw {
+  margin-top: 12px;
+  font-size: 0.78rem;
+
+  summary {
+    cursor: pointer;
+    color: #b9a3ff;
+    font-weight: 600;
+
+    &:focus-visible {
+      outline: 2px solid #1bdc6f;
+      outline-offset: 2px;
+    }
+  }
+}
+
+.ax-run-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.74rem;
+  }
+}
+
+.ax-run-ts {
+  color: #c4c4d2;
+}
+
+.ax-run-duration,
+.ax-run-items {
+  color: #6d6d7d;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .ax-cron-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ax-run-list li {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-btn {
+    transition: none;
+  }
+}

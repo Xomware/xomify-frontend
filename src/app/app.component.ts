@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { LikesPushCoordinatorService } from './services/likes-push-coordinator.service';
+import { VisitTrackerService } from './services/visit-tracker.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { PlayerService } from './services/player.service';
 import { Subject } from 'rxjs';
@@ -20,6 +21,7 @@ export class AppComponent implements OnDestroy, OnInit {
     private authService: AuthService,
     private userService: UserService,
     private likesPushCoordinator: LikesPushCoordinatorService,
+    private visitTracker: VisitTrackerService,
     private router: Router,
     private playerService: PlayerService
   ) {}
@@ -67,6 +69,18 @@ export class AppComponent implements OnDestroy, OnInit {
         if (main) {
           main.focus({ preventScroll: true });
         }
+      });
+
+    // Log page visits (throttled/deduped, skips logged-out) — backs the
+    // Admin Portal's Users→visits view. See VisitTrackerService.
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        const path = event.urlAfterRedirects.split('?')[0].split('#')[0];
+        this.visitTracker.log(path);
       });
   }
 

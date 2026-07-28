@@ -1,0 +1,85 @@
+<div>
+  <!-- Loading -->
+  <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <p>Loading cron status…</p>
+  </div>
+
+  <!-- Not live yet -->
+  <div class="ax-state-block" *ngIf="state === 'not-live'">
+    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <h2>Cron run history isn't live yet</h2>
+    <p>The backend endpoint hasn't deployed yet.</p>
+    <button type="button" class="ax-btn" (click)="retry()">Check again</button>
+  </div>
+
+  <!-- Error -->
+  <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
+    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <h2>Couldn't load cron status</h2>
+    <button type="button" class="ax-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded'">
+    <div class="ax-state-block" *ngIf="!crons.length">
+      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <h2>No scheduled crons</h2>
+      <p>Nothing has reported a run yet.</p>
+    </div>
+
+    <div class="ax-cron-grid" *ngIf="crons.length">
+      <article class="ax-cron-card" *ngFor="let cron of crons; trackBy: trackByCron">
+        <header class="ax-cron-head">
+          <h3>{{ cron.cronName }}</h3>
+          <span
+            class="ax-cron-status"
+            [class.ax-cron-status--ok]="statusClass(cron.lastRun?.status) === 'ok'"
+            [class.ax-cron-status--error]="statusClass(cron.lastRun?.status) === 'error'"
+          >
+            {{ cron.lastRun?.status || 'No runs yet' }}
+          </span>
+        </header>
+
+        <ng-container *ngIf="cron.lastRun as run; else noRuns">
+          <dl class="ax-cron-meta">
+            <div>
+              <dt>Started</dt>
+              <dd>{{ humanTs(run.startedAt) }}</dd>
+            </div>
+            <div>
+              <dt>Duration</dt>
+              <dd>{{ duration(run) }}</dd>
+            </div>
+            <div>
+              <dt>Items processed</dt>
+              <dd>{{ run.itemsProcessed ?? '—' }}</dd>
+            </div>
+          </dl>
+
+          <p class="ax-cron-error" *ngIf="run.error" role="alert">{{ run.error }}</p>
+        </ng-container>
+        <ng-template #noRuns>
+          <p class="ax-cron-empty">This job hasn't reported a run yet.</p>
+        </ng-template>
+
+        <details class="ax-raw" *ngIf="cron.recentRuns?.length">
+          <summary>Recent runs ({{ cron.recentRuns.length }})</summary>
+          <ul class="ax-run-list">
+            <li *ngFor="let run of cron.recentRuns; trackBy: trackByRun">
+              <span
+                class="ax-cron-status ax-cron-status--sm"
+                [class.ax-cron-status--ok]="statusClass(run.status) === 'ok'"
+                [class.ax-cron-status--error]="statusClass(run.status) === 'error'"
+              >
+                {{ run.status }}
+              </span>
+              <span class="ax-run-ts">{{ humanTs(run.startedAt) }}</span>
+              <span class="ax-run-duration">{{ duration(run) }}</span>
+              <span class="ax-run-items">{{ run.itemsProcessed ?? '—' }} items</span>
+            </li>
+          </ul>
+        </details>
+      </article>
+    </div>
+  </ng-container>
+</div>

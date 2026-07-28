@@ -11,8 +11,74 @@
     </a>
   </header>
 
-  <section aria-labelledby="ax-broadcasts-heading">
-    <h2 id="ax-broadcasts-heading" class="ax-section-title">Broadcasts</h2>
-    <app-broadcasts-panel></app-broadcasts-panel>
-  </section>
+  <nav class="ax-tabs" role="tablist" aria-label="Admin sections">
+    <button
+      *ngFor="let tab of tabs; let i = index"
+      #tabBtn
+      type="button"
+      role="tab"
+      class="ax-tab"
+      [class.ax-tab--active]="activeTab === tab.value"
+      [attr.aria-selected]="activeTab === tab.value"
+      [id]="'ax-tab-' + tab.value"
+      [attr.aria-controls]="'ax-panel-' + tab.value"
+      [attr.tabindex]="activeTab === tab.value ? 0 : -1"
+      (click)="setTab(tab.value)"
+      (keydown)="onTabKeydown($event, i)"
+    >
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <div [ngSwitch]="activeTab">
+    <section
+      *ngSwitchCase="'health'"
+      id="ax-panel-health"
+      role="tabpanel"
+      aria-labelledby="ax-tab-health"
+      tabindex="0"
+    >
+      <app-admin-health-panel></app-admin-health-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'users'"
+      id="ax-panel-users"
+      role="tabpanel"
+      aria-labelledby="ax-tab-users"
+      tabindex="0"
+    >
+      <app-admin-users-panel></app-admin-users-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'crons'"
+      id="ax-panel-crons"
+      role="tabpanel"
+      aria-labelledby="ax-tab-crons"
+      tabindex="0"
+    >
+      <app-admin-crons-panel></app-admin-crons-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'notifications'"
+      id="ax-panel-notifications"
+      role="tabpanel"
+      aria-labelledby="ax-tab-notifications"
+      tabindex="0"
+    >
+      <app-admin-notifications-panel></app-admin-notifications-panel>
+    </section>
+
+    <section
+      *ngSwitchCase="'broadcasts'"
+      id="ax-panel-broadcasts"
+      role="tabpanel"
+      aria-labelledby="ax-tab-broadcasts"
+      tabindex="0"
+    >
+      <app-broadcasts-panel></app-broadcasts-panel>
+    </section>
+  </div>
 </main>

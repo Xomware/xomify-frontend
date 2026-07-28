@@ -1,0 +1,182 @@
+<div>
+  <!-- Loading -->
+  <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <p>Loading the user directory…</p>
+  </div>
+
+  <!-- Not live yet -->
+  <div class="ax-state-block" *ngIf="state === 'not-live'">
+    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <h2>User directory isn't live yet</h2>
+    <p>The backend endpoint hasn't deployed yet.</p>
+    <button type="button" class="ax-btn" (click)="retry()">Check again</button>
+  </div>
+
+  <!-- Error -->
+  <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
+    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <h2>Couldn't load the user directory</h2>
+    <button type="button" class="ax-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <ng-container *ngIf="state === 'loaded'">
+    <!-- Empty -->
+    <div class="ax-state-block" *ngIf="!users.length">
+      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <h2>No users yet</h2>
+      <p>Nobody has signed into Xomify yet.</p>
+    </div>
+
+    <div *ngIf="users.length">
+      <p class="ax-count">{{ users.length }} {{ users.length === 1 ? 'user' : 'users' }}</p>
+
+      <div class="ax-table-wrap">
+        <table class="ax-table">
+          <caption class="sr-only">Xomify user directory</caption>
+          <thead>
+            <tr>
+              <th scope="col">
+                <button type="button" class="ax-sort-btn" [attr.aria-sort]="sortAriaSort('email')" (click)="setSort('email')">
+                  Email <span aria-hidden="true">{{ sortKey === 'email' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="ax-sort-btn" [attr.aria-sort]="sortAriaSort('displayName')" (click)="setSort('displayName')">
+                  Name <span aria-hidden="true">{{ sortKey === 'displayName' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="ax-sort-btn" [attr.aria-sort]="sortAriaSort('lastSeen')" (click)="setSort('lastSeen')">
+                  Last seen <span aria-hidden="true">{{ sortKey === 'lastSeen' ? (sortDesc ? '▾' : '▴') : '' }}</span>
+                </button>
+              </th>
+              <th scope="col">Spotify</th>
+              <th scope="col"><span class="sr-only">Details</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let user of sortedUsers; trackBy: trackByEmail">
+              <tr class="ax-row" [class.ax-row--expanded]="isExpanded(user)">
+                <td class="ax-cell-email">{{ user.email }}</td>
+                <td>{{ user.displayName || '—' }}</td>
+                <td>{{ humanDate(user.lastSeen) }}</td>
+                <td>
+                  <span class="ax-badge" [class.ax-badge--on]="user.spotifyConnected">
+                    {{ user.spotifyConnected ? 'Connected' : 'No' }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="ax-btn ax-btn--sm"
+                    [attr.aria-expanded]="isExpanded(user)"
+                    [attr.aria-controls]="'ax-drawer-' + user.email"
+                    (click)="toggleRow(user)"
+                  >
+                    {{ isExpanded(user) ? 'Hide' : 'Details' }}
+                  </button>
+                </td>
+              </tr>
+
+              <tr class="ax-drawer-row" *ngIf="isExpanded(user)">
+                <td [id]="'ax-drawer-' + user.email" colspan="5">
+                  <div class="ax-drawer">
+                    <section class="ax-drawer-section">
+                      <h3>Opt-ins</h3>
+                      <div class="ax-badge-row">
+                        <span
+                          class="ax-badge"
+                          *ngFor="let opt of optInEntries(user.optIns)"
+                          [class.ax-badge--on]="opt.on"
+                        >
+                          {{ opt.label }}: {{ opt.on ? 'On' : 'Off' }}
+                        </span>
+                      </div>
+                    </section>
+
+                    <section class="ax-drawer-section">
+                      <h3>Recent visits</h3>
+                      <div class="ax-drawer-substate" *ngIf="visitsState === 'loading'" aria-busy="true" aria-live="polite">
+                        <app-admin-state-icon name="spinner"></app-admin-state-icon>
+                        <span>Loading visits…</span>
+                      </div>
+                      <div class="ax-drawer-substate" *ngIf="visitsState === 'error'" role="alert">
+                        <app-admin-state-icon name="warning"></app-admin-state-icon>
+                        <span>Couldn't load visits.</span>
+                      </div>
+                      <p class="ax-drawer-empty" *ngIf="visitsState === 'loaded' && !visits.length">No visits logged yet.</p>
+                      <ul class="ax-visit-list" *ngIf="visitsState === 'loaded' && visits.length" aria-label="Recent visits">
+                        <li *ngFor="let v of visits; trackBy: trackByVisit">
+                          <span class="ax-visit-path">{{ v.path }}</span>
+                          <span class="ax-visit-ts">{{ humanTs(v.ts) }}</span>
+                        </li>
+                      </ul>
+                    </section>
+
+                    <section class="ax-drawer-section">
+                      <h3>View as</h3>
+                      <button
+                        type="button"
+                        class="ax-btn ax-btn--sm"
+                        *ngIf="viewAsState === 'idle'"
+                        (click)="loadViewAs(user.email)"
+                      >
+                        Load read-only view
+                      </button>
+
+                      <div class="ax-drawer-substate" *ngIf="viewAsState === 'loading'" aria-busy="true" aria-live="polite">
+                        <app-admin-state-icon name="spinner"></app-admin-state-icon>
+                        <span>Loading view-as snapshot…</span>
+                      </div>
+                      <div class="ax-drawer-substate" *ngIf="viewAsState === 'error'" role="alert">
+                        <app-admin-state-icon name="warning"></app-admin-state-icon>
+                        <span>Couldn't load that snapshot.</span>
+                        <button type="button" class="ax-btn ax-btn--sm" (click)="loadViewAs(user.email)">Try again</button>
+                      </div>
+
+                      <div class="ax-viewas" *ngIf="viewAsState === 'loaded' && viewAsData as va">
+                        <p class="ax-viewas-note" role="note">{{ va.note }}</p>
+
+                        <div class="ax-badge-row" *ngIf="viewAsOptInEntries(va.optIns).length">
+                          <span
+                            class="ax-badge"
+                            *ngFor="let opt of viewAsOptInEntries(va.optIns)"
+                            [class.ax-badge--on]="opt.on"
+                          >
+                            {{ opt.label }}: {{ opt.on ? 'On' : 'Off' }}
+                          </span>
+                        </div>
+
+                        <p class="ax-drawer-empty" *ngIf="!va.recentVisits.length">No recent visits.</p>
+                        <ul class="ax-visit-list" *ngIf="va.recentVisits.length" aria-label="Their recent visits">
+                          <li *ngFor="let v of va.recentVisits; trackBy: trackByVisit">
+                            <span class="ax-visit-path">{{ v.path }}</span>
+                            <span class="ax-visit-ts">{{ humanTs(v.ts) }}</span>
+                          </li>
+                        </ul>
+
+                        <details class="ax-raw" *ngIf="hasContent(va.profile)">
+                          <summary>Profile (raw)</summary>
+                          <pre>{{ prettyJson(va.profile) }}</pre>
+                        </details>
+                        <details class="ax-raw" *ngIf="hasContent(va.favorites)">
+                          <summary>Favorites (raw)</summary>
+                          <pre>{{ prettyJson(va.favorites) }}</pre>
+                        </details>
+                        <details class="ax-raw" *ngIf="hasContent(va.activeBroadcasts)">
+                          <summary>Active broadcasts ({{ va.activeBroadcasts.length }})</summary>
+                          <pre>{{ prettyJson(va.activeBroadcasts) }}</pre>
+                        </details>
+                      </div>
+                    </section>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>
