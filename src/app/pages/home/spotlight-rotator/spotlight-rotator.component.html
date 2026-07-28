@@ -10,6 +10,7 @@
   <ng-container *ngIf="activeSlide as slide">
     <div
       class="spotlight-card"
+      [@crossfade]="slide.id"
       [class.clickable]="!!slide.link"
       [class.kind-recent]="slide.kind === 'recent'"
       [class.kind-top]="slide.kind === 'top'"

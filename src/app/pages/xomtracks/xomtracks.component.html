@@ -109,7 +109,7 @@
 
   <!-- Error -->
   <div class="xt-state-block xt-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load the feed</h2>
     <p>Something went wrong reaching the feed.</p>
     <button type="button" class="xt-state-btn" (click)="retry()">Try again</button>
@@ -232,7 +232,7 @@
 
     <ng-template #empty>
       <div class="xt-state-block">
-        <div aria-hidden="true">{{ isFiltered ? '🔍' : '🎧' }}</div>
+        <app-icon [name]="isFiltered ? 'search' : 'headphones'" [size]="36"></app-icon>
         <h2>{{ isFiltered ? 'No matches' : 'Nothing here yet' }}</h2>
         <p *ngIf="isFiltered">No shares match "{{ search.trim() }}" in this window.</p>
         <p *ngIf="!isFiltered">{{ emptyText }} Try a wider range.</p>

@@ -15,6 +15,7 @@ export interface Goal {
   metric: GoalMetric;
   target: number;
   label: string;
+  /** `app-icon` name — see `components/icon/icon.component.html`. */
   icon: string;
   current: number;
   completed: boolean;
@@ -31,10 +32,10 @@ const GOALS_KEY = 'xomify_goals';
 const HISTORY_KEY = 'xomify_goals_history';
 
 const DEFAULT_GOALS: Omit<Goal, 'id' | 'current' | 'completed'>[] = [
-  { metric: 'minutes_listened', target: 300, label: 'Listen for 5 hours', icon: '🎵' },
-  { metric: 'new_artists', target: 3, label: 'Discover 3 new artists', icon: '🎤' },
-  { metric: 'genres_explored', target: 4, label: 'Explore 4 genres', icon: '🎸' },
-  { metric: 'unique_tracks', target: 50, label: '50 unique tracks', icon: '🎶' },
+  { metric: 'minutes_listened', target: 300, label: 'Listen for 5 hours', icon: 'headphones' },
+  { metric: 'new_artists', target: 3, label: 'Discover 3 new artists', icon: 'mic' },
+  { metric: 'genres_explored', target: 4, label: 'Explore 4 genres', icon: 'music-note' },
+  { metric: 'unique_tracks', target: 50, label: '50 unique tracks', icon: 'trending-up' },
 ];
 
 @Injectable({
@@ -202,13 +203,14 @@ export class GoalsService {
     }
   }
 
+  /** Returns an `app-icon` name (not an emoji glyph) for the given metric. */
   getMetricIcon(metric: GoalMetric): string {
     const icons: Record<GoalMetric, string> = {
-      minutes_listened: '🎵',
-      new_artists: '🎤',
-      genres_explored: '🎸',
-      songs_from_top_artist: '⭐',
-      unique_tracks: '🎶',
+      minutes_listened: 'headphones',
+      new_artists: 'mic',
+      genres_explored: 'music-note',
+      songs_from_top_artist: 'sparkle',
+      unique_tracks: 'trending-up',
     };
     return icons[metric];
   }

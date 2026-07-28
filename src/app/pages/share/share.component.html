@@ -21,9 +21,9 @@
     <!-- Stats Card -->
     <div class="stats-card">
       <div class="stats-card-header">
-        <h2 class="section-title">📊 Your Stats</h2>
+        <h2 class="section-title"><app-icon name="chart" [size]="20"></app-icon> Your Stats</h2>
         <button class="btn-copy" (click)="copyStats()" title="Copy all stats">
-          📋 Copy All
+          <app-icon name="copy" [size]="15"></app-icon> Copy All
         </button>
       </div>
 
@@ -31,7 +31,7 @@
         <!-- Top Songs -->
         <div class="stats-section">
           <div class="stats-section-header">
-            <h3 class="stats-section-title">🎵 Top Songs</h3>
+            <h3 class="stats-section-title"><app-icon name="music-note" [size]="17"></app-icon> Top Songs</h3>
             <button class="btn-copy-small" (click)="copySongsSection()">Copy</button>
           </div>
           <div class="empty-section" *ngIf="stats.topSongs.length === 0">
@@ -52,7 +52,7 @@
         <!-- Top Artists -->
         <div class="stats-section">
           <div class="stats-section-header">
-            <h3 class="stats-section-title">🎤 Top Artists</h3>
+            <h3 class="stats-section-title"><app-icon name="mic" [size]="17"></app-icon> Top Artists</h3>
             <button class="btn-copy-small" (click)="copyArtistsSection()">Copy</button>
           </div>
           <div class="empty-section" *ngIf="stats.topArtists.length === 0">
@@ -76,14 +76,14 @@
         <h3 class="preview-title">Share Text Preview</h3>
         <pre class="preview-text">{{ statsText }}</pre>
         <div class="preview-actions">
-          <button class="btn-primary" (click)="copyStats()">📋 Copy to Clipboard</button>
+          <button class="btn-primary" (click)="copyStats()"><app-icon name="copy" [size]="15"></app-icon> Copy to Clipboard</button>
         </div>
       </div>
     </div>
 
     <!-- Playlist Share -->
     <div class="playlist-share-card">
-      <h2 class="section-title">🎧 Share a Playlist</h2>
+      <h2 class="section-title"><app-icon name="headphones" [size]="20"></app-icon> Share a Playlist</h2>
       <p class="section-desc">Search for one of your playlists and copy its link</p>
 
       <div class="playlist-search-row">
@@ -122,7 +122,7 @@
           <span class="selected-url">{{ selectedPlaylist.external_urls?.spotify }}</span>
         </div>
         <div class="selected-actions">
-          <button class="btn-copy" (click)="copyPlaylistLink()">📋 Copy Link</button>
+          <button class="btn-copy" (click)="copyPlaylistLink()"><app-icon name="copy" [size]="15"></app-icon> Copy Link</button>
           <button class="btn-share" (click)="sharePlaylist()" *ngIf="hasWebShare()">
             ↗ Share
           </button>

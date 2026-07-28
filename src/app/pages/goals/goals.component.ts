@@ -87,6 +87,6 @@ export class GoalsComponent implements OnInit {
 
   get streakLabel(): string {
     if (this.streak === 0) return '';
-    return `🔥 ${this.streak}-week streak`;
+    return `${this.streak}-week streak`;
   }
 }

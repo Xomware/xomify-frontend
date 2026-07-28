@@ -90,7 +90,7 @@ export class ShareComponent implements OnInit {
   async copyStats(): Promise<void> {
     const success = await this.shareService.copyToClipboard(this.statsText);
     if (success) {
-      this.toastService.showPositiveToast('Stats copied to clipboard! 🎵');
+      this.toastService.showPositiveToast('Stats copied to clipboard!');
     } else {
       this.toastService.showNegativeToast('Failed to copy');
     }
@@ -101,7 +101,7 @@ export class ShareComponent implements OnInit {
       .slice(0, 5)
       .map((s, i) => `${i + 1}. ${s.name} — ${(s.artists || []).map((a: any) => a.name).join(', ')}`)
       .join('\n');
-    const success = await this.shareService.copyToClipboard(`🎵 My Top Songs:\n${text}`);
+    const success = await this.shareService.copyToClipboard(`My Top Songs:\n${text}`);
     if (success) {
       this.toastService.showPositiveToast('Top songs copied!');
     } else {
@@ -114,7 +114,7 @@ export class ShareComponent implements OnInit {
       .slice(0, 5)
       .map((a, i) => `${i + 1}. ${a.name}`)
       .join('\n');
-    const success = await this.shareService.copyToClipboard(`🎤 My Top Artists:\n${text}`);
+    const success = await this.shareService.copyToClipboard(`My Top Artists:\n${text}`);
     if (success) {
       this.toastService.showPositiveToast('Top artists copied!');
     } else {

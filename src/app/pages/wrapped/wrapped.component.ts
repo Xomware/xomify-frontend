@@ -256,7 +256,7 @@ export class WrappedComponent implements OnInit {
           this.isGeneratingPlaylist = false;
           this.generatedPlaylistUrl = playlist?.external_urls?.spotify || null;
           this.toastService.showPositiveToast(
-            `Playlist "${playlistName}" created on Spotify! 🎵`
+            `Playlist "${playlistName}" created on Spotify!`
           );
         },
         error: (err) => {
@@ -287,7 +287,7 @@ export class WrappedComponent implements OnInit {
 
     const shared = await this.shareService.share({
       title: `Xomify Wrapped — ${monthYear}`,
-      text: `🎵 My Xomify Wrapped for ${monthYear}:\n${top}`,
+      text: `My Xomify Wrapped for ${monthYear}:\n${top}`,
       url: window.location.href,
     });
     this.toastService.showPositiveToast(shared ? 'Shared!' : 'Copied to clipboard');

@@ -5,6 +5,7 @@ import {
   OnDestroy,
   SimpleChanges,
 } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Router } from '@angular/router';
 import { TopItemsData, TopItemsTimeRange } from 'src/app/services/top-items.service';
 import { ReducedMotionService } from 'src/app/services/reduced-motion.service';
@@ -48,6 +49,19 @@ const RANGE_LABELS: Record<TopItemsTimeRange, string> = {
   selector: 'app-home-top-items-rotator',
   templateUrl: './top-items-rotator.component.html',
   styleUrls: ['./top-items-rotator.component.scss'],
+  animations: [
+    // Same "any state change" crossfade idiom as SpotlightRotatorComponent —
+    // bound to category+range so switching either fades the whole grid.
+    trigger('crossfade', [
+      transition('* => *', [
+        style({ opacity: 0, transform: 'translateY(6px)' }),
+        animate('280ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
+  ],
+  host: {
+    '[@.disabled]': 'reducedMotion.prefersReducedMotion()',
+  },
 })
 export class TopItemsRotatorComponent implements OnChanges, OnDestroy {
   @Input() data: TopItemsData | null = null;
@@ -67,7 +81,7 @@ export class TopItemsRotatorComponent implements OnChanges, OnDestroy {
 
   constructor(
     private router: Router,
-    private reducedMotion: ReducedMotionService,
+    public reducedMotion: ReducedMotionService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {

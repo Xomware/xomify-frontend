@@ -61,6 +61,9 @@ export interface FavoritesHistoryResponse {
   events: FavoritesHistoryEvent[];
 }
 
+/** Mirrors Spotify's own top-items time-range vocabulary (see `TopItemsService`). */
+export type FavoritesRecommendationRange = 'short_term' | 'medium_term' | 'long_term';
+
 export interface FavoritesRecommendation {
   spotifyId: string;
   name: string;
@@ -167,15 +170,24 @@ export class FavoritesService {
       );
   }
 
-  /** `GET /favorites/recommendations?category=&listId=&year=` — suggestions from listening history, excluding items already on the list. Non-fatal on error (strip just stays empty). */
+  /**
+   * `GET /favorites/recommendations?category=&listId=&year=&range=` —
+   * suggestions from listening history over the given time period,
+   * excluding items already on the list. `range` mirrors Spotify's own
+   * short_term/medium_term/long_term time-range vocabulary (already used by
+   * `TopItemsService`) — defaults to `short_term` (~4 weeks) so callers that
+   * don't care about the period keep the previous behavior. Non-fatal on
+   * error (strip just stays empty).
+   */
   getRecommendations(
     year: number,
     category: FavoriteCategory,
     listId: string,
+    range: FavoritesRecommendationRange = 'short_term',
   ): Observable<FavoritesRecommendation[]> {
     return this.http
       .get<FavoritesRecommendationsResponse>(`${this.baseUrl}/recommendations`, {
-        params: { category, listId, year: year.toString() },
+        params: { category, listId, year: year.toString(), range },
       })
       .pipe(
         map((resp) => resp?.recommendations ?? []),

@@ -109,7 +109,7 @@ export class WeeklyWrappedComponent implements OnInit {
       link.download = `xomify-weekly-${this.currentSnapshot?.weekKey || 'wrapped'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-      this.toastService.showPositiveToast('Image downloaded! 📸');
+      this.toastService.showPositiveToast('Image downloaded!');
     } catch (err) {
       console.error('Export error:', err);
       this.toastService.showNegativeToast('Failed to export image.');

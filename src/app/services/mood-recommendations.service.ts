@@ -8,7 +8,8 @@ export type MoodType = 'Happy' | 'Chill' | 'Hype' | 'Focus' | 'Sad' | 'Party' | 
 
 export interface MoodPreset {
   name: MoodType;
-  emoji: string;
+  /** `app-icon` name — see `components/icon/icon.component.html`. */
+  icon: string;
   description: string;
   genreKeywords: string[]; // substring matches against artist.genres
 }
@@ -16,43 +17,43 @@ export interface MoodPreset {
 export const MOOD_PRESETS: MoodPreset[] = [
   {
     name: 'Happy',
-    emoji: '🌞',
+    icon: 'sun',
     description: 'Upbeat and joyful',
     genreKeywords: ['pop', 'dance', 'disco', 'funk', 'indie pop', 'bubblegum'],
   },
   {
     name: 'Chill',
-    emoji: '🌊',
+    icon: 'wave',
     description: 'Relaxed and mellow',
     genreKeywords: ['chill', 'lo-fi', 'lofi', 'ambient', 'acoustic', 'bedroom', 'singer-songwriter'],
   },
   {
     name: 'Hype',
-    emoji: '⚡',
+    icon: 'bolt',
     description: 'High-energy bangers',
     genreKeywords: ['edm', 'trap', 'drill', 'electronic', 'house', 'dubstep', 'hip hop', 'rap'],
   },
   {
     name: 'Focus',
-    emoji: '🧘',
+    icon: 'leaf',
     description: 'Instrumental, clean',
     genreKeywords: ['ambient', 'classical', 'post-rock', 'instrumental', 'minimal', 'study'],
   },
   {
     name: 'Sad',
-    emoji: '🌧️',
+    icon: 'droplet',
     description: 'Introspective and emotional',
     genreKeywords: ['emo', 'indie folk', 'sad', 'melancholy', 'slowcore', 'singer-songwriter', 'ballad'],
   },
   {
     name: 'Party',
-    emoji: '🎉',
+    icon: 'sparkle',
     description: 'Loud, fun, danceable',
     genreKeywords: ['dance', 'house', 'pop', 'reggaeton', 'latin', 'edm', 'disco', 'funk'],
   },
   {
     name: 'Workout',
-    emoji: '💪',
+    icon: 'flame',
     description: 'Drive-through-a-wall energy',
     genreKeywords: ['hip hop', 'rap', 'edm', 'trap', 'punk', 'metal', 'rock', 'drill'],
   },

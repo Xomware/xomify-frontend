@@ -13,9 +13,16 @@ import {
   FavoriteItem,
   FavoritesHistoryEvent,
   FavoritesRecommendation,
+  FavoritesRecommendationRange,
   FavoritesService,
 } from 'src/app/services/favorites.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+const RANGE_LABELS: Record<FavoritesRecommendationRange, string> = {
+  short_term: 'Last Month',
+  medium_term: 'Last 6 Months',
+  long_term: 'All Time',
+};
 
 /** Per-item movement since the previous rank-history event: up N spots, down
  * N spots, unchanged, or brand new to the list. */
@@ -74,6 +81,13 @@ export class FavoritesRankedListComponent implements OnInit, OnChanges {
   suggestionsOpen = false;
   suggestionsLoading = false;
   suggestions: FavoritesRecommendation[] = [];
+  suggestionsRange: FavoritesRecommendationRange = 'short_term';
+
+  readonly rangeOptions: { value: FavoritesRecommendationRange; label: string }[] = [
+    { value: 'short_term', label: RANGE_LABELS.short_term },
+    { value: 'medium_term', label: RANGE_LABELS.medium_term },
+    { value: 'long_term', label: RANGE_LABELS.long_term },
+  ];
 
   pickerOpen = false;
 
@@ -223,17 +237,33 @@ export class FavoritesRankedListComponent implements OnInit, OnChanges {
   toggleSuggestions(): void {
     this.suggestionsOpen = !this.suggestionsOpen;
     if (this.suggestionsOpen && this.suggestions.length === 0 && !this.suggestionsLoading) {
-      this.suggestionsLoading = true;
-      this.favoritesService
-        .getRecommendations(this.year, this.category, this.listId)
-        .pipe(take(1))
-        .subscribe((recs) => {
-          this.suggestions = recs.filter(
-            (r) => !this.localItems.some((i) => i.spotifyId === r.spotifyId),
-          );
-          this.suggestionsLoading = false;
-        });
+      this.loadSuggestions();
     }
+  }
+
+  /** Switches the "Suggested from your listening" period and refetches —
+   * only when the strip is actually open (a closed strip just clears the
+   * cache so the next expand fetches fresh with the new range). */
+  selectSuggestionsRange(range: FavoritesRecommendationRange): void {
+    if (this.suggestionsRange === range) return;
+    this.suggestionsRange = range;
+    this.suggestions = [];
+    if (this.suggestionsOpen) {
+      this.loadSuggestions();
+    }
+  }
+
+  private loadSuggestions(): void {
+    this.suggestionsLoading = true;
+    this.favoritesService
+      .getRecommendations(this.year, this.category, this.listId, this.suggestionsRange)
+      .pipe(take(1))
+      .subscribe((recs) => {
+        this.suggestions = recs.filter(
+          (r) => !this.localItems.some((i) => i.spotifyId === r.spotifyId),
+        );
+        this.suggestionsLoading = false;
+      });
   }
 
   // ── Rank history / movement ─────────────────────────────────────────

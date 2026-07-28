@@ -1,20 +1,20 @@
 <div>
   <!-- Loading -->
   <div class="xta-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <div aria-hidden="true">⏳</div>
+    <app-icon name="spinner" [size]="36"></app-icon>
     <p>Loading ingest tokens…</p>
   </div>
 
   <!-- Error -->
   <div class="xta-state-block xta-state-block--error" *ngIf="state === 'error'" role="alert">
-    <div aria-hidden="true">⚠️</div>
+    <app-icon name="warning" [size]="36"></app-icon>
     <h2>Couldn't load tokens</h2>
     <button type="button" class="xta-btn" (click)="retry()">Try again</button>
   </div>
 
   <ng-container *ngIf="state === 'loaded'">
     <div class="xta-state-block" *ngIf="!count">
-      <div aria-hidden="true">🔑</div>
+      <app-icon name="key" [size]="36"></app-icon>
       <h2>No ingest tokens yet</h2>
       <p>Nobody has minted a self-serve extractor token.</p>
     </div>
