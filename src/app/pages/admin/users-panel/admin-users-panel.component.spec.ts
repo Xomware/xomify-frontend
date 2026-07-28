@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminUsersPanelComponent } from './admin-users-panel.component';
-import { AdminStateIconComponent } from '../components/admin-state-icon/admin-state-icon.component';
+import { IconComponent } from '../../../components/icon/icon.component';
+import { AxTimestampPipe } from '../pipes/ax-timestamp.pipe';
 import { AdminPortalService } from '../services/admin-portal.service';
 import { AdminUser, AdminViewAs } from '../models/admin-portal.model';
 
@@ -36,7 +37,7 @@ describe('AdminUsersPanelComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CommonModule],
-      declarations: [AdminUsersPanelComponent, AdminStateIconComponent],
+      declarations: [AdminUsersPanelComponent, IconComponent, AxTimestampPipe],
       providers: [{ provide: AdminPortalService, useValue: adminSpy }],
     }).compileComponents();
 
@@ -109,5 +110,13 @@ describe('AdminUsersPanelComponent', () => {
     expect(component.hasContent({})).toBe(false);
     expect(component.hasContent([1])).toBe(true);
     expect(component.hasContent({ a: 1 })).toBe(true);
+  });
+
+  it('optInSummary counts how many opt-ins are on', () => {
+    expect(component.optInSummary(users[0].optIns)).toBe('2/4');
+    expect(component.optInSummary(users[1].optIns)).toBe('2/4');
+    expect(
+      component.optInSummary({ wrapped: true, releaseRadar: true, likesPublic: true, favoritesReminder: true }),
+    ).toBe('4/4');
   });
 });

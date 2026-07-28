@@ -50,13 +50,13 @@
 
     <!-- Loading -->
     <div class="axb-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-      <app-admin-state-icon name="spinner"></app-admin-state-icon>
+      <app-icon name="spinner" [size]="22"></app-icon>
       <p>Loading broadcasts…</p>
     </div>
 
     <!-- Not live yet (backend 404) -->
     <div class="axb-state-block" *ngIf="state === 'not-live'">
-      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <app-icon name="inbox" [size]="22"></app-icon>
       <h3>Broadcasts aren't live yet</h3>
       <p>The backend endpoint hasn't deployed. You can still draft one above once it has — retry to check again.</p>
       <button type="button" class="axb-btn axb-btn--sm" (click)="retry()">Check again</button>
@@ -64,7 +64,7 @@
 
     <!-- Error -->
     <div class="axb-state-block axb-state-block--error" *ngIf="state === 'error'" role="alert">
-      <app-admin-state-icon name="warning"></app-admin-state-icon>
+      <app-icon name="warning" [size]="22"></app-icon>
       <h3>Couldn't load broadcasts</h3>
       <button type="button" class="axb-btn axb-btn--sm" (click)="retry()">Try again</button>
     </div>
@@ -73,7 +73,7 @@
       <p class="axb-inline-error" role="alert" *ngIf="loadErrorMessage">{{ loadErrorMessage }}</p>
 
       <div class="axb-state-block" *ngIf="!broadcasts.length">
-        <app-admin-state-icon name="megaphone"></app-admin-state-icon>
+        <app-icon name="megaphone" [size]="22"></app-icon>
         <h3>No broadcasts yet</h3>
         <p>Publish one above — it'll show up here.</p>
       </div>

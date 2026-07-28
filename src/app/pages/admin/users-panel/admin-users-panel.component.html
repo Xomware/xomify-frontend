@@ -1,13 +1,13 @@
 <div>
   <!-- Loading -->
   <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <app-icon name="spinner" [size]="24"></app-icon>
     <p>Loading the user directory…</p>
   </div>
 
   <!-- Not live yet -->
   <div class="ax-state-block" *ngIf="state === 'not-live'">
-    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <app-icon name="inbox" [size]="24"></app-icon>
     <h2>User directory isn't live yet</h2>
     <p>The backend endpoint hasn't deployed yet.</p>
     <button type="button" class="ax-btn" (click)="retry()">Check again</button>
@@ -15,7 +15,7 @@
 
   <!-- Error -->
   <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
-    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <app-icon name="warning" [size]="24"></app-icon>
     <h2>Couldn't load the user directory</h2>
     <button type="button" class="ax-btn" (click)="retry()">Try again</button>
   </div>
@@ -23,7 +23,7 @@
   <ng-container *ngIf="state === 'loaded'">
     <!-- Empty -->
     <div class="ax-state-block" *ngIf="!users.length">
-      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <app-icon name="inbox" [size]="24"></app-icon>
       <h2>No users yet</h2>
       <p>Nobody has signed into Xomify yet.</p>
     </div>
@@ -51,6 +51,7 @@
                   Last seen <span aria-hidden="true">{{ sortKey === 'lastSeen' ? (sortDesc ? '▾' : '▴') : '' }}</span>
                 </button>
               </th>
+              <th scope="col">Opt-ins</th>
               <th scope="col">Spotify</th>
               <th scope="col"><span class="sr-only">Details</span></th>
             </tr>
@@ -59,8 +60,9 @@
             <ng-container *ngFor="let user of sortedUsers; trackBy: trackByEmail">
               <tr class="ax-row" [class.ax-row--expanded]="isExpanded(user)">
                 <td class="ax-cell-email">{{ user.email }}</td>
-                <td>{{ user.displayName || '—' }}</td>
-                <td>{{ humanDate(user.lastSeen) }}</td>
+                <td class="ax-cell-nowrap">{{ user.displayName || '—' }}</td>
+                <td class="ax-cell-nowrap">{{ user.lastSeen | axTimestamp }}</td>
+                <td class="ax-cell-nowrap">{{ optInSummary(user.optIns) }}</td>
                 <td>
                   <span class="ax-badge" [class.ax-badge--on]="user.spotifyConnected">
                     {{ user.spotifyConnected ? 'Connected' : 'No' }}
@@ -80,7 +82,7 @@
               </tr>
 
               <tr class="ax-drawer-row" *ngIf="isExpanded(user)">
-                <td [id]="'ax-drawer-' + user.email" colspan="5">
+                <td [id]="'ax-drawer-' + user.email" colspan="6">
                   <div class="ax-drawer">
                     <section class="ax-drawer-section">
                       <h3>Opt-ins</h3>
@@ -98,18 +100,18 @@
                     <section class="ax-drawer-section">
                       <h3>Recent visits</h3>
                       <div class="ax-drawer-substate" *ngIf="visitsState === 'loading'" aria-busy="true" aria-live="polite">
-                        <app-admin-state-icon name="spinner"></app-admin-state-icon>
+                        <app-icon name="spinner" [size]="14"></app-icon>
                         <span>Loading visits…</span>
                       </div>
                       <div class="ax-drawer-substate" *ngIf="visitsState === 'error'" role="alert">
-                        <app-admin-state-icon name="warning"></app-admin-state-icon>
+                        <app-icon name="warning" [size]="14"></app-icon>
                         <span>Couldn't load visits.</span>
                       </div>
                       <p class="ax-drawer-empty" *ngIf="visitsState === 'loaded' && !visits.length">No visits logged yet.</p>
                       <ul class="ax-visit-list" *ngIf="visitsState === 'loaded' && visits.length" aria-label="Recent visits">
                         <li *ngFor="let v of visits; trackBy: trackByVisit">
                           <span class="ax-visit-path">{{ v.path }}</span>
-                          <span class="ax-visit-ts">{{ humanTs(v.ts) }}</span>
+                          <span class="ax-visit-ts">{{ v.ts | axTimestamp: 'relative' }}</span>
                         </li>
                       </ul>
                     </section>
@@ -126,11 +128,11 @@
                       </button>
 
                       <div class="ax-drawer-substate" *ngIf="viewAsState === 'loading'" aria-busy="true" aria-live="polite">
-                        <app-admin-state-icon name="spinner"></app-admin-state-icon>
+                        <app-icon name="spinner" [size]="14"></app-icon>
                         <span>Loading view-as snapshot…</span>
                       </div>
                       <div class="ax-drawer-substate" *ngIf="viewAsState === 'error'" role="alert">
-                        <app-admin-state-icon name="warning"></app-admin-state-icon>
+                        <app-icon name="warning" [size]="14"></app-icon>
                         <span>Couldn't load that snapshot.</span>
                         <button type="button" class="ax-btn ax-btn--sm" (click)="loadViewAs(user.email)">Try again</button>
                       </div>
@@ -152,7 +154,7 @@
                         <ul class="ax-visit-list" *ngIf="va.recentVisits.length" aria-label="Their recent visits">
                           <li *ngFor="let v of va.recentVisits; trackBy: trackByVisit">
                             <span class="ax-visit-path">{{ v.path }}</span>
-                            <span class="ax-visit-ts">{{ humanTs(v.ts) }}</span>
+                            <span class="ax-visit-ts">{{ v.ts | axTimestamp: 'relative' }}</span>
                           </li>
                         </ul>
 

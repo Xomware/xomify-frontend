@@ -14,13 +14,13 @@
 
   <!-- Loading -->
   <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <app-icon name="spinner" [size]="24"></app-icon>
     <p>Loading health metrics…</p>
   </div>
 
   <!-- Not live yet (backend 404) -->
   <div class="ax-state-block" *ngIf="state === 'not-live'">
-    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <app-icon name="inbox" [size]="24"></app-icon>
     <h2>Health metrics aren't live yet</h2>
     <p>The request-log instrumentation hasn't deployed on the backend yet.</p>
     <button type="button" class="ax-btn" (click)="retry()">Check again</button>
@@ -28,7 +28,7 @@
 
   <!-- Error -->
   <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
-    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <app-icon name="warning" [size]="24"></app-icon>
     <h2>Couldn't load health metrics</h2>
     <button type="button" class="ax-btn" (click)="retry()">Try again</button>
   </div>
@@ -54,7 +54,7 @@
     </div>
 
     <div class="ax-state-block" *ngIf="s.totalCalls === 0">
-      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <app-icon name="inbox" [size]="24"></app-icon>
       <h2>No calls logged</h2>
       <p>Nothing recorded in the last {{ windowLabel(s.windowHours) }}.</p>
     </div>
@@ -74,11 +74,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of s.byRoute; trackBy: trackByPath">
+              <tr *ngFor="let row of s.byRoute; trackBy: trackByPath" [class.ax-row--warn]="row.errors > 0">
                 <td class="ax-cell-mono">{{ row.path }}</td>
-                <td>{{ row.count }}</td>
-                <td [class.ax-cell-warn]="row.errors > 0">{{ row.errors }}</td>
-                <td>{{ row.p50ms }}</td>
+                <td class="ax-cell-num">{{ row.count }}</td>
+                <td class="ax-cell-num" [class.ax-cell-warn]="row.errors > 0">{{ row.errors }}</td>
+                <td class="ax-cell-num">{{ row.p50ms }}</td>
               </tr>
             </tbody>
           </table>
@@ -88,18 +88,34 @@
       <section class="ax-subsection">
         <h2>Recent errors</h2>
         <div class="ax-state-block ax-state-block--compact" *ngIf="!s.recentErrors.length">
-          <app-admin-state-icon name="check"></app-admin-state-icon>
+          <app-icon name="check-circle" [size]="18"></app-icon>
           <p>No errors in this window.</p>
         </div>
-        <ul class="ax-error-list" *ngIf="s.recentErrors.length" aria-label="Recent errors">
-          <li class="ax-error-row" *ngFor="let e of s.recentErrors; trackBy: trackByError">
-            <span class="ax-error-ts">{{ humanTs(e.ts) }}</span>
-            <span class="ax-error-status" [class.ax-error-status--warn]="isErrorStatus(e.status)">{{ e.status }}</span>
-            <span class="ax-error-path">{{ e.path }}</span>
-            <span class="ax-error-email">{{ e.email || '—' }}</span>
-            <span class="ax-error-msg">{{ e.error || '—' }}</span>
-          </li>
-        </ul>
+        <div class="ax-table-wrap" *ngIf="s.recentErrors.length">
+          <table class="ax-table">
+            <caption class="sr-only">Recent errors</caption>
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Status</th>
+                <th scope="col">Path</th>
+                <th scope="col">User</th>
+                <th scope="col">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of s.recentErrors; trackBy: trackByError">
+                <td class="ax-cell-nowrap">{{ e.ts | axTimestamp }}</td>
+                <td>
+                  <span class="ax-badge" [class.ax-badge--warn]="isErrorStatus(e.status)">{{ e.status }}</span>
+                </td>
+                <td class="ax-cell-mono">{{ e.path }}</td>
+                <td class="ax-cell-nowrap">{{ e.email || '—' }}</td>
+                <td class="ax-cell-truncate">{{ e.error || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </ng-container>
   </ng-container>

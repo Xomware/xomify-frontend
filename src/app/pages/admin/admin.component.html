@@ -1,84 +1,96 @@
 <main class="ax-page">
-  <header class="ax-head">
-    <div>
-      <h1>Admin</h1>
-      <p class="ax-sub">Xomify operations — visible to Dom only.</p>
+  <div class="ax-shell">
+    <nav class="ax-nav" role="tablist" aria-label="Admin sections" aria-orientation="vertical">
+      <div class="ax-nav-head">
+        <h1>Admin</h1>
+        <p class="ax-nav-sub">Xomify operations · Dom only</p>
+      </div>
+
+      <button
+        *ngFor="let tab of tabs; let i = index"
+        #tabBtn
+        type="button"
+        role="tab"
+        class="ax-nav-item"
+        [class.ax-nav-item--active]="activeTab === tab.value"
+        [attr.aria-selected]="activeTab === tab.value"
+        [id]="'ax-tab-' + tab.value"
+        [attr.aria-controls]="'ax-panel-' + tab.value"
+        [attr.tabindex]="activeTab === tab.value ? 0 : -1"
+        (click)="setTab(tab.value)"
+        (keydown)="onTabKeydown($event, i)"
+      >
+        <app-icon [name]="tab.icon" [size]="16"></app-icon>
+        <span>{{ tab.label }}</span>
+      </button>
+
+      <a class="ax-nav-external" routerLink="/shares/admin">
+        <app-icon name="headphones" [size]="16"></app-icon>
+        <span>Shares Admin</span>
+        <span class="ax-nav-external-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </nav>
+
+    <div class="ax-content" [ngSwitch]="activeTab">
+      <section
+        *ngSwitchCase="'overview'"
+        id="ax-panel-overview"
+        role="tabpanel"
+        aria-labelledby="ax-tab-overview"
+        tabindex="0"
+      >
+        <app-admin-overview-panel (jumpToTab)="setTab($event)"></app-admin-overview-panel>
+      </section>
+
+      <section
+        *ngSwitchCase="'health'"
+        id="ax-panel-health"
+        role="tabpanel"
+        aria-labelledby="ax-tab-health"
+        tabindex="0"
+      >
+        <app-admin-health-panel></app-admin-health-panel>
+      </section>
+
+      <section
+        *ngSwitchCase="'users'"
+        id="ax-panel-users"
+        role="tabpanel"
+        aria-labelledby="ax-tab-users"
+        tabindex="0"
+      >
+        <app-admin-users-panel></app-admin-users-panel>
+      </section>
+
+      <section
+        *ngSwitchCase="'crons'"
+        id="ax-panel-crons"
+        role="tabpanel"
+        aria-labelledby="ax-tab-crons"
+        tabindex="0"
+      >
+        <app-admin-crons-panel></app-admin-crons-panel>
+      </section>
+
+      <section
+        *ngSwitchCase="'notifications'"
+        id="ax-panel-notifications"
+        role="tabpanel"
+        aria-labelledby="ax-tab-notifications"
+        tabindex="0"
+      >
+        <app-admin-notifications-panel></app-admin-notifications-panel>
+      </section>
+
+      <section
+        *ngSwitchCase="'broadcasts'"
+        id="ax-panel-broadcasts"
+        role="tabpanel"
+        aria-labelledby="ax-tab-broadcasts"
+        tabindex="0"
+      >
+        <app-broadcasts-panel></app-broadcasts-panel>
+      </section>
     </div>
-
-    <a class="ax-shares-link" routerLink="/shares/admin">
-      Shares Admin
-      <span aria-hidden="true">&rarr;</span>
-    </a>
-  </header>
-
-  <nav class="ax-tabs" role="tablist" aria-label="Admin sections">
-    <button
-      *ngFor="let tab of tabs; let i = index"
-      #tabBtn
-      type="button"
-      role="tab"
-      class="ax-tab"
-      [class.ax-tab--active]="activeTab === tab.value"
-      [attr.aria-selected]="activeTab === tab.value"
-      [id]="'ax-tab-' + tab.value"
-      [attr.aria-controls]="'ax-panel-' + tab.value"
-      [attr.tabindex]="activeTab === tab.value ? 0 : -1"
-      (click)="setTab(tab.value)"
-      (keydown)="onTabKeydown($event, i)"
-    >
-      {{ tab.label }}
-    </button>
-  </nav>
-
-  <div [ngSwitch]="activeTab">
-    <section
-      *ngSwitchCase="'health'"
-      id="ax-panel-health"
-      role="tabpanel"
-      aria-labelledby="ax-tab-health"
-      tabindex="0"
-    >
-      <app-admin-health-panel></app-admin-health-panel>
-    </section>
-
-    <section
-      *ngSwitchCase="'users'"
-      id="ax-panel-users"
-      role="tabpanel"
-      aria-labelledby="ax-tab-users"
-      tabindex="0"
-    >
-      <app-admin-users-panel></app-admin-users-panel>
-    </section>
-
-    <section
-      *ngSwitchCase="'crons'"
-      id="ax-panel-crons"
-      role="tabpanel"
-      aria-labelledby="ax-tab-crons"
-      tabindex="0"
-    >
-      <app-admin-crons-panel></app-admin-crons-panel>
-    </section>
-
-    <section
-      *ngSwitchCase="'notifications'"
-      id="ax-panel-notifications"
-      role="tabpanel"
-      aria-labelledby="ax-tab-notifications"
-      tabindex="0"
-    >
-      <app-admin-notifications-panel></app-admin-notifications-panel>
-    </section>
-
-    <section
-      *ngSwitchCase="'broadcasts'"
-      id="ax-panel-broadcasts"
-      role="tabpanel"
-      aria-labelledby="ax-tab-broadcasts"
-      tabindex="0"
-    >
-      <app-broadcasts-panel></app-broadcasts-panel>
-    </section>
   </div>
 </main>
