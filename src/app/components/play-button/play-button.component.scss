@@ -16,7 +16,7 @@
   &.small {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 
     svg {
       width: 14px;
@@ -27,7 +27,7 @@
   &.medium {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 
     svg {
       width: 18px;
@@ -38,7 +38,7 @@
   &.large {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 
     svg {
       width: 24px;
@@ -48,66 +48,64 @@
 
   // Variants
   &.filled {
-    background: #1bdc6f;
-    color: #000;
-    box-shadow: 0 4px 15px rgba(27, 220, 111, 0.3);
+    background: var(--accent-green);
+    color: #05130a;
+    box-shadow: var(--shadow-xs);
 
     &:hover:not(:disabled) {
-      background: #22f080;
-      transform: scale(1.08);
-      box-shadow: 0 6px 20px rgba(27, 220, 111, 0.4);
+      background: var(--accent-green-hover);
+      box-shadow: var(--shadow-sm);
     }
 
     &.playing {
-      background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+      background: var(--accent-purple);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(156, 10, 191, 0.4);
+      box-shadow: var(--shadow-xs);
 
       &:hover:not(:disabled) {
-        box-shadow: 0 6px 20px rgba(156, 10, 191, 0.5);
+        background: var(--accent-purple-hover);
+        box-shadow: var(--shadow-sm);
       }
     }
   }
 
   &.outline {
     background: transparent;
-    color: #1bdc6f;
-    border: 2px solid rgba(27, 220, 111, 0.5);
+    color: var(--accent-green);
+    border: 1px solid rgba(27, 220, 111, 0.5);
 
     &:hover:not(:disabled) {
-      background: rgba(27, 220, 111, 0.1);
-      border-color: #1bdc6f;
-      transform: scale(1.05);
+      background: var(--accent-green-muted);
+      border-color: var(--accent-green);
     }
 
     &.playing {
-      color: #9c0abf;
+      color: var(--accent-purple);
       border-color: rgba(156, 10, 191, 0.5);
 
       &:hover:not(:disabled) {
-        background: rgba(156, 10, 191, 0.1);
-        border-color: #9c0abf;
+        background: var(--accent-purple-muted);
+        border-color: var(--accent-purple);
       }
     }
   }
 
   &.ghost {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
     backdrop-filter: blur(4px);
 
     &:hover:not(:disabled) {
-      background: rgba(27, 220, 111, 0.2);
-      color: #1bdc6f;
-      transform: scale(1.05);
+      background: var(--accent-green-muted);
+      color: var(--accent-green);
     }
 
     &.playing {
-      background: rgba(156, 10, 191, 0.2);
-      color: #c77ddb;
+      background: var(--accent-purple-muted);
+      color: var(--accent-purple-text);
 
       &:hover:not(:disabled) {
-        background: rgba(156, 10, 191, 0.3);
+        background: rgba(156, 10, 191, 0.28);
       }
     }
   }

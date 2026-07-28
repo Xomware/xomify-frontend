@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: var(--bg);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,10 +26,10 @@
 }
 
 .wave {
-  width: 8px;
+  width: 6px;
   height: 20px;
-  background: linear-gradient(180deg, #9c0abf 0%, #1bdc6f 100%);
-  border-radius: 4px;
+  background: var(--accent-purple);
+  border-radius: var(--radius-sm);
   animation: wave 1.2s ease-in-out infinite;
   
   &:nth-child(1) {
@@ -61,10 +61,9 @@
 }
 
 .loader-message {
-  color: #fff;
-  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
   font-weight: 500;
-  letter-spacing: 1px;
+  letter-spacing: 0.4px;
   margin: 0;
-  opacity: 0.9;
 }

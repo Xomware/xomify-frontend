@@ -1,0 +1,105 @@
+// Global design tokens — "professional / de-bubbled" pass.
+//
+// Generalizes the macOS System Settings-style token seed prototyped for the
+// Admin Portal restyle (`ax-theme-tokens` mixin, scoped to `.ax-page`) into
+// a single app-wide source of truth: flat surfaces, hairline separators,
+// small radii, restrained brand accents (purple/green reserved for
+// selection/status/CTA rather than decoration everywhere), low/no glow
+// shadows.
+//
+// Emitted directly onto `:root` in the real global stylesheet (not a mixin)
+// — `styles.scss` sits outside Angular's per-component view encapsulation,
+// so every component in the app can read `var(--token)` without importing
+// anything itself. When the (currently separate, unmerged) admin-only
+// `--ax-*` token set lands, it should be reconciled to alias these instead
+// of redefining its own copy scoped to `.ax-page`.
+:root {
+  // ── Neutral gray structural palette ──────────────────────────────────
+  --gray-950: #0a0a0d;
+  --gray-900: #131316;
+  --gray-850: #18181c;
+  --gray-800: #1e1e23;
+  --gray-700: #2a2a30;
+  --gray-600: #3a3a42;
+  --gray-500: #55555f;
+  --gray-400: #74747d;
+  --gray-300: #9a9aa3;
+  --gray-200: #c2c2c9;
+  --gray-100: #e8e8ec;
+
+  // ── Surfaces ──────────────────────────────────────────────────────────
+  --bg: var(--gray-950);
+  --surface: var(--gray-900);
+  --surface-raised: var(--gray-800);
+  --surface-sunken: rgba(0, 0, 0, 0.22);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  // ── Text ──────────────────────────────────────────────────────────────
+  --text-primary: #f2f2f4;
+  --text-secondary: #a3a3ab;
+  --text-tertiary: #6f6f78;
+
+  // ── Brand accents — restrained. Purple is the primary interactive
+  // accent (selection, focus, key CTAs); green is reserved for
+  // positive/success/"playing" states, not decoration. Both get a muted
+  // (low-alpha) variant for backgrounds/hovers so color isn't shouting. ──
+  --accent-purple: #9c0abf;
+  --accent-purple-hover: #b32bd6;
+  --accent-purple-muted: rgba(156, 10, 191, 0.14);
+  --accent-purple-text: #d3a4e8;
+
+  --accent-green: #1bdc6f;
+  --accent-green-hover: #22f080;
+  --accent-green-muted: rgba(27, 220, 111, 0.14);
+
+  --positive: #34c77b;
+  --positive-muted: rgba(52, 199, 123, 0.14);
+  --negative: #f0596b;
+  --negative-muted: rgba(240, 89, 107, 0.16);
+  --warning: #e0a63f;
+  --warning-muted: rgba(224, 166, 63, 0.14);
+
+  // ── Shape — small radii everywhere, no pill/bubble radii on text
+  // containers. `--radius-full` is reserved for genuinely circular
+  // controls (avatars, dots, icon-only round buttons), not tab/chip/badge
+  // shapes. ──────────────────────────────────────────────────────────────
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  // ── Shadows — subtle, low-spread. Hairline borders do most of the
+  // separation work; shadows are for genuine elevation (menus, modals). ──
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.32);
+
+  // ── Spacing scale ─────────────────────────────────────────────────────
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  // ── Type ──────────────────────────────────────────────────────────────
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+
+  // ── Motion ────────────────────────────────────────────────────────────
+  --transition-fast: 120ms ease;
+  --transition: 180ms ease;
+  --transition-slow: 280ms ease;
+}

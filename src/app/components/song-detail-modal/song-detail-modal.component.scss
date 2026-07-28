@@ -35,8 +35,9 @@
 }
 
 .modal-content {
-  background: linear-gradient(180deg, #282828 0%, #181818 100%);
-  border-radius: 16px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
@@ -44,6 +45,7 @@
   position: relative;
   padding: 24px;
   animation: slideUp 0.3s ease;
+  box-shadow: var(--shadow-lg);
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -54,8 +56,8 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #3a3a4a;
-    border-radius: 3px;
+    background: var(--gray-600);
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -63,22 +65,22 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #b3b3b3;
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
   z-index: 1;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
   }
 }
 
@@ -94,9 +96,9 @@
   flex-shrink: 0;
   width: 140px;
   height: 140px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
 
   .album-art {
     width: 100%;
@@ -217,8 +219,9 @@
 
 // Rating section
 .rating-section {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -243,10 +246,10 @@
   align-items: center;
   gap: 4px;
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   padding: 6px 12px;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -264,8 +267,9 @@
 
 // Friends ratings section
 .friends-ratings-section {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -304,7 +308,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 0.2s ease;
 
@@ -315,7 +319,7 @@
   .friend-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
   }
 
@@ -344,22 +348,23 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
   }
 
   &.active {
-    background: rgba(29, 185, 84, 0.2);
+    background: rgba(29, 185, 84, 0.18);
+    border-color: rgba(29, 185, 84, 0.4);
     color: #1db954;
   }
 
