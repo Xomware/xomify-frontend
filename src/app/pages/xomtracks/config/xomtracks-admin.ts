@@ -3,7 +3,8 @@
  * ingest-token affordance is hidden for this account — see
  * `XomtracksSetupCardComponent.isAdmin`.
  *
- * A single exported const so the admin identity is easy to change later
- * without hunting through the component.
+ * Re-exported from the shared xomify-level const (lifted for the nav
+ * restructure + `/admin` route) — see `src/app/config/admin.config.ts`.
+ * Kept here too so this import path stays valid for existing callers.
  */
-export const ADMIN_EMAIL = 'dominickj.giordano@gmail.com';
+export { ADMIN_EMAIL } from '../../../config/admin.config';

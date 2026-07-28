@@ -1,0 +1,102 @@
+<main class="fav-page">
+  <header class="fav-page-head">
+    <div class="fav-page-head-text">
+      <h1 class="fav-page-title">My Favorites</h1>
+      <p class="fav-page-sub">Your hand-picked best-of — separate from your Spotify-derived Music Taste.</p>
+    </div>
+
+    <label class="fav-year-select">
+      <span class="fav-year-label">Year</span>
+      <select [ngModel]="year" (ngModelChange)="onYearChange($event)" aria-label="Select favorites year">
+        <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+      </select>
+    </label>
+  </header>
+
+  <!-- Loading -->
+  <div class="fav-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading your favorites">
+    <div class="fav-loader" aria-hidden="true">
+      <span class="fav-loader-wave" *ngFor="let s of [1,2,3,4,5]"></span>
+    </div>
+    <p>Loading your favorites…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="fav-state-block fav-state-block--error" *ngIf="state === 'error'" role="alert">
+    <div aria-hidden="true">⚠️</div>
+    <h2>Couldn't load your favorites</h2>
+    <p>Something went wrong reaching the favorites service.</p>
+    <button type="button" class="fav-retry-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <section class="fav-section">
+      <div class="fav-section-head">
+        <h2 class="fav-section-title">Overall {{ year }}</h2>
+        <span class="fav-section-sub">Your top 5 songs, albums, and artists of the year</span>
+      </div>
+
+      <div class="fav-grid">
+        <app-favorites-ranked-list
+          title="Songs"
+          category="songs"
+          [year]="year"
+          [listId]="overallListId('songs')"
+          [items]="overall.songs"
+        ></app-favorites-ranked-list>
+        <app-favorites-ranked-list
+          title="Albums"
+          category="albums"
+          [year]="year"
+          [listId]="overallListId('albums')"
+          [items]="overall.albums"
+        ></app-favorites-ranked-list>
+        <app-favorites-ranked-list
+          title="Artists"
+          category="artists"
+          [year]="year"
+          [listId]="overallListId('artists')"
+          [items]="overall.artists"
+        ></app-favorites-ranked-list>
+      </div>
+    </section>
+
+    <section class="fav-section">
+      <div class="fav-section-head">
+        <div>
+          <h2 class="fav-section-title">Your lists</h2>
+          <span class="fav-section-sub">Genre, mood, whatever you want to rank</span>
+        </div>
+        <button type="button" class="fav-new-list-btn" (click)="openNewList()">
+          <span aria-hidden="true">+</span> New list
+        </button>
+      </div>
+
+      <p class="fav-empty-lists" *ngIf="lists.length === 0">
+        No custom lists yet — try "Top Rap Albums" or "Top EDM Artists".
+      </p>
+
+      <div class="fav-grid" *ngIf="lists.length > 0">
+        <app-favorites-ranked-list
+          *ngFor="let list of lists; trackBy: trackByListId"
+          [title]="list.genreLabel"
+          [subtitle]="categoryLabel(list.category)"
+          [category]="list.category"
+          [year]="year"
+          [listId]="list.listId"
+          [items]="list.items"
+          [deletable]="true"
+          (listDeleted)="onListDeleted($event)"
+        ></app-favorites-ranked-list>
+      </div>
+    </section>
+  </ng-container>
+
+  <app-favorites-new-list-modal
+    *ngIf="newListOpen"
+    [saving]="creatingList"
+    (created)="createList($event)"
+    (closed)="closeNewList()"
+  ></app-favorites-new-list-modal>
+</main>

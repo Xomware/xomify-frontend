@@ -1,0 +1,217 @@
+// Broadcasts panel — same dark gradient + purple/green design language as
+// the Shares Admin Portal (xta- classes), scoped `axb-` (Admin / Xomify /
+// Broadcasts) so nothing collides.
+
+.axb {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.axb-form-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    color: #fff;
+  }
+}
+
+.axb-form-sub {
+  margin: 4px 0 16px;
+  font-size: 0.8rem;
+  color: #8a8a9a;
+}
+
+.axb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #d5d5e0;
+  }
+
+  .axb-optional {
+    font-weight: 400;
+    color: #6d6d7d;
+  }
+
+  input,
+  textarea {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: #fff;
+    font-size: 0.88rem;
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: none;
+      border-color: #9c0abf;
+      box-shadow: 0 0 0 3px rgba(156, 10, 191, 0.35);
+    }
+
+    &::placeholder {
+      color: #6d6d7d;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  &--inline input {
+    color-scheme: dark;
+  }
+}
+
+.axb-btn {
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &--sm {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+  }
+
+  &--danger {
+    background: linear-gradient(135deg, #ff3750 0%, #b91c3b 100%);
+  }
+}
+
+.axb-inline-error {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 55, 80, 0.12);
+  border: 1px solid rgba(255, 55, 80, 0.4);
+  color: #ff8fa0;
+  font-size: 0.82rem;
+}
+
+.axb-list-section h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.axb-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #8a8a9a;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+
+  div:first-child {
+    font-size: 2rem;
+  }
+
+  h3 {
+    margin: 4px 0 0;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    max-width: 46ch;
+    font-size: 0.85rem;
+  }
+}
+
+.axb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.axb-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.axb-item-main {
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 0.92rem;
+    color: #fff;
+  }
+
+  p {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    color: #cfcfdc;
+    white-space: pre-wrap;
+  }
+}
+
+.axb-item-meta {
+  font-size: 0.72rem;
+  color: #6d6d7d;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .axb {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .axb-item {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .axb-btn {
+    transition: none;
+  }
+}

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 import { HomeComponent } from './pages/home/home.component';
 import { CallbackComponent } from './components/callback/callback.component';
@@ -105,9 +106,27 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/xomtracks/xomtracks.module').then((m) => m.XomtracksModule),
   },
+  // My Favorites — user-curated best-of lists (WS-D, distinct from the
+  // Spotify-derived Music Taste pages above).
+  {
+    path: 'favorites',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./pages/favorites/favorites.module').then((m) => m.FavoritesModule),
+  },
   // Legacy route — the Shares feature used to live at `/xomtracks`. Keep a
   // redirect so old links/bookmarks (incl. `/xomtracks/admin`) still land.
   { path: 'xomtracks', redirectTo: 'shares', pathMatch: 'prefix' },
+  // xomify-level Admin Portal (WS-B) — Broadcasts authoring + a link out to
+  // the Shares Admin Portal. AuthGuard proves the caller is logged in;
+  // AdminGuard additionally proves they're the admin (client-side
+  // ADMIN_EMAIL check against the xomify JWT) before the chunk even loads.
+  {
+    path: 'admin',
+    canActivate: [AuthGuard, AdminGuard],
+    loadChildren: () =>
+      import('./pages/admin/admin.module').then((m) => m.AdminModule),
+  },
   {
     path: '',
     canActivate: [AuthGuard],

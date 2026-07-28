@@ -1,0 +1,86 @@
+// Admin Portal shell — same dark gradient + purple/green design language as
+// the Shares feed / Shares Admin Portal, scoped `ax-` (xomify Admin) so
+// nothing collides with `xta-` (Xomtracks Admin).
+
+.ax-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
+  padding: 70px 24px 120px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ax-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #fff;
+    background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.ax-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #8a8a9a;
+}
+
+.ax-shares-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: rgba(27, 220, 111, 0.1);
+  border: 1px solid rgba(27, 220, 111, 0.4);
+  color: #b9f7d3;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(27, 220, 111, 0.2);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1bdc6f;
+    outline-offset: 2px;
+  }
+}
+
+.ax-section-title {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .ax-page {
+    padding: 70px 16px 100px;
+  }
+  .ax-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ax-shares-link {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ax-shares-link {
+    transition: none;
+  }
+}
