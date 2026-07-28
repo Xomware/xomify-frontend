@@ -1,64 +1,74 @@
-// Crons panel — `ax-` prefix, matches the rest of the Admin Portal.
+// Crons panel — reads the `var(--ax-*)` tokens set on `.ax-page`
+// (see `admin.component.scss` / `src/styles/_admin-theme.scss`).
 
 .ax-state-block {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 40px 24px;
+  padding: 36px 24px;
   text-align: center;
-  color: #8a8a9a;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  color: var(--ax-text-secondary);
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-hairline);
+  border-radius: var(--ax-radius-lg);
+
+  app-icon {
+    color: var(--ax-text-tertiary);
+  }
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1.05rem;
-    color: #fff;
+    font-size: 1rem;
+    color: var(--ax-text);
   }
 
   p {
     margin: 0;
     max-width: 46ch;
+    font-size: 0.84rem;
   }
 
   &--error {
-    border-color: rgba(255, 55, 80, 0.3);
+    border-color: rgba(240, 89, 107, 0.3);
+
+    app-icon {
+      color: var(--ax-negative);
+    }
   }
 }
 
 .ax-btn {
-  margin-top: 10px;
-  padding: 9px 18px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
+  margin-top: 6px;
+  padding: 6px 14px;
+  border-radius: var(--ax-radius-sm);
+  background: var(--ax-accent);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.82rem;
+  font-weight: 600;
+  font-size: 0.78rem;
   border: none;
   cursor: pointer;
 
   &:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.1);
   }
   &:focus-visible {
-    outline: 2px solid #1bdc6f;
+    outline: 2px solid var(--ax-accent);
     outline-offset: 2px;
   }
 }
 
 .ax-cron-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
 }
 
 .ax-cron-card {
-  padding: 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  border-radius: var(--ax-radius-lg);
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-hairline);
 }
 
 .ax-cron-head {
@@ -66,94 +76,96 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 
   h3 {
     margin: 0;
-    font-size: 0.92rem;
-    color: #fff;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--ax-text);
     word-break: break-word;
   }
 }
 
 .ax-cron-status {
   flex-shrink: 0;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.7rem;
+  padding: 1px 8px;
+  border-radius: var(--ax-radius-sm);
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: capitalize;
   background: rgba(255, 255, 255, 0.06);
-  color: #8a8a9a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ax-text-secondary);
+  border: 1px solid var(--ax-hairline);
 
   &--ok {
-    background: rgba(27, 220, 111, 0.12);
-    color: #b9f7d3;
-    border-color: rgba(27, 220, 111, 0.35);
+    background: var(--ax-positive-muted);
+    color: var(--ax-positive);
+    border-color: rgba(52, 199, 123, 0.35);
   }
 
   &--error {
-    background: rgba(255, 55, 80, 0.12);
-    color: #ff8fa0;
-    border-color: rgba(255, 55, 80, 0.4);
+    background: var(--ax-negative-muted);
+    color: var(--ax-negative);
+    border-color: rgba(240, 89, 107, 0.4);
   }
 
   &--sm {
-    font-size: 0.66rem;
-    padding: 2px 8px;
+    font-size: 0.62rem;
+    padding: 1px 6px;
   }
 }
 
 .ax-cron-meta {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 0 0 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0 0 6px;
 
   dt {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: #6d6d7d;
+    color: var(--ax-text-tertiary);
   }
 
   dd {
-    margin: 2px 0 0;
-    font-size: 0.85rem;
-    color: #fff;
+    margin: 1px 0 0;
+    font-size: 0.8rem;
+    color: var(--ax-text);
+    font-variant-numeric: tabular-nums;
   }
 }
 
 .ax-cron-error {
-  margin: 8px 0 0;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: rgba(255, 55, 80, 0.1);
-  border: 1px solid rgba(255, 55, 80, 0.35);
-  color: #ff8fa0;
-  font-size: 0.76rem;
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border-radius: var(--ax-radius-sm);
+  background: var(--ax-negative-muted);
+  border: 1px solid rgba(240, 89, 107, 0.35);
+  color: var(--ax-negative);
+  font-size: 0.74rem;
   word-break: break-word;
 }
 
 .ax-cron-empty {
   margin: 0;
-  font-size: 0.8rem;
-  color: #6d6d7d;
+  font-size: 0.78rem;
+  color: var(--ax-text-tertiary);
 }
 
 .ax-raw {
-  margin-top: 12px;
-  font-size: 0.78rem;
+  margin-top: 10px;
+  font-size: 0.76rem;
 
   summary {
     cursor: pointer;
-    color: #b9a3ff;
+    color: var(--ax-accent-text);
     font-weight: 600;
 
     &:focus-visible {
-      outline: 2px solid #1bdc6f;
+      outline: 2px solid var(--ax-accent);
       outline-offset: 2px;
     }
   }
@@ -165,7 +177,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   max-height: 220px;
   overflow-y: auto;
 
@@ -174,20 +186,20 @@
     grid-template-columns: auto 1fr auto auto;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
+    padding: 5px 7px;
+    border-radius: var(--ax-radius-sm);
     background: rgba(255, 255, 255, 0.03);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 }
 
 .ax-run-ts {
-  color: #c4c4d2;
+  color: var(--ax-text-secondary);
 }
 
 .ax-run-duration,
 .ax-run-items {
-  color: #6d6d7d;
+  color: var(--ax-text-tertiary);
   white-space: nowrap;
 }
 

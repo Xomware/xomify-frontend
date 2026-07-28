@@ -176,31 +176,13 @@ export class AdminUsersPanelComponent implements OnInit {
     return true;
   }
 
-  humanDate(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    const ms = Date.parse(iso);
-    if (Number.isNaN(ms)) return '—';
-    const diffMs = Date.now() - ms;
-    const diffMin = Math.floor(diffMs / 60_000);
-    if (diffMin < 1) return 'just now';
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHr = Math.floor(diffMin / 60);
-    if (diffHr < 24) return `${diffHr}h ago`;
-    const diffDay = Math.floor(diffHr / 24);
-    if (diffDay < 30) return `${diffDay}d ago`;
-    return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  humanTs(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    const ms = Date.parse(iso);
-    if (Number.isNaN(ms)) return String(iso);
-    return new Date(ms).toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
+  /** Compact "N/4" opt-in summary shown in the table row, so the count is
+   * visible without expanding the drawer (density ask — the drawer still
+   * shows each opt-in individually). */
+  optInSummary(optIns: AdminUserOptIns): string {
+    const total = Object.keys(OPT_IN_LABELS).length;
+    const on = (Object.keys(OPT_IN_LABELS) as Array<keyof AdminUserOptIns>).filter((key) => !!optIns?.[key]).length;
+    return `${on}/${total}`;
   }
 
   trackByEmail(_index: number, user: AdminUser): string {

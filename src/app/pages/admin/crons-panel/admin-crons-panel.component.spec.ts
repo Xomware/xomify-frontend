@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminCronsPanelComponent } from './admin-crons-panel.component';
-import { AdminStateIconComponent } from '../components/admin-state-icon/admin-state-icon.component';
+import { IconComponent } from '../../../components/icon/icon.component';
+import { AxTimestampPipe } from '../pipes/ax-timestamp.pipe';
 import { AdminPortalService } from '../services/admin-portal.service';
 import { AdminCron } from '../models/admin-portal.model';
 
@@ -32,7 +33,7 @@ describe('AdminCronsPanelComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CommonModule],
-      declarations: [AdminCronsPanelComponent, AdminStateIconComponent],
+      declarations: [AdminCronsPanelComponent, IconComponent, AxTimestampPipe],
       providers: [{ provide: AdminPortalService, useValue: adminSpy }],
     }).compileComponents();
 

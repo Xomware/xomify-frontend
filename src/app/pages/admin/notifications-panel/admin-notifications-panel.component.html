@@ -14,13 +14,13 @@
 
   <!-- Loading -->
   <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
-    <app-admin-state-icon name="spinner"></app-admin-state-icon>
+    <app-icon name="spinner" [size]="24"></app-icon>
     <p>Loading notification log…</p>
   </div>
 
   <!-- Not live yet -->
   <div class="ax-state-block" *ngIf="state === 'not-live'">
-    <app-admin-state-icon name="empty"></app-admin-state-icon>
+    <app-icon name="inbox" [size]="24"></app-icon>
     <h2>Notification log isn't live yet</h2>
     <p>The backend endpoint hasn't deployed yet.</p>
     <button type="button" class="ax-btn" (click)="retry()">Check again</button>
@@ -28,17 +28,22 @@
 
   <!-- Error -->
   <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
-    <app-admin-state-icon name="warning"></app-admin-state-icon>
+    <app-icon name="warning" [size]="24"></app-icon>
     <h2>Couldn't load the notification log</h2>
     <button type="button" class="ax-btn" (click)="retry()">Try again</button>
   </div>
 
   <ng-container *ngIf="state === 'loaded'">
     <div class="ax-state-block" *ngIf="!notifications.length">
-      <app-admin-state-icon name="empty"></app-admin-state-icon>
+      <app-icon name="inbox" [size]="24"></app-icon>
       <h2>No notifications sent</h2>
       <p>Nothing in the send log yet.</p>
     </div>
+
+    <p class="ax-count" *ngIf="notifications.length">
+      {{ notifications.length }} {{ notifications.length === 1 ? 'notification' : 'notifications' }}
+      <span *ngIf="failedCount"> · {{ failedCount }} failed</span>
+    </p>
 
     <div class="ax-table-wrap" *ngIf="notifications.length">
       <table class="ax-table">
@@ -54,8 +59,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let n of notifications; trackBy: trackByRow">
-            <td class="ax-cell-nowrap">{{ humanTs(n.ts) }}</td>
+          <tr *ngFor="let n of notifications; trackBy: trackByRow" [class.ax-row--warn]="isFailed(n.status)">
+            <td class="ax-cell-nowrap">{{ n.ts | axTimestamp }}</td>
             <td>
               <span class="ax-badge">{{ n.channel }}</span>
             </td>

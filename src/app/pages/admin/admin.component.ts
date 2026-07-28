@@ -2,20 +2,23 @@ import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } fro
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AX_ADMIN_TABS, AdminTab } from './models/admin-portal.model';
+import { AX_ADMIN_DEFAULT_TAB, AX_ADMIN_TABS, AdminTab } from './models/admin-portal.model';
 
 /**
  * The xomify-level Admin Portal (`/admin`, gated by `AdminGuard`). Reachable
- * from the user-avatar dropdown (Dom-only). A tabbed shell over five
- * sections — Health, Users, Crons, Notifications, Broadcasts — plus a link
- * out to the separately-gated Shares Admin Portal (`/shares/admin`,
- * xomtracks-backend). `docs/features/xomify-admin-portal/PLAN.md`.
+ * from the user-avatar dropdown (Dom-only). A tabbed shell over six
+ * sections — Overview, Health, Users, Crons, Notifications, Broadcasts —
+ * plus a link out to the separately-gated Shares Admin Portal
+ * (`/shares/admin`, xomtracks-backend). `docs/features/xomify-admin-portal/
+ * PLAN.md`; the macOS-style restyle + Overview tab are a follow-up pass on
+ * top of that.
  *
  * Only the active tab's panel is mounted (`*ngSwitch`), so each panel owns
  * its own load/error/empty state independently and nothing fetches until
  * its tab is first opened. The active tab is deep-linkable via `?tab=` and
- * the tablist implements the WAI-ARIA APG roving-tabindex keyboard pattern
- * (Left/Right/Home/End moves focus and activates).
+ * the nav implements the WAI-ARIA APG tablist roving-tabindex keyboard
+ * pattern (Left/Right/Home/End moves focus and activates) — same pattern
+ * whether it renders as the desktop sidebar or the mobile top scroller.
  */
 @Component({
   selector: 'app-admin',
@@ -27,7 +30,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   readonly tabs = AX_ADMIN_TABS;
 
-  activeTab: AdminTab = 'health';
+  activeTab: AdminTab = AX_ADMIN_DEFAULT_TAB;
 
   private destroy$ = new Subject<void>();
 
@@ -40,7 +43,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     // Drive tab selection from the URL so /admin?tab=users is a deep link.
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const tab = params.get('tab') as AdminTab | null;
-      this.activeTab = this.tabs.some((t) => t.value === tab) ? (tab as AdminTab) : 'health';
+      this.activeTab = this.tabs.some((t) => t.value === tab) ? (tab as AdminTab) : AX_ADMIN_DEFAULT_TAB;
     });
   }
 
@@ -54,7 +57,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: tab === 'health' ? {} : { tab },
+      queryParams: tab === AX_ADMIN_DEFAULT_TAB ? {} : { tab },
       queryParamsHandling: '',
       replaceUrl: true,
     });

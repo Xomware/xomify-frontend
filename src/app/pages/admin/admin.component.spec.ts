@@ -37,8 +37,8 @@ describe('AdminComponent', () => {
     fixture.detectChanges();
   });
 
-  it('defaults to the Health tab when there is no ?tab= param', () => {
-    expect(component.activeTab).toBe('health');
+  it('defaults to the Overview tab when there is no ?tab= param', () => {
+    expect(component.activeTab).toBe('overview');
   });
 
   it('drives the active tab from ?tab=', () => {
@@ -46,22 +46,22 @@ describe('AdminComponent', () => {
     expect(component.activeTab).toBe('crons');
   });
 
-  it('falls back to Health for an unknown ?tab= value', () => {
+  it('falls back to Overview for an unknown ?tab= value', () => {
     queryParamMap$.next(convertToParamMap({ tab: 'not-a-real-tab' }));
-    expect(component.activeTab).toBe('health');
+    expect(component.activeTab).toBe('overview');
   });
 
-  it('setTab updates the URL, omitting the param for the default (Health) tab', () => {
+  it('setTab updates the URL, omitting the param for the default (Overview) tab', () => {
     component.setTab('users');
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: { tab: 'users' } }));
 
-    component.setTab('health');
+    component.setTab('overview');
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: {} }));
   });
 
   it('setTab is a no-op if the tab is already active', () => {
     (router.navigate as jasmine.Spy).calls.reset();
-    component.setTab('health');
+    component.setTab('overview');
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
