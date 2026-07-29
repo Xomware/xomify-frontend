@@ -71,6 +71,13 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .module-loading .loader .wave {
+    animation: none;
+    transform: scaleY(0.75);
+  }
+}
+
 .module-error,
 .module-empty {
   color: #8a8a9a;

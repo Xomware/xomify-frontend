@@ -31,6 +31,74 @@
   }
 }
 
+// Loading skeleton — shares .spotlight-card's box (padding/border-radius/
+// min-height) so nothing shifts layout when real content swaps in.
+.spotlight-card.skeleton {
+  cursor: default;
+}
+
+.spotlight-skeleton-image,
+.spotlight-skeleton-line {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: spotlightShimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+.spotlight-skeleton-image {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+}
+
+.spotlight-skeleton-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.spotlight-skeleton-line {
+  height: 12px;
+
+  &--eyebrow {
+    width: 30%;
+    height: 9px;
+  }
+
+  &--title {
+    width: 60%;
+    height: 18px;
+  }
+
+  &--subtitle {
+    width: 45%;
+  }
+}
+
+@keyframes spotlightShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-skeleton-image,
+  .spotlight-skeleton-line {
+    animation: none;
+  }
+}
+
 .spotlight-image {
   flex-shrink: 0;
   width: 72px;
@@ -135,7 +203,8 @@
     gap: 14px;
   }
 
-  .spotlight-image {
+  .spotlight-image,
+  .spotlight-skeleton-image {
     width: 56px;
     height: 56px;
   }

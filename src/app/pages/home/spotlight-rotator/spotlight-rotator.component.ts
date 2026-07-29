@@ -55,6 +55,14 @@ const ROTATE_MS = 8_000;
 export class SpotlightRotatorComponent implements OnChanges, OnDestroy {
   @Input() slides: SpotlightSlide[] = [];
 
+  /**
+   * True while HomeComponent's fetches are still in flight and nothing has
+   * resolved yet. Distinguishes "still loading" from "genuinely nothing to
+   * show" (`slides` is `[]` in both cases otherwise) so this module renders
+   * a skeleton instead of silently disappearing on first paint.
+   */
+  @Input() loading = false;
+
   activeIndex = 0;
   paused = false;
 

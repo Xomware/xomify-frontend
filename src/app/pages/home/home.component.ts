@@ -44,6 +44,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   spotlightSlides: SpotlightSlide[] = [];
 
   /**
+   * True until the first of the three concurrent fetches
+   * (recently-played / top-items / broadcasts) resolves. `spotlightSlides`
+   * is `[]` both before anything has loaded AND, in principle, once
+   * everything has loaded with nothing to show -- this flag is what lets
+   * the spotlight module tell those two states apart and render a skeleton
+   * instead of just vanishing on first paint.
+   */
+  spotlightLoading = true;
+
+  /**
    * My Favorites (WS-D) is a sibling PR. The merge order in the plan lands
    * it before this one, but that isn't guaranteed at any given point in
    * time -- checking the router's registered top-level routes lets the
@@ -51,6 +61,15 @@ export class HomeComponent implements OnInit, OnDestroy {
    * linking into a 404 if this PR is deployed first.
    */
   favoritesAvailable = false;
+
+  // `/user/top-items` is cached server-side per UTC day (see
+  // TopItemsService), but that's still a full network round-trip every time
+  // this page mounts. A short sessionStorage cache here means navigating
+  // away and back to Home within the same session shows the top-items
+  // module instantly instead of re-showing its skeleton -- mirrors the
+  // pattern ListeningHistoryService already uses for recently-played.
+  private readonly topItemsCacheKey = 'xomify_home_top_items';
+  private readonly topItemsCacheTTL = 10 * 60 * 1000; // 10 minutes
 
   private destroy$ = new Subject<void>();
 
@@ -124,12 +143,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadTopItems(): void {
+    const cached = this.getCachedTopItems();
+    if (cached) {
+      this.topItemsData = cached;
+      this.rebuildSpotlightSlides();
+      return;
+    }
+
     this.topItemsService
       .getTopItems()
       .pipe(take(1), takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           this.topItemsData = response.data;
+          this.setCachedTopItems(response.data);
           this.rebuildSpotlightSlides();
         },
         error: () => {
@@ -137,6 +164,33 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.rebuildSpotlightSlides();
         },
       });
+  }
+
+  private getCachedTopItems(): TopItemsData | null {
+    try {
+      const raw = sessionStorage.getItem(this.topItemsCacheKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { data: TopItemsData; timestamp: number };
+      if (Date.now() - parsed.timestamp > this.topItemsCacheTTL) {
+        sessionStorage.removeItem(this.topItemsCacheKey);
+        return null;
+      }
+      return parsed.data;
+    } catch {
+      return null;
+    }
+  }
+
+  private setCachedTopItems(data: TopItemsData): void {
+    try {
+      sessionStorage.setItem(
+        this.topItemsCacheKey,
+        JSON.stringify({ data, timestamp: Date.now() }),
+      );
+    } catch {
+      // Storage unavailable (private mode, quota) -- just skip caching,
+      // the page still works, it re-fetches next visit.
+    }
   }
 
   private loadBroadcasts(): void {
@@ -155,6 +209,8 @@ export class HomeComponent implements OnInit, OnDestroy {
    * waiting on the slowest of three unrelated network calls.
    */
   private rebuildSpotlightSlides(): void {
+    this.spotlightLoading = false;
+
     const slides: SpotlightSlide[] = [];
 
     const mostRecent = this.recentItems?.[0];
