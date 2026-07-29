@@ -109,6 +109,23 @@
   font: inherit;
 }
 
+.listening-art-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.listening-play {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  z-index: 1;
+
+  ::ng-deep .play-button.ghost {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+  }
+}
+
 .listening-art {
   width: 130px;
   height: 130px;

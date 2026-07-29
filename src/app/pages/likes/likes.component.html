@@ -58,16 +58,14 @@
 
           <!-- Per-row actions -->
           <div class="track-actions">
-            <button
-              type="button"
-              class="action-btn"
-              (click)="playSong(track)"
-              title="Play"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </button>
+            <app-play-button
+              [trackId]="track.trackId"
+              [title]="track.trackName || ''"
+              [artist]="track.artistName || ''"
+              [spotifyUrl]="track.trackId ? 'https://open.spotify.com/track/' + track.trackId : undefined"
+              size="small"
+              variant="ghost"
+            ></app-play-button>
             <button
               type="button"
               class="action-btn"

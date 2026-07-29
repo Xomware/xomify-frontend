@@ -287,20 +287,17 @@
               [alt]="track.name"
               (error)="$any($event.target).src = getDefaultArtist()"
             />
-            <button
-              class="play-overlay"
-              (click)="playSong(track, $event)"
-              title="Play this song now"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </button>
+            <div class="play-overlay" (click)="$event.stopPropagation()">
+              <app-play-button
+                [trackId]="track.id"
+                [title]="track.name"
+                [artist]="getArtistNames(track.artists)"
+                [previewUrl]="track.preview_url"
+                [spotifyUrl]="track.external_urls?.spotify"
+                size="medium"
+                variant="ghost"
+              ></app-play-button>
+            </div>
           </div>
           <div class="track-info">
             <h4 class="track-name">{{ track.name }}</h4>
@@ -664,11 +661,15 @@
               </span>
             </div>
             <div class="shared-song-actions">
-              <button class="action-btn" (click)="playSong(track, $event)" title="Play">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
+              <app-play-button
+                [trackId]="track.id"
+                [title]="track.name"
+                [artist]="track.artists?.[0]?.name || track.artistName || ''"
+                [previewUrl]="track.preview_url"
+                [spotifyUrl]="track.external_urls?.spotify"
+                size="small"
+                variant="ghost"
+              ></app-play-button>
             </div>
           </div>
         </div>

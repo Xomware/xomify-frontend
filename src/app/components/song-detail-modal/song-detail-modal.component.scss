@@ -123,15 +123,44 @@
     justify-content: center;
     opacity: 0;
     transition: all 0.2s ease;
+    text-decoration: none;
 
     &:hover {
       background: #1db954;
       transform: translate(-50%, -50%) scale(1.05);
     }
+
+    &.loading {
+      cursor: wait;
+    }
+
+    &--unavailable {
+      color: #b3b3b3;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.85);
+        color: #1db954;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 
-  &:hover .play-overlay-btn {
+  &:hover .play-overlay-btn,
+  .play-overlay-btn:focus-visible {
     opacity: 1;
+  }
+
+  .preview-spinner {
+    animation: preview-spin 1s linear infinite;
+  }
+
+  @keyframes preview-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .explicit-badge {

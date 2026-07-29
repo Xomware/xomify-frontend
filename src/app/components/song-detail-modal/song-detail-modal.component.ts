@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 import { RatingsService, FriendRating } from 'src/app/services/ratings.service';
 import { UserService } from 'src/app/services/user.service';
 import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -22,6 +23,7 @@ export interface SongDetailTrack {
   popularity?: number;
   explicit?: boolean;
   external_urls?: { spotify: string };
+  preview_url?: string | null;
 }
 
 @Component({
@@ -47,11 +49,14 @@ export class SongDetailModalComponent implements OnInit, OnDestroy {
 
   // Playing state
   isPlaying = false;
+  isLoadingPreview = false;
+  previewUnavailable = false;
 
   constructor(
     private ratingsService: RatingsService,
     private userService: UserService,
     private playerService: PlayerService,
+    private previewPlayer: PreviewPlayerService,
     private queueService: QueueService,
     private toastService: ToastService,
     private router: Router
@@ -60,18 +65,35 @@ export class SongDetailModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentEmail = this.userService.getEmail();
 
-    // Subscribe to currently playing track
+    // Subscribe to the shared preview player so this modal's play/pause
+    // button reflects state whenever ITS track is the one playing.
     this.subscriptions.push(
-      this.playerService.currentTrackId$.subscribe((currentId) => {
+      this.previewPlayer.currentTrackId$.subscribe((currentId) => {
         this.isPlaying =
-          this.track?.id === currentId && this.playerService.isCurrentlyPlaying;
+          this.track?.id === currentId && this.previewPlayer.isCurrentlyPlaying;
+        this.isLoadingPreview = false;
       })
     );
 
     this.subscriptions.push(
-      this.playerService.isPlaying$.subscribe((playing) => {
+      this.previewPlayer.isPlaying$.subscribe((playing) => {
         this.isPlaying =
-          this.track?.id === this.playerService.currentTrackId && playing;
+          this.track?.id === this.previewPlayer.currentTrackId && playing;
+      })
+    );
+
+    this.subscriptions.push(
+      this.previewPlayer.isLoading$.subscribe((loading) => {
+        this.isLoadingPreview =
+          this.track?.id === this.previewPlayer.currentTrackId && loading;
+      })
+    );
+
+    this.subscriptions.push(
+      this.previewPlayer.unavailable$.subscribe((id) => {
+        if (this.track?.id === id) {
+          this.previewUnavailable = true;
+        }
       })
     );
   }
@@ -84,6 +106,7 @@ export class SongDetailModalComponent implements OnInit, OnDestroy {
     this.track = track;
     this.isVisible = true;
     this.userRating = this.ratingsService.getCachedRating(track.id);
+    this.previewUnavailable = this.previewPlayer.isKnownUnavailable(track.id);
     this.loadFriendsRatings();
     document.body.classList.add('modal-open');
   }
@@ -178,11 +201,12 @@ export class SongDetailModalComponent implements OnInit, OnDestroy {
   togglePlay(): void {
     if (!this.track) return;
 
-    if (this.isPlaying) {
-      this.playerService.stopSong();
-    } else {
-      this.playerService.playSong(this.track.id);
-    }
+    this.previewPlayer.toggle({
+      id: this.track.id,
+      title: this.track.name,
+      artist: this.getArtistNames(this.track.artists),
+      previewUrl: this.track.preview_url,
+    });
   }
 
   addToQueue(): void {

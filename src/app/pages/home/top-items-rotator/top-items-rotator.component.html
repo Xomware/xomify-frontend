@@ -65,20 +65,37 @@
     <li *ngFor="let item of items; trackBy: trackById">
       <button type="button" class="item-card" (click)="onItemActivate(item)">
         <span class="item-rank">#{{ item.rank }}</span>
-        <img
-          *ngIf="item.image"
-          [src]="item.image"
-          [alt]="''"
-          class="item-image"
-          [class.round]="item.round"
-        />
-        <div class="item-genre-icon" *ngIf="!item.image">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
-            />
-          </svg>
-        </div>
+        <span class="item-image-wrap">
+          <img
+            *ngIf="item.image"
+            [src]="item.image"
+            [alt]="''"
+            class="item-image"
+            [class.round]="item.round"
+          />
+          <div class="item-genre-icon" *ngIf="!item.image">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+              />
+            </svg>
+          </div>
+          <span
+            class="item-play"
+            *ngIf="activeCategory === 'songs'"
+            (click)="$event.stopPropagation()"
+          >
+            <app-play-button
+              [trackId]="item.id"
+              [title]="item.name"
+              [artist]="item.subtitle || ''"
+              [previewUrl]="item.previewUrl"
+              [spotifyUrl]="'https://open.spotify.com/track/' + item.id"
+              size="small"
+              variant="ghost"
+            ></app-play-button>
+          </span>
+        </span>
         <span class="item-name">{{ item.name }}</span>
         <span class="item-subtitle" *ngIf="item.subtitle">{{ item.subtitle }}</span>
         <span class="item-weight-bar" *ngIf="item.weightPct !== undefined">

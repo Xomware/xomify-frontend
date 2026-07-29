@@ -25,12 +25,24 @@
   <ul class="listening-strip" *ngIf="displayItems.length > 0">
     <li *ngFor="let item of displayItems; trackBy: trackByPlayedAt">
       <button type="button" class="listening-item" (click)="openTrack(item)">
-        <img
-          *ngIf="trackImage(item)"
-          [src]="trackImage(item)"
-          [alt]="''"
-          class="listening-art"
-        />
+        <span class="listening-art-wrap">
+          <img
+            *ngIf="trackImage(item)"
+            [src]="trackImage(item)"
+            [alt]="''"
+            class="listening-art"
+          />
+          <span class="listening-play" (click)="$event.stopPropagation()">
+            <app-play-button
+              [trackId]="item.track.id"
+              [title]="item.track.name"
+              [artist]="trackArtists(item)"
+              [spotifyUrl]="item.track.external_urls?.spotify"
+              size="small"
+              variant="ghost"
+            ></app-play-button>
+          </span>
+        </span>
         <span class="listening-text">
           <span class="listening-name">{{ item.track.name }}</span>
           <span class="listening-artist">{{ trackArtists(item) }}</span>

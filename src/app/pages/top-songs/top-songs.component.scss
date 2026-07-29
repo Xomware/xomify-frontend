@@ -190,6 +190,25 @@
     &:hover .play-icon {
       transform: scale(1.1);
     }
+
+    // Keep the overlay visible (not just on hover) while its preview is
+    // actually playing, so the pause icon stays legible.
+    &.playing {
+      opacity: 1;
+    }
+
+    .spinner {
+      animation: top-songs-spin 1s linear infinite;
+    }
+  }
+
+  @keyframes top-songs-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .explicit-badge {

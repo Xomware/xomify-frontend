@@ -11,7 +11,7 @@ import {
   ShareFeedService,
   ReactResponse,
 } from 'src/app/services/share-feed.service';
-import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { UserService } from 'src/app/services/user.service';
 import { ShareService } from 'src/app/services/share.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -54,10 +54,9 @@ describe('ShareCardComponent', () => {
     ]);
     const shareSpy = jasmine.createSpyObj('ShareService', ['share']);
     const userSpy = jasmine.createSpyObj('UserService', ['getEmail']);
-    const playerSpy = jasmine.createSpyObj('PlayerService', ['playSong', 'addToSpotifyQueue']);
+    const previewPlayerSpy = jasmine.createSpyObj('PreviewPlayerService', ['toggle']);
     userSpy.getEmail.and.returnValue('viewer@example.com');
     shareSpy.share.and.resolveTo(true);
-    playerSpy.addToSpotifyQueue.and.returnValue(of(true));
 
     await TestBed.configureTestingModule({
       declarations: [ShareCardComponent],
@@ -67,7 +66,7 @@ describe('ShareCardComponent', () => {
         { provide: ToastService, useValue: toastSpy },
         { provide: ShareService, useValue: shareSpy },
         { provide: UserService, useValue: userSpy },
-        { provide: PlayerService, useValue: playerSpy },
+        { provide: PreviewPlayerService, useValue: previewPlayerSpy },
       ],
       // Allow the new <app-reactions-bar> child without dragging in the
       // SocialModule wiring — the component is covered by its own spec.
@@ -209,12 +208,18 @@ describe('ShareCardComponent', () => {
       expect(component.menuOpen).toBe(false);
     });
 
-    it('menuPlay calls playerService.playSong and closes menu', () => {
-      const playerService = TestBed.inject(PlayerService) as jasmine.SpyObj<PlayerService>;
+    it('menuPlay toggles the shared preview player and closes menu', () => {
+      const previewPlayer = TestBed.inject(
+        PreviewPlayerService,
+      ) as jasmine.SpyObj<PreviewPlayerService>;
       component.menuOpen = true;
       component.menuPlay();
       expect(component.menuOpen).toBe(false);
-      expect(playerService.playSong).toHaveBeenCalledWith('t1');
+      expect(previewPlayer.toggle).toHaveBeenCalledWith({
+        id: 't1',
+        title: 'Example Track',
+        artist: 'Example Artist',
+      });
     });
 
     it('menuQueue delegates to toggleQueue and closes menu', () => {

@@ -180,6 +180,19 @@
   cursor: help;
 }
 
+.xt-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.xt-preview-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9a9aab;
+}
+
 .xt-play-link {
   display: inline-flex;
   align-items: center;

@@ -33,6 +33,20 @@
       {{ platformLabel }}
     </span>
 
+    <!-- 30s preview, centered over the cover art — sits above the whole-card
+         trigger (z-index) with its own click handler so it doesn't also
+         open the detail modal. -->
+    <div class="xt-cover-play" (click)="$event.stopPropagation()">
+      <app-play-button
+        [trackId]="share.resolvedSpotifyId || share.shareId"
+        [title]="title"
+        [artist]="artist"
+        [spotifyUrl]="hasOpenTarget ? openUrl : undefined"
+        size="large"
+        variant="ghost"
+      ></app-play-button>
+    </div>
+
     <span
       class="xt-count-badge"
       *ngIf="showCount"

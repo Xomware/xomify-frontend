@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, throwError } from 'rxjs';
 
 import { SearchComponent } from './search.component';
@@ -10,7 +11,6 @@ import {
   SearchService,
   SearchType,
 } from 'src/app/services/search.service';
-import { PlayerService } from 'src/app/services/player.service';
 
 const TRACK_RESULT: SearchResults = {
   tracks: [
@@ -57,21 +57,17 @@ describe('SearchComponent', () => {
   let fixture: ComponentFixture<SearchComponent>;
   let component: SearchComponent;
   let searchSpy: jasmine.SpyObj<SearchService>;
-  let playerSpy: jasmine.SpyObj<PlayerService>;
   let router: Router;
 
   beforeEach(async () => {
     searchSpy = jasmine.createSpyObj('SearchService', ['search']);
-    playerSpy = jasmine.createSpyObj('PlayerService', ['playSong']);
     searchSpy.search.and.returnValue(of(TRACK_RESULT));
 
     await TestBed.configureTestingModule({
       declarations: [SearchComponent],
       imports: [HttpClientTestingModule, RouterTestingModule],
-      providers: [
-        { provide: SearchService, useValue: searchSpy },
-        { provide: PlayerService, useValue: playerSpy },
-      ],
+      providers: [{ provide: SearchService, useValue: searchSpy }],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchComponent);
@@ -216,11 +212,6 @@ describe('SearchComponent', () => {
   });
 
   describe('result row clicks', () => {
-    it('plays a track via PlayerService when clicked', () => {
-      component.onTrackClick(TRACK_RESULT.tracks[0]);
-      expect(playerSpy.playSong).toHaveBeenCalledWith('t1');
-    });
-
     it('navigates to /artist-profile/:id when an artist is clicked', () => {
       const navSpy = spyOn(router, 'navigate');
       component.onArtistClick(ARTIST_RESULT.artists[0]);

@@ -4,7 +4,7 @@ import { UserService } from './services/user.service';
 import { LikesPushCoordinatorService } from './services/likes-push-coordinator.service';
 import { VisitTrackerService } from './services/visit-tracker.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
-import { PlayerService } from './services/player.service';
+import { PreviewPlayerService } from './services/preview-player.service';
 import { Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil } from 'rxjs/operators';
 
@@ -23,7 +23,7 @@ export class AppComponent implements OnDestroy, OnInit {
     private likesPushCoordinator: LikesPushCoordinatorService,
     private visitTracker: VisitTrackerService,
     private router: Router,
-    private playerService: PlayerService
+    private previewPlayer: PreviewPlayerService
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +55,7 @@ export class AppComponent implements OnDestroy, OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.playerService.stopSong();
+        this.previewPlayer.stop();
       });
 
     // Move focus to main content on route change for accessibility

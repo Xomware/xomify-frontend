@@ -13,7 +13,6 @@ import {
   LikesService,
   LikesTrackDisplayItem,
 } from 'src/app/services/likes.service';
-import { PlayerService } from 'src/app/services/player.service';
 import { SongService } from 'src/app/services/song.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
@@ -50,7 +49,6 @@ export class LikesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private likesService: LikesService,
     private songService: SongService,
-    private playerService: PlayerService,
     private toastService: ToastService,
     private userService: UserService,
   ) {}
@@ -101,13 +99,7 @@ export class LikesComponent implements OnInit, OnDestroy {
       });
   }
 
-  playSong(track: LikesTrackDisplayItem): void {
-    if (track.trackId) {
-      this.playerService.playSong(track.trackId);
-    }
-  }
-
-  openInSpotify(track: LikesTrackDisplayItem): void {
+openInSpotify(track: LikesTrackDisplayItem): void {
     const url = track.trackUri
       ? `https://open.spotify.com/track/${track.trackId}`
       : '';
