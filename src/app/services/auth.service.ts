@@ -124,7 +124,8 @@ export class AuthService {
               },
             });
 
-          this.router.navigate(['/my-profile']);
+          // Land on the Home dashboard after login, not the profile page.
+          this.router.navigate(['/']);
         },
         error: () => {
           this.toastService.showNegativeToast('Token exchange failed.');

@@ -113,6 +113,21 @@ describe('ToolbarComponent', () => {
       expect(leaves).toContain('/release-radar');
       expect(leaves).toContain('/wrapped');
     });
+
+    it('marks the Home link as an exact route match so it does not stay highlighted on every page', () => {
+      const home = component.navEntries.find(
+        (e) => e.kind === 'link' && e.link.route === '/',
+      );
+      expect(home?.kind).toBe('link');
+      expect(home?.kind === 'link' && home.link.exact).toBe(true);
+    });
+
+    it('does not mark other top-level leaves as exact', () => {
+      const releaseRadar = component.navEntries.find(
+        (e) => e.kind === 'link' && e.link.route === '/release-radar',
+      );
+      expect(releaseRadar?.kind === 'link' && releaseRadar.link.exact).toBeFalsy();
+    });
   });
 
   describe('avatar dropdown', () => {

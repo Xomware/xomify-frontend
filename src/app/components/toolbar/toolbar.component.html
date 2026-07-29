@@ -23,6 +23,7 @@
           *ngIf="asLink(entry) as link"
           [routerLink]="link.route"
           routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: !!link.exact }"
           [ngClass]="{ selected: isSelected(link.route) }"
           [attr.aria-current]="isSelected(link.route) ? 'page' : null"
         >
@@ -143,6 +144,7 @@
         *ngIf="asLink(entry) as link"
         [routerLink]="link.route"
         routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: !!link.exact }"
         (click)="selectItem(link.route)"
         role="menuitem"
       >
