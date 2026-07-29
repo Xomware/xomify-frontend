@@ -294,8 +294,9 @@
   font-size: 1rem;
   font-weight: 700;
   color: #9c0abf;
-  width: 30px;
+  min-width: 30px;
   text-align: center;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
@@ -347,8 +348,12 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: #1bdc6f;
-  width: 50px;
+  // A fixed width here can be narrower than the rendered text (varies by
+  // font metrics/zoom), pushing the number outside the box to the right.
+  // `min-width` reserves the usual space but lets the box grow to fit.
+  min-width: 50px;
   text-align: right;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
@@ -407,17 +412,24 @@
 
   .genre-name {
     flex: 0 0 120px;
+    min-width: 0;
     font-size: 1rem;
     font-weight: 600;
     color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .group-stats {
     font-size: 0.8rem;
     color: #8a8a9a;
     flex-shrink: 0;
-    width: 70px;
+    // Same fixed-width overflow risk as .genre-percentage above — let the
+    // box grow past the usual 70px instead of clipping/overflowing.
+    min-width: 70px;
     text-align: right;
+    white-space: nowrap;
   }
 
   .expand-icon {
@@ -548,7 +560,12 @@
 
     .genre-info {
       flex: 1;
-      min-width: calc(100% - 50px);
+      // Reserve room for .genre-rank (30px) + .genre-percentage (~50px) +
+      // the two 10px gaps between them on this line — the old `- 50px`
+      // only accounted for the percentage, so this line's total minimum
+      // width was guaranteed to exceed 100% and push the percentage onto
+      // its own line instead of sitting inline at the right.
+      min-width: calc(100% - 100px);
       order: 1;
 
       .genre-name {
