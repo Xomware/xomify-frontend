@@ -1,7 +1,7 @@
 // auth.interceptor.spec.ts
 //
 // Coverage for the global AuthInterceptor introduced in sub-feature 0e:
-//   - Attaches `Authorization: Bearer <jwt>` from sessionStorage on Xomify calls.
+//   - Attaches `Authorization: Bearer <jwt>` from localStorage on Xomify calls.
 //   - Falls back to the legacy static `environment.apiAuthToken` when the
 //     per-user JWT is missing.
 //   - Skips the header for the public `/auth/login` endpoint.
@@ -44,6 +44,7 @@ describe('AuthInterceptor', () => {
   const xomtracksUrl = `${xomtracksBase}/shares/list?direction=in&window=month`;
 
   beforeEach(() => {
+    localStorage.clear();
     sessionStorage.clear();
 
     authServiceMock = jasmine.createSpyObj<AuthService>('AuthService', [
@@ -70,6 +71,7 @@ describe('AuthInterceptor', () => {
 
   afterEach(() => {
     httpMock.verify();
+    localStorage.clear();
     sessionStorage.clear();
   });
 
@@ -77,32 +79,32 @@ describe('AuthInterceptor', () => {
   // Header attach
   // ---------------------------------------------------------------------------
 
-  it('attaches the per-user JWT from sessionStorage as Bearer on Xomify calls', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+  it('attaches the per-user JWT from localStorage as Bearer on Xomify calls', () => {
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
 
     httpClient.get(xomifyUrl).subscribe();
 
     const req = httpMock.expectOne(xomifyUrl);
     expect(req.request.headers.get('Authorization')).toBe(
-      'Bearer jwt-from-session',
+      'Bearer jwt-from-storage',
     );
     req.flush({});
   });
 
-  it('attaches the per-user JWT from sessionStorage as Bearer on Xomtracks calls', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+  it('attaches the per-user JWT from localStorage as Bearer on Xomtracks calls', () => {
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
 
     httpClient.get(xomtracksUrl).subscribe();
 
     const req = httpMock.expectOne(xomtracksUrl);
     expect(req.request.headers.get('Authorization')).toBe(
-      'Bearer jwt-from-session',
+      'Bearer jwt-from-storage',
     );
     req.flush({ data: {}, error: null, meta: {} });
   });
 
-  it('falls back to environment.apiAuthToken when sessionStorage has no JWT', () => {
-    // No JWT in sessionStorage.
+  it('falls back to environment.apiAuthToken when localStorage has no JWT', () => {
+    // No JWT in localStorage.
     httpClient.get(xomifyUrl).subscribe();
 
     const req = httpMock.expectOne(xomifyUrl);
@@ -113,7 +115,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('skips the Authorization header for POST /auth/login', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
 
     httpClient.post(loginUrl, { spotifyAccessToken: 'sp-token' }).subscribe();
 
@@ -123,7 +125,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('leaves non-Xomify requests (Spotify) untouched', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
 
     httpClient
       .get(spotifyUrl, { headers: { Authorization: 'Bearer spotify-tok' } })
@@ -138,7 +140,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('does not clobber an Authorization header set by the caller on a Xomify call', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-session');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
 
     httpClient
       .get(xomifyUrl, { headers: { Authorization: 'Bearer caller-set' } })
@@ -154,7 +156,7 @@ describe('AuthInterceptor', () => {
   // ---------------------------------------------------------------------------
 
   it('on 401: refreshes Spotify access token, re-mints the JWT, and retries once', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
     authServiceMock.refreshSpotifyAccessToken.and.returnValue(
       of('fresh-spotify-token'),
     );
@@ -200,12 +202,12 @@ describe('AuthInterceptor', () => {
     expect(response).toEqual({ ok: true });
     expect(errored).toBe(false);
     expect(authServiceMock.refreshSpotifyAccessToken).toHaveBeenCalledTimes(1);
-    // sessionStorage now reflects the fresh JWT.
-    expect(sessionStorage.getItem(XOMIFY_JWT_STORAGE_KEY)).toBe('fresh-jwt');
+    // localStorage now reflects the fresh JWT.
+    expect(localStorage.getItem(XOMIFY_JWT_STORAGE_KEY)).toBe('fresh-jwt');
   });
 
   it('does not retry a second time on a repeat 401 (no infinite loop)', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
     authServiceMock.refreshSpotifyAccessToken.and.returnValue(
       of('fresh-spotify-token'),
     );
@@ -241,7 +243,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('propagates the 401 immediately when Spotify refresh returns null (no refresh token available)', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
     authServiceMock.refreshSpotifyAccessToken.and.returnValue(of(null));
 
     let lastErrorStatus: number | null = null;
@@ -262,7 +264,7 @@ describe('AuthInterceptor', () => {
   });
 
   it('does not retry on non-401 errors (e.g. 500)', () => {
-    sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt');
+    localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt');
 
     let lastErrorStatus: number | null = null;
     httpClient.get(xomifyUrl).subscribe({
