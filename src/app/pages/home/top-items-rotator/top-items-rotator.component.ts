@@ -30,7 +30,7 @@ interface RotatorItem {
   previewUrl?: string | null;
 }
 
-const ROTATE_MS = 10_000;
+const ROTATE_MS = 7_000;
 const RANGE_LABELS: Record<TopItemsTimeRange, string> = {
   short_term: 'Last Month',
   medium_term: 'Last 6 Months',

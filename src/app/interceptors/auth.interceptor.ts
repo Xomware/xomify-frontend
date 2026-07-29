@@ -10,7 +10,7 @@
 //      xomtracks-backend now validates xomify's own HS256 token in-handler
 //      (the WS-AUTH re-base — see `docs/features/xomtracks-xomify-merge/PLAN.md`),
 //      so the same Bearer token is correct for both.
-//   2. Source the JWT from sessionStorage via XomifyAuthService. If the JWT
+//   2. Source the JWT from localStorage via XomifyAuthService. If the JWT
 //      is missing, fall back to `environment.apiAuthToken` so the legacy
 //      static-token path keeps working until the dual-mode authorizer is
 //      retired (sub-feature 1l).

@@ -84,7 +84,7 @@
   display: flex;
   gap: 14px;
   overflow-x: auto;
-  padding: 4px 2px 8px;
+  padding: 4px 2px 12px;
   margin: 0;
   list-style: none;
   scroll-snap-type: x proximity;
@@ -93,6 +93,33 @@
     flex: 0 0 auto;
     scroll-snap-align: start;
   }
+
+  // The global scrollbar (styles.scss) is intentionally muted for page
+  // chrome, which left this horizontal strip's scroll affordance nearly
+  // invisible against the dark background. Reuse the app's brand gradient
+  // (same one as the loading wave above) so the strip is clearly scrollable
+  // at a glance, not just discoverable by hovering.
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #9c0abf 0%, #1bdc6f 100%);
+    border-radius: 3px;
+
+    &:hover {
+      background: linear-gradient(90deg, #b30edf 0%, #22f080 100%);
+    }
+  }
+
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: #9c0abf rgba(255, 255, 255, 0.08);
 }
 
 .listening-item {

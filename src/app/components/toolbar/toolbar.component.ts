@@ -14,6 +14,9 @@ export interface NavLink {
   route: string;
   label: string;
   badge$?: 'queue' | 'friends';
+  /** Only highlight on an exact URL match — used for `/` (Home), which
+   * would otherwise match every route as a routerLinkActive prefix. */
+  exact?: boolean;
 }
 
 export interface NavGroup {
@@ -48,7 +51,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
-    { kind: 'link', link: { route: '/', label: 'Home' } },
+    { kind: 'link', link: { route: '/', label: 'Home', exact: true } },
     {
       kind: 'group',
       group: {

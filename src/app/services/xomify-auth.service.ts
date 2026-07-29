@@ -1,7 +1,8 @@
 // xomify-auth.service.ts
 //
 // Owns the per-user Xomify JWT lifecycle: mint via POST /auth/login, persist
-// in sessionStorage, expose to the AuthInterceptor, clear on logout.
+// in localStorage (survives a browser restart), expose to the
+// AuthInterceptor, clear on logout.
 //
 // This service is intentionally separate from `AuthService` (which owns the
 // Spotify OAuth flow) so the AuthInterceptor can depend on it without pulling
@@ -16,6 +17,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import {
+  readPersistedToken,
+  writePersistedToken,
+  removePersistedToken,
+} from '../utils/persisted-token-storage';
 
 /**
  * Raw response shape returned by `POST /auth/login`.
@@ -38,9 +44,9 @@ export interface AuthLoginResponse {
   meta?: Record<string, unknown>;
 }
 
-/** sessionStorage key for the per-user Xomify JWT (Q3 in the epic plan). */
+/** localStorage key for the per-user Xomify JWT (Q3 in the epic plan). */
 export const XOMIFY_JWT_STORAGE_KEY = 'xomify_jwt';
-/** sessionStorage key for the JWT's expiry timestamp (ISO 8601). */
+/** localStorage key for the JWT's expiry timestamp (ISO 8601). */
 export const XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY = 'xomify_jwt_expires_at';
 
 @Injectable({
@@ -52,25 +58,16 @@ export class XomifyAuthService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Read the current JWT from sessionStorage. Returns `null` if absent.
+   * Read the current JWT from localStorage. Returns `null` if absent.
    * Synchronous so the interceptor can use it without subscribing.
    */
   getJwt(): string | null {
-    try {
-      return sessionStorage.getItem(XOMIFY_JWT_STORAGE_KEY);
-    } catch {
-      // sessionStorage can throw in private-mode browsers; treat as missing.
-      return null;
-    }
+    return readPersistedToken(XOMIFY_JWT_STORAGE_KEY);
   }
 
   /** ISO timestamp at which the current JWT expires, or `null` if unknown. */
   getExpiresAt(): string | null {
-    try {
-      return sessionStorage.getItem(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
-    } catch {
-      return null;
-    }
+    return readPersistedToken(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
   }
 
   /**
@@ -111,20 +108,16 @@ export class XomifyAuthService {
   }
 
   /**
-   * Persist a JWT (+ expiry) to sessionStorage. Public so callers (e.g. the
+   * Persist a JWT (+ expiry) to localStorage. Public so callers (e.g. the
    * 401-retry path) can stash a re-minted token without going through
    * `mintFromSpotifyAccessToken`.
    */
   persist(token: string, expiresAt: string | null): void {
-    try {
-      sessionStorage.setItem(XOMIFY_JWT_STORAGE_KEY, token);
-      if (expiresAt) {
-        sessionStorage.setItem(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY, expiresAt);
-      } else {
-        sessionStorage.removeItem(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
-      }
-    } catch (err) {
-      console.warn('[XomifyAuthService] failed to persist JWT', err);
+    writePersistedToken(XOMIFY_JWT_STORAGE_KEY, token);
+    if (expiresAt) {
+      writePersistedToken(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY, expiresAt);
+    } else {
+      removePersistedToken(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
     }
   }
 
@@ -142,16 +135,12 @@ export class XomifyAuthService {
 
   /** Wipe the JWT (+ expiry). Called on logout and when re-mint fails. */
   clear(): void {
-    try {
-      sessionStorage.removeItem(XOMIFY_JWT_STORAGE_KEY);
-      sessionStorage.removeItem(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
-    } catch {
-      // Best-effort.
-    }
+    removePersistedToken(XOMIFY_JWT_STORAGE_KEY);
+    removePersistedToken(XOMIFY_JWT_EXPIRES_AT_STORAGE_KEY);
   }
 
   /**
-   * True iff sessionStorage holds a JWT that is:
+   * True iff localStorage holds a JWT that is:
    *   1. structurally valid (decodes as `header.payload.signature`)
    *   2. carries both `email` and `userId` claims (sub-feature 0a contract)
    *   3. is not expired or within 60s of expiring.

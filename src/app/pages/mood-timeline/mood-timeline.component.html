@@ -136,6 +136,13 @@
         <!-- Peak Energy Annotation -->
         <g *ngIf="getPeakEnergyPos() as pos">
           <circle [attr.cx]="pos.x" [attr.cy]="pos.y" r="5" fill="#00b4d8" stroke="#fff" stroke-width="1.5" />
+          <!-- Bolt glyph — same path as the shared `app-icon` "bolt" icon
+               (components/icon/icon.component.html), inlined because this
+               annotation lives inside an SVG chart where the app-icon
+               component can't render directly. -->
+          <g [attr.transform]="'translate(' + (pos.x - 30) + ',' + (pos.y - 21) + ') scale(0.42)'" fill="#00b4d8" aria-hidden="true">
+            <path d="M13 2 3 14 12 14 11 22 21 10 12 10 Z" />
+          </g>
           <text
             [attr.x]="pos.x"
             [attr.y]="pos.y - 12"

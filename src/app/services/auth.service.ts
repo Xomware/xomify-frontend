@@ -6,6 +6,11 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ToastService } from './toast.service';
 import { XomifyAuthService } from './xomify-auth.service';
+import {
+  readPersistedToken,
+  writePersistedToken,
+  removePersistedToken,
+} from '../utils/persisted-token-storage';
 
 interface TokenResponse {
   access_token: string;
@@ -42,8 +47,13 @@ export class AuthService {
   }
 
   private restoreTokens(): void {
-    const storedAccess = sessionStorage.getItem(STORAGE_KEY_ACCESS);
-    const storedRefresh = sessionStorage.getItem(STORAGE_KEY_REFRESH);
+    // localStorage survives a browser restart — critical for the refresh
+    // token, since that's what lets `ensureXomifyJwt()` re-mint a Xomify JWT
+    // without forcing the user back through the Spotify OAuth screen.
+    // `readPersistedToken` also migrates forward any value still sitting in
+    // the legacy sessionStorage slot from before this change.
+    const storedAccess = readPersistedToken(STORAGE_KEY_ACCESS);
+    const storedRefresh = readPersistedToken(STORAGE_KEY_REFRESH);
     if (storedAccess) {
       this.accessToken = storedAccess;
     }
@@ -53,13 +63,13 @@ export class AuthService {
   }
 
   private persistTokens(): void {
-    sessionStorage.setItem(STORAGE_KEY_ACCESS, this.accessToken);
-    sessionStorage.setItem(STORAGE_KEY_REFRESH, this.refreshToken);
+    writePersistedToken(STORAGE_KEY_ACCESS, this.accessToken);
+    writePersistedToken(STORAGE_KEY_REFRESH, this.refreshToken);
   }
 
   private clearPersistedTokens(): void {
-    sessionStorage.removeItem(STORAGE_KEY_ACCESS);
-    sessionStorage.removeItem(STORAGE_KEY_REFRESH);
+    removePersistedToken(STORAGE_KEY_ACCESS);
+    removePersistedToken(STORAGE_KEY_REFRESH);
   }
 
   login(): void {
@@ -114,7 +124,8 @@ export class AuthService {
               },
             });
 
-          this.router.navigate(['/my-profile']);
+          // Land on the Home dashboard after login, not the profile page.
+          this.router.navigate(['/']);
         },
         error: () => {
           this.toastService.showNegativeToast('Token exchange failed.');

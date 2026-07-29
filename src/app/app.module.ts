@@ -94,7 +94,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
       useClass: AuthInterceptor,
       multi: true,
     },
-    // Block app bootstrap until the per-user Xomify JWT is in sessionStorage.
+    // Block app bootstrap until the per-user Xomify JWT is in localStorage.
     // Without this, components that fire API calls in their constructors race
     // with the async mint and 401 because the helper can no longer fall back
     // to a query/body `email` (sub-feature 1j). The factory is a no-op when

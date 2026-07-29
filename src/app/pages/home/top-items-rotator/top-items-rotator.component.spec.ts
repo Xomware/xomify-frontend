@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -153,4 +153,87 @@ describe('TopItemsRotatorComponent', () => {
     expect(component.items[0].name).toBe('Song One');
     expect(component.items[0].subtitle).toBe('Artist One');
   });
+});
+
+describe('TopItemsRotatorComponent auto-rotate', () => {
+  let component: TopItemsRotatorComponent;
+  let fixture: ComponentFixture<TopItemsRotatorComponent>;
+
+  function setUp(prefersReducedMotion: boolean) {
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule],
+      declarations: [TopItemsRotatorComponent],
+      providers: [
+        { provide: ReducedMotionService, useValue: { prefersReducedMotion: () => prefersReducedMotion } },
+      ],
+    });
+    fixture = TestBed.createComponent(TopItemsRotatorComponent);
+    component = fixture.componentInstance;
+    component.data = baseData();
+    component.ngOnChanges({ data: {} as any });
+  }
+
+  // `ngOnDestroy` clears the periodic `setInterval`. It must run inside the
+  // same `fakeAsync` zone as the test that started the timer -- fakeAsync
+  // checks for pending periodic timers as soon as its callback returns, so a
+  // normal (non-fakeAsync) `afterEach` would run too late to satisfy it.
+
+  it('auto-cycles through the category tabs on a timer', fakeAsync(() => {
+    setUp(false);
+    expect(component.activeCategory).toBe('songs');
+
+    tick(7_000);
+    expect(component.activeCategory).toBe('artists');
+
+    tick(7_000);
+    expect(component.activeCategory).toBe('genres');
+
+    tick(7_000);
+    expect(component.activeCategory).toBe('songs');
+
+    component.ngOnDestroy();
+  }));
+
+  it('does not auto-cycle when prefers-reduced-motion is set', fakeAsync(() => {
+    setUp(true);
+    expect(component.activeCategory).toBe('songs');
+
+    tick(30_000);
+    expect(component.activeCategory).toBe('songs');
+
+    component.ngOnDestroy();
+  }));
+
+  it('pauses the auto-cycle while paused (hover/focus) is true', fakeAsync(() => {
+    setUp(false);
+    component.paused = true;
+
+    tick(30_000);
+    expect(component.activeCategory).toBe('songs');
+
+    component.paused = false;
+    tick(7_000);
+    expect(component.activeCategory).toBe('artists');
+
+    component.ngOnDestroy();
+  }));
+
+  it('a manual tab selection resets the auto-cycle countdown', fakeAsync(() => {
+    setUp(false);
+
+    tick(5_000);
+    // Manual override mid-cycle.
+    component.selectCategory('genres');
+    expect(component.activeCategory).toBe('genres');
+
+    // The old countdown (5s in) would have rolled over at 7s; confirm the
+    // manual pick reset it instead of letting a stale timer fire early.
+    tick(2_000);
+    expect(component.activeCategory).toBe('genres');
+
+    tick(5_000);
+    expect(component.activeCategory).toBe('songs');
+
+    component.ngOnDestroy();
+  }));
 });
