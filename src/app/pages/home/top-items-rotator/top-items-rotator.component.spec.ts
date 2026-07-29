@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { TopItemsRotatorComponent } from './top-items-rotator.component';
 import { TopItemsData } from 'src/app/services/top-items.service';
@@ -25,6 +26,7 @@ describe('TopItemsRotatorComponent', () => {
       providers: [
         { provide: ReducedMotionService, useValue: { prefersReducedMotion: () => true } },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
     fixture = TestBed.createComponent(TopItemsRotatorComponent);
     component = fixture.componentInstance;

@@ -94,16 +94,16 @@
           <span class="track-duration">{{ getDuration(track) }}</span>
 
           <!-- Play -->
-          <a
+          <app-play-button
             class="btn-play"
-            [href]="track.external_urls.spotify"
-            target="_blank"
-            rel="noopener"
-            title="Open in Spotify"
-            (click)="openSpotify(track.external_urls.spotify, $event)"
-          >
-            ▶
-          </a>
+            [trackId]="track.id"
+            [title]="track.name"
+            [artist]="getArtistNames(track)"
+            [previewUrl]="track.preview_url"
+            [spotifyUrl]="track.external_urls.spotify"
+            size="small"
+            variant="ghost"
+          ></app-play-button>
         </div>
       </div>
     </div>

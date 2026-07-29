@@ -327,6 +327,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       popularity: track.popularity,
       explicit: track.explicit,
       external_urls: track.external_urls,
+      preview_url: track.preview_url,
     };
     this.songDetailModal.open(detailTrack);
   }

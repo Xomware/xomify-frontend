@@ -159,6 +159,10 @@
           <div class="track-play" *ngIf="item.track">
             <app-play-button
               [trackId]="item.track.id"
+              [title]="item.track.name"
+              [artist]="getArtistNames(item.track)"
+              [previewUrl]="item.track.preview_url"
+              [spotifyUrl]="'https://open.spotify.com/track/' + item.track.id"
               size="small"
               variant="ghost"
             ></app-play-button>

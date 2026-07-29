@@ -39,6 +39,17 @@
           </ng-template>
         </span>
 
+        <app-play-button
+          *ngIf="category === 'songs'"
+          class="fav-item-play"
+          [trackId]="item.spotifyId"
+          [title]="item.name"
+          [artist]="item.artist"
+          [spotifyUrl]="'https://open.spotify.com/track/' + item.spotifyId"
+          size="small"
+          variant="ghost"
+        ></app-play-button>
+
         <span class="fav-item-text">
           <span class="fav-item-name">{{ item.name }}</span>
           <span class="fav-item-artist">{{ item.artist }}</span>

@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 import { FriendsService, FriendProfile } from 'src/app/services/friends.service';
 import { UserService } from 'src/app/services/user.service';
 import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { SongService } from 'src/app/services/song.service';
@@ -74,6 +75,7 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
     private friendsService: FriendsService,
     private userService: UserService,
     private playerService: PlayerService,
+    private previewPlayer: PreviewPlayerService,
     private queueService: QueueService,
     private toastService: ToastService,
     private songService: SongService,
@@ -93,7 +95,7 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
-    this.playerService.stopSong();
+    this.previewPlayer.stop();
   }
 
   loadProfile(): void {
@@ -300,11 +302,6 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
   }
 
   // Track actions
-  playSong(track: any, event: Event): void {
-    event.stopPropagation();
-    this.playerService.playSong(track.id);
-  }
-
   addToSpotifyQueue(track: any, event: Event): void {
     event.stopPropagation();
     this.playerService.addToSpotifyQueue(track.id).pipe(take(1)).subscribe({
@@ -765,6 +762,7 @@ export class FriendProfileComponent implements OnInit, OnDestroy {
       popularity: track.popularity,
       explicit: track.explicit,
       external_urls: track.external_urls,
+      preview_url: track.preview_url,
     };
     this.songDetailModal.open(detailTrack);
   }

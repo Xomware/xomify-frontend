@@ -136,6 +136,10 @@ export class PlaylistDetailComponent implements OnInit {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  getArtistNames(track: any): string {
+    return track.artists?.map((a: any) => a.name).join(', ') || '';
+  }
+
   formatDate(dateString: string): string {
     if (!dateString) return '—';
     const date = new Date(dateString);
@@ -262,6 +266,7 @@ export class PlaylistDetailComponent implements OnInit {
       popularity: track.popularity,
       explicit: track.explicit,
       external_urls: track.external_urls,
+      preview_url: track.preview_url,
     };
     this.songDetailModal.open(detailTrack);
   }

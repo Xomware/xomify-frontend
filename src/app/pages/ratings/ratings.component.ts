@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RatingsService, TrackRating } from 'src/app/services/ratings.service';
 import { UserService } from 'src/app/services/user.service';
-import { PlayerService } from 'src/app/services/player.service';
 import { ToastService } from 'src/app/services/toast.service';
 import {
   SongDetailModalComponent,
@@ -55,7 +54,6 @@ export class RatingsComponent implements OnInit, OnDestroy {
   constructor(
     private ratingsService: RatingsService,
     private userService: UserService,
-    private playerService: PlayerService,
     private toastService: ToastService,
     private router: Router
   ) {}
@@ -181,11 +179,6 @@ export class RatingsComponent implements OnInit, OnDestroy {
       },
     };
     this.songDetailModal.open(track);
-  }
-
-  playTrack(rating: TrackRating, event: Event): void {
-    event.stopPropagation();
-    this.playerService.playSong(rating.trackId);
   }
 
   removeRating(rating: TrackRating, event: Event): void {

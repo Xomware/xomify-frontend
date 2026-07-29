@@ -89,12 +89,9 @@
       *ngIf="activeTab === 'track' && tracks.length > 0 && !loading"
       data-testid="tracks-list"
     >
-      <button
-        type="button"
+      <div
         class="result-row track-row"
         *ngFor="let t of tracks; trackBy: trackByItemId"
-        (click)="onTrackClick(t)"
-        [attr.aria-label]="'Play ' + t.name"
       >
         <div class="art" *ngIf="artworkFor(t.album?.images)">
           <img [src]="artworkFor(t.album?.images)" [alt]="t.album?.name || t.name" />
@@ -109,6 +106,14 @@
           <span class="secondary" [title]="trackArtists(t)">{{ trackArtists(t) }}</span>
         </div>
         <div class="row-actions">
+          <app-play-button
+            [trackId]="t.id"
+            [title]="t.name"
+            [artist]="trackArtists(t)"
+            [spotifyUrl]="'https://open.spotify.com/track/' + t.id"
+            size="small"
+            variant="ghost"
+          ></app-play-button>
           <span
             class="open-spotify"
             (click)="openTrackInSpotify(t, $event)"
@@ -124,7 +129,7 @@
             </svg>
           </span>
         </div>
-      </button>
+      </div>
     </div>
 
     <!-- Artists grid -->

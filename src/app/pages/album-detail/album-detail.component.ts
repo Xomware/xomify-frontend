@@ -106,6 +106,10 @@ export class AlbumDetailComponent implements OnInit, OnDestroy {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  getArtistNames(track: any): string {
+    return track.artists?.map((a: any) => a.name).join(', ') || '';
+  }
+
   formatReleaseDate(dateString: string): string {
     if (!dateString) return '';
     const parts = dateString.split('-');
@@ -221,6 +225,7 @@ export class AlbumDetailComponent implements OnInit, OnDestroy {
       popularity: track.popularity,
       explicit: track.explicit,
       external_urls: track.external_urls,
+      preview_url: track.preview_url,
     };
     this.songDetailModal.open(detailTrack);
   }

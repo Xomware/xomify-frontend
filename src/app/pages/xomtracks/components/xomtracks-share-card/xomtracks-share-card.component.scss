@@ -104,6 +104,26 @@
   background: rgba(156, 10, 191, 0.85);
 }
 
+.xt-cover-play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  ::ng-deep .play-button,
+  ::ng-deep .play-button-unavailable {
+    pointer-events: auto;
+  }
+
+  ::ng-deep .play-button.ghost {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+  }
+}
+
 .xt-heard-toggle {
   position: absolute;
   bottom: 10px;

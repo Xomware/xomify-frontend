@@ -117,11 +117,16 @@
     >
       <div class="album-art" (click)="goToAlbum(rating.albumId, $event)">
         <img [src]="rating.albumArt || getDefaultAlbumArt()" [alt]="rating.trackName" />
-        <button class="play-btn" (click)="playTrack(rating, $event)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </button>
+        <div class="play-btn" (click)="$event.stopPropagation()">
+          <app-play-button
+            [trackId]="rating.trackId"
+            [title]="rating.trackName"
+            [artist]="rating.artistName"
+            [spotifyUrl]="'https://open.spotify.com/track/' + rating.trackId"
+            size="medium"
+            variant="ghost"
+          ></app-play-button>
+        </div>
       </div>
 
       <div class="track-info">

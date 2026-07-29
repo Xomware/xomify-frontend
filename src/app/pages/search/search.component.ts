@@ -24,7 +24,6 @@ import {
   SearchTrack,
   SearchType,
 } from 'src/app/services/search.service';
-import { PlayerService } from 'src/app/services/player.service';
 
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 300;
@@ -70,7 +69,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private searchService: SearchService,
     private router: Router,
-    private playerService: PlayerService,
   ) {}
 
   ngOnInit(): void {
@@ -175,12 +173,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   // ============================================
   // Result row click handlers
   // ============================================
-
-  onTrackClick(track: SearchTrack): void {
-    if (track.id) {
-      this.playerService.playSong(track.id);
-    }
-  }
 
   openTrackInSpotify(track: SearchTrack, event: MouseEvent): void {
     event.stopPropagation();

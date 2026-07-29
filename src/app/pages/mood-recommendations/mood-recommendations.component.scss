@@ -271,25 +271,11 @@
     font-variant-numeric: tabular-nums;
   }
 
+  // Sizing/visuals now come from <app-play-button [size] [variant]> itself —
+  // this just keeps it from being squashed in the flex row.
   .btn-play {
-    background: rgba(124, 58, 237, 0.15);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    color: #7c3aed;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 0.75rem;
     flex-shrink: 0;
-    transition: background 0.2s;
-
-    &:hover {
-      background: rgba(124, 58, 237, 0.3);
-    }
   }
 
   // ─── Animation ────────────────────────────────

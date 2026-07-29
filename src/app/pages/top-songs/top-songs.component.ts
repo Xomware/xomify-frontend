@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SongService } from 'src/app/services/song.service';
 import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { RatingsService } from 'src/app/services/ratings.service';
@@ -13,7 +14,7 @@ import {
   SongDetailModalComponent,
   SongDetailTrack,
 } from 'src/app/components/song-detail-modal/song-detail-modal.component';
-import { take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 
 interface TopSong {
   id: string;
@@ -49,15 +50,24 @@ export class TopSongsComponent implements OnInit, OnDestroy {
   activeTimeRange: TopItemsTimeRange = 'short_term';
   currentlyFlippedIndex: number | null = null;
 
+  /** Which track's preview is currently playing/loading, for the front-card
+   * play/pause icon — kept in sync with the shared PreviewPlayerService. */
+  previewTrackId: string | null = null;
+  previewPlaying = false;
+  previewLoading = false;
+
   timeRanges = [
     { value: 'short_term' as const, label: 'Last 4 Weeks' },
     { value: 'medium_term' as const, label: 'Last 6 Months' },
     { value: 'long_term' as const, label: 'All Time' },
   ];
 
+  private previewSubs: Subscription[] = [];
+
   constructor(
     private songService: SongService,
     private playerService: PlayerService,
+    private previewPlayer: PreviewPlayerService,
     private queueService: QueueService,
     private toastService: ToastService,
     private ratingsService: RatingsService,
@@ -83,11 +93,26 @@ export class TopSongsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadTopSongs();
+
+    this.previewSubs.push(
+      this.previewPlayer.currentTrackId$.subscribe((id) => (this.previewTrackId = id)),
+      this.previewPlayer.isPlaying$.subscribe((playing) => (this.previewPlaying = playing)),
+      this.previewPlayer.isLoading$.subscribe((loading) => (this.previewLoading = loading)),
+    );
   }
 
   ngOnDestroy(): void {
     // Stop playback when navigating away from this page
-    this.playerService.stopSong();
+    this.previewPlayer.stop();
+    this.previewSubs.forEach((sub) => sub.unsubscribe());
+  }
+
+  isPreviewPlaying(songId: string): boolean {
+    return this.previewTrackId === songId && this.previewPlaying;
+  }
+
+  isPreviewLoading(songId: string): boolean {
+    return this.previewTrackId === songId && this.previewLoading;
   }
 
   loadTopSongs(): void {
@@ -171,7 +196,7 @@ export class TopSongsComponent implements OnInit, OnDestroy {
       song.flipped = false;
       this.currentlyFlippedIndex = null;
       // Stop playback when flipping back
-      this.playerService.stopSong();
+      this.previewPlayer.stop();
       return;
     }
 
@@ -188,12 +213,17 @@ export class TopSongsComponent implements OnInit, OnDestroy {
     song.flipped = true;
     this.currentlyFlippedIndex = index;
 
-    // Play the song when flipping
+    // Play the song's preview when flipping
     this.playSong(song);
   }
 
   playSong(song: TopSong): void {
-    this.playerService.playSong(song.id);
+    this.previewPlayer.toggle({
+      id: song.id,
+      title: song.name,
+      artist: this.getArtistNames(song.artists),
+      previewUrl: song.preview_url,
+    });
   }
 
   getArtistNames(artists: { id: string; name: string }[]): string {
@@ -278,6 +308,7 @@ export class TopSongsComponent implements OnInit, OnDestroy {
       popularity: song.popularity,
       explicit: song.explicit,
       external_urls: song.external_urls,
+      preview_url: song.preview_url,
     };
     this.songDetailModal.open(track);
   }

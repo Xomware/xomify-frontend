@@ -19,7 +19,7 @@ import {
   xtSharerLabel,
 } from '../../utils/xomtracks-track-display';
 
-type XtEmbedKind = 'spotify' | 'soundcloud' | null;
+type XtEmbedKind = 'soundcloud' | null;
 
 const MATCH_LABELS: Record<XtShare['matchStatus'], string> = {
   matched: 'Matched on Spotify',
@@ -164,29 +164,40 @@ export class XomtracksTrackDetailModalComponent implements AfterViewInit {
     return xtIsMatched(this.share);
   }
 
-  /** Which inline player, if any, we can embed for this share. */
+  /** Which inline iframe player, if any, we can embed for this share.
+   * Spotify's own embed is intentionally NOT used here (or anywhere in the
+   * app) — it runs Spotify's Web Playback SDK internally, which requires
+   * Premium + a live Connect session and 404s on
+   * social-connect/v2/sessions/current for everyone else, silently killing
+   * playback. Matched (Spotify) tracks instead get the shared 30-second
+   * preview player below (`app-play-button`). SoundCloud's embed has no
+   * such requirement and plays fine, so it stays. */
   get embedKind(): XtEmbedKind {
-    if (this.isMatched) return 'spotify';
     if (this.share.platform === 'soundcloud' && this.share.sourceUrl) return 'soundcloud';
     return null;
   }
 
-  /** Sanitised iframe URL for the embeddable player (Spotify or SoundCloud). */
+  /** Sanitised iframe URL for the embeddable SoundCloud player. */
   get embedUrl(): SafeResourceUrl | null {
-    const kind = this.embedKind;
-    if (kind === 'spotify') {
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://open.spotify.com/embed/track/${this.share.resolvedSpotifyId}`,
-      );
-    }
-    if (kind === 'soundcloud') {
-      const src = encodeURIComponent(this.share.sourceUrl);
-      return this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://w.soundcloud.com/player/?url=${src}` +
-          '&color=%23ff3750&auto_play=false&hide_related=true&show_comments=false&show_user=true',
-      );
-    }
-    return null;
+    if (this.embedKind !== 'soundcloud') return null;
+    const src = encodeURIComponent(this.share.sourceUrl);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://w.soundcloud.com/player/?url=${src}` +
+        '&color=%23ff3750&auto_play=false&hide_related=true&show_comments=false&show_user=true',
+    );
+  }
+
+  /** Stable id for the shared preview player — the real Spotify id when
+   * matched (so it caches/dedupes against the same track elsewhere in the
+   * app), else this share's own id. */
+  get previewTrackId(): string {
+    return this.share.resolvedSpotifyId || this.share.shareId;
+  }
+
+  /** Whether to show the shared 30s preview player at all — anything with
+   * enough metadata to search on is worth trying, matched or not. */
+  get showPreviewPlayer(): boolean {
+    return !!(this.title || this.artist);
   }
 
   get dateLabel(): string {

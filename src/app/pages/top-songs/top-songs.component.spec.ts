@@ -2,11 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { TopSongsComponent } from './top-songs.component';
 import { SongService } from 'src/app/services/song.service';
 import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { QueueService } from 'src/app/services/queue.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { RatingsService } from 'src/app/services/ratings.service';
@@ -76,10 +77,17 @@ describe('TopSongsComponent', () => {
     songSpy.getLongTermTopTracks.and.returnValue([]);
 
     const playerSpy = jasmine.createSpyObj('PlayerService', [
-      'stopSong',
-      'playSong',
       'addToSpotifyQueue',
     ]);
+    const previewPlayerSpy = jasmine.createSpyObj(
+      'PreviewPlayerService',
+      ['toggle', 'stop'],
+      {
+        currentTrackId$: new Subject<string | null>().asObservable(),
+        isPlaying$: new Subject<boolean>().asObservable(),
+        isLoading$: new Subject<boolean>().asObservable(),
+      },
+    );
     const queueSpy = jasmine.createSpyObj('QueueService', [
       'isInQueue',
       'addToQueue',
@@ -104,6 +112,7 @@ describe('TopSongsComponent', () => {
         { provide: TopItemsService, useValue: topItemsSpy },
         { provide: SongService, useValue: songSpy },
         { provide: PlayerService, useValue: playerSpy },
+        { provide: PreviewPlayerService, useValue: previewPlayerSpy },
         { provide: QueueService, useValue: queueSpy },
         { provide: ToastService, useValue: toastSpy },
         { provide: RatingsService, useValue: ratingsSpy },

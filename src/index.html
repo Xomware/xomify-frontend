@@ -10,7 +10,10 @@
   <body>
     <a class="skip-link sr-only" href="#main-content">Skip to main content</a>
     <app-root></app-root>
-    <!-- Spotify Web Playback SDK - Required for in-browser playback -->
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <!-- Spotify Web Playback SDK intentionally NOT loaded: it requires
+         Premium + a live Connect session and 404s on
+         social-connect/v2/sessions/current for everyone else, breaking
+         playback with no user-visible error. Song previews use a local
+         HTML5 Audio player instead (see PreviewPlayerService). -->
   </body>
 </html>

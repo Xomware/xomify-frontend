@@ -60,6 +60,18 @@
           ></app-xomtracks-rating-stars>
         </div>
 
+        <div class="xt-preview-row" *ngIf="showPreviewPlayer">
+          <app-play-button
+            [trackId]="previewTrackId"
+            [title]="title"
+            [artist]="artist"
+            [spotifyUrl]="primaryUrl"
+            size="medium"
+            variant="filled"
+          ></app-play-button>
+          <span class="xt-preview-label">30-second preview</span>
+        </div>
+
         <a class="xt-play-link" [href]="primaryUrl" target="_blank" rel="noopener noreferrer">
           {{ primaryLinkLabel }}
           <span aria-hidden="true">↗</span>
@@ -73,7 +85,7 @@
         [src]="src"
         [title]="title + ' — inline player'"
         width="100%"
-        [height]="embedKind === 'soundcloud' ? 166 : 152"
+        [height]="166"
         frameborder="0"
         loading="lazy"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

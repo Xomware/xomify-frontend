@@ -9,7 +9,7 @@ import {
   ShareFeedService,
   ShareReaction,
 } from 'src/app/services/share-feed.service';
-import { PlayerService } from 'src/app/services/player.service';
+import { PreviewPlayerService } from 'src/app/services/preview-player.service';
 import { ShareService } from 'src/app/services/share.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
@@ -66,7 +66,7 @@ export class ShareCardComponent {
   constructor(
     private router: Router,
     private shareFeedService: ShareFeedService,
-    private playerService: PlayerService,
+    private previewPlayer: PreviewPlayerService,
     private shareService: ShareService,
     private toastService: ToastService,
     private userService: UserService,
@@ -304,7 +304,11 @@ export class ShareCardComponent {
   menuPlay(): void {
     this.menuOpen = false;
     if (this.share.trackId) {
-      this.playerService.playSong(this.share.trackId);
+      this.previewPlayer.toggle({
+        id: this.share.trackId,
+        title: this.share.trackName,
+        artist: this.share.artistName,
+      });
     }
   }
 

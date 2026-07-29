@@ -117,6 +117,7 @@
           <thead>
             <tr>
               <th class="col-art"></th>
+              <th class="col-play"></th>
               <th class="sortable" (click)="setSort('name')">
                 Track {{ getSortIcon('name') }}
               </th>
@@ -138,6 +139,16 @@
             <tr *ngFor="let track of sortedTracks" class="track-row">
               <td class="col-art">
                 <img class="album-art" [src]="track.albumArt || 'assets/img/placeholder.png'" [alt]="track.name" />
+              </td>
+              <td class="col-play">
+                <app-play-button
+                  [trackId]="track.id"
+                  [title]="track.name"
+                  [artist]="track.artists"
+                  [spotifyUrl]="track.spotifyUrl"
+                  size="small"
+                  variant="ghost"
+                ></app-play-button>
               </td>
               <td class="col-name">
                 <a [href]="track.spotifyUrl" target="_blank" rel="noopener" class="track-link">

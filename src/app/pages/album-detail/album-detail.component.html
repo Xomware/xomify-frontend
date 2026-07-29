@@ -111,6 +111,10 @@
           <div class="track-play">
             <app-play-button
               [trackId]="track.id"
+              [title]="track.name"
+              [artist]="getArtistNames(track)"
+              [previewUrl]="track.preview_url"
+              [spotifyUrl]="'https://open.spotify.com/track/' + track.id"
               size="small"
               variant="ghost"
             ></app-play-button>

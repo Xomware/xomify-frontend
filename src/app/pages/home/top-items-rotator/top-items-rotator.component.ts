@@ -26,6 +26,8 @@ interface RotatorItem {
   round?: boolean;
   weightPct?: number;
   link: string[];
+  /** Set only for track items — Spotify's own preview_url (may be null). */
+  previewUrl?: string | null;
 }
 
 const ROTATE_MS = 7_000;
@@ -158,6 +160,7 @@ export class TopItemsRotatorComponent implements OnChanges, OnDestroy {
       subtitle: track.artists?.map((a) => a.name).join(', '),
       image: track.album?.images?.[track.album.images.length - 1]?.url || track.album?.images?.[0]?.url,
       link: ['/top-songs'],
+      previewUrl: track.preview_url,
     }));
   }
 
