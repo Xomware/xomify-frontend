@@ -62,7 +62,10 @@
       <p class="dashboard-subtitle">Here's what's happening with your music.</p>
     </header>
 
-    <app-home-spotlight [slides]="spotlightSlides"></app-home-spotlight>
+    <app-home-spotlight
+      [slides]="spotlightSlides"
+      [loading]="spotlightLoading"
+    ></app-home-spotlight>
 
     <app-home-active-listening
       [items]="recentItems"

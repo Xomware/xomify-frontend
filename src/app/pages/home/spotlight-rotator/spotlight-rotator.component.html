@@ -1,12 +1,22 @@
 <section
   class="spotlight"
-  *ngIf="slides.length > 0"
+  *ngIf="slides.length > 0 || loading"
   aria-label="What's happening"
+  [attr.aria-busy]="loading && slides.length === 0 ? 'true' : null"
   (mouseenter)="paused = true"
   (mouseleave)="paused = false"
   (focusin)="paused = true"
   (focusout)="paused = false"
 >
+  <div class="spotlight-card skeleton" *ngIf="loading && slides.length === 0" aria-hidden="true">
+    <div class="spotlight-skeleton-image"></div>
+    <div class="spotlight-skeleton-body">
+      <span class="spotlight-skeleton-line spotlight-skeleton-line--eyebrow"></span>
+      <span class="spotlight-skeleton-line spotlight-skeleton-line--title"></span>
+      <span class="spotlight-skeleton-line spotlight-skeleton-line--subtitle"></span>
+    </div>
+  </div>
+
   <ng-container *ngIf="activeSlide as slide">
     <div
       class="spotlight-card"
@@ -59,7 +69,7 @@
     </button>
   </div>
 
-  <div class="sr-only" aria-live="polite">
-    {{ activeSlide?.eyebrow }}: {{ activeSlide?.title }}
+  <div class="sr-only" aria-live="polite" *ngIf="activeSlide as slide">
+    {{ slide.eyebrow }}: {{ slide.title }}
   </div>
 </section>

@@ -19,6 +19,7 @@ describe('HomeComponent', () => {
   let userServiceSpy: jasmine.SpyObj<UserService>;
 
   beforeEach(() => {
+    sessionStorage.clear();
     authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'login']);
     userServiceSpy = jasmine.createSpyObj('UserService', ['getUserName', 'ensureLoaded']);
     listeningHistorySpy = jasmine.createSpyObj('ListeningHistoryService', ['getRecentlyPlayed', 'getRelativeTime']);
@@ -42,6 +43,10 @@ describe('HomeComponent', () => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
   }
+
+  afterEach(() => {
+    sessionStorage.clear();
+  });
 
   it('does not fetch any dashboard data for a logged-out visitor', () => {
     authServiceSpy.isLoggedIn.and.returnValue(false);
@@ -136,5 +141,66 @@ describe('HomeComponent', () => {
     expect(component.favoritesAvailable).toBe(false);
     const favoritesSlide = component.spotlightSlides.find((s) => s.kind === 'favorites');
     expect(favoritesSlide?.link).toBeUndefined();
+  });
+
+  it('starts spotlightLoading true and flips false once any fetch resolves', () => {
+    authServiceSpy.isLoggedIn.and.returnValue(true);
+    userServiceSpy.getUserName.and.returnValue('Dom');
+    listeningHistorySpy.getRecentlyPlayed.and.returnValue(
+      of({ items: [], next: null, limit: 50, href: '' }),
+    );
+    topItemsSpy.getTopItems.and.returnValue(
+      of({
+        data: {
+          tracks: { short_term: [], medium_term: [], long_term: [] },
+          artists: { short_term: [], medium_term: [], long_term: [] },
+          genres: { short_term: {}, medium_term: {}, long_term: {} },
+        },
+        error: null,
+        meta: {},
+      }),
+    );
+    broadcastsSpy.getActiveBroadcasts.and.returnValue(of([]));
+    createComponent();
+
+    expect(component.spotlightLoading).toBe(true);
+
+    component.ngOnInit();
+
+    // All three sources here are synchronous mocks, so by the time
+    // ngOnInit returns at least one has already resolved.
+    expect(component.spotlightLoading).toBe(false);
+  });
+
+  it('reuses a cached top-items response instead of re-fetching within the session', () => {
+    authServiceSpy.isLoggedIn.and.returnValue(true);
+    userServiceSpy.getUserName.and.returnValue('Dom');
+    listeningHistorySpy.getRecentlyPlayed.and.returnValue(
+      of({ items: [], next: null, limit: 50, href: '' }),
+    );
+    const topItemsResponse = {
+      data: {
+        tracks: { short_term: [], medium_term: [], long_term: [] },
+        artists: { short_term: [], medium_term: [], long_term: [] },
+        genres: { short_term: {}, medium_term: {}, long_term: {} },
+      },
+      error: null,
+      meta: {},
+    };
+    topItemsSpy.getTopItems.and.returnValue(of(topItemsResponse));
+    broadcastsSpy.getActiveBroadcasts.and.returnValue(of([]));
+
+    createComponent();
+    component.ngOnInit();
+    expect(topItemsSpy.getTopItems).toHaveBeenCalledTimes(1);
+    expect(component.topItemsData).toEqual(topItemsResponse.data);
+
+    // Simulate navigating away and back within the same session -- a fresh
+    // component instance, same sessionStorage.
+    createComponent();
+    component.ngOnInit();
+
+    expect(topItemsSpy.getTopItems).toHaveBeenCalledTimes(1);
+    expect(component.topItemsData).toEqual(topItemsResponse.data);
   });
 });

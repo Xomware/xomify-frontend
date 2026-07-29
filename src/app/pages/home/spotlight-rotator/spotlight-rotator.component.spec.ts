@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 
@@ -22,7 +23,7 @@ describe('SpotlightRotatorComponent', () => {
   function setup(prefersReduced: boolean) {
     reducedMotion = { prefersReducedMotion: jasmine.createSpy().and.returnValue(prefersReduced) };
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, NoopAnimationsModule],
       declarations: [SpotlightRotatorComponent],
       providers: [{ provide: ReducedMotionService, useValue: reducedMotion }],
     });
@@ -115,5 +116,38 @@ describe('SpotlightRotatorComponent', () => {
 
     component.onCardActivate(slide);
     expect(router.navigate).toHaveBeenCalledWith(['/top-songs'], {});
+  });
+
+  it('renders a loading skeleton instead of disappearing while nothing has loaded yet', () => {
+    setup(true);
+    component.loading = true;
+    component.slides = [];
+    fixture.detectChanges();
+
+    const section = fixture.nativeElement.querySelector('.spotlight');
+    expect(section).toBeTruthy();
+    expect(section.querySelector('.spotlight-card.skeleton')).toBeTruthy();
+    expect(section.getAttribute('aria-busy')).toBe('true');
+  });
+
+  it('renders nothing when not loading and there are no slides', () => {
+    setup(true);
+    component.loading = false;
+    component.slides = [];
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.spotlight')).toBeFalsy();
+  });
+
+  it('shows real content, not the skeleton, once slides have arrived even if still marked loading', () => {
+    setup(true);
+    component.loading = true;
+    component.slides = mkSlides(1);
+    component.ngOnChanges({ slides: {} as any });
+    fixture.detectChanges();
+
+    const section = fixture.nativeElement.querySelector('.spotlight');
+    expect(section.querySelector('.spotlight-card.skeleton')).toBeFalsy();
+    expect(section.querySelector('.spotlight-title').textContent).toContain('Slide 0');
   });
 });
