@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { XomtracksSetupCardComponent } from './xomtracks-setup-card.component';
 import { XomtracksIngestTokensService } from '../../services/xomtracks-ingest-tokens.service';
 import { XomifyAuthService } from '../../../../services/xomify-auth.service';
+import { ImpersonationService } from '../../../../services/impersonation.service';
 import { ADMIN_EMAIL } from '../../config/xomtracks-admin';
 
 describe('XomtracksSetupCardComponent', () => {
@@ -10,16 +11,22 @@ describe('XomtracksSetupCardComponent', () => {
   let component: XomtracksSetupCardComponent;
   let authSpy: jasmine.SpyObj<XomifyAuthService>;
   let tokensSpy: jasmine.SpyObj<XomtracksIngestTokensService>;
+  // Stub avoids pulling the real ImpersonationService (and its HttpClient dep)
+  // into the standalone component's injector. Defaults to "not impersonating";
+  // individual specs flip `isImpersonating` where they exercise that path.
+  let impersonationStub: { isImpersonating: boolean };
 
   beforeEach(async () => {
     authSpy = jasmine.createSpyObj('XomifyAuthService', ['getEmail']);
     tokensSpy = jasmine.createSpyObj('XomtracksIngestTokensService', ['create', 'revoke']);
+    impersonationStub = { isImpersonating: false };
 
     await TestBed.configureTestingModule({
       imports: [XomtracksSetupCardComponent],
       providers: [
         { provide: XomifyAuthService, useValue: authSpy },
         { provide: XomtracksIngestTokensService, useValue: tokensSpy },
+        { provide: ImpersonationService, useValue: impersonationStub },
       ],
     }).compileComponents();
 
@@ -36,6 +43,16 @@ describe('XomtracksSetupCardComponent', () => {
 
   it('shows the card for a non-admin account', () => {
     authSpy.getEmail.and.returnValue('someone@example.com');
+    fixture.detectChanges();
+    expect(component.isAdmin).toBe(false);
+    expect(fixture.nativeElement.querySelector('.xt-setup')).not.toBeNull();
+  });
+
+  it('shows the card while the admin is impersonating a non-admin target', () => {
+    // JWT email is still the admin's during impersonation, but the effective
+    // user is the (non-admin) target, who can opt in — so the card must show.
+    authSpy.getEmail.and.returnValue(ADMIN_EMAIL);
+    impersonationStub.isImpersonating = true;
     fixture.detectChanges();
     expect(component.isAdmin).toBe(false);
     expect(fixture.nativeElement.querySelector('.xt-setup')).not.toBeNull();
