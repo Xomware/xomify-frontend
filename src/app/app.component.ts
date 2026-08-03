@@ -3,9 +3,10 @@ import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { LikesPushCoordinatorService } from './services/likes-push-coordinator.service';
 import { VisitTrackerService } from './services/visit-tracker.service';
+import { ImpersonationService } from './services/impersonation.service';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { PreviewPlayerService } from './services/preview-player.service';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -17,14 +18,22 @@ export class AppComponent implements OnDestroy, OnInit {
   title = 'XOMIFY';
   private destroy$ = new Subject<void>();
 
+  /** Drives `.app-container--impersonating` (see app.component.scss), which
+   * reserves layout space for the impersonation banner and shifts the
+   * toolbar + page content down to stay clear of it. */
+  readonly isImpersonating$: Observable<boolean>;
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private likesPushCoordinator: LikesPushCoordinatorService,
     private visitTracker: VisitTrackerService,
+    private impersonation: ImpersonationService,
     private router: Router,
     private previewPlayer: PreviewPlayerService
-  ) {}
+  ) {
+    this.isImpersonating$ = this.impersonation.isImpersonating$;
+  }
 
   ngOnInit(): void {
     // On app boot, if a session already exists:

@@ -34,6 +34,9 @@ const OPT_IN_LABELS: Record<keyof AdminUserOptIns, string> = {
 export class AdminUsersPanelComponent implements OnInit {
   /** "View as" row action — the parent shell owns jumping to the View As tab. */
   @Output() viewAs = new EventEmitter<string>();
+  /** "Step through as this user" row action — the parent shell owns starting
+   * full impersonation and navigating into the app. */
+  @Output() stepThroughAs = new EventEmitter<string>();
 
   state: AxLoadState = 'loading';
   users: AdminUser[] = [];
@@ -114,6 +117,12 @@ export class AdminUsersPanelComponent implements OnInit {
   /** Jump to the parent shell's View As tab, pre-loaded for this user. */
   onViewAs(user: AdminUser): void {
     this.viewAs.emit(user.email);
+  }
+
+  /** Start full "step through as" impersonation for this user (see
+   * `ImpersonationService`), navigating out of the Admin Portal into the app. */
+  onStepThroughAs(user: AdminUser): void {
+    this.stepThroughAs.emit(user.email);
   }
 
   private loadVisits(email: string): void {

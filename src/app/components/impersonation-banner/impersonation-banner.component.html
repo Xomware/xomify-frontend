@@ -1,0 +1,25 @@
+<div
+  class="impersonation-banner"
+  *ngIf="impersonatedEmail$ | async as email"
+  role="status"
+  aria-live="polite"
+>
+  <app-icon name="warning" [size]="16" class="impersonation-banner-icon"></app-icon>
+
+  <p class="impersonation-banner-text">
+    Impersonating <strong>{{ email }}</strong>
+    <span class="impersonation-banner-note">
+      &mdash; Shares reflects their account. Spotify-derived stats (top items, recently
+      played, likes) still show yours &mdash; there's no target Spotify token to impersonate.
+    </span>
+  </p>
+
+  <button
+    type="button"
+    class="impersonation-banner-exit"
+    (click)="exit()"
+    aria-label="Exit impersonation and return to Admin"
+  >
+    Exit impersonation
+  </button>
+</div>

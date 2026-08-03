@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminPortalService } from '../services/admin-portal.service';
 import { AdminUserOptIns, AdminUserVisit, AdminViewAs } from '../models/admin-portal.model';
@@ -39,6 +39,12 @@ const OPT_IN_LABELS: Record<keyof AdminUserOptIns, string> = {
 export class AdminViewasPanelComponent implements OnInit, OnChanges {
   /** Email pre-filled from the Users panel's "View as" row action. */
   @Input() presetEmail: string | null = null;
+
+  /** "Step through app as this user" — the parent shell owns starting full
+   * impersonation and navigating into the app. Only offered once a snapshot
+   * has actually loaded, so impersonation only ever targets a real, known
+   * user (the same guarantee `viewAs`'s 404 handling gives this panel). */
+  @Output() stepThroughAs = new EventEmitter<string>();
 
   emailInput = '';
   state: AxViewAsState = 'idle';
@@ -83,6 +89,11 @@ export class AdminViewasPanelComponent implements OnInit, OnChanges {
 
   toggleSignupPreview(): void {
     this.showSignupPreview = !this.showSignupPreview;
+  }
+
+  onStepThroughAs(): void {
+    if (!this.viewingEmail) return;
+    this.stepThroughAs.emit(this.viewingEmail);
   }
 
   optInEntries(optIns: AdminViewAs['optIns']): Array<{ key: string; label: string; on: boolean }> {

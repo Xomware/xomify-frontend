@@ -87,6 +87,15 @@
                     <app-icon name="eye" [size]="12"></app-icon>
                     View as
                   </button>
+                  <button
+                    type="button"
+                    class="ax-btn ax-btn--sm ax-btn--warning"
+                    (click)="onStepThroughAs(user)"
+                    [attr.aria-label]="'Step through the app as ' + user.email"
+                  >
+                    <app-icon name="warning" [size]="12"></app-icon>
+                    Step through as
+                  </button>
                 </td>
               </tr>
 
@@ -130,7 +139,10 @@
                       <p class="ax-drawer-empty">
                         Jump to the
                         <button type="button" class="ax-drawer-link" (click)="onViewAs(user)">View As tab</button>
-                        to load a read-only impersonation snapshot for this user.
+                        to load a read-only impersonation snapshot for this user, or
+                        <button type="button" class="ax-drawer-link" (click)="onStepThroughAs(user)">step through the app</button>
+                        as them &mdash; a persistent banner marks the session and Shares data
+                        scopes to their account.
                       </p>
                     </section>
                   </div>

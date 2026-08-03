@@ -12,6 +12,16 @@ html, body {
   padding: 0;
   position: relative;
   z-index: 1;
+
+  // Reserves layout space for the fixed impersonation banner (see
+  // impersonation-banner.component.ts) — this value must match that
+  // component's own rendered height. `app-toolbar` (fixed, top: 0 by
+  // default — toolbar.component.scss) and `.content` both read this to
+  // shift down and stay clear of it, since the banner sits above both,
+  // fixed at the very top of the viewport.
+  &.app-container--impersonating {
+    --impersonation-banner-h: 44px;
+  }
 }
 
 app-toolbar {
@@ -22,6 +32,7 @@ app-toolbar {
 
 .content {
   padding: 0;
+  padding-top: var(--impersonation-banner-h, 0px);
   flex: 1;
   margin: 0;
   overflow-y: auto;

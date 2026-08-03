@@ -7,7 +7,9 @@
   display: flex;
   align-items: center;
   position: fixed;
-  top: 0;
+  // Shifted down by the impersonation banner's height while impersonating —
+  // see `--impersonation-banner-h` in app.component.scss (0px otherwise).
+  top: var(--impersonation-banner-h, 0px);
   left: 0;
   z-index: 1000;
   box-sizing: border-box;

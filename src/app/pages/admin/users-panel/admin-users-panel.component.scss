@@ -76,6 +76,23 @@
       filter: none;
     }
   }
+
+  // Distinct from "View as" (read-only preview) — this one actually starts
+  // a live impersonation session, so it gets the warning treatment instead
+  // of the neutral accent used elsewhere in this panel.
+  &--warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    color: var(--ax-warning);
+    border: 1px solid rgba(224, 166, 63, 0.4);
+
+    &:hover {
+      background: var(--ax-warning-muted);
+      filter: none;
+    }
+  }
 }
 
 .ax-cell-actions {

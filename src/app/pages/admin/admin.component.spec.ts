@@ -1,21 +1,24 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AdminComponent } from './admin.component';
+import { ImpersonationService } from '../../services/impersonation.service';
 
 describe('AdminComponent', () => {
   let fixture: ComponentFixture<AdminComponent>;
   let component: AdminComponent;
   let queryParamMap$: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
   let router: Router;
+  let impersonation: ImpersonationService;
 
   beforeEach(async () => {
     queryParamMap$ = new BehaviorSubject(convertToParamMap({}));
 
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       declarations: [AdminComponent],
       // Shallow shell test — child panels (health/users/crons/notifications/
       // broadcasts) each have their own spec; here we only exercise tab
@@ -31,6 +34,10 @@ describe('AdminComponent', () => {
 
     router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.resolveTo(true);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
+
+    impersonation = TestBed.inject(ImpersonationService);
+    spyOn(impersonation, 'enter');
 
     fixture = TestBed.createComponent(AdminComponent);
     component = fixture.componentInstance;
@@ -112,5 +119,11 @@ describe('AdminComponent', () => {
     // setTab no-ops (already on 'viewas'), so no re-navigation happens —
     // the child panel still re-loads because the @Input binding changes.
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('stepThroughAs starts impersonation and navigates out of the Admin Portal into the app', () => {
+    component.stepThroughAs('someone@example.com');
+    expect(impersonation.enter).toHaveBeenCalledWith('someone@example.com');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/');
   });
 });

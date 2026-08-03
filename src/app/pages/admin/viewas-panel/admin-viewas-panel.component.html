@@ -20,6 +20,15 @@
       Viewing as <strong>{{ viewingEmail }}</strong> (read-only)
     </span>
     <span *ngIf="!viewingEmail && state === 'loading'">Loading…</span>
+    <button
+      type="button"
+      class="ax-btn ax-btn--sm ax-btn--warning"
+      (click)="onStepThroughAs()"
+      *ngIf="viewingEmail"
+    >
+      <app-icon name="warning" [size]="12"></app-icon>
+      Step through app as this user
+    </button>
     <button type="button" class="ax-viewas-exit" (click)="exit()" *ngIf="viewingEmail">Exit</button>
   </div>
 
