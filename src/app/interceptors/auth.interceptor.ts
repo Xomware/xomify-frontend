@@ -36,13 +36,30 @@
 //      pass through untouched.
 //   6. Impersonation (full-app "step through as" mode, distinct from the
 //      read-only Admin Portal "View As" projection): while the admin is
-//      impersonating (`ImpersonationService.impersonatedEmail`), every
-//      request to the Xomtracks/Shares backend ONLY
-//      (`environment.xomtracksApiUrl` — never `xomifyApiUrl`, never Spotify)
-//      gets `?impersonate=<email>` appended. The backend contract (in
-//      flight) honors this param for admin-issued JWTs only and scopes
-//      Shares data to that user. Applied once, up front, before the
-//      retry/auth machinery below, so a 401-triggered retry still carries it.
+//      impersonating (`ImpersonationService.impersonatedEmail`):
+//        a. Every request to the Xomtracks/Shares backend
+//           (`environment.xomtracksApiUrl`, any method) gets
+//           `?impersonate=<email>` appended — the backend contract honors
+//           this for admin-issued JWTs and scopes Shares data/actions to
+//           that user.
+//        b. Every READ (GET) request to Xomify's own backend
+//           (`environment.xomifyApiUrl`) ALSO gets `?impersonate=<email>`
+//           appended — e.g. `/user/top-items`, `/user/data`, which compute
+//           Spotify-derived data server-side keyed off the CALLER's identity
+//           and need the same scoping to return the target's data instead of
+//           the admin's own. Writes (POST/PUT/DELETE) are deliberately
+//           excluded so impersonation can never silently mutate xomify
+//           account state for/as the target via this param — Shares actions
+//           are the one place impersonation is meant to act as the target,
+//           and that's `xomtracksApiUrl`, covered by (a).
+//        c. Direct `api.spotify.com` calls get the TARGET's Spotify access
+//           token swapped in instead of the admin's own (see responsibility
+//           5's `interceptSpotify`/`getSpotifyAuthToken`) — this is what
+//           actually makes top items, recently-played, now-playing,
+//           playlists, and the "Welcome, <name>" greeting reflect the target,
+//           since those are all direct Spotify Web API calls.
+//      (a)/(b) are applied once, up front, before the retry/auth machinery
+//      below, so a 401-triggered retry still carries the param.
 
 import { Injectable } from '@angular/core';
 import {
@@ -52,7 +69,7 @@ import {
   HttpRequest,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { XomifyAuthService } from '../services/xomify-auth.service';
@@ -68,6 +85,12 @@ const IMPERSONATE_PARAM = 'impersonate';
 const AUTH_HEADER = 'Authorization';
 /** Path suffix of the public mint endpoint — never gets an Authorization header. */
 const AUTH_LOGIN_PATH = '/auth/login';
+/** Path suffix of the admin-only endpoint that mints the TARGET's Spotify
+ * access token (see `ImpersonationService`). It already takes its own
+ * `email` query param — never gets `?impersonate=` appended too, which would
+ * be self-referential/confusing (and is the one xomify-backend GET call that
+ * must always run as the ADMIN, not scoped to the target). */
+const IMPERSONATION_TOKEN_PATH = '/admin/impersonation-token';
 /** Custom flag header marking a request as already-retried. Stripped before send. */
 const RETRY_FLAG_HEADER = 'X-Xomify-Auth-Retry';
 /** Base URL of the Spotify Web API — distinct from accounts.spotify.com. */
@@ -156,18 +179,22 @@ export class AuthInterceptor implements HttpInterceptor {
     return !!xomtracksBase && req.url.startsWith(xomtracksBase);
   }
 
+  private isXomifyOwnApiRequest(req: HttpRequest<unknown>): boolean {
+    const xomifyBase = environment.xomifyApiUrl;
+    return !!xomifyBase && req.url.startsWith(xomifyBase);
+  }
+
   /**
    * While impersonating, appends `?impersonate=<email>` to Xomtracks/Shares
-   * calls ONLY — never xomify's own API, never Spotify (see responsibility
-   * 6). `HttpParams.set` URL-encodes the value. Re-checks admin status here
-   * too (belt and suspenders alongside `ImpersonationService.enter`'s own
-   * gate) so a stale value can never leak a scoped request for a non-admin
-   * caller. Never clobbers a value the caller already set explicitly.
+   * calls (any method) and to READ (GET) calls against Xomify's own backend
+   * — never Spotify, never a write against `xomifyApiUrl` (see
+   * responsibility 6b). `HttpParams.set` URL-encodes the value. Re-checks
+   * admin status here too (belt and suspenders alongside
+   * `ImpersonationService.enter`'s own gate) so a stale value can never leak
+   * a scoped request for a non-admin caller. Never clobbers a value the
+   * caller already set explicitly.
    */
   private applyImpersonation(req: HttpRequest<unknown>): HttpRequest<unknown> {
-    if (!this.isXomtracksApiRequest(req)) {
-      return req;
-    }
     const email = this.impersonation.impersonatedEmail;
     if (!email || !isAdminEmail(this.xomifyAuth.getEmail())) {
       return req;
@@ -175,7 +202,19 @@ export class AuthInterceptor implements HttpInterceptor {
     if (req.params.has(IMPERSONATE_PARAM)) {
       return req;
     }
-    return req.clone({ params: req.params.set(IMPERSONATE_PARAM, email) });
+    if (req.url.endsWith(IMPERSONATION_TOKEN_PATH)) {
+      return req;
+    }
+
+    if (this.isXomtracksApiRequest(req)) {
+      return req.clone({ params: req.params.set(IMPERSONATE_PARAM, email) });
+    }
+
+    if (this.isXomifyOwnApiRequest(req) && req.method === 'GET') {
+      return req.clone({ params: req.params.set(IMPERSONATE_PARAM, email) });
+    }
+
+    return req;
   }
 
   private isSpotifyApiRequest(req: HttpRequest<unknown>): boolean {
@@ -263,6 +302,12 @@ export class AuthInterceptor implements HttpInterceptor {
    * regardless of whatever (possibly stale) header the calling service set.
    * Falls back to a reactive refresh-and-retry-once on a 401, in case the
    * proactive expiry check missed a still-invalid token.
+   *
+   * While impersonating (responsibility 6c), the token swapped in is the
+   * TARGET's Spotify access token, not the admin's own — this is the entire
+   * mechanism behind top items / recently-played / now-playing / playlists /
+   * the greeting reflecting the impersonated user, since every one of those
+   * is a direct Spotify Web API call.
    */
   private interceptSpotify(
     req: HttpRequest<unknown>,
@@ -279,7 +324,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(cleanReq);
     }
 
-    return this.authService.getValidAccessToken().pipe(
+    return this.getSpotifyAuthToken().pipe(
       switchMap((validToken) => {
         // Swap in a known-fresh token when we have one — this is what
         // actually fixes the stale-localStorage-token 401s, since the
@@ -306,16 +351,51 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   /**
+   * Resolves the Spotify access token to use for an outgoing
+   * `api.spotify.com` request. While impersonating, prefers the target's
+   * token (`ImpersonationService.getValidSpotifyToken`); if that mint has
+   * failed (endpoint not deployed yet, target has no stored refresh token),
+   * falls back to the admin's own token rather than sending an unauthorized
+   * request — same "degrade, don't break" contract as the rest of
+   * impersonation mode. Outside impersonation, this is just the caller's own
+   * token, unchanged from before.
+   */
+  private getSpotifyAuthToken(): Observable<string | null> {
+    if (this.impersonation.isImpersonating) {
+      return this.impersonation.getValidSpotifyToken().pipe(
+        switchMap((impersonatedToken) =>
+          impersonatedToken
+            ? of(impersonatedToken)
+            : this.authService.getValidAccessToken(),
+        ),
+      );
+    }
+    return this.authService.getValidAccessToken();
+  }
+
+  /**
    * Reactive fallback for a Spotify 401: refresh the access token and retry
    * the original request ONCE with the fresh token swapped into the
    * `Authorization` header. If there's no refresh token (or refresh fails),
-   * propagate the 401 — same contract as the Xomify `handle401` path.
+   * propagate the 401 — same contract as the Xomify `handle401` path. While
+   * impersonating, refreshes the TARGET's token first (falling back to the
+   * admin's own refresh if that fails), mirroring `getSpotifyAuthToken`.
    */
   private handleSpotify401(
     originalReq: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    return this.authService.refreshSpotifyAccessToken().pipe(
+    const refresh$ = this.impersonation.isImpersonating
+      ? this.impersonation.refreshSpotifyToken().pipe(
+          switchMap((impersonatedToken) =>
+            impersonatedToken
+              ? of(impersonatedToken)
+              : this.authService.refreshSpotifyAccessToken(),
+          ),
+        )
+      : this.authService.refreshSpotifyAccessToken();
+
+    return refresh$.pipe(
       switchMap((freshToken) => {
         if (!freshToken) {
           return throwError(

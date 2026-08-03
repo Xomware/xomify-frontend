@@ -8,6 +8,7 @@ import { UserService } from 'src/app/services/user.service';
 import { ListeningHistoryService } from 'src/app/services/listening-history.service';
 import { TopItemsService } from 'src/app/services/top-items.service';
 import { BroadcastsService } from 'src/app/services/broadcasts.service';
+import { ImpersonationService } from 'src/app/services/impersonation.service';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -17,6 +18,7 @@ describe('HomeComponent', () => {
   let topItemsSpy: jasmine.SpyObj<TopItemsService>;
   let broadcastsSpy: jasmine.SpyObj<BroadcastsService>;
   let userServiceSpy: jasmine.SpyObj<UserService>;
+  let impersonationSpy: jasmine.SpyObj<ImpersonationService>;
 
   beforeEach(() => {
     sessionStorage.clear();
@@ -25,6 +27,11 @@ describe('HomeComponent', () => {
     listeningHistorySpy = jasmine.createSpyObj('ListeningHistoryService', ['getRecentlyPlayed', 'getRelativeTime']);
     topItemsSpy = jasmine.createSpyObj('TopItemsService', ['getTopItems']);
     broadcastsSpy = jasmine.createSpyObj('BroadcastsService', ['getActiveBroadcasts']);
+    // Not impersonating by default -- individual tests override
+    // `impersonationSpy.impersonatedEmail` to cover the cache-key isolation.
+    impersonationSpy = jasmine.createSpyObj('ImpersonationService', [], {
+      impersonatedEmail: null,
+    });
 
     TestBed.configureTestingModule({
       declarations: [HomeComponent],
@@ -35,6 +42,7 @@ describe('HomeComponent', () => {
         { provide: ListeningHistoryService, useValue: listeningHistorySpy },
         { provide: TopItemsService, useValue: topItemsSpy },
         { provide: BroadcastsService, useValue: broadcastsSpy },
+        { provide: ImpersonationService, useValue: impersonationSpy },
       ],
     });
   });
@@ -202,5 +210,40 @@ describe('HomeComponent', () => {
 
     expect(topItemsSpy.getTopItems).toHaveBeenCalledTimes(1);
     expect(component.topItemsData).toEqual(topItemsResponse.data);
+  });
+
+  it('does not reuse the self-scoped top-items cache entry once impersonating a target', () => {
+    authServiceSpy.isLoggedIn.and.returnValue(true);
+    userServiceSpy.getUserName.and.returnValue('Dom');
+    listeningHistorySpy.getRecentlyPlayed.and.returnValue(
+      of({ items: [], next: null, limit: 50, href: '' }),
+    );
+    const topItemsResponse = {
+      data: {
+        tracks: { short_term: [], medium_term: [], long_term: [] },
+        artists: { short_term: [], medium_term: [], long_term: [] },
+        genres: { short_term: {}, medium_term: {}, long_term: {} },
+      },
+      error: null,
+      meta: {},
+    };
+    topItemsSpy.getTopItems.and.returnValue(of(topItemsResponse));
+    broadcastsSpy.getActiveBroadcasts.and.returnValue(of([]));
+
+    createComponent();
+    component.ngOnInit();
+    expect(topItemsSpy.getTopItems).toHaveBeenCalledTimes(1);
+
+    // Simulate the admin starting to impersonate a target and landing back
+    // on Home (`stepThroughAs` navigates to `/`) -- the self-scoped cache
+    // entry from above must NOT be reused for the target's identity.
+    Object.defineProperty(impersonationSpy, 'impersonatedEmail', {
+      value: 'target@example.com',
+      configurable: true,
+    });
+    createComponent();
+    component.ngOnInit();
+
+    expect(topItemsSpy.getTopItems).toHaveBeenCalledTimes(2);
   });
 });
