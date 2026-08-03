@@ -5,6 +5,7 @@ import {
   XomtracksIngestTokensService,
 } from '../../services/xomtracks-ingest-tokens.service';
 import { XomifyAuthService } from '../../../../services/xomify-auth.service';
+import { ImpersonationService } from '../../../../services/impersonation.service';
 import { ADMIN_EMAIL } from '../../config/xomtracks-admin';
 // `SharedModule` (not the directive directly) — `TooltipDirective` isn't
 // itself standalone, so it has to come in via its declaring NgModule.
@@ -70,6 +71,7 @@ export class XomtracksSetupCardComponent implements OnInit {
   constructor(
     private ingestTokens: XomtracksIngestTokensService,
     private auth: XomifyAuthService,
+    private impersonation: ImpersonationService,
   ) {}
 
   ngOnInit(): void {
@@ -78,9 +80,14 @@ export class XomtracksSetupCardComponent implements OnInit {
   }
 
   /** True for the admin account — their shares are always-on for everyone,
-   * so this affordance never applies and stays hidden (unless previewing). */
+   * so this affordance never applies and stays hidden (unless previewing).
+   *
+   * While impersonating, the effective user is the (non-admin) TARGET, who
+   * CAN opt in — so the card must show. The JWT email is still the admin's
+   * here, so we can't read it directly; defer to impersonation state first. */
   get isAdmin(): boolean {
     if (this.forcePreview) return false;
+    if (this.impersonation.isImpersonating) return false;
     const email = this.auth.getEmail();
     return !!email && email.toLowerCase() === ADMIN_EMAIL;
   }
