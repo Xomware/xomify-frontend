@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminPortalService } from '../services/admin-portal.service';
-import { AdminUser, AdminUserOptIns, AdminUserVisit, AdminViewAs } from '../models/admin-portal.model';
+import { AdminUser, AdminUserOptIns, AdminUserVisit } from '../models/admin-portal.model';
 
 type AxLoadState = 'loading' | 'loaded' | 'not-live' | 'error';
 type AxSortKey = 'email' | 'displayName' | 'lastSeen';
@@ -17,10 +17,10 @@ const OPT_IN_LABELS: Record<keyof AdminUserOptIns, string> = {
 /**
  * Admin Portal — "Users" tab. `GET /admin/users-list`: the full user
  * directory, sortable (defaults to most-recently-seen first). Each row
- * expands into a read-only drawer with opt-in badges, page-visit history
- * (`GET /admin/user-visits?email=`, auto-loaded on expand), and a lazy
- * "View as" impersonation snapshot (`GET /admin/view-as?email=`, loaded
- * only once the admin asks for it).
+ * expands into a read-only drawer with opt-in badges and page-visit history
+ * (`GET /admin/user-visits?email=`, auto-loaded on expand), plus a "View as"
+ * row action that jumps the parent shell to the dedicated View As tab,
+ * pre-loaded for that user (`viewAs` output).
  *
  * Only one row is expanded at a time — simplest accordion behavior for a
  * directory this shape, and keeps the drawer's own load state a single set
@@ -32,6 +32,9 @@ const OPT_IN_LABELS: Record<keyof AdminUserOptIns, string> = {
   styleUrls: ['./admin-users-panel.component.scss'],
 })
 export class AdminUsersPanelComponent implements OnInit {
+  /** "View as" row action — the parent shell owns jumping to the View As tab. */
+  @Output() viewAs = new EventEmitter<string>();
+
   state: AxLoadState = 'loading';
   users: AdminUser[] = [];
 
@@ -42,9 +45,6 @@ export class AdminUsersPanelComponent implements OnInit {
 
   visitsState: AxSubState = 'idle';
   visits: AdminUserVisit[] = [];
-
-  viewAsState: AxSubState = 'idle';
-  viewAsData: AdminViewAs | null = null;
 
   constructor(private admin: AdminPortalService) {}
 
@@ -108,9 +108,12 @@ export class AdminUsersPanelComponent implements OnInit {
     this.expandedEmail = user.email;
     this.visitsState = 'idle';
     this.visits = [];
-    this.viewAsState = 'idle';
-    this.viewAsData = null;
     this.loadVisits(user.email);
+  }
+
+  /** Jump to the parent shell's View As tab, pre-loaded for this user. */
+  onViewAs(user: AdminUser): void {
+    this.viewAs.emit(user.email);
   }
 
   private loadVisits(email: string): void {
@@ -127,53 +130,12 @@ export class AdminUsersPanelComponent implements OnInit {
     });
   }
 
-  loadViewAs(email: string): void {
-    if (this.viewAsState === 'loading') return;
-    this.viewAsState = 'loading';
-    this.admin.viewAs(email).subscribe({
-      next: (res) => {
-        this.viewAsData = res;
-        this.viewAsState = 'loaded';
-      },
-      error: () => {
-        this.viewAsData = null;
-        this.viewAsState = 'error';
-      },
-    });
-  }
-
   optInEntries(optIns: AdminUserOptIns): Array<{ key: string; label: string; on: boolean }> {
     return (Object.keys(OPT_IN_LABELS) as Array<keyof AdminUserOptIns>).map((key) => ({
       key,
       label: OPT_IN_LABELS[key],
       on: !!optIns?.[key],
     }));
-  }
-
-  /** Same badge rendering, but defensive against `view-as`'s looser optIns type. */
-  viewAsOptInEntries(optIns: AdminViewAs['optIns']): Array<{ key: string; label: string; on: boolean }> {
-    if (!optIns) return [];
-    return Object.entries(optIns).map(([key, value]) => ({
-      key,
-      label: OPT_IN_LABELS[key as keyof AdminUserOptIns] ?? key,
-      on: !!value,
-    }));
-  }
-
-  prettyJson(value: unknown): string {
-    if (value === null || value === undefined) return '—';
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch {
-      return String(value);
-    }
-  }
-
-  hasContent(value: unknown): boolean {
-    if (value === null || value === undefined) return false;
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'object') return Object.keys(value).length > 0;
-    return true;
   }
 
   /** Compact "N/4" opt-in summary shown in the table row, so the count is

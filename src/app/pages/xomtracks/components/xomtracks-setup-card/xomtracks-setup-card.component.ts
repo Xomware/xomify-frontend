@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   XomtracksIngestTokensService,
 } from '../../services/xomtracks-ingest-tokens.service';
 import { XomifyAuthService } from '../../../../services/xomify-auth.service';
 import { ADMIN_EMAIL } from '../../config/xomtracks-admin';
+// `SharedModule` (not the directive directly) — `TooltipDirective` isn't
+// itself standalone, so it has to come in via its declaring NgModule.
+import { SharedModule } from '../../../../shared/shared.module';
 
 type XtSetupState = 'idle' | 'minting' | 'minted' | 'error';
 
@@ -31,14 +36,25 @@ const STORAGE_KEY_LABEL = 'xt.ingest.label';
  * Renders as a small, collapsed-by-default strip (`expanded`/`toggleExpanded`)
  * rather than an always-open card — it's a secondary affordance, not the
  * main point of the page. Hidden entirely for the admin account (`isAdmin`),
- * whose shares are always-on for everyone and never need self-serve setup.
+ * whose shares are always-on for everyone and never need self-serve setup —
+ * unless `forcePreview` is set, which is how the Admin Portal's "Preview:
+ * Shares signup" section (`admin-viewas-panel`) shows Dom this exact card as
+ * a first-time visitor would see it. Standalone so it can be dropped into
+ * that unrelated feature module's `imports` without pulling in all of
+ * `XomtracksModule`.
  */
 @Component({
   selector: 'app-xomtracks-setup-card',
+  standalone: true,
+  imports: [CommonModule, FormsModule, SharedModule],
   templateUrl: './xomtracks-setup-card.component.html',
   styleUrls: ['./xomtracks-setup-card.component.scss'],
 })
 export class XomtracksSetupCardComponent implements OnInit {
+  /** When true, renders the card's setup flow regardless of `isAdmin` — used
+   * by the Admin Portal's read-only "preview a new user" affordance. */
+  @Input() forcePreview = false;
+
   state: XtSetupState = 'idle';
   label = '';
   plaintextToken: string | null = null;
@@ -47,7 +63,8 @@ export class XomtracksSetupCardComponent implements OnInit {
   errorMessage = '';
   copied = false;
 
-  /** Collapsed by default — expands to reveal the mint form. */
+  /** Collapsed by default — expands to reveal the mint form. In preview
+   * mode it starts expanded so the whole flow is visible immediately. */
   expanded = false;
 
   constructor(
@@ -57,11 +74,13 @@ export class XomtracksSetupCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreExisting();
+    if (this.forcePreview) this.expanded = true;
   }
 
   /** True for the admin account — their shares are always-on for everyone,
-   * so this affordance never applies and stays hidden. */
+   * so this affordance never applies and stays hidden (unless previewing). */
   get isAdmin(): boolean {
+    if (this.forcePreview) return false;
     const email = this.auth.getEmail();
     return !!email && email.toLowerCase() === ADMIN_EMAIL;
   }

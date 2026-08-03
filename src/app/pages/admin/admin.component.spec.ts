@@ -94,4 +94,23 @@ describe('AdminComponent', () => {
     component.onTabKeydown(event, 1);
     expect(component.activeTab).toBe('users');
   });
+
+  it('viewAs sets the preset email and jumps to the View As tab', () => {
+    component.viewAs('someone@example.com');
+    expect(component.viewAsPresetEmail).toBe('someone@example.com');
+    expect(component.activeTab).toBe('viewas');
+    expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({ queryParams: { tab: 'viewas' } }));
+  });
+
+  it('viewAs updates the preset email even if already on the View As tab', () => {
+    component.viewAs('first@example.com');
+    (router.navigate as jasmine.Spy).calls.reset();
+
+    component.viewAs('second@example.com');
+    expect(component.viewAsPresetEmail).toBe('second@example.com');
+    expect(component.activeTab).toBe('viewas');
+    // setTab no-ops (already on 'viewas'), so no re-navigation happens —
+    // the child panel still re-loads because the @Input binding changes.
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
 });
