@@ -15,12 +15,25 @@
 //      static-token path keeps working until the dual-mode authorizer is
 //      retired (sub-feature 1l).
 //   3. Skip the header for `POST /auth/login` itself (public route).
-//   4. Skip non-Xomify/Xomtracks hosts (Spotify Web API, Spotify accounts,
-//      etc.) — those requests carry their own user-bound Spotify access token.
-//   5. On a 401 from a Xomify/Xomtracks call: refresh the Spotify access
+//   4. On a 401 from a Xomify/Xomtracks call: refresh the Spotify access
 //      token, mint a fresh JWT via `/auth/login`, and retry the original
 //      request ONCE. A second 401 is propagated to the caller (no infinite
 //      loop).
+//   5. Direct `api.spotify.com` calls (services build these themselves, e.g.
+//      UserService.getUserData, ListeningHistoryService.getRecentlyPlayed —
+//      they set their own `Authorization` header since they predate this
+//      interceptor). Spotify access tokens now persist in localStorage
+//      across browser restarts (see `persisted-token-storage.ts`), so a
+//      stale/expired one can sit there instead of forcing a re-login. Fix:
+//        a. Proactively check `AuthService.getValidAccessToken()` before
+//           sending — if the stored token is expired/near-expiry/unknown, it
+//           is refreshed first, and the (possibly stale) header the caller
+//           set is REPLACED with the fresh one.
+//        b. As a fallback, a 401 on a Spotify call still refreshes and
+//           retries ONCE, same as the Xomify path — belt and suspenders in
+//           case the proactive check's clock/expiry tracking is off.
+//      All other hosts (Spotify accounts.spotify.com token endpoint, etc.)
+//      pass through untouched.
 
 import { Injectable } from '@angular/core';
 import {
@@ -42,6 +55,8 @@ const AUTH_HEADER = 'Authorization';
 const AUTH_LOGIN_PATH = '/auth/login';
 /** Custom flag header marking a request as already-retried. Stripped before send. */
 const RETRY_FLAG_HEADER = 'X-Xomify-Auth-Retry';
+/** Base URL of the Spotify Web API — distinct from accounts.spotify.com. */
+const SPOTIFY_API_BASE = 'https://api.spotify.com';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -54,8 +69,15 @@ export class AuthInterceptor implements HttpInterceptor {
     req: HttpRequest<unknown>,
     next: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    // Only touch calls aimed at the Xomify backend. Spotify, third-party,
-    // and absolute URLs to other hosts pass through untouched.
+    // Direct Spotify Web API calls get their own proactive-refresh +
+    // 401-retry handling (see file header, responsibility 5).
+    if (this.isSpotifyApiRequest(req)) {
+      return this.interceptSpotify(req, next);
+    }
+
+    // Only touch calls aimed at the Xomify backend. Third-party and
+    // absolute URLs to other hosts (e.g. accounts.spotify.com) pass through
+    // untouched.
     if (!this.isXomifyApiRequest(req)) {
       return next.handle(req);
     }
@@ -107,6 +129,13 @@ export class AuthInterceptor implements HttpInterceptor {
   private isAuthLoginRequest(req: HttpRequest<unknown>): boolean {
     // Match by path suffix to avoid coupling to the full base URL.
     return req.url.endsWith(AUTH_LOGIN_PATH);
+  }
+
+  private isSpotifyApiRequest(req: HttpRequest<unknown>): boolean {
+    // Only the Web API host — NOT accounts.spotify.com (the OAuth
+    // token/refresh endpoint AuthService itself calls; that request has no
+    // Bearer-token-swap concept and must pass through unmodified).
+    return req.url.startsWith(SPOTIFY_API_BASE);
   }
 
   private attachAuth(req: HttpRequest<unknown>): HttpRequest<unknown> {
@@ -175,6 +204,88 @@ export class AuthInterceptor implements HttpInterceptor {
               return next.handle(retried);
             }),
           );
+      }),
+      catchError((err: unknown) => throwError(() => err)),
+    );
+  }
+
+  /**
+   * Handles a direct `api.spotify.com` request (see file header,
+   * responsibility 5): proactively refreshes an expired/near-expiry access
+   * token BEFORE sending, swapping it into the `Authorization` header
+   * regardless of whatever (possibly stale) header the calling service set.
+   * Falls back to a reactive refresh-and-retry-once on a 401, in case the
+   * proactive expiry check missed a still-invalid token.
+   */
+  private interceptSpotify(
+    req: HttpRequest<unknown>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<unknown>> {
+    const isRetry = req.headers.has(RETRY_FLAG_HEADER);
+    const cleanReq = isRetry
+      ? req.clone({ headers: req.headers.delete(RETRY_FLAG_HEADER) })
+      : req;
+
+    if (isRetry) {
+      // Already carrying a freshly-refreshed token from handleSpotify401 —
+      // send as-is. A 401 here is NOT retried again (no infinite loop).
+      return next.handle(cleanReq);
+    }
+
+    return this.authService.getValidAccessToken().pipe(
+      switchMap((validToken) => {
+        // Swap in a known-fresh token when we have one — this is what
+        // actually fixes the stale-localStorage-token 401s, since the
+        // calling service builds this header itself before the interceptor
+        // ever sees the request. If no token is available (logged out),
+        // send unmodified and let the 401 (if any) surface normally.
+        const outgoing =
+          validToken && validToken.length > 0
+            ? cleanReq.clone({
+                setHeaders: { [AUTH_HEADER]: `Bearer ${validToken}` },
+              })
+            : cleanReq;
+
+        return next.handle(outgoing).pipe(
+          catchError((err: unknown) => {
+            if (err instanceof HttpErrorResponse && err.status === 401) {
+              return this.handleSpotify401(cleanReq, next);
+            }
+            return throwError(() => err);
+          }),
+        );
+      }),
+    );
+  }
+
+  /**
+   * Reactive fallback for a Spotify 401: refresh the access token and retry
+   * the original request ONCE with the fresh token swapped into the
+   * `Authorization` header. If there's no refresh token (or refresh fails),
+   * propagate the 401 — same contract as the Xomify `handle401` path.
+   */
+  private handleSpotify401(
+    originalReq: HttpRequest<unknown>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<unknown>> {
+    return this.authService.refreshSpotifyAccessToken().pipe(
+      switchMap((freshToken) => {
+        if (!freshToken) {
+          return throwError(
+            () =>
+              new HttpErrorResponse({
+                status: 401,
+                statusText: 'Unauthorized (no Spotify refresh token)',
+              }),
+          );
+        }
+        const retried = originalReq.clone({
+          setHeaders: {
+            [AUTH_HEADER]: `Bearer ${freshToken}`,
+            [RETRY_FLAG_HEADER]: '1',
+          },
+        });
+        return next.handle(retried);
       }),
       catchError((err: unknown) => throwError(() => err)),
     );

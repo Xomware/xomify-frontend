@@ -23,6 +23,9 @@ interface TokenResponse {
 
 const STORAGE_KEY_ACCESS = 'xomify_access_token';
 const STORAGE_KEY_REFRESH = 'xomify_refresh_token';
+const STORAGE_KEY_EXPIRES_AT = 'xomify_access_token_expires_at';
+/** Refresh proactively this far ahead of the actual expiry. */
+const EXPIRY_BUFFER_MS = 60_000;
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +39,12 @@ export class AuthService {
   private readonly spotifyTokenUrl = 'https://accounts.spotify.com/api/token';
   accessToken: string = '';
   refreshToken: string = '';
+  /**
+   * Epoch ms when `accessToken` expires. `0` means unknown (e.g. a session
+   * restored from a build that predates this field) — treated as expired so
+   * we refresh once rather than trusting a token we can't verify.
+   */
+  private accessTokenExpiresAt: number = 0;
 
   constructor(
     private http: HttpClient,
@@ -54,22 +63,69 @@ export class AuthService {
     // the legacy sessionStorage slot from before this change.
     const storedAccess = readPersistedToken(STORAGE_KEY_ACCESS);
     const storedRefresh = readPersistedToken(STORAGE_KEY_REFRESH);
+    const storedExpiresAt = readPersistedToken(STORAGE_KEY_EXPIRES_AT);
     if (storedAccess) {
       this.accessToken = storedAccess;
     }
     if (storedRefresh) {
       this.refreshToken = storedRefresh;
     }
+    // A missing/unparseable value leaves accessTokenExpiresAt at its default
+    // `0` (unknown -> treated as expired). This is the case for sessions
+    // persisted before this field existed, and for the localStorage
+    // migration — an access token restored across a browser restart with no
+    // known expiry gets refreshed once rather than trusted blindly, which is
+    // what actually fixes the direct-Spotify-call 401s.
+    const parsedExpiresAt = storedExpiresAt ? Number(storedExpiresAt) : NaN;
+    if (!Number.isNaN(parsedExpiresAt)) {
+      this.accessTokenExpiresAt = parsedExpiresAt;
+    }
   }
 
   private persistTokens(): void {
     writePersistedToken(STORAGE_KEY_ACCESS, this.accessToken);
     writePersistedToken(STORAGE_KEY_REFRESH, this.refreshToken);
+    writePersistedToken(
+      STORAGE_KEY_EXPIRES_AT,
+      String(this.accessTokenExpiresAt),
+    );
   }
 
   private clearPersistedTokens(): void {
     removePersistedToken(STORAGE_KEY_ACCESS);
     removePersistedToken(STORAGE_KEY_REFRESH);
+    removePersistedToken(STORAGE_KEY_EXPIRES_AT);
+  }
+
+  /**
+   * `true` when the current Spotify access token is missing, unknown-expiry,
+   * or within `bufferMs` of expiring. Spotify access tokens last 1h; the
+   * default 60s buffer avoids a token expiring mid-flight to Spotify's API.
+   */
+  isAccessTokenExpired(bufferMs: number = EXPIRY_BUFFER_MS): boolean {
+    if (!this.accessToken || this.accessToken.trim().length === 0) {
+      return true;
+    }
+    if (!this.accessTokenExpiresAt) {
+      return true;
+    }
+    return Date.now() + bufferMs >= this.accessTokenExpiresAt;
+  }
+
+  /**
+   * Returns a Spotify access token known to be valid for at least
+   * `EXPIRY_BUFFER_MS`, refreshing first if the current one is expired,
+   * about to expire, or of unknown expiry. Used by the AuthInterceptor to
+   * proactively refresh before a direct `api.spotify.com` call, so `/me` and
+   * `/recently-played` don't 401 on the first load after a browser restart
+   * (Spotify access tokens now persist in localStorage, so a stale one can
+   * stick around instead of forcing a fresh login).
+   */
+  getValidAccessToken(): Observable<string | null> {
+    if (!this.isAccessTokenExpired()) {
+      return of(this.accessToken);
+    }
+    return this.refreshSpotifyAccessToken();
   }
 
   login(): void {
@@ -110,6 +166,8 @@ export class AuthService {
           if (response.refresh_token) {
             this.refreshToken = response.refresh_token;
           }
+          this.accessTokenExpiresAt =
+            Date.now() + response.expires_in * 1000;
           this.persistTokens();
 
           // Sub-feature 0e: mint a per-user Xomify JWT from the Spotify
@@ -163,6 +221,8 @@ export class AuthService {
           if (response.refresh_token) {
             this.refreshToken = response.refresh_token;
           }
+          this.accessTokenExpiresAt =
+            Date.now() + response.expires_in * 1000;
           this.persistTokens();
           return this.accessToken;
         }),
@@ -205,6 +265,7 @@ export class AuthService {
   logout(): void {
     this.accessToken = '';
     this.refreshToken = '';
+    this.accessTokenExpiresAt = 0;
     this.clearPersistedTokens();
     this.xomifyAuth.clear();
   }
