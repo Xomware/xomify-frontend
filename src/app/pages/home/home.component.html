@@ -57,7 +57,7 @@
 
     <header class="dashboard-header">
       <h1 class="dashboard-title">
-        Welcome back<span *ngIf="userName">, {{ userName }}</span>
+        Welcome back<ng-container *ngIf="userName">, <span class="dashboard-title-name">{{ userName }}</span></ng-container>
       </h1>
       <p class="dashboard-subtitle">Here's what's happening with your music.</p>
     </header>

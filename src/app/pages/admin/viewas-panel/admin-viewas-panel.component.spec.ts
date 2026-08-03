@@ -115,6 +115,27 @@ describe('AdminViewasPanelComponent', () => {
     expect(component.emailInput).toBe('');
   });
 
+  it('onStepThroughAs emits the currently-viewed email once a snapshot has loaded', () => {
+    component.presetEmail = 'someone@example.com';
+    fixture.detectChanges();
+    const emitted: string[] = [];
+    component.stepThroughAs.subscribe((email) => emitted.push(email));
+
+    component.onStepThroughAs();
+
+    expect(emitted).toEqual(['someone@example.com']);
+  });
+
+  it('onStepThroughAs is a no-op with no snapshot loaded (never impersonates an unverified email)', () => {
+    fixture.detectChanges();
+    const emitted: string[] = [];
+    component.stepThroughAs.subscribe((email) => emitted.push(email));
+
+    component.onStepThroughAs();
+
+    expect(emitted).toEqual([]);
+  });
+
   it('toggleSignupPreview flips the preview visibility', () => {
     fixture.detectChanges();
     expect(component.showSignupPreview).toBe(false);

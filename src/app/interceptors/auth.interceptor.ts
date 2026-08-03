@@ -34,6 +34,15 @@
 //           case the proactive check's clock/expiry tracking is off.
 //      All other hosts (Spotify accounts.spotify.com token endpoint, etc.)
 //      pass through untouched.
+//   6. Impersonation (full-app "step through as" mode, distinct from the
+//      read-only Admin Portal "View As" projection): while the admin is
+//      impersonating (`ImpersonationService.impersonatedEmail`), every
+//      request to the Xomtracks/Shares backend ONLY
+//      (`environment.xomtracksApiUrl` — never `xomifyApiUrl`, never Spotify)
+//      gets `?impersonate=<email>` appended. The backend contract (in
+//      flight) honors this param for admin-issued JWTs only and scopes
+//      Shares data to that user. Applied once, up front, before the
+//      retry/auth machinery below, so a 401-triggered retry still carries it.
 
 import { Injectable } from '@angular/core';
 import {
@@ -48,6 +57,12 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { XomifyAuthService } from '../services/xomify-auth.service';
 import { AuthService } from '../services/auth.service';
+import { ImpersonationService } from '../services/impersonation.service';
+import { isAdminEmail } from '../config/admin.config';
+
+/** Query param the Xomtracks/Shares backend reads to scope a request to the
+ * impersonated user's data instead of the calling admin's own. */
+const IMPERSONATE_PARAM = 'impersonate';
 
 /** Header name used by every Xomify API call. */
 const AUTH_HEADER = 'Authorization';
@@ -63,6 +78,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private xomifyAuth: XomifyAuthService,
     private authService: AuthService,
+    private impersonation: ImpersonationService,
   ) {}
 
   intercept(
@@ -87,10 +103,14 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const isRetry = req.headers.has(RETRY_FLAG_HEADER);
+    // Applied first (see responsibility 6) so it's baked into `cleanReq`,
+    // which both the happy path AND the 401 retry path below derive from.
+    const impersonatedReq = this.applyImpersonation(req);
+
+    const isRetry = impersonatedReq.headers.has(RETRY_FLAG_HEADER);
     const cleanReq = isRetry
-      ? req.clone({ headers: req.headers.delete(RETRY_FLAG_HEADER) })
-      : req;
+      ? impersonatedReq.clone({ headers: impersonatedReq.headers.delete(RETRY_FLAG_HEADER) })
+      : impersonatedReq;
     const authedReq = this.attachAuth(cleanReq);
 
     return next.handle(authedReq).pipe(
@@ -101,7 +121,7 @@ export class AuthInterceptor implements HttpInterceptor {
           err.status === 401 &&
           !isRetry
         ) {
-          return this.handle401(req, next);
+          return this.handle401(cleanReq, next);
         }
         return throwError(() => err);
       }),
@@ -129,6 +149,33 @@ export class AuthInterceptor implements HttpInterceptor {
   private isAuthLoginRequest(req: HttpRequest<unknown>): boolean {
     // Match by path suffix to avoid coupling to the full base URL.
     return req.url.endsWith(AUTH_LOGIN_PATH);
+  }
+
+  private isXomtracksApiRequest(req: HttpRequest<unknown>): boolean {
+    const xomtracksBase = environment.xomtracksApiUrl;
+    return !!xomtracksBase && req.url.startsWith(xomtracksBase);
+  }
+
+  /**
+   * While impersonating, appends `?impersonate=<email>` to Xomtracks/Shares
+   * calls ONLY — never xomify's own API, never Spotify (see responsibility
+   * 6). `HttpParams.set` URL-encodes the value. Re-checks admin status here
+   * too (belt and suspenders alongside `ImpersonationService.enter`'s own
+   * gate) so a stale value can never leak a scoped request for a non-admin
+   * caller. Never clobbers a value the caller already set explicitly.
+   */
+  private applyImpersonation(req: HttpRequest<unknown>): HttpRequest<unknown> {
+    if (!this.isXomtracksApiRequest(req)) {
+      return req;
+    }
+    const email = this.impersonation.impersonatedEmail;
+    if (!email || !isAdminEmail(this.xomifyAuth.getEmail())) {
+      return req;
+    }
+    if (req.params.has(IMPERSONATE_PARAM)) {
+      return req;
+    }
+    return req.clone({ params: req.params.set(IMPERSONATE_PARAM, email) });
   }
 
   private isSpotifyApiRequest(req: HttpRequest<unknown>): boolean {

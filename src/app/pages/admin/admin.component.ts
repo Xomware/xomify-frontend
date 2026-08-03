@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AX_ADMIN_DEFAULT_TAB, AX_ADMIN_TABS, AdminTab } from './models/admin-portal.model';
+import { ImpersonationService } from '../../services/impersonation.service';
 
 /**
  * The xomify-level Admin Portal (`/admin`, gated by `AdminGuard`). Reachable
@@ -42,6 +43,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private impersonation: ImpersonationService,
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +74,18 @@ export class AdminComponent implements OnInit, OnDestroy {
   viewAs(email: string): void {
     this.viewAsPresetEmail = email;
     this.setTab('viewas');
+  }
+
+  /**
+   * "Step through app as this user" — fired from either the Users panel's
+   * row action or the View As panel's button. Starts full impersonation
+   * (`ImpersonationService.enter`, admin-only/no-op otherwise) and navigates
+   * out of the Admin Portal into the app itself, where the persistent
+   * banner takes over.
+   */
+  stepThroughAs(email: string): void {
+    this.impersonation.enter(email);
+    this.router.navigateByUrl('/');
   }
 
   /** WAI-ARIA APG tablist keyboard pattern: Left/Right/Up/Down cycle,

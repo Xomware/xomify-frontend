@@ -71,10 +71,32 @@
       background: var(--ax-accent-muted);
     }
   }
+
+  &--sm {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+  }
+
+  // Live impersonation (as opposed to this panel's own read-only preview)
+  // gets the warning treatment so it reads as the more consequential action.
+  &--warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    color: var(--ax-warning);
+    border: 1px solid rgba(224, 166, 63, 0.4);
+
+    &:hover {
+      background: var(--ax-warning-muted);
+      filter: none;
+    }
+  }
 }
 
 .ax-viewas-banner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   margin-bottom: 14px;

@@ -83,6 +83,16 @@ describe('AdminUsersPanelComponent', () => {
     expect(emitted).toEqual(['a@b.com']);
   });
 
+  it('onStepThroughAs emits the user email for the parent shell to start impersonation', () => {
+    fixture.detectChanges();
+    const emitted: string[] = [];
+    component.stepThroughAs.subscribe((email) => emitted.push(email));
+
+    component.onStepThroughAs(users[0]);
+
+    expect(emitted).toEqual(['a@b.com']);
+  });
+
   it('optInSummary counts how many opt-ins are on', () => {
     expect(component.optInSummary(users[0].optIns)).toBe('2/4');
     expect(component.optInSummary(users[1].optIns)).toBe('2/4');

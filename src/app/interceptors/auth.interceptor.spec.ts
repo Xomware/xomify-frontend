@@ -28,6 +28,7 @@ import {
   XOMIFY_JWT_STORAGE_KEY,
 } from '../services/xomify-auth.service';
 import { AuthService } from '../services/auth.service';
+import { ImpersonationService } from '../services/impersonation.service';
 import { environment } from 'src/environments/environment';
 import { of } from 'rxjs';
 
@@ -35,6 +36,7 @@ describe('AuthInterceptor', () => {
   let httpClient: HttpClient;
   let httpMock: HttpTestingController;
   let xomifyAuth: XomifyAuthService;
+  let impersonation: ImpersonationService;
   let authServiceMock: jasmine.SpyObj<AuthService>;
 
   // The interceptor matches Xomify calls by `environment.xomifyApiUrl`
@@ -78,6 +80,7 @@ describe('AuthInterceptor', () => {
     httpClient = TestBed.inject(HttpClient);
     httpMock = TestBed.inject(HttpTestingController);
     xomifyAuth = TestBed.inject(XomifyAuthService);
+    impersonation = TestBed.inject(ImpersonationService);
   });
 
   afterEach(() => {
@@ -407,5 +410,121 @@ describe('AuthInterceptor', () => {
 
     expect(lastErrorStatus).toBe(500);
     expect(authServiceMock.refreshSpotifyAccessToken).not.toHaveBeenCalled();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Impersonation (`ImpersonationService` -> `?impersonate=<email>`)
+  // ---------------------------------------------------------------------------
+
+  describe('impersonation', () => {
+    const targetEmail = 'target@example.com';
+    // `xomtracksUrl` is passed to HttpClient as a single literal string
+    // (embedded query string, not the `params:` option), so Angular stores
+    // it verbatim as `request.url` and leaves `request.params` empty until
+    // the interceptor adds to it. Match on `urlWithParams`, which reflects
+    // both the original embedded query AND anything the interceptor appends.
+    const matchesXomtracksWithImpersonate = (r: { urlWithParams: string }) =>
+      r.urlWithParams.startsWith(xomtracksUrl) &&
+      r.urlWithParams.includes('impersonate=');
+
+    it('does not append ?impersonate= to Xomtracks calls when not impersonating', () => {
+      httpClient.get(xomtracksUrl).subscribe();
+
+      const req = httpMock.expectOne(xomtracksUrl);
+      expect(req.request.urlWithParams).toBe(xomtracksUrl);
+      expect(req.request.params.has('impersonate')).toBe(false);
+      req.flush({ data: {}, error: null, meta: {} });
+    });
+
+    it('appends ?impersonate=<email> to Xomtracks calls while impersonating as the admin, preserving existing query params', () => {
+      spyOn(xomifyAuth, 'getEmail').and.returnValue(
+        'dominickj.giordano@gmail.com',
+      );
+      impersonation.enter(targetEmail);
+
+      httpClient.get(xomtracksUrl).subscribe();
+
+      const req = httpMock.expectOne(matchesXomtracksWithImpersonate);
+      expect(req.request.params.get('impersonate')).toBe(targetEmail);
+      // The original embedded query string (`?direction=in&window=month`) is
+      // untouched — still part of the base url, now suffixed with `&impersonate=`.
+      expect(req.request.urlWithParams).toContain('direction=in');
+      expect(req.request.urlWithParams).toContain('window=month');
+      req.flush({ data: {}, error: null, meta: {} });
+    });
+
+    it('does NOT append ?impersonate= to xomify API calls, even while impersonating', () => {
+      spyOn(xomifyAuth, 'getEmail').and.returnValue(
+        'dominickj.giordano@gmail.com',
+      );
+      impersonation.enter(targetEmail);
+
+      httpClient.get(xomifyUrl).subscribe();
+
+      const req = httpMock.expectOne(xomifyUrl);
+      expect(req.request.urlWithParams).toBe(xomifyUrl);
+      expect(req.request.params.has('impersonate')).toBe(false);
+      req.flush({});
+    });
+
+    it('does NOT append ?impersonate= to direct Spotify calls, even while impersonating', () => {
+      spyOn(xomifyAuth, 'getEmail').and.returnValue(
+        'dominickj.giordano@gmail.com',
+      );
+      impersonation.enter(targetEmail);
+
+      httpClient.get(spotifyUrl).subscribe();
+
+      const req = httpMock.expectOne(spotifyUrl);
+      expect(req.request.params.has('impersonate')).toBe(false);
+      req.flush({});
+    });
+
+    it('does not append ?impersonate= when the current caller is not the admin', () => {
+      // `ImpersonationService.enter` itself no-ops for a non-admin caller —
+      // this end-to-end check confirms that no-op actually prevents the
+      // interceptor from ever seeing an impersonated email to append.
+      spyOn(xomifyAuth, 'getEmail').and.returnValue('someone-else@example.com');
+      impersonation.enter(targetEmail);
+      expect(impersonation.impersonatedEmail).toBeNull();
+
+      httpClient.get(xomtracksUrl).subscribe();
+
+      const req = httpMock.expectOne(xomtracksUrl);
+      expect(req.request.params.has('impersonate')).toBe(false);
+      req.flush({ data: {}, error: null, meta: {} });
+    });
+
+    it('preserves the impersonate param on the retried request after a 401', () => {
+      localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
+      spyOn(xomifyAuth, 'getEmail').and.returnValue(
+        'dominickj.giordano@gmail.com',
+      );
+      impersonation.enter(targetEmail);
+      authServiceMock.refreshSpotifyAccessToken.and.returnValue(
+        of('fresh-spotify-token'),
+      );
+
+      httpClient.get(xomtracksUrl).subscribe();
+
+      const initial = httpMock.expectOne(matchesXomtracksWithImpersonate);
+      initial.flush(
+        { error: 'unauthorized' },
+        { status: 401, statusText: 'Unauthorized' },
+      );
+
+      httpMock.expectOne(loginUrl).flush({
+        data: { token: 'fresh-jwt', expiresAt: '2099-01-01T00:00:00Z' },
+        error: null,
+        meta: {},
+      });
+
+      const retried = httpMock.expectOne(matchesXomtracksWithImpersonate);
+      expect(retried.request.params.get('impersonate')).toBe(targetEmail);
+      expect(retried.request.headers.get('Authorization')).toBe(
+        'Bearer fresh-jwt',
+      );
+      retried.flush({ ok: true });
+    });
   });
 });
