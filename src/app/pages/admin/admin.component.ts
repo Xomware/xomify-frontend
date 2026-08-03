@@ -6,12 +6,13 @@ import { AX_ADMIN_DEFAULT_TAB, AX_ADMIN_TABS, AdminTab } from './models/admin-po
 
 /**
  * The xomify-level Admin Portal (`/admin`, gated by `AdminGuard`). Reachable
- * from the user-avatar dropdown (Dom-only). A tabbed shell over six
- * sections — Overview, Health, Users, Crons, Notifications, Broadcasts —
- * plus a link out to the separately-gated Shares Admin Portal
+ * from the user-avatar dropdown (Dom-only). A tabbed shell over seven
+ * sections — Overview, Health, Users, View As, Crons, Notifications,
+ * Broadcasts — plus a link out to the separately-gated Shares Admin Portal
  * (`/shares/admin`, xomtracks-backend). `docs/features/xomify-admin-portal/
  * PLAN.md`; the macOS-style restyle + Overview tab are a follow-up pass on
- * top of that.
+ * top of that. View As restores the impersonation feature dropped by that
+ * restyle, promoted from an inline Users-panel drawer to its own tab.
  *
  * Only the active tab's panel is mounted (`*ngSwitch`), so each panel owns
  * its own load/error/empty state independently and nothing fetches until
@@ -31,6 +32,10 @@ export class AdminComponent implements OnInit, OnDestroy {
   readonly tabs = AX_ADMIN_TABS;
 
   activeTab: AdminTab = AX_ADMIN_DEFAULT_TAB;
+
+  /** Set when the Users panel's "View as" row action fires; consumed once by
+   * the View As panel's `presetEmail` input on mount. */
+  viewAsPresetEmail: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -61,6 +66,12 @@ export class AdminComponent implements OnInit, OnDestroy {
       queryParamsHandling: '',
       replaceUrl: true,
     });
+  }
+
+  /** "View as" from the Users panel: jump to the View As tab pre-loaded for that user. */
+  viewAs(email: string): void {
+    this.viewAsPresetEmail = email;
+    this.setTab('viewas');
   }
 
   /** WAI-ARIA APG tablist keyboard pattern: Left/Right/Up/Down cycle,

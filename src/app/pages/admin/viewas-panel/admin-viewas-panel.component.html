@@ -1,0 +1,126 @@
+<div class="ax-viewas">
+  <form class="ax-viewas-form" (ngSubmit)="submit()">
+    <label class="ax-viewas-field">
+      <span>User email</span>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="emailInput"
+        placeholder="someone@example.com"
+        required
+        aria-label="Email of the user to view as"
+      />
+    </label>
+    <button type="submit" class="ax-btn" [disabled]="!emailInput.trim()">View</button>
+  </form>
+
+  <!-- Read-only banner — shown any time a snapshot is loaded or loading -->
+  <div class="ax-viewas-banner" *ngIf="viewingEmail || state === 'loading'" role="status">
+    <span *ngIf="viewingEmail">
+      Viewing as <strong>{{ viewingEmail }}</strong> (read-only)
+    </span>
+    <span *ngIf="!viewingEmail && state === 'loading'">Loading…</span>
+    <button type="button" class="ax-viewas-exit" (click)="exit()" *ngIf="viewingEmail">Exit</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="ax-state-block" *ngIf="state === 'loading'" aria-busy="true" aria-live="polite">
+    <app-icon name="spinner" [size]="28"></app-icon>
+    <p>Loading {{ emailInput }}'s view-as snapshot…</p>
+  </div>
+
+  <!-- Not found -->
+  <div class="ax-state-block" *ngIf="state === 'not-found'" role="alert">
+    <app-icon name="search" [size]="28"></app-icon>
+    <h2>Unknown user</h2>
+    <p>"{{ emailInput }}" hasn't signed into Xomify.</p>
+  </div>
+
+  <!-- Error -->
+  <div class="ax-state-block ax-state-block--error" *ngIf="state === 'error'" role="alert">
+    <app-icon name="warning" [size]="28"></app-icon>
+    <h2>Couldn't load that snapshot</h2>
+    <button type="button" class="ax-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Idle -->
+  <div class="ax-state-block" *ngIf="state === 'idle'">
+    <app-icon name="eye" [size]="28"></app-icon>
+    <h2>No user selected</h2>
+    <p>Enter an email above, or use "View as" from the Users tab.</p>
+  </div>
+
+  <!-- Loaded -->
+  <div class="ax-viewas-result" *ngIf="state === 'loaded' && data as va">
+    <p class="ax-viewas-note" role="note">{{ va.note }}</p>
+
+    <div class="ax-viewas-grid">
+      <section class="ax-drawer-section" *ngIf="hasContent(va.profile)">
+        <h3>Profile</h3>
+        <pre class="ax-raw-pre">{{ prettyJson(va.profile) }}</pre>
+      </section>
+
+      <section class="ax-drawer-section" *ngIf="optInEntries(va.optIns).length">
+        <h3>Opt-ins</h3>
+        <div class="ax-badge-row">
+          <span
+            class="ax-badge"
+            *ngFor="let opt of optInEntries(va.optIns)"
+            [class.ax-badge--on]="opt.on"
+          >
+            {{ opt.label }}: {{ opt.on ? 'On' : 'Off' }}
+          </span>
+        </div>
+      </section>
+
+      <section class="ax-drawer-section">
+        <h3>Recent visits</h3>
+        <p class="ax-drawer-empty" *ngIf="!va.recentVisits.length">No recent visits.</p>
+        <ul class="ax-visit-list" *ngIf="va.recentVisits.length" aria-label="Their recent visits">
+          <li *ngFor="let v of va.recentVisits; trackBy: trackByVisit">
+            <span class="ax-visit-path">{{ v.path }}</span>
+            <span class="ax-visit-ts">{{ v.ts | axTimestamp: 'relative' }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="ax-drawer-section" *ngIf="hasContent(va.favorites)">
+        <h3>Favorites</h3>
+        <pre class="ax-raw-pre">{{ prettyJson(va.favorites) }}</pre>
+      </section>
+
+      <section class="ax-drawer-section" *ngIf="hasContent(va.activeBroadcasts)">
+        <h3>Active broadcasts ({{ va.activeBroadcasts.length }})</h3>
+        <pre class="ax-raw-pre">{{ prettyJson(va.activeBroadcasts) }}</pre>
+      </section>
+    </div>
+  </div>
+
+  <!-- Preview: Shares new-user signup -->
+  <section class="ax-signup-preview" aria-labelledby="ax-signup-preview-heading">
+    <button
+      type="button"
+      class="ax-btn ax-btn--secondary"
+      [attr.aria-expanded]="showSignupPreview"
+      aria-controls="ax-signup-preview-body"
+      (click)="toggleSignupPreview()"
+    >
+      <app-icon name="sparkle" [size]="14"></app-icon>
+      {{ showSignupPreview ? 'Hide' : 'Preview' }} Shares new-user signup
+    </button>
+
+    <div class="ax-signup-preview-body" id="ax-signup-preview-body" *ngIf="showSignupPreview">
+      <h2 id="ax-signup-preview-heading" class="ax-signup-preview-heading">
+        Preview: what a new user sees when they set up Shares
+      </h2>
+      <p class="ax-signup-preview-copy">
+        Your account is always-on for everyone, so this card is normally hidden for you —
+        this renders it exactly as a first-time visitor would see it, so you can walk
+        through the toggle-in, generate-token, and install steps. It's fully live: clicking
+        "Generate my token" below mints a real ingest token on your own account, the same
+        way it would for them.
+      </p>
+      <app-xomtracks-setup-card [forcePreview]="true"></app-xomtracks-setup-card>
+    </div>
+  </section>
+</div>

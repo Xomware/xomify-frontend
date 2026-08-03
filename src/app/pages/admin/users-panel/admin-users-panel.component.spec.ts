@@ -6,7 +6,7 @@ import { AdminUsersPanelComponent } from './admin-users-panel.component';
 import { IconComponent } from '../../../components/icon/icon.component';
 import { AxTimestampPipe } from '../pipes/ax-timestamp.pipe';
 import { AdminPortalService } from '../services/admin-portal.service';
-import { AdminUser, AdminViewAs } from '../models/admin-portal.model';
+import { AdminUser } from '../models/admin-portal.model';
 
 describe('AdminUsersPanelComponent', () => {
   let fixture: ComponentFixture<AdminUsersPanelComponent>;
@@ -31,7 +31,7 @@ describe('AdminUsersPanelComponent', () => {
   ];
 
   beforeEach(async () => {
-    adminSpy = jasmine.createSpyObj('AdminPortalService', ['usersList', 'userVisits', 'viewAs']);
+    adminSpy = jasmine.createSpyObj('AdminPortalService', ['usersList', 'userVisits']);
     adminSpy.usersList.and.returnValue(of(users));
     adminSpy.userVisits.and.returnValue(of([{ ts: '2026-07-28T00:00:00Z', path: '/home' }]));
 
@@ -73,43 +73,14 @@ describe('AdminUsersPanelComponent', () => {
     expect(component.expandedEmail).toBeNull();
   });
 
-  it('does not load view-as until explicitly requested', () => {
+  it('onViewAs emits the user email for the parent shell to handle', () => {
     fixture.detectChanges();
-    component.toggleRow(users[0]);
-    expect(adminSpy.viewAs).not.toHaveBeenCalled();
-    expect(component.viewAsState).toBe('idle');
-  });
+    const emitted: string[] = [];
+    component.viewAs.subscribe((email) => emitted.push(email));
 
-  it('loadViewAs fetches the read-only snapshot and shows the note', () => {
-    const snapshot: AdminViewAs = {
-      email: 'a@b.com',
-      profile: { displayName: 'A' },
-      optIns: { wrapped: true },
-      recentVisits: [],
-      favorites: null,
-      activeBroadcasts: [],
-      note: "Spotify-derived surfaces aren't impersonated.",
-    };
-    adminSpy.viewAs.and.returnValue(of(snapshot));
+    component.onViewAs(users[0]);
 
-    fixture.detectChanges();
-    component.toggleRow(users[0]);
-    component.loadViewAs('a@b.com');
-
-    expect(component.viewAsState).toBe('loaded');
-    expect(component.viewAsData?.note).toBe(snapshot.note);
-  });
-
-  it('viewAsOptInEntries handles a null optIns gracefully', () => {
-    expect(component.viewAsOptInEntries(null)).toEqual([]);
-  });
-
-  it('hasContent distinguishes empty from populated values', () => {
-    expect(component.hasContent(null)).toBe(false);
-    expect(component.hasContent([])).toBe(false);
-    expect(component.hasContent({})).toBe(false);
-    expect(component.hasContent([1])).toBe(true);
-    expect(component.hasContent({ a: 1 })).toBe(true);
+    expect(emitted).toEqual(['a@b.com']);
   });
 
   it('optInSummary counts how many opt-ins are on', () => {

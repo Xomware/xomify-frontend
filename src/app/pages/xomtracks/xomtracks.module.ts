@@ -35,7 +35,6 @@ const routes: Routes = [
     XomtracksTrackDetailModalComponent,
     XomtracksRatingStarsComponent,
     XomtracksPlaylistsPanelComponent,
-    XomtracksSetupCardComponent,
     XomtracksAdminComponent,
     XomtracksAdminUsersPanelComponent,
     XomtracksAdminViewasPanelComponent,
@@ -47,6 +46,9 @@ const routes: Routes = [
     FormsModule,
     SharedModule, // brings in the `[appTooltip]` directive
     RouterModule.forChild(routes),
+    // Standalone — also reused as-is by the xomify Admin Portal's "Preview:
+    // Shares signup" section (`admin-viewas-panel`, in `forcePreview` mode).
+    XomtracksSetupCardComponent,
   ],
 })
 export class XomtracksModule {}
