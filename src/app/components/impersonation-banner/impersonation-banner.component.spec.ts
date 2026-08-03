@@ -12,11 +12,17 @@ describe('ImpersonationBannerComponent', () => {
   let impersonationSpy: jasmine.SpyObj<ImpersonationService>;
   let router: Router;
 
-  async function build(impersonatedEmail: string | null): Promise<void> {
+  async function build(
+    impersonatedEmail: string | null,
+    spotifyTokenUnavailable = false,
+  ): Promise<void> {
     impersonationSpy = jasmine.createSpyObj(
       'ImpersonationService',
       ['exit'],
-      { impersonatedEmail$: of(impersonatedEmail) },
+      {
+        impersonatedEmail$: of(impersonatedEmail),
+        spotifyTokenUnavailable$: of(spotifyTokenUnavailable),
+      },
     );
 
     await TestBed.configureTestingModule({
@@ -43,6 +49,19 @@ describe('ImpersonationBannerComponent', () => {
     const el = fixture.debugElement.query(By.css('.impersonation-banner'));
     expect(el).not.toBeNull();
     expect(el.nativeElement.textContent).toContain('target@example.com');
+  });
+
+  it('does not render the Spotify-token-unavailable note when the target token loaded fine', async () => {
+    await build('target@example.com', false);
+    const note = fixture.debugElement.query(By.css('.impersonation-banner-note'));
+    expect(note).toBeNull();
+  });
+
+  it('renders the Spotify-token-unavailable note when minting the target token failed', async () => {
+    await build('target@example.com', true);
+    const note = fixture.debugElement.query(By.css('.impersonation-banner-note'));
+    expect(note).not.toBeNull();
+    expect(note.nativeElement.textContent).toContain("couldn't load their Spotify data");
   });
 
   it('exit() clears impersonation and navigates back to /admin', async () => {

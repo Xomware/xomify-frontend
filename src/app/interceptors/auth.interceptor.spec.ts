@@ -413,11 +413,13 @@ describe('AuthInterceptor', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Impersonation (`ImpersonationService` -> `?impersonate=<email>`)
+  // Impersonation (`ImpersonationService` -> `?impersonate=<email>` +
+  // TARGET Spotify access token swap)
   // ---------------------------------------------------------------------------
 
   describe('impersonation', () => {
     const targetEmail = 'target@example.com';
+    const impersonationTokenUrl = `${xomifyBase}/admin/impersonation-token`;
     // `xomtracksUrl` is passed to HttpClient as a single literal string
     // (embedded query string, not the `params:` option), so Angular stores
     // it verbatim as `request.url` and leaves `request.params` empty until
@@ -426,6 +428,32 @@ describe('AuthInterceptor', () => {
     const matchesXomtracksWithImpersonate = (r: { urlWithParams: string }) =>
       r.urlWithParams.startsWith(xomtracksUrl) &&
       r.urlWithParams.includes('impersonate=');
+
+    /** `enter()` fires an eager GET to mint the target's Spotify token — flush
+     * it so `httpMock.verify()` doesn't see it as unhandled. */
+    function flushImpersonationToken(
+      email: string,
+      response: { accessToken: string; expiresIn: number } | null = {
+        accessToken: 'target-spotify-token',
+        expiresIn: 3600,
+      },
+    ): void {
+      const req = httpMock.expectOne(
+        (r) => r.url === impersonationTokenUrl && r.params.get('email') === email,
+      );
+      if (response) {
+        req.flush(response);
+      } else {
+        req.flush({ message: 'not found' }, { status: 404, statusText: 'Not Found' });
+      }
+    }
+
+    function enterAsAdmin(email: string): void {
+      spyOn(xomifyAuth, 'getEmail').and.returnValue(
+        'dominickj.giordano@gmail.com',
+      );
+      impersonation.enter(email);
+    }
 
     it('does not append ?impersonate= to Xomtracks calls when not impersonating', () => {
       httpClient.get(xomtracksUrl).subscribe();
@@ -437,10 +465,8 @@ describe('AuthInterceptor', () => {
     });
 
     it('appends ?impersonate=<email> to Xomtracks calls while impersonating as the admin, preserving existing query params', () => {
-      spyOn(xomifyAuth, 'getEmail').and.returnValue(
-        'dominickj.giordano@gmail.com',
-      );
-      impersonation.enter(targetEmail);
+      enterAsAdmin(targetEmail);
+      flushImpersonationToken(targetEmail);
 
       httpClient.get(xomtracksUrl).subscribe();
 
@@ -453,25 +479,42 @@ describe('AuthInterceptor', () => {
       req.flush({ data: {}, error: null, meta: {} });
     });
 
-    it('does NOT append ?impersonate= to xomify API calls, even while impersonating', () => {
-      spyOn(xomifyAuth, 'getEmail').and.returnValue(
-        'dominickj.giordano@gmail.com',
-      );
-      impersonation.enter(targetEmail);
+    it('appends ?impersonate=<email> to a READ (GET) xomify API call while impersonating — e.g. /user/top-items', () => {
+      enterAsAdmin(targetEmail);
+      flushImpersonationToken(targetEmail);
 
       httpClient.get(xomifyUrl).subscribe();
 
-      const req = httpMock.expectOne(xomifyUrl);
-      expect(req.request.urlWithParams).toBe(xomifyUrl);
+      const req = httpMock.expectOne(
+        (r) => r.url === xomifyUrl && r.params.get('impersonate') === targetEmail,
+      );
+      req.flush({});
+    });
+
+    it('does NOT append ?impersonate= to a WRITE (POST) xomify API call, even while impersonating', () => {
+      enterAsAdmin(targetEmail);
+      flushImpersonationToken(targetEmail);
+
+      httpClient.post(`${xomifyBase}/user/update`, { wrappedEnrolled: true }).subscribe();
+
+      const req = httpMock.expectOne(`${xomifyBase}/user/update`);
       expect(req.request.params.has('impersonate')).toBe(false);
       req.flush({});
     });
 
-    it('does NOT append ?impersonate= to direct Spotify calls, even while impersonating', () => {
-      spyOn(xomifyAuth, 'getEmail').and.returnValue(
-        'dominickj.giordano@gmail.com',
+    it('never appends ?impersonate= to the impersonation-token mint endpoint itself', () => {
+      enterAsAdmin(targetEmail);
+
+      const req = httpMock.expectOne(
+        (r) => r.url === impersonationTokenUrl && r.params.get('email') === targetEmail,
       );
-      impersonation.enter(targetEmail);
+      expect(req.request.params.has('impersonate')).toBe(false);
+      req.flush({ accessToken: 'target-spotify-token', expiresIn: 3600 });
+    });
+
+    it('does NOT append ?impersonate= (query param) to direct Spotify calls, even while impersonating', () => {
+      enterAsAdmin(targetEmail);
+      flushImpersonationToken(targetEmail);
 
       httpClient.get(spotifyUrl).subscribe();
 
@@ -487,6 +530,8 @@ describe('AuthInterceptor', () => {
       spyOn(xomifyAuth, 'getEmail').and.returnValue('someone-else@example.com');
       impersonation.enter(targetEmail);
       expect(impersonation.impersonatedEmail).toBeNull();
+      // Non-admin `enter()` never even attempts to mint a target token.
+      httpMock.expectNone(impersonationTokenUrl);
 
       httpClient.get(xomtracksUrl).subscribe();
 
@@ -497,10 +542,8 @@ describe('AuthInterceptor', () => {
 
     it('preserves the impersonate param on the retried request after a 401', () => {
       localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'stale-jwt');
-      spyOn(xomifyAuth, 'getEmail').and.returnValue(
-        'dominickj.giordano@gmail.com',
-      );
-      impersonation.enter(targetEmail);
+      enterAsAdmin(targetEmail);
+      flushImpersonationToken(targetEmail);
       authServiceMock.refreshSpotifyAccessToken.and.returnValue(
         of('fresh-spotify-token'),
       );
@@ -525,6 +568,111 @@ describe('AuthInterceptor', () => {
         'Bearer fresh-jwt',
       );
       retried.flush({ ok: true });
+    });
+
+    // -------------------------------------------------------------------------
+    // Target Spotify access token swap (top items, recently-played,
+    // now-playing, playlists, the greeting — all direct api.spotify.com calls)
+    // -------------------------------------------------------------------------
+
+    describe('Spotify token swap', () => {
+      it('uses the TARGET Spotify access token on a direct Spotify call while impersonating', () => {
+        enterAsAdmin(targetEmail);
+        flushImpersonationToken(targetEmail, {
+          accessToken: 'target-spotify-token',
+          expiresIn: 3600,
+        });
+
+        httpClient
+          .get(spotifyUrl, { headers: { Authorization: 'Bearer admins-own-stale-token' } })
+          .subscribe();
+
+        const req = httpMock.expectOne(spotifyUrl);
+        expect(req.request.headers.get('Authorization')).toBe(
+          'Bearer target-spotify-token',
+        );
+        req.flush({});
+      });
+
+      it('falls back to the admin\'s own Spotify token when minting the target token fails', () => {
+        enterAsAdmin(targetEmail);
+        flushImpersonationToken(targetEmail, null);
+        authServiceMock.getValidAccessToken.and.returnValue(
+          of('admins-own-fresh-token'),
+        );
+
+        httpClient.get(spotifyUrl).subscribe();
+
+        const req = httpMock.expectOne(spotifyUrl);
+        expect(req.request.headers.get('Authorization')).toBe(
+          'Bearer admins-own-fresh-token',
+        );
+        req.flush({});
+      });
+
+      it('does not use the target token for Spotify calls when not impersonating', () => {
+        authServiceMock.getValidAccessToken.and.returnValue(
+          of('admins-own-fresh-token'),
+        );
+
+        httpClient.get(spotifyUrl).subscribe();
+
+        const req = httpMock.expectOne(spotifyUrl);
+        expect(req.request.headers.get('Authorization')).toBe(
+          'Bearer admins-own-fresh-token',
+        );
+        req.flush({});
+        httpMock.expectNone(impersonationTokenUrl);
+      });
+
+      it('on a Spotify 401 while impersonating: re-mints the target token and retries once', () => {
+        enterAsAdmin(targetEmail);
+        flushImpersonationToken(targetEmail, {
+          accessToken: 'stale-target-token',
+          expiresIn: 3600,
+        });
+
+        httpClient.get(spotifyUrl).subscribe();
+
+        const initial = httpMock.expectOne(spotifyUrl);
+        expect(initial.request.headers.get('Authorization')).toBe(
+          'Bearer stale-target-token',
+        );
+        initial.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+        // Retry path forces a fresh mint (bypasses the cached token above).
+        flushImpersonationToken(targetEmail, {
+          accessToken: 'refreshed-target-token',
+          expiresIn: 3600,
+        });
+
+        const retried = httpMock.expectOne(spotifyUrl);
+        expect(retried.request.headers.get('Authorization')).toBe(
+          'Bearer refreshed-target-token',
+        );
+        retried.flush({ ok: true });
+      });
+
+      it('reuses the cached target token across multiple Spotify calls (no redundant mint requests)', () => {
+        enterAsAdmin(targetEmail);
+        flushImpersonationToken(targetEmail, {
+          accessToken: 'target-spotify-token',
+          expiresIn: 3600,
+        });
+
+        httpClient.get(spotifyUrl).subscribe();
+        httpMock.expectOne(spotifyUrl).flush({});
+
+        httpClient.get(`${spotifyUrl}/player`).subscribe();
+        const second = httpMock.expectOne(`${spotifyUrl}/player`);
+        expect(second.request.headers.get('Authorization')).toBe(
+          'Bearer target-spotify-token',
+        );
+        second.flush({});
+
+        // Only the one eager mint from `enter()` — no per-call re-fetch.
+        httpMock.expectNone(impersonationTokenUrl);
+      });
     });
   });
 });

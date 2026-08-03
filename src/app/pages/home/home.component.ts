@@ -9,6 +9,7 @@ import {
 } from 'src/app/services/listening-history.service';
 import { TopItemsData, TopItemsService } from 'src/app/services/top-items.service';
 import { Broadcast, BroadcastsService } from 'src/app/services/broadcasts.service';
+import { ImpersonationService } from 'src/app/services/impersonation.service';
 import { SpotlightSlide } from './spotlight-rotator/spotlight-rotator.component';
 import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
 
@@ -73,8 +74,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   // away and back to Home within the same session shows the top-items
   // module instantly instead of re-showing its skeleton -- mirrors the
   // pattern ListeningHistoryService already uses for recently-played.
-  private readonly topItemsCacheKey = 'xomify_home_top_items';
+  //
+  // The key is suffixed with the current impersonation target (or `self`)
+  // so entering/exiting impersonation can never serve a still-fresh cache
+  // entry that belongs to the OTHER identity -- top-items now varies by
+  // who's being impersonated (see AuthInterceptor's `?impersonate=` widening
+  // to `/user/top-items`).
+  private readonly topItemsCacheBaseKey = 'xomify_home_top_items';
   private readonly topItemsCacheTTL = 10 * 60 * 1000; // 10 minutes
+
+  private get topItemsCacheKey(): string {
+    return `${this.topItemsCacheBaseKey}:${this.impersonation.impersonatedEmail ?? 'self'}`;
+  }
 
   private destroy$ = new Subject<void>();
 
@@ -84,6 +95,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private listeningHistoryService: ListeningHistoryService,
     private topItemsService: TopItemsService,
     private broadcastsService: BroadcastsService,
+    private impersonation: ImpersonationService,
     private router: Router,
   ) {}
 

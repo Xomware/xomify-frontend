@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { ImpersonationService } from './impersonation.service';
 
 export interface RecentlyPlayedItem {
   track: {
@@ -43,7 +44,22 @@ export class ListeningHistoryService {
   private readonly cacheKey = 'xomify_recently_played';
   private readonly cacheTTL = 10 * 60 * 1000; // 10 minutes
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private impersonation: ImpersonationService,
+  ) {
+    // Recently-played is cached client-side (see `cacheKey`/`cacheTTL`
+    // below) keyed on nothing but the browser session — an impersonation
+    // enter/exit swaps the Spotify token the interceptor attaches (see
+    // AuthInterceptor), but a still-fresh cache entry from before the
+    // switch would otherwise keep serving whichever identity's data was
+    // cached first. Clear it on every transition so the next call re-fetches
+    // with the newly-active token.
+    this.impersonation.impersonatedEmail$.subscribe(() => {
+      this.clearCache();
+    });
+  }
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({

@@ -8,9 +8,12 @@
 
   <p class="impersonation-banner-text">
     Impersonating <strong>{{ email }}</strong>
-    <span class="impersonation-banner-note">
-      &mdash; Shares reflects their account. Spotify-derived stats (top items, recently
-      played, likes) still show yours &mdash; there's no target Spotify token to impersonate.
+    <span
+      class="impersonation-banner-note"
+      *ngIf="spotifyTokenUnavailable$ | async"
+    >
+      &mdash; couldn't load their Spotify data (no token available) &mdash; Spotify-derived
+      stats still show yours.
     </span>
   </p>
 

@@ -14,6 +14,15 @@ import { ImpersonationService } from '../../services/impersonation.service';
  * (see `app.component.scss`), which both `app-toolbar` and `.content` read
  * to shift down and stay clear of the fixed toolbar — see those files for
  * the mechanism.
+ *
+ * Spotify-derived surfaces (top items, recently-played, playlists, the
+ * greeting) DO reflect the target now — impersonation swaps in the target's
+ * Spotify access token (see `ImpersonationService`). `spotifyTokenUnavailable$`
+ * is only true when minting that token failed (e.g. the backend endpoint
+ * isn't deployed yet, or the target has no stored Spotify refresh token);
+ * in that case Spotify-derived surfaces silently fall back to the admin's
+ * own data, so the banner calls that out explicitly rather than leaving it
+ * silently wrong.
  */
 @Component({
   selector: 'app-impersonation-banner',
@@ -22,12 +31,14 @@ import { ImpersonationService } from '../../services/impersonation.service';
 })
 export class ImpersonationBannerComponent {
   readonly impersonatedEmail$: Observable<string | null>;
+  readonly spotifyTokenUnavailable$: Observable<boolean>;
 
   constructor(
     private impersonation: ImpersonationService,
     private router: Router,
   ) {
     this.impersonatedEmail$ = this.impersonation.impersonatedEmail$;
+    this.spotifyTokenUnavailable$ = this.impersonation.spotifyTokenUnavailable$;
   }
 
   exit(): void {

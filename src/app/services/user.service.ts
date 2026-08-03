@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { ImpersonationService } from './impersonation.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -34,11 +35,33 @@ export class UserService implements OnInit {
   constructor(
     private http: HttpClient,
     private AuthService: AuthService,
-  ) {}
+    private impersonation: ImpersonationService,
+  ) {
+    // Every transition in/out of impersonation (or between two different
+    // targets) means `getUserData()`'s next call must hit `/me` again with
+    // the newly-swapped Spotify token (see AuthInterceptor) — otherwise the
+    // "Welcome, <name>" greeting and enrollment flags would keep showing
+    // whichever profile was cached before the switch, since `ensureLoaded()`
+    // otherwise short-circuits on an already-populated cache.
+    this.impersonation.impersonatedEmail$.subscribe(() => {
+      this.resetProfileCache();
+    });
+  }
 
   ngOnInit() {
     this.accessToken = this.AuthService.getAccessToken();
     this.refreshToken = this.AuthService.getRefreshToken();
+  }
+
+  /** See constructor — clears the in-memory Spotify-profile/enrollment cache
+   * so the next `ensureLoaded()` call re-fetches instead of replaying stale
+   * data across an impersonation enter/exit. */
+  private resetProfileCache(): void {
+    this.enrollmentLoaded = false;
+    this.bootstrap$ = null;
+    this.userName = '';
+    this.user = undefined;
+    this.id = '';
   }
 
   private getAuthHeaders(): HttpHeaders {
