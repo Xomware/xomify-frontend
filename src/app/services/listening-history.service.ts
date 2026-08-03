@@ -42,7 +42,12 @@ export interface PlaySession {
 export class ListeningHistoryService {
   private readonly spotifyBase = 'https://api.spotify.com/v1';
   private readonly cacheKey = 'xomify_recently_played';
-  private readonly cacheTTL = 10 * 60 * 1000; // 10 minutes
+  // Short TTL so the Home recently-played strip (and the "latest play" the
+  // spotlight rotator derives from it) stays close to live — xomware's
+  // server-side now-playing is always fresh, and a 10-min client cache made
+  // xomify visibly lag it. 60s still coalesces the burst of callers on a
+  // single Home load into one Spotify request.
+  private readonly cacheTTL = 60 * 1000; // 60 seconds
 
   constructor(
     private http: HttpClient,
