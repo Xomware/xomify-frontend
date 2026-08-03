@@ -26,6 +26,7 @@ import { ImpersonationBannerComponent } from './components/impersonation-banner/
 import { HomeComponent } from './pages/home/home.component';
 import { BroadcastBannerComponent } from './pages/home/broadcast-banner/broadcast-banner.component';
 import { ActiveListeningComponent } from './pages/home/active-listening/active-listening.component';
+import { NowPlayingComponent } from './pages/home/now-playing/now-playing.component';
 import { TopItemsRotatorComponent } from './pages/home/top-items-rotator/top-items-rotator.component';
 import { SpotlightRotatorComponent } from './pages/home/spotlight-rotator/spotlight-rotator.component';
 import { QuickLinksComponent } from './pages/home/quick-links/quick-links.component';
@@ -60,6 +61,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     HomeComponent,
     BroadcastBannerComponent,
     ActiveListeningComponent,
+    NowPlayingComponent,
     TopItemsRotatorComponent,
     SpotlightRotatorComponent,
     QuickLinksComponent,

@@ -1,0 +1,39 @@
+<section
+  class="dashboard-module now-playing"
+  *ngIf="state?.track as track"
+  aria-labelledby="now-playing-heading"
+>
+  <div class="module-header">
+    <h2 id="now-playing-heading" class="module-title">
+      <span
+        class="np-equalizer"
+        [class.np-equalizer--paused]="!state?.isPlaying"
+        aria-hidden="true"
+      >
+        <span></span><span></span><span></span><span></span>
+      </span>
+      {{ state?.isPlaying ? 'Now Playing' : 'Paused' }}
+    </h2>
+  </div>
+
+  <button type="button" class="np-card" (click)="openTrack()">
+    <span class="np-art-wrap">
+      <img *ngIf="track.albumArt" [src]="track.albumArt" [alt]="''" class="np-art" />
+    </span>
+
+    <span class="np-body">
+      <span class="np-name">{{ track.name }}</span>
+      <span class="np-artist">{{ track.artists }}</span>
+
+      <span class="np-progress" aria-hidden="true">
+        <span class="np-progress-track">
+          <span class="np-progress-fill" [style.width.%]="progressPercent"></span>
+        </span>
+        <span class="np-times">
+          <span class="np-time">{{ progressLabel() }}</span>
+          <span class="np-time">{{ durationLabel() }}</span>
+        </span>
+      </span>
+    </span>
+  </button>
+</section>

@@ -1,0 +1,170 @@
+:host {
+  display: block;
+}
+
+.now-playing {
+  // Subtle green wash so the live module reads as distinct from the static
+  // dashboard cards below it, without a loud fill.
+  background: linear-gradient(
+    135deg,
+    var(--accent-green-muted),
+    var(--surface)
+  );
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.module-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-green);
+}
+
+// ── Animated equalizer bars (no emoji — pure CSS) ───────────────────────
+.np-equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+
+  span {
+    width: 3px;
+    height: 100%;
+    border-radius: 1px;
+    background: var(--accent-green);
+    transform-origin: bottom;
+    animation: npBar 0.9s ease-in-out infinite;
+  }
+  span:nth-child(1) { animation-delay: -0.5s; }
+  span:nth-child(2) { animation-delay: -0.2s; }
+  span:nth-child(3) { animation-delay: -0.7s; }
+  span:nth-child(4) { animation-delay: -0.3s; }
+}
+
+// Paused: freeze the bars at a low, even height.
+.np-equalizer--paused span {
+  animation-play-state: paused;
+  transform: scaleY(0.3);
+}
+
+@keyframes npBar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-equalizer span {
+    animation: none;
+    transform: scaleY(0.55);
+  }
+}
+
+// ── Card ────────────────────────────────────────────────────────────────
+.np-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.np-art-wrap {
+  flex: 0 0 auto;
+}
+
+.np-art {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease;
+}
+
+.np-card:hover .np-art {
+  transform: scale(1.03);
+}
+
+.np-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.np-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-artist {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Live progress bar ───────────────────────────────────────────────────
+.np-progress {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.np-progress-track {
+  display: block;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.np-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--accent-green);
+  // Matches the 1s local tick — keeps the bar gliding instead of stepping.
+  transition: width 1s linear;
+}
+
+.np-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .np-art {
+    width: 72px;
+    height: 72px;
+  }
+  .np-name {
+    font-size: 0.95rem;
+  }
+}
