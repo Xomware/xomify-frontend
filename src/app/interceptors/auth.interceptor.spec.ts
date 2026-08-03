@@ -5,10 +5,15 @@
 //   - Falls back to the legacy static `environment.apiAuthToken` when the
 //     per-user JWT is missing.
 //   - Skips the header for the public `/auth/login` endpoint.
-//   - Leaves non-Xomify requests (e.g. Spotify Web API) untouched.
+//   - Leaves non-Xomify, non-Spotify requests (e.g. accounts.spotify.com)
+//     untouched.
 //   - Refreshes the Spotify access token, mints a new JWT, and retries the
 //     original request once on a 401. A second 401 propagates.
 //   - Does not loop on a retry that itself returns 401.
+//   - Direct api.spotify.com calls: proactively swaps in a valid access
+//     token via AuthService.getValidAccessToken() before sending, and falls
+//     back to a refresh-and-retry-once on a 401 (see responsibility 5 in
+//     auth.interceptor.ts).
 
 import { TestBed } from '@angular/core/testing';
 import {
@@ -49,7 +54,13 @@ describe('AuthInterceptor', () => {
 
     authServiceMock = jasmine.createSpyObj<AuthService>('AuthService', [
       'refreshSpotifyAccessToken',
+      'getValidAccessToken',
     ]);
+    // Default: token already valid, no proactive refresh needed. Individual
+    // tests override this to simulate an expired/unknown-expiry token.
+    authServiceMock.getValidAccessToken.and.returnValue(
+      of('valid-spotify-token'),
+    );
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -124,19 +135,133 @@ describe('AuthInterceptor', () => {
     req.flush({ data: { token: 'x', expiresAt: 'y' }, error: null, meta: {} });
   });
 
-  it('leaves non-Xomify requests (Spotify) untouched', () => {
+  it('leaves non-Xomify, non-Spotify requests (accounts.spotify.com) untouched', () => {
     localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
+    const accountsUrl = 'https://accounts.spotify.com/api/token';
 
     httpClient
-      .get(spotifyUrl, { headers: { Authorization: 'Bearer spotify-tok' } })
+      .post(accountsUrl, {}, { headers: { Authorization: 'Bearer caller' } })
+      .subscribe();
+
+    const req = httpMock.expectOne(accountsUrl);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer caller');
+    req.flush({});
+  });
+
+  // ---------------------------------------------------------------------------
+  // Direct Spotify Web API calls (api.spotify.com)
+  // ---------------------------------------------------------------------------
+
+  it('proactively swaps in a valid access token on a Spotify call, replacing the caller-set (possibly stale) header', () => {
+    authServiceMock.getValidAccessToken.and.returnValue(
+      of('fresh-spotify-token'),
+    );
+
+    httpClient
+      .get(spotifyUrl, { headers: { Authorization: 'Bearer stale-cached-token' } })
       .subscribe();
 
     const req = httpMock.expectOne(spotifyUrl);
-    // Spotify call keeps its own caller-set token.
     expect(req.request.headers.get('Authorization')).toBe(
-      'Bearer spotify-tok',
+      'Bearer fresh-spotify-token',
     );
     req.flush({});
+  });
+
+  it('on a Spotify 401: refreshes the access token and retries once with the fresh token swapped in', () => {
+    authServiceMock.refreshSpotifyAccessToken.and.returnValue(
+      of('retried-fresh-token'),
+    );
+
+    let response: unknown;
+    let errored = false;
+    httpClient
+      .get(spotifyUrl, { headers: { Authorization: 'Bearer valid-spotify-token' } })
+      .subscribe({
+        next: (r) => (response = r),
+        error: () => (errored = true),
+      });
+
+    const initial = httpMock.expectOne(spotifyUrl);
+    initial.flush(
+      { error: 'unauthorized' },
+      { status: 401, statusText: 'Unauthorized' },
+    );
+
+    const retried = httpMock.expectOne(spotifyUrl);
+    expect(retried.request.headers.get('Authorization')).toBe(
+      'Bearer retried-fresh-token',
+    );
+    retried.flush({ ok: true });
+
+    expect(response).toEqual({ ok: true });
+    expect(errored).toBe(false);
+    expect(authServiceMock.refreshSpotifyAccessToken).toHaveBeenCalledTimes(
+      1,
+    );
+  });
+
+  it('does not retry a Spotify call a second time on a repeat 401 (no infinite loop)', () => {
+    authServiceMock.refreshSpotifyAccessToken.and.returnValue(
+      of('retried-fresh-token'),
+    );
+
+    let lastErrorStatus: number | null = null;
+    httpClient.get(spotifyUrl).subscribe({
+      error: (err) => {
+        lastErrorStatus = err.status ?? null;
+      },
+    });
+
+    httpMock
+      .expectOne(spotifyUrl)
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    httpMock
+      .expectOne(spotifyUrl)
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(lastErrorStatus).toBe(401);
+    httpMock.expectNone(spotifyUrl);
+  });
+
+  it('propagates a Spotify 401 immediately when refresh returns null (no refresh token available)', () => {
+    authServiceMock.refreshSpotifyAccessToken.and.returnValue(of(null));
+
+    let lastErrorStatus: number | null = null;
+    httpClient.get(spotifyUrl).subscribe({
+      error: (err) => {
+        lastErrorStatus = err.status ?? null;
+      },
+    });
+
+    httpMock
+      .expectOne(spotifyUrl)
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(lastErrorStatus).toBe(401);
+    expect(authServiceMock.refreshSpotifyAccessToken).toHaveBeenCalledTimes(
+      1,
+    );
+  });
+
+  it('does not retry a Spotify call on non-401 errors (e.g. 500)', () => {
+    let lastErrorStatus: number | null = null;
+    httpClient.get(spotifyUrl).subscribe({
+      error: (err) => {
+        lastErrorStatus = err.status ?? null;
+      },
+    });
+
+    httpMock
+      .expectOne(spotifyUrl)
+      .flush(
+        { error: 'server error' },
+        { status: 500, statusText: 'Server Error' },
+      );
+
+    expect(lastErrorStatus).toBe(500);
+    expect(authServiceMock.refreshSpotifyAccessToken).not.toHaveBeenCalled();
   });
 
   it('does not clobber an Authorization header set by the caller on a Xomify call', () => {
