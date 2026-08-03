@@ -125,13 +125,14 @@ export const AX_NOTIFICATIONS_LIMITS: ReadonlyArray<{ value: number; label: stri
 
 // ── Tab shell ─────────────────────────────────────────────────────────────
 
-export type AdminTab = 'overview' | 'health' | 'users' | 'crons' | 'notifications' | 'broadcasts';
+export type AdminTab = 'overview' | 'health' | 'users' | 'viewas' | 'crons' | 'notifications' | 'broadcasts';
 
 /** `icon` is a name from the shared `app-icon` registry (`components/icon/`). */
 export const AX_ADMIN_TABS: ReadonlyArray<{ value: AdminTab; label: string; icon: string }> = [
   { value: 'overview', label: 'Overview', icon: 'chart' },
   { value: 'health', label: 'Health', icon: 'trending-up' },
   { value: 'users', label: 'Users', icon: 'people' },
+  { value: 'viewas', label: 'View As', icon: 'eye' },
   { value: 'crons', label: 'Crons', icon: 'refresh' },
   { value: 'notifications', label: 'Notifications', icon: 'bell' },
   { value: 'broadcasts', label: 'Broadcasts', icon: 'megaphone' },

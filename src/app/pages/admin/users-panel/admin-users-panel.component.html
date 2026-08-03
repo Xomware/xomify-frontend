@@ -53,7 +53,7 @@
               </th>
               <th scope="col">Opt-ins</th>
               <th scope="col">Spotify</th>
-              <th scope="col"><span class="sr-only">Details</span></th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +68,7 @@
                     {{ user.spotifyConnected ? 'Connected' : 'No' }}
                   </span>
                 </td>
-                <td>
+                <td class="ax-cell-actions">
                   <button
                     type="button"
                     class="ax-btn ax-btn--sm"
@@ -77,6 +77,15 @@
                     (click)="toggleRow(user)"
                   >
                     {{ isExpanded(user) ? 'Hide' : 'Details' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="ax-btn ax-btn--sm ax-btn--secondary"
+                    (click)="onViewAs(user)"
+                    [attr.aria-label]="'View as ' + user.email"
+                  >
+                    <app-icon name="eye" [size]="12"></app-icon>
+                    View as
                   </button>
                 </td>
               </tr>
@@ -118,59 +127,11 @@
 
                     <section class="ax-drawer-section">
                       <h3>View as</h3>
-                      <button
-                        type="button"
-                        class="ax-btn ax-btn--sm"
-                        *ngIf="viewAsState === 'idle'"
-                        (click)="loadViewAs(user.email)"
-                      >
-                        Load read-only view
-                      </button>
-
-                      <div class="ax-drawer-substate" *ngIf="viewAsState === 'loading'" aria-busy="true" aria-live="polite">
-                        <app-icon name="spinner" [size]="14"></app-icon>
-                        <span>Loading view-as snapshot…</span>
-                      </div>
-                      <div class="ax-drawer-substate" *ngIf="viewAsState === 'error'" role="alert">
-                        <app-icon name="warning" [size]="14"></app-icon>
-                        <span>Couldn't load that snapshot.</span>
-                        <button type="button" class="ax-btn ax-btn--sm" (click)="loadViewAs(user.email)">Try again</button>
-                      </div>
-
-                      <div class="ax-viewas" *ngIf="viewAsState === 'loaded' && viewAsData as va">
-                        <p class="ax-viewas-note" role="note">{{ va.note }}</p>
-
-                        <div class="ax-badge-row" *ngIf="viewAsOptInEntries(va.optIns).length">
-                          <span
-                            class="ax-badge"
-                            *ngFor="let opt of viewAsOptInEntries(va.optIns)"
-                            [class.ax-badge--on]="opt.on"
-                          >
-                            {{ opt.label }}: {{ opt.on ? 'On' : 'Off' }}
-                          </span>
-                        </div>
-
-                        <p class="ax-drawer-empty" *ngIf="!va.recentVisits.length">No recent visits.</p>
-                        <ul class="ax-visit-list" *ngIf="va.recentVisits.length" aria-label="Their recent visits">
-                          <li *ngFor="let v of va.recentVisits; trackBy: trackByVisit">
-                            <span class="ax-visit-path">{{ v.path }}</span>
-                            <span class="ax-visit-ts">{{ v.ts | axTimestamp: 'relative' }}</span>
-                          </li>
-                        </ul>
-
-                        <details class="ax-raw" *ngIf="hasContent(va.profile)">
-                          <summary>Profile (raw)</summary>
-                          <pre>{{ prettyJson(va.profile) }}</pre>
-                        </details>
-                        <details class="ax-raw" *ngIf="hasContent(va.favorites)">
-                          <summary>Favorites (raw)</summary>
-                          <pre>{{ prettyJson(va.favorites) }}</pre>
-                        </details>
-                        <details class="ax-raw" *ngIf="hasContent(va.activeBroadcasts)">
-                          <summary>Active broadcasts ({{ va.activeBroadcasts.length }})</summary>
-                          <pre>{{ prettyJson(va.activeBroadcasts) }}</pre>
-                        </details>
-                      </div>
+                      <p class="ax-drawer-empty">
+                        Jump to the
+                        <button type="button" class="ax-drawer-link" (click)="onViewAs(user)">View As tab</button>
+                        to load a read-only impersonation snapshot for this user.
+                      </p>
                     </section>
                   </div>
                 </td>
