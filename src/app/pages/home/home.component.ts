@@ -10,6 +10,11 @@ import {
 import { TopItemsData, TopItemsService } from 'src/app/services/top-items.service';
 import { Broadcast, BroadcastsService } from 'src/app/services/broadcasts.service';
 import { SpotlightSlide } from './spotlight-rotator/spotlight-rotator.component';
+import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
+
+/** `.spotlight-image` renders at 72px (56px on mobile) — needs at least the
+ * 300px Spotify image, or the 64px thumbnail shows up visibly blurry. */
+const SPOTLIGHT_IMAGE_MIN_PX = 144;
 
 /**
  * Home — logged-out visitors get the existing Spotify login CTA; logged-in
@@ -221,9 +226,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         eyebrow: 'Just played',
         title: mostRecent.track.name,
         subtitle: mostRecent.track.artists?.map((a) => a.name).join(', '),
-        image:
-          mostRecent.track.album?.images?.[mostRecent.track.album.images.length - 1]?.url ||
-          mostRecent.track.album?.images?.[0]?.url,
+        image: pickAlbumImage(mostRecent.track.album?.images, SPOTLIGHT_IMAGE_MIN_PX),
         cta: 'View recent activity',
         link: ['/my-profile'],
         queryParams: { tab: 'recent' },
@@ -238,9 +241,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         eyebrow: "This month's #1",
         title: topTrack.name,
         subtitle: topTrack.artists?.map((a) => a.name).join(', '),
-        image:
-          topTrack.album?.images?.[topTrack.album.images.length - 1]?.url ||
-          topTrack.album?.images?.[0]?.url,
+        image: pickAlbumImage(topTrack.album?.images, SPOTLIGHT_IMAGE_MIN_PX),
         cta: 'See your top songs',
         link: ['/top-songs'],
       });

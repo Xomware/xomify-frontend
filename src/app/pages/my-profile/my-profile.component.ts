@@ -30,6 +30,11 @@ import {
 import { forkJoin, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
+import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
+
+/** `.recent-art` renders at 56px — needs at least the 300px Spotify image,
+ * or the 64px thumbnail shows up visibly blurry (especially on retina). */
+const RECENT_ART_MIN_PX = 112;
 
 interface TickerItem {
   id: string;
@@ -538,9 +543,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   }
 
   recentTrackImage(item: RecentlyPlayedItem): string {
-    const images = item.track.album?.images ?? [];
-    if (images.length === 0) return '';
-    return images[images.length - 1]?.url || images[0]?.url || '';
+    return pickAlbumImage(item.track.album?.images, RECENT_ART_MIN_PX);
   }
 
   recentTrackArtists(item: RecentlyPlayedItem): string {

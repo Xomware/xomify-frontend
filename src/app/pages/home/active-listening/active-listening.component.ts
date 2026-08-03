@@ -4,6 +4,11 @@ import {
   ListeningHistoryService,
   RecentlyPlayedItem,
 } from 'src/app/services/listening-history.service';
+import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
+
+/** `.listening-art` renders at 130px (108px on mobile) — needs at least the
+ * 300px Spotify image, or the 64px thumbnail shows up visibly blurry. */
+const ART_MIN_PX = 260;
 
 /**
  * Recently-played strip for Home. Purely presentational — `@Input items`
@@ -31,9 +36,7 @@ export class ActiveListeningComponent {
   }
 
   trackImage(item: RecentlyPlayedItem): string {
-    const images = item.track.album?.images ?? [];
-    if (images.length === 0) return '';
-    return images[images.length - 1]?.url || images[0]?.url || '';
+    return pickAlbumImage(item.track.album?.images, ART_MIN_PX);
   }
 
   trackArtists(item: RecentlyPlayedItem): string {

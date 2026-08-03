@@ -9,6 +9,11 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Router } from '@angular/router';
 import { TopItemsData, TopItemsTimeRange } from 'src/app/services/top-items.service';
 import { ReducedMotionService } from 'src/app/services/reduced-motion.service';
+import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
+
+/** `.item-image` renders at 84px (68px on mobile) — needs at least the 300px
+ * Spotify image, or the 64px thumbnail shows up visibly blurry. */
+const ITEM_IMAGE_MIN_PX = 168;
 
 type Category = 'songs' | 'albums' | 'artists' | 'genres';
 
@@ -158,7 +163,7 @@ export class TopItemsRotatorComponent implements OnChanges, OnDestroy {
       rank: index + 1,
       name: track.name,
       subtitle: track.artists?.map((a) => a.name).join(', '),
-      image: track.album?.images?.[track.album.images.length - 1]?.url || track.album?.images?.[0]?.url,
+      image: pickAlbumImage(track.album?.images, ITEM_IMAGE_MIN_PX),
       link: ['/top-songs'],
       previewUrl: track.preview_url,
     }));
@@ -183,7 +188,7 @@ export class TopItemsRotatorComponent implements OnChanges, OnDestroy {
       rank: index + 1,
       name: artist.name,
       subtitle: artist.genres?.[0] || 'Artist',
-      image: artist.images?.[artist.images.length - 1]?.url || artist.images?.[0]?.url,
+      image: pickAlbumImage(artist.images, ITEM_IMAGE_MIN_PX),
       round: true,
       link: ['/artist-profile', artist.id],
     }));
