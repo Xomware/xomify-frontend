@@ -103,6 +103,10 @@ export interface XtAdminTokensResponse {
   tokens: XtAdminToken[];
   byOwner: Record<string, XtAdminToken[]>;
   count: number;
+  /** Owners (emails) that are Spotify-connected in xomtracks — the rolling
+   * cron can build their OWN playlists. An owner with a token but not here
+   * ingests shares but gets no own playlists. */
+  spotifyConnectedOwners?: string[];
 }
 
 // ── POST /admin/revoke-token ─────────────────────────────────────────────
