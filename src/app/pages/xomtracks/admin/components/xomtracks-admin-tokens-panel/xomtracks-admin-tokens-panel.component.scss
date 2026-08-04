@@ -128,6 +128,32 @@
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.1);
   }
+
+  &--muted {
+    color: #a3a3ab;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &--warn {
+    margin-left: 6px;
+    color: #e0a63f;
+    background: rgba(224, 166, 63, 0.14);
+    border-color: rgba(224, 166, 63, 0.4);
+  }
+}
+
+.xta-owner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+
+  .xta-owner-heading {
+    margin: 0;
+  }
 }
 
 @media (max-width: 640px) {

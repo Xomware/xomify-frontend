@@ -22,15 +22,26 @@
     <p class="xta-inline-error" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
 
     <div class="xta-owner-group" *ngFor="let group of groups; trackBy: trackByOwner">
-      <h2 class="xta-owner-heading">{{ group.owner }}</h2>
+      <div class="xta-owner-head">
+        <h2 class="xta-owner-heading">{{ group.owner }}</h2>
+        <span
+          class="xta-badge"
+          [class.xta-badge--muted]="!group.connected"
+          [attr.title]="group.connected
+            ? 'Spotify-connected — the rolling cron builds their own playlists'
+            : 'No Spotify connection in xomtracks — ingests shares but gets no own playlists'"
+        >
+          {{ group.connected ? 'Playlists: building' : 'Playlists: not connected' }}
+        </span>
+      </div>
       <div class="xta-table-wrap">
         <table class="xta-table">
-          <caption class="sr-only">Ingest tokens for {{ group.owner }}</caption>
+          <caption class="sr-only">Extractor devices for {{ group.owner }}</caption>
           <thead>
             <tr>
-              <th scope="col">Label</th>
+              <th scope="col">Device</th>
               <th scope="col">Created</th>
-              <th scope="col">Last used</th>
+              <th scope="col">Last scan</th>
               <th scope="col">Status</th>
               <th scope="col"><span class="sr-only">Actions</span></th>
             </tr>
@@ -39,7 +50,10 @@
             <tr *ngFor="let token of group.tokens; trackBy: trackByHash">
               <td>{{ token.label || '—' }}</td>
               <td>{{ humanDate(token.createdAt) }}</td>
-              <td>{{ humanDate(token.lastUsedAt) }}</td>
+              <td>
+                {{ lastScan(token) }}
+                <span class="xta-badge xta-badge--warn" *ngIf="isStale(token)" title="No scan in over 3 days — this Mac has likely been off or asleep">stale</span>
+              </td>
               <td>
                 <span class="xta-badge" [class.xta-badge--revoked]="token.revoked">
                   {{ token.revoked ? 'Revoked' : 'Active' }}
