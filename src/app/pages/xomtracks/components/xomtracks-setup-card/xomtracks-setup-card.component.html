@@ -1,96 +1,197 @@
 <section class="xt-setup" *ngIf="!isAdmin">
-  <button
-    type="button"
-    class="xt-setup-toggle"
-    [attr.aria-expanded]="expanded"
-    aria-controls="xt-setup-body"
-    (click)="toggleExpanded()"
-  >
-    <span class="xt-setup-toggle-icon" aria-hidden="true">{{ expanded ? '−' : '+' }}</span>
-    Toggle in your own shares
-  </button>
+  <!-- Loading the caller's connection state -->
+  <div class="xt-setup-loading" *ngIf="phase === 'loading'">
+    <span class="xt-spinner" aria-hidden="true"></span>
+    <span>Checking your connection…</span>
+  </div>
 
-  <div class="xt-setup-body" id="xt-setup-body" *ngIf="expanded">
-    <p class="xt-setup-sub">
-      You're seeing the shared feed. Want your own iMessage music links in
-      here too? Generate a token below and run the extractor on your Mac —
-      it scans your message history locally for music links and pushes them
-      here, stamped as yours.
-    </p>
+  <!-- ── Phase A: not connected ──────────────────────────────────────── -->
+  <div class="xt-phase-setup" *ngIf="phase === 'setup'">
+    <header class="xt-setup-head">
+      <h3 class="xt-setup-title">Add your own shares</h3>
+      <p class="xt-setup-sub">
+        Your iMessage music links, scanned on your Mac and added to the feed as
+        yours. You're already seeing the shared feed — this layers your own on
+        top.
+      </p>
+    </header>
 
-    <!-- Minted: show the plaintext token ONCE + the install steps. -->
-    <ng-container *ngIf="state === 'minted' && plaintextToken as token">
-      <div class="xt-setup-warning" role="alert">
-        <strong>Copy this now</strong> — it's shown once and can't be recovered.
+    <div class="xt-setup-cols">
+      <div class="xt-setup-col">
+        <h4 class="xt-setup-col-title">You'll need</h4>
+        <ul class="xt-req-list">
+          <li>A <strong>Mac</strong> (it reads your Messages database)</li>
+          <li>Comfort running one <strong>Terminal</strong> command</li>
+          <li>To grant <strong>Full Disk Access</strong> to the extractor</li>
+        </ul>
       </div>
+      <div class="xt-setup-col">
+        <h4 class="xt-setup-col-title">How your data is handled</h4>
+        <ul class="xt-trust-list">
+          <li>Runs entirely on your Mac, <strong>read-only</strong></li>
+          <li>Never sends messages, never writes to your Messages DB</li>
+          <li>Only <strong>music links</strong> are shared — never text or contacts</li>
+          <li>Your token lives in the login Keychain, never on disk</li>
+        </ul>
+      </div>
+    </div>
 
-      <div class="xt-token-row">
-        <code class="xt-token">{{ token }}</code>
-        <button type="button" class="xt-copy-btn" (click)="copyToken()">
-          {{ copied ? 'Copied' : 'Copy' }}
+    <form class="xt-mint-form" (ngSubmit)="mint()">
+      <label class="xt-label" for="xt-token-label">
+        Device name
+        <span
+          class="xt-label-hint"
+          appTooltip="Optional — a name for this Mac, e.g. “MacBook Pro”, so you can tell your devices apart later"
+        >?</span>
+      </label>
+      <input
+        id="xt-token-label"
+        class="xt-input"
+        type="text"
+        [(ngModel)]="label"
+        name="label"
+        maxlength="100"
+        placeholder="e.g. MacBook Pro"
+        [disabled]="state === 'minting'"
+      />
+      <button type="submit" class="xt-mint-btn" [disabled]="state === 'minting'">
+        {{ state === 'minting' ? 'Generating…' : 'Generate my token' }}
+      </button>
+      <p class="xt-error" role="alert" *ngIf="state === 'error'">{{ errorMessage }}</p>
+    </form>
+  </div>
+
+  <!-- ── Phase B: token minted (one-time reveal) ─────────────────────── -->
+  <div class="xt-phase-minted" *ngIf="phase === 'minted' && plaintextToken as token">
+    <div class="xt-setup-warning" role="alert">
+      <strong>Copy this now</strong> — it's shown once and can't be recovered.
+    </div>
+
+    <div class="xt-token-row">
+      <code class="xt-token">{{ token }}</code>
+      <button type="button" class="xt-copy-btn" (click)="copyToken()">
+        {{ copied ? 'Copied' : 'Copy' }}
+      </button>
+    </div>
+
+    <ol class="xt-steps">
+      <li>
+        <p>
+          Run the guided installer in Terminal — it stores your token, walks you
+          through granting Full Disk Access (so it can read
+          <code>chat.db</code> locally, read-only), and schedules a recurring
+          scan. It'll ask you to paste the token above.
+        </p>
+        <div class="xt-code-row">
+          <code class="xt-code">{{ installCommand }}</code>
+          <button type="button" class="xt-copy-btn" (click)="copyInstallCommand()">Copy</button>
+        </div>
+      </li>
+    </ol>
+
+    <!-- Keychain command demoted to an alternative — the installer takes the
+         token interactively, so this is only for people who'd rather store it
+         by hand first. -->
+    <div class="xt-keychain-alt">
+      <button
+        type="button"
+        class="xt-keychain-toggle"
+        [attr.aria-expanded]="keychainOpen"
+        (click)="toggleKeychain()"
+      >
+        <span aria-hidden="true">{{ keychainOpen ? '−' : '+' }}</span>
+        Prefer to store the token in your Keychain manually?
+      </button>
+      <div class="xt-code-row" *ngIf="keychainOpen">
+        <code class="xt-code">{{ keychainCommand }}</code>
+        <button type="button" class="xt-copy-btn" (click)="copyKeychainCommand()">Copy</button>
+      </div>
+    </div>
+
+    <button type="button" class="xt-done-btn" (click)="finishMinted()">
+      {{ forcePreview ? 'Done' : "I've run the installer" }}
+    </button>
+  </div>
+
+  <!-- ── Phase C: connected (live status + devices) ──────────────────── -->
+  <div class="xt-phase-connected" *ngIf="phase === 'connected'">
+    <header class="xt-conn-head">
+      <div class="xt-conn-status">
+        <span class="xt-conn-dot" aria-hidden="true"></span>
+        <span class="xt-conn-label">Connected</span>
+      </div>
+      <dl class="xt-conn-stats">
+        <div>
+          <dt>Last scan</dt>
+          <dd>{{ relativeTime(lastScanAt) || 'waiting for first scan…' }}</dd>
+        </div>
+        <div>
+          <dt>Your links</dt>
+          <dd>{{ shareCount }} in the feed</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="xt-devices">
+      <div class="xt-devices-head">
+        <h4 class="xt-devices-title">Your devices</h4>
+        <button
+          type="button"
+          class="xt-add-device"
+          *ngIf="!addingDevice && !readOnly"
+          (click)="startAddDevice()"
+        >
+          + Add another device
         </button>
       </div>
 
-      <ol class="xt-steps">
-        <li>
-          <p>Store it in your login Keychain:</p>
-          <div class="xt-code-row">
-            <code class="xt-code">{{ keychainCommand }}</code>
-            <button type="button" class="xt-copy-btn" (click)="copyKeychainCommand()">Copy</button>
-          </div>
+      <p class="xt-devices-empty" *ngIf="devices.length === 0 && !addingDevice">
+        No active devices — add one to keep your links flowing in.
+      </p>
+
+      <ul class="xt-device-list" *ngIf="devices.length > 0">
+        <li class="xt-device" *ngFor="let d of devices; trackBy: trackByHash">
+          <span class="xt-device-info">
+            <span class="xt-device-name">{{ deviceLabel(d) }}</span>
+            <span class="xt-device-scan">
+              {{ relativeTime(d.lastScanAt) ? 'last scan ' + relativeTime(d.lastScanAt) : 'no scan yet' }}
+            </span>
+          </span>
+          <button
+            type="button"
+            class="xt-revoke-btn"
+            (click)="revoke(d)"
+            [disabled]="readOnly"
+            [attr.title]="readOnly ? 'Read-only while impersonating' : null"
+          >
+            Revoke
+          </button>
         </li>
-        <li>
-          <p>
-            Run the guided installer in Terminal — it walks you through
-            granting Full Disk Access (so the extractor can read
-            <code>chat.db</code> locally, read-only, and never send
-            messages) and schedules a recurring scan for you. It'll also ask
-            you to paste this token directly, if you'd rather skip the
-            Keychain command above.
-          </p>
-          <div class="xt-code-row">
-            <code class="xt-code">{{ installCommand }}</code>
-            <button type="button" class="xt-copy-btn" (click)="copyInstallCommand()">Copy</button>
-          </div>
-        </li>
-      </ol>
+      </ul>
 
-      <button type="button" class="xt-done-btn" (click)="dismissMinted()">Done</button>
-    </ng-container>
-
-    <!-- Idle / minting / error: the mint form. -->
-    <ng-container *ngIf="state !== 'minted'">
-      <div class="xt-existing" *ngIf="existingTokenHash">
-        <span>
-          You already have a token{{ existingLabel ? ' — ' + existingLabel : '' }} set up.
-        </span>
-        <button type="button" class="xt-revoke-btn" (click)="revoke()">Revoke it</button>
-      </div>
-
-      <form class="xt-mint-form" (ngSubmit)="mint()" *ngIf="!existingTokenHash || state === 'error'">
-        <label class="xt-label" for="xt-token-label">
-          Label
-          <span
-            class="xt-label-hint"
-            appTooltip="Optional — a name for this device, e.g. “MacBook Pro”, so you can tell tokens apart later"
-          >?</span>
-        </label>
+      <!-- Add-another-device mint form (reuses the same mint flow → Phase B) -->
+      <form class="xt-mint-form xt-mint-inline" *ngIf="addingDevice" (ngSubmit)="mint()">
+        <label class="xt-label" for="xt-add-label">Device name</label>
         <input
-          id="xt-token-label"
+          id="xt-add-label"
           class="xt-input"
           type="text"
           [(ngModel)]="label"
           name="label"
           maxlength="100"
-          placeholder="e.g. MacBook Pro"
+          placeholder="e.g. Mac mini"
           [disabled]="state === 'minting'"
         />
-        <button type="submit" class="xt-mint-btn" [disabled]="state === 'minting'">
-          {{ state === 'minting' ? 'Minting…' : 'Generate my token' }}
-        </button>
+        <div class="xt-inline-actions">
+          <button type="submit" class="xt-mint-btn" [disabled]="state === 'minting'">
+            {{ state === 'minting' ? 'Generating…' : 'Generate token' }}
+          </button>
+          <button type="button" class="xt-cancel-btn" (click)="cancelAddDevice()">Cancel</button>
+        </div>
+        <p class="xt-error" role="alert" *ngIf="state === 'error'">{{ errorMessage }}</p>
       </form>
 
-      <p class="xt-error" role="alert" *ngIf="state === 'error'">{{ errorMessage }}</p>
-    </ng-container>
+      <p class="xt-error" role="alert" *ngIf="errorMessage && !addingDevice">{{ errorMessage }}</p>
+    </div>
   </div>
 </section>
