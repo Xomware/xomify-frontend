@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { XomtracksAdminService } from '../../../services/xomtracks-admin.service';
-import { XtAdminToken } from '../../../models/xomtracks-admin.model';
+import {
+  XtAdminRun,
+  XtAdminRunsResponse,
+  XtAdminToken,
+} from '../../../models/xomtracks-admin.model';
 
 type XtaLoadState = 'loading' | 'loaded' | 'error';
 
@@ -34,6 +40,11 @@ export class XomtracksAdminTokensPanelComponent implements OnInit {
   groups: XtaOwnerGroup[] = [];
   count = 0;
 
+  /** Recent runs per owner (from GET /admin/runs). */
+  runsByOwner: Record<string, XtAdminRun[]> = {};
+  /** Which owner's run history is currently expanded (only one at a time). */
+  expandedRunsOwner: string | null = null;
+
   /** tokenHash currently mid-revoke, so its button can show a busy state and
    * disable double-clicks. */
   revokingHash: string | null = null;
@@ -48,21 +59,59 @@ export class XomtracksAdminTokensPanelComponent implements OnInit {
   load(): void {
     this.state = 'loading';
     this.errorMessage = '';
-    this.admin.listTokens().subscribe({
-      next: (res) => {
-        const connected = new Set(res.spotifyConnectedOwners ?? []);
-        this.groups = Object.entries(res.byOwner ?? {})
-          .map(([owner, tokens]) => ({ owner, tokens, connected: connected.has(owner) }))
+    // Tokens are the primary data; runs enrich it — a runs failure must not
+    // fail the whole panel, so it degrades to no run history.
+    const emptyRuns: XtAdminRunsResponse = { byOwner: {}, ownerCount: 0 };
+    forkJoin({
+      tokens: this.admin.listTokens(),
+      runs: this.admin.listRuns().pipe(catchError(() => of(emptyRuns))),
+    }).subscribe({
+      next: ({ tokens, runs }) => {
+        const connected = new Set(tokens.spotifyConnectedOwners ?? []);
+        this.groups = Object.entries(tokens.byOwner ?? {})
+          .map(([owner, list]) => ({ owner, tokens: list, connected: connected.has(owner) }))
           .sort((a, b) => a.owner.localeCompare(b.owner));
-        this.count = res.count ?? 0;
+        this.count = tokens.count ?? 0;
+        this.runsByOwner = runs.byOwner ?? {};
         this.state = 'loaded';
       },
       error: () => {
         this.groups = [];
         this.count = 0;
+        this.runsByOwner = {};
         this.state = 'error';
       },
     });
+  }
+
+  runsFor(owner: string): XtAdminRun[] {
+    return this.runsByOwner[owner] ?? [];
+  }
+
+  toggleRuns(owner: string): void {
+    this.expandedRunsOwner = this.expandedRunsOwner === owner ? null : owner;
+  }
+
+  /** "Aug 4, 3:15pm" from an epoch-seconds run timestamp. */
+  runTime(run: XtAdminRun): string {
+    const d = new Date(run.runAt * 1000);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  }
+
+  /** "0.8s" / "820ms" / "—". */
+  runDuration(run: XtAdminRun): string {
+    if (run.durationMs == null) return '—';
+    return run.durationMs >= 1000 ? `${(run.durationMs / 1000).toFixed(1)}s` : `${run.durationMs}ms`;
+  }
+
+  trackByRunAt(_index: number, run: XtAdminRun): number {
+    return run.runAt;
   }
 
   retry(): void {

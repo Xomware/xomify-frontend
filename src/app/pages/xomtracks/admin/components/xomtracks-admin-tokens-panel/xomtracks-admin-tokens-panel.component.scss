@@ -156,6 +156,72 @@
   }
 }
 
+.xta-runs {
+  margin-top: 8px;
+}
+
+.xta-runs-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #8a8a9a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: #c2c2c9;
+  }
+
+  span {
+    font-weight: 800;
+  }
+}
+
+.xta-run-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.xta-run {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.78rem;
+  color: #c2c2c9;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.xta-run-time {
+  min-width: 120px;
+  color: #e8e8ec;
+}
+
+.xta-run-stat {
+  color: #8a8a9a;
+
+  &--new {
+    color: #5df399;
+  }
+}
+
+.xta-run-dur {
+  margin-left: auto;
+  color: #6d6d7d;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 640px) {
   .xta-table {
     font-size: 0.78rem;
