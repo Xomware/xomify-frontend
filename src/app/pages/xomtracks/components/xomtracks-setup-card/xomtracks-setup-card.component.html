@@ -22,15 +22,19 @@
         <ul class="xt-req-list">
           <li>A <strong>Mac</strong> (it reads your Messages database)</li>
           <li>Comfort running one <strong>Terminal</strong> command</li>
-          <li>To grant <strong>Full Disk Access</strong> to the extractor</li>
+          <li>To grant <strong>Full Disk Access</strong> (to read Messages + Contacts)</li>
         </ul>
       </div>
       <div class="xt-setup-col">
         <h4 class="xt-setup-col-title">How your data is handled</h4>
         <ul class="xt-trust-list">
           <li>Runs entirely on your Mac, <strong>read-only</strong></li>
-          <li>Never sends messages, never writes to your Messages DB</li>
-          <li>Only <strong>music links</strong> are shared — never text or contacts</li>
+          <li>Never sends your messages, never writes to your Messages DB</li>
+          <li>
+            Reads Contacts locally only to put a <strong>name</strong> to who
+            shared a link — your address book is never uploaded
+          </li>
+          <li>What's shared: the <strong>music link</strong> + the sharer's name — never message text</li>
           <li>Your token lives in the login Keychain, never on disk</li>
         </ul>
       </div>
@@ -78,9 +82,9 @@
       <li>
         <p>
           Run the guided installer in Terminal — it stores your token, walks you
-          through granting Full Disk Access (so it can read
-          <code>chat.db</code> locally, read-only), and schedules a recurring
-          scan. It'll ask you to paste the token above.
+          through granting Full Disk Access (so it can read your Messages and
+          Contacts locally, read-only), and schedules a recurring scan. It'll
+          ask you to paste the token above.
         </p>
         <div class="xt-code-row">
           <code class="xt-code">{{ installCommand }}</code>
