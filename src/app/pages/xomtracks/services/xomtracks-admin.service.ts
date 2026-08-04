@@ -7,6 +7,7 @@ import { XtDirection, XtTimeWindow } from '../models/xomtracks-share.model';
 import {
   XtAdminCallsSummary,
   XtAdminRevokeTokenResult,
+  XtAdminRunsResponse,
   XtAdminTokensResponse,
   XtAdminUserFeedResponse,
   XtAdminUsersResponse,
@@ -69,6 +70,13 @@ export class XomtracksAdminService {
   listTokens(): Observable<XtAdminTokensResponse> {
     return this.http
       .get<XtApiEnvelope<XtAdminTokensResponse>>(`${this.baseUrl}/tokens`)
+      .pipe(map((res) => res.data));
+  }
+
+  /** GET /admin/runs — recent extractor run summaries, grouped by owner. */
+  listRuns(): Observable<XtAdminRunsResponse> {
+    return this.http
+      .get<XtApiEnvelope<XtAdminRunsResponse>>(`${this.baseUrl}/runs`)
       .pipe(map((res) => res.data));
   }
 

@@ -109,6 +109,24 @@ export interface XtAdminTokensResponse {
   spotifyConnectedOwners?: string[];
 }
 
+// ── GET /admin/runs ──────────────────────────────────────────────────────
+
+/** One compact extractor run summary. */
+export interface XtAdminRun {
+  /** Epoch seconds when the run completed. */
+  runAt: number;
+  scanned: number;
+  ingested: number;
+  newWatermark: number | null;
+  durationMs: number | null;
+}
+
+export interface XtAdminRunsResponse {
+  /** Recent runs per owner (recent-first). Owners with no runs are omitted. */
+  byOwner: Record<string, XtAdminRun[]>;
+  ownerCount: number;
+}
+
 // ── POST /admin/revoke-token ─────────────────────────────────────────────
 
 export interface XtAdminRevokeTokenResult {

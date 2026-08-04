@@ -74,6 +74,29 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Recent runs (compact telemetry from GET /admin/runs) -->
+      <div class="xta-runs" *ngIf="runsFor(group.owner).length">
+        <button
+          type="button"
+          class="xta-runs-toggle"
+          [attr.aria-expanded]="expandedRunsOwner === group.owner"
+          (click)="toggleRuns(group.owner)"
+        >
+          <span aria-hidden="true">{{ expandedRunsOwner === group.owner ? '−' : '+' }}</span>
+          Recent runs ({{ runsFor(group.owner).length }})
+        </button>
+        <ul class="xta-run-list" *ngIf="expandedRunsOwner === group.owner">
+          <li class="xta-run" *ngFor="let run of runsFor(group.owner); trackBy: trackByRunAt">
+            <span class="xta-run-time">{{ runTime(run) }}</span>
+            <span class="xta-run-stat">scanned {{ run.scanned }}</span>
+            <span class="xta-run-stat" [class.xta-run-stat--new]="run.ingested > 0">
+              +{{ run.ingested }} new
+            </span>
+            <span class="xta-run-dur">{{ runDuration(run) }}</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </ng-container>
 </div>
