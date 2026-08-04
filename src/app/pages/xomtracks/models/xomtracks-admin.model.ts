@@ -25,6 +25,10 @@ export interface XtMeResponse {
    * client-side from the JWT. */
   isAdmin: boolean;
   ownIngest: boolean;
+  /** ISO 8601 of the most recent extractor push across the caller's active
+   * ingest tokens, or `null` until the first scan lands. Drives the
+   * onboarding "Connected" panel's "last scan" readout. */
+  lastScanAt: string | null;
 }
 
 // ── GET /admin/users ─────────────────────────────────────────────────────

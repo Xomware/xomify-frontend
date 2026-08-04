@@ -20,6 +20,7 @@ describe('XomtracksAdminGuard', () => {
     spotifyUserId: null,
     isAdmin: false,
     ownIngest: false,
+    lastScanAt: null,
   };
 
   beforeEach(() => {

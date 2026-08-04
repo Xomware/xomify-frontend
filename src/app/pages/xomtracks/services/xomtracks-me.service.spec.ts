@@ -20,6 +20,7 @@ describe('XomtracksMeService', () => {
     spotifyUserId: 'spuser1',
     isAdmin: true,
     ownIngest: true,
+    lastScanAt: null,
   };
 
   beforeEach(() => {

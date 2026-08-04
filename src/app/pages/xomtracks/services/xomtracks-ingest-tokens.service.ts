@@ -30,6 +30,19 @@ export interface XtIngestTokenRevokeResult {
 }
 
 /**
+ * One active ingest token as the caller's own "device", from
+ * GET /ingest-tokens/list. Non-secret: `tokenHash` is the id used to revoke,
+ * never the plaintext token. `lastScanAt` is `null` until that device's
+ * extractor has pushed at least once.
+ */
+export interface XtIngestDevice {
+  tokenHash: string;
+  label: string | null;
+  createdAt: string | null;
+  lastScanAt: string | null;
+}
+
+/**
  * Mints/revokes the caller's own extractor ingest token — the credential
  * their local iMessage extractor uses to authenticate `POST /shares/ingest`
  * as them (self-serve foundation Phase 3). Backs the Xomtracks "Set up your
@@ -55,5 +68,14 @@ export class XomtracksIngestTokensService {
     return this.http
       .post<XtApiEnvelope<XtIngestTokenRevokeResult>>(`${this.baseUrl}/revoke`, { tokenHash })
       .pipe(map((res) => res.data));
+  }
+
+  /** GET /ingest-tokens/list — the caller's own active devices (non-revoked
+   * tokens), so the onboarding panel can list them and revoke any one from
+   * any browser (not just the one that minted it). */
+  list(): Observable<XtIngestDevice[]> {
+    return this.http
+      .get<XtApiEnvelope<{ devices: XtIngestDevice[] }>>(`${this.baseUrl}/list`)
+      .pipe(map((res) => res.data.devices ?? []));
   }
 }
