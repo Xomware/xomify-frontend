@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -20,7 +22,7 @@
     background: transparent;
     border: none;
     color: #8a8a9a;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     cursor: pointer;
     padding: 8px 0;
     margin-bottom: 16px;
@@ -32,8 +34,8 @@
   }
 
   .page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: $text-4xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 8px 0;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -43,7 +45,7 @@
   }
 
   .page-subtitle {
-    font-size: 1.1rem;
+    font-size: $text-md;
     color: #8a8a9a;
     margin: 0;
   }
@@ -82,8 +84,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0;
 
@@ -92,8 +94,8 @@
     }
 
     .track-count {
-      font-size: 0.85rem;
-      font-weight: 400;
+      font-size: $text-sm;
+      font-weight: $font-weight-regular;
       color: #8a8a9a;
       background: rgba(255, 255, 255, 0.05);
       padding: 4px 10px;
@@ -107,7 +109,7 @@
     color: #ff4757;
     padding: 6px 14px;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -144,7 +146,7 @@
     background: transparent;
     border: none;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: $text-base;
     outline: none;
 
     &::placeholder {
@@ -262,8 +264,8 @@
 
     .track-name {
       display: block;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: $text-sm;
+      font-weight: $font-weight-medium;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -272,7 +274,7 @@
 
     .track-artist {
       display: block;
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       cursor: pointer;
 
@@ -283,7 +285,7 @@
   }
 
   .track-duration {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #6a6a7a;
     flex-shrink: 0;
   }
@@ -327,7 +329,7 @@
 
   p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: $text-base;
   }
 }
 
@@ -346,13 +348,13 @@
 
     .stat-value {
       display: block;
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: $text-md;
+      font-weight: $font-weight-semibold;
       color: #1bdc6f;
     }
 
     .stat-label {
-      font-size: 0.75rem;
+      font-size: $text-2xs;
       color: #8a8a9a;
     }
   }
@@ -417,8 +419,8 @@
   }
 
   .queue-number {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     color: #6a6a7a;
     text-align: center;
   }
@@ -448,8 +450,8 @@
 
     .track-name {
       display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: $text-sm;
+      font-weight: $font-weight-medium;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -458,13 +460,13 @@
 
     .track-artist {
       display: block;
-      font-size: 0.75rem;
+      font-size: $text-2xs;
       color: #8a8a9a;
     }
   }
 
   .track-duration {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #6a6a7a;
     flex-shrink: 0;
   }
@@ -543,14 +545,14 @@
   }
 
   h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #6a6a7a;
     margin: 0;
   }
@@ -573,8 +575,8 @@
   gap: 10px;
   padding: 14px 20px;
   border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -630,8 +632,8 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
   h2 {
-    font-size: 1.3rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0;
   }
@@ -659,8 +661,8 @@
 
   label {
     display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     color: #b0b0b0;
     margin-bottom: 8px;
   }
@@ -673,7 +675,7 @@
     border-radius: 10px;
     padding: 14px 16px;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: $text-base;
     transition: all 0.3s ease;
 
     &:focus {
@@ -718,7 +720,7 @@
       &::after {
         content: "✓";
         color: #1bdc6f;
-        font-size: 12px;
+        font-size: $text-2xs;
         opacity: 0;
         transition: opacity 0.3s ease;
       }
@@ -741,7 +743,7 @@
   padding: 14px 16px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 }
 
@@ -759,8 +761,8 @@
   color: #b0b0b0;
   padding: 14px 20px;
   border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: $text-base;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -777,8 +779,8 @@
   color: #000;
   padding: 14px 20px;
   border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -816,7 +818,7 @@
 
   .page-header {
     .page-title {
-      font-size: 1.8rem;
+      font-size: $text-2xl;
     }
   }
 

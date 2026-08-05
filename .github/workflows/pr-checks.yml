@@ -21,6 +21,9 @@ jobs:
         # (e.g. zone.js bumps that are not yet compatible with the current Angular version)
         run: npm install --legacy-peer-deps
 
+      - name: Check design tokens
+        run: npm run lint:css
+
       - name: Build
         run: npm run build:prod
 

@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // ---------------------------------------------------------------------------
 // Dashboard (logged-in Home)
 // ---------------------------------------------------------------------------
@@ -16,8 +18,8 @@
 
 .dashboard-title {
   margin: 0 0 6px 0;
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: $text-2xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
 
   .dashboard-title-name {
@@ -31,7 +33,7 @@
 .dashboard-subtitle {
   margin: 0;
   color: #8a8a9a;
-  font-size: 0.95rem;
+  font-size: $text-base;
 }
 
 // Shared "quick links" module shell -- the child components (spotlight,
@@ -48,8 +50,8 @@
 
   .module-title {
     margin: 0 0 18px 0;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
     color: #fff;
   }
 }
@@ -60,7 +62,7 @@
   }
 
   .dashboard-title {
-    font-size: 1.4rem;
+    font-size: $text-xl;
   }
 }
 
@@ -100,8 +102,8 @@
 }
 
 .welcome-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: $text-4xl;
+  font-weight: $font-weight-bold;
   color: #ffffff;
   margin: 0 0 12px 0;
   background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -111,7 +113,7 @@
 }
 
 .welcome-subtitle {
-  font-size: 1.1rem;
+  font-size: $text-md;
   color: #8a8a9a;
   margin: 0 0 32px 0;
 }
@@ -134,18 +136,18 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 
   .feature-icon {
-    font-size: 1.1rem;
+    font-size: $text-md;
   }
 
   .feature-text {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #b0b0b0;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
   }
 }
 
 .feature-description {
-  font-size: 0.95rem;
+  font-size: $text-base;
   color: #6a6a7a;
   line-height: 1.6;
   margin: 0 0 32px 0;
@@ -162,8 +164,8 @@
   border: none;
   border-radius: 30px;
   padding: 16px 40px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: $text-md;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(29, 185, 84, 0.3);
@@ -222,12 +224,12 @@
   }
 
   .welcome-title {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
     margin-bottom: 4px;
   }
 
   .welcome-subtitle {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     margin-bottom: 16px;
   }
 
@@ -240,16 +242,16 @@
     padding: 6px 10px;
 
     .feature-icon {
-      font-size: 0.85rem;
+      font-size: $text-sm;
     }
 
     .feature-text {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
     }
   }
 
   .feature-description {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     margin-bottom: 16px;
     padding: 0 10px;
     line-height: 1.4;
@@ -257,7 +259,7 @@
 
   .login-button {
     padding: 12px 28px;
-    font-size: 0.95rem;
+    font-size: $text-base;
     width: auto;
     min-width: 220px;
   }
@@ -274,11 +276,11 @@
   }
 
   .welcome-title {
-    font-size: 1.4rem;
+    font-size: $text-xl;
   }
 
   .welcome-subtitle {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     margin-bottom: 12px;
   }
 
@@ -291,17 +293,17 @@
     padding: 5px 8px;
 
     .feature-text {
-      font-size: 0.65rem;
+      font-size: $text-3xs;
     }
   }
 
   .feature-description {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     margin-bottom: 12px;
   }
 
   .login-button {
     padding: 10px 24px;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 }

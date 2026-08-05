@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Crons panel — reads the `var(--ax-*)` tokens set on `.ax-page`
 // (see `admin.component.scss` / `src/styles/_admin-theme.scss`).
 
@@ -19,14 +21,14 @@
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1rem;
+    font-size: $text-base;
     color: var(--ax-text);
   }
 
   p {
     margin: 0;
     max-width: 46ch;
-    font-size: 0.84rem;
+    font-size: $text-xs;
   }
 
   &--error {
@@ -44,8 +46,8 @@
   border-radius: var(--ax-radius-sm);
   background: var(--ax-accent);
   color: #fff;
-  font-weight: 600;
-  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-2xs;
   border: none;
   cursor: pointer;
 
@@ -80,8 +82,8 @@
 
   h3 {
     margin: 0;
-    font-size: 0.86rem;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     color: var(--ax-text);
     word-break: break-word;
   }
@@ -91,8 +93,8 @@
   flex-shrink: 0;
   padding: 1px 8px;
   border-radius: var(--ax-radius-sm);
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   text-transform: capitalize;
   background: rgba(255, 255, 255, 0.06);
   color: var(--ax-text-secondary);
@@ -111,7 +113,7 @@
   }
 
   &--sm {
-    font-size: 0.62rem;
+    font-size: $text-3xs;
     padding: 1px 6px;
   }
 }
@@ -123,16 +125,16 @@
   margin: 0 0 6px;
 
   dt {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: var(--ax-text-tertiary);
   }
 
   dd {
     margin: 1px 0 0;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: var(--ax-text);
     font-variant-numeric: tabular-nums;
   }
@@ -145,24 +147,24 @@
   background: var(--ax-negative-muted);
   border: 1px solid rgba(240, 89, 107, 0.35);
   color: var(--ax-negative);
-  font-size: 0.74rem;
+  font-size: $text-2xs;
   word-break: break-word;
 }
 
 .ax-cron-empty {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: var(--ax-text-tertiary);
 }
 
 .ax-raw {
   margin-top: 10px;
-  font-size: 0.76rem;
+  font-size: $text-2xs;
 
   summary {
     cursor: pointer;
     color: var(--ax-accent-text);
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
 
     &:focus-visible {
       outline: 2px solid var(--ax-accent);
@@ -189,7 +191,7 @@
     padding: 5px 7px;
     border-radius: var(--ax-radius-sm);
     background: rgba(255, 255, 255, 0.03);
-    font-size: 0.72rem;
+    font-size: $text-2xs;
   }
 }
 

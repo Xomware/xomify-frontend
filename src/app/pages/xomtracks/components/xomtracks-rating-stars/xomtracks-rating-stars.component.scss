@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xt-rating {
   display: inline-flex;
   align-items: center;
@@ -51,15 +53,15 @@
 }
 
 .xt-rating-summary {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #d8d8e2;
   white-space: nowrap;
 }
 
 .xt-rating-count {
   color: #8a8a9a;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
 }
 
 @media (prefers-reduced-motion: reduce) {

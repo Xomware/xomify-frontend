@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .fav-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -56,7 +58,7 @@
   border: none;
   border-radius: 50%;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: $text-lg;
   transition: background 0.2s ease;
 
   &:hover {
@@ -66,8 +68,8 @@
 
 .fav-modal-title {
   margin: 0 0 14px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
   color: #fff;
   padding-right: 32px;
 }
@@ -93,7 +95,7 @@
     border: none;
     outline: none;
     color: #fff;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     margin-left: 8px;
 
     &::placeholder {
@@ -110,7 +112,7 @@
   background: transparent;
   border: none;
   color: #8a8a9a;
-  font-size: 1.1rem;
+  font-size: $text-md;
   padding: 0 2px;
 
   &:hover {
@@ -122,14 +124,14 @@
 .fav-search-loading,
 .fav-search-empty {
   margin: 8px 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
   text-align: center;
 }
 
 .fav-search-error {
   margin: 8px 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #ff4757;
   text-align: center;
 }
@@ -189,8 +191,8 @@
 }
 
 .fav-result-name {
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -198,7 +200,7 @@
 }
 
 .fav-result-artist {
-  font-size: 0.76rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
   white-space: nowrap;
   overflow: hidden;
@@ -208,8 +210,8 @@
 .fav-result-add {
   flex-shrink: 0;
   color: #1bdc6f;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
 }
 
 @media (prefers-reduced-motion: reduce) {

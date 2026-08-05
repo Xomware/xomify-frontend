@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Self-serve onboarding "Connection" panel. An always-open card (not the old
 // collapsed strip) — one of setup / minted / connected renders at a time.
 .xt-setup {
@@ -13,7 +15,7 @@
   align-items: center;
   gap: 0.6rem;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 .xt-spinner {
@@ -36,14 +38,14 @@
 
 .xt-setup-title {
   margin: 0 0 0.35rem;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: var(--text-primary);
 }
 
 .xt-setup-sub {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: var(--text-secondary);
   line-height: 1.5;
   max-width: 60ch;
@@ -62,9 +64,9 @@
 
 .xt-setup-col-title {
   margin: 0 0 0.5rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
@@ -81,7 +83,7 @@
   li {
     position: relative;
     padding-left: 1.1rem;
-    font-size: 0.82rem;
+    font-size: $text-xs;
     color: var(--text-secondary);
     line-height: 1.4;
   }
@@ -97,7 +99,7 @@
   }
   strong {
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -113,7 +115,7 @@
   background: var(--warning-muted);
   border: 1px solid var(--warning);
   color: var(--warning);
-  font-size: 0.83rem;
+  font-size: $text-xs;
 
   strong { color: var(--text-primary); }
 }
@@ -135,7 +137,7 @@
   background: var(--surface-sunken);
   border: 1px solid var(--border);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -150,8 +152,8 @@
   background: var(--surface-raised);
   border: 1px solid var(--border-strong);
   color: var(--text-primary);
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
 
   &:hover { background: var(--gray-700); }
@@ -165,12 +167,15 @@
   flex-direction: column;
   gap: 0.85rem;
 
-  li { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; }
+  li { font-size: $text-xs; color: var(--text-secondary); line-height: 1.55; }
   p { margin: 0 0 0.4rem; }
   code {
     padding: 0.05rem 0.3rem;
     border-radius: var(--radius-sm);
     background: var(--surface-sunken);
+    // Deliberately `em`: monospace renders visually larger at the same size,
+    // so inline code is shrunk relative to its surrounding text.
+    // stylelint-disable-next-line declaration-property-value-allowed-list
     font-size: 0.82em;
   }
 }
@@ -187,11 +192,11 @@
   background: none;
   border: none;
   color: var(--text-tertiary);
-  font-size: 0.8rem;
+  font-size: $text-xs;
   cursor: pointer;
 
   &:hover { color: var(--text-secondary); }
-  span { font-weight: 700; }
+  span { font-weight: $font-weight-bold; }
 }
 
 .xt-done-btn {
@@ -200,8 +205,8 @@
   background: var(--accent-green);
   border: 1px solid var(--accent-green);
   color: var(--gray-950);
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
 
   &:hover { background: var(--accent-green-hover); }
@@ -234,8 +239,8 @@
 }
 
 .xt-conn-label {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: var(--text-primary);
 }
 
@@ -245,15 +250,15 @@
   margin: 0;
 
   dt {
-    font-size: 0.68rem;
-    letter-spacing: 0.04em;
+    font-size: $text-3xs;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: var(--text-tertiary);
     margin-bottom: 0.15rem;
   }
   dd {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
   }
@@ -272,9 +277,9 @@
 
 .xt-devices-title {
   margin: 0;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
@@ -284,8 +289,8 @@
   background: none;
   border: none;
   color: var(--accent-green);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
 
   &:hover { color: var(--accent-green-hover); }
@@ -293,7 +298,7 @@
 
 .xt-devices-empty {
   margin: 0.25rem 0 0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: var(--text-secondary);
 }
 
@@ -325,13 +330,13 @@
 }
 
 .xt-device-name {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: var(--text-primary);
 }
 
 .xt-device-scan {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: var(--text-tertiary);
 }
 
@@ -358,8 +363,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: var(--text-tertiary);
   flex: 1;
   min-width: 160px;
@@ -374,8 +379,8 @@
   border-radius: var(--radius-full);
   background: var(--surface-raised);
   color: var(--text-secondary);
-  font-size: 0.62rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   cursor: help;
 }
 
@@ -385,7 +390,7 @@
   background: var(--surface-sunken);
   border: 1px solid var(--border-strong);
   color: var(--text-primary);
-  font-size: 0.85rem;
+  font-size: $text-sm;
 
   &:focus-visible { outline: 2px solid var(--accent-green); outline-offset: 1px; }
 }
@@ -396,8 +401,8 @@
   background: var(--accent-purple);
   border: 1px solid var(--accent-purple);
   color: var(--text-primary);
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   white-space: nowrap;
   cursor: pointer;
 
@@ -412,7 +417,7 @@
   background: none;
   border: 1px solid var(--border-strong);
   color: var(--text-secondary);
-  font-size: 0.84rem;
+  font-size: $text-xs;
   cursor: pointer;
 
   &:hover { color: var(--text-primary); }
@@ -425,8 +430,8 @@
   background: var(--negative-muted);
   border: 1px solid var(--negative);
   color: var(--negative);
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
 
   &:hover:not(:disabled) { background: var(--negative); color: var(--text-primary); }
@@ -436,7 +441,7 @@
 
 .xt-error {
   margin: 0.6rem 0 0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: var(--negative);
   flex-basis: 100%;
 }

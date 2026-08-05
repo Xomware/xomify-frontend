@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   padding: 24px 20px 80px;
@@ -13,15 +15,15 @@
 
 .page-header {
   .page-title {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 6px;
   }
 
   .page-subtitle {
     color: #8a8a9a;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     margin: 0;
   }
 }
@@ -46,7 +48,7 @@
     border: none;
     outline: none;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: $text-base;
 
     &::placeholder {
       color: #8a8a9a;
@@ -104,8 +106,8 @@
 
     .track-name {
       color: #fff;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: $font-weight-semibold;
+      font-size: $text-base;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -113,7 +115,7 @@
 
     .track-artist {
       color: #8a8a9a;
-      font-size: 0.85rem;
+      font-size: $text-sm;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -167,13 +169,13 @@
 
   h3 {
     color: #cfcfdc;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 0;
   }
 
   p {
     color: #8a8a9a;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     margin: 0;
   }
 }
@@ -188,7 +190,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     color: #cfcfdc;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     padding: 10px 28px;
     cursor: pointer;
     transition: all 0.2s ease;

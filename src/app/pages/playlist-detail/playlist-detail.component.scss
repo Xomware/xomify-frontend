@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -18,7 +20,7 @@
   border-radius: 25px;
   color: #b0b0b0;
   padding: 10px 20px;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 24px;
@@ -67,25 +69,25 @@
   min-width: 0;
 
   .playlist-type {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
     color: #9c0abf;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: $tracking-wide;
     margin-bottom: 8px;
     display: block;
   }
 
   .playlist-name {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: $text-4xl;
+    font-weight: $font-weight-extrabold;
     color: #fff;
     margin: 0 0 12px 0;
     line-height: 1.2;
   }
 
   .playlist-description {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #b0b0b0;
     margin: 0 0 16px 0;
     line-height: 1.5;
@@ -104,7 +106,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.9rem;
+      font-size: $text-sm;
       color: #8a8a9a;
 
       svg {
@@ -131,8 +133,8 @@
   padding: 12px 24px;
   border-radius: 30px;
   border: 1px solid transparent;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   font-family: inherit;
   line-height: 1;
   text-decoration: none;
@@ -208,10 +210,10 @@
   padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   color: #6a6a7a;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
 
   .col-play {
     // Empty for play button
@@ -252,7 +254,7 @@
 }
 
 .track-num {
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: #6a6a7a;
   text-align: center;
 }
@@ -282,8 +284,8 @@
 
     .track-name {
       display: block;
-      font-size: 0.95rem;
-      font-weight: 500;
+      font-size: $text-base;
+      font-weight: $font-weight-medium;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -292,7 +294,7 @@
 
     .track-artists {
       display: block;
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       white-space: nowrap;
       overflow: hidden;
@@ -319,7 +321,7 @@
 }
 
 .track-album {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
   white-space: nowrap;
   overflow: hidden;
@@ -327,12 +329,12 @@
 }
 
 .track-added {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #6a6a7a;
 }
 
 .track-duration {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #6a6a7a;
   text-align: right;
 }
@@ -394,8 +396,8 @@
         border-radius: 16px;
 
         .rating-value {
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: $text-3xs;
+          font-weight: $font-weight-semibold;
         }
       }
     }
@@ -415,8 +417,8 @@
   color: #9c0abf;
   padding: 12px 32px;
   border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -443,7 +445,7 @@
 
   p {
     color: #6a6a7a;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 }
 
@@ -457,7 +459,7 @@
 
   .error-text {
     color: #ff4757;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 20px 0;
   }
 
@@ -467,8 +469,8 @@
     border: none;
     padding: 12px 28px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -521,7 +523,7 @@
 
   .playlist-details {
     .playlist-name {
-      font-size: 1.8rem;
+      font-size: $text-2xl;
     }
 
     .playlist-meta {

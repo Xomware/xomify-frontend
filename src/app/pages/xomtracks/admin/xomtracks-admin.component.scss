@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Admin Portal shell — same dark gradient + purple/green design language as
 // the Shares feed (`xomtracks.component.scss`), scoped with an `xta-` prefix
 // so nothing collides with the feed's `xt-` classes.
@@ -20,7 +22,7 @@
 
   h1 {
     margin: 0;
-    font-size: 1.6rem;
+    font-size: $text-2xl;
     color: #fff;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
     -webkit-background-clip: text;
@@ -31,7 +33,7 @@
 
 .xta-sub {
   margin: 4px 0 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 }
 
@@ -47,8 +49,8 @@
   color: #8a8a9a;
   padding: 9px 18px;
   border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover {

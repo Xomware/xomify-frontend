@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -34,7 +36,7 @@
 
   .loading-text {
     color: #8a8a9a;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 }
 
@@ -59,7 +61,7 @@
 
   .error-text {
     color: #ff4757;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 20px 0;
   }
 
@@ -69,8 +71,8 @@
     border: none;
     padding: 12px 28px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -91,8 +93,8 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    font-size: 2.2rem;
-    font-weight: 800;
+    font-size: $text-4xl;
+    font-weight: $font-weight-extrabold;
     color: #fff;
     margin: 0 0 8px 0;
 
@@ -102,7 +104,7 @@
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -146,14 +148,14 @@
     flex: 1;
 
     h3 {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: $text-base;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 2px 0;
     }
 
     p {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       margin: 0;
       line-height: 1.35;
@@ -167,8 +169,8 @@
     border: none;
     padding: 8px 20px;
     border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 100px;
@@ -210,12 +212,12 @@
   
   .stats-period {
     text-align: center;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     color: #9c0abf;
     margin: 0 0 12px 0;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: $tracking-wide;
   }
 }
 
@@ -250,17 +252,17 @@
 
   .stat-value {
     display: block;
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin-bottom: 4px;
   }
 
   .stat-label {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #6a6a7a;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
 }
 
@@ -288,8 +290,8 @@
     color: #6a6a7a;
     padding: 10px 16px;
     border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -320,7 +322,7 @@
     border-radius: 10px;
     padding: 10px 16px;
     color: #fff;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 150px;
@@ -343,7 +345,7 @@
   }
 
   .week-count {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #6a6a7a;
     white-space: nowrap;
   }
@@ -417,8 +419,8 @@
     flex: 1;
 
     h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: $text-xl;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 8px 0;
     }
@@ -429,7 +431,7 @@
       color: #1bdc6f;
       padding: 6px 16px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: $text-xs;
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -449,8 +451,8 @@
 
   .week-day {
     text-align: center;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
     color: #6a6a7a;
     padding: 8px;
     min-width: 0;
@@ -499,7 +501,7 @@
 
     .day-number {
       color: #1bdc6f;
-      font-weight: 700;
+      font-weight: $font-weight-bold;
     }
   }
 
@@ -517,8 +519,8 @@
   }
 
   .day-number {
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     color: #fff;
   }
 
@@ -543,7 +545,7 @@
     }
 
     .more-dot {
-      font-size: 0.65rem;
+      font-size: $text-3xs;
       color: #8a8a9a;
     }
   }
@@ -587,8 +589,8 @@
 
         .preview-name {
           display: block;
-          font-size: 0.8rem;
-          font-weight: 500;
+          font-size: $text-xs;
+          font-weight: $font-weight-medium;
           color: #fff;
           white-space: nowrap;
           overflow: hidden;
@@ -597,14 +599,14 @@
 
         .preview-artist {
           display: block;
-          font-size: 0.7rem;
+          font-size: $text-3xs;
           color: #8a8a9a;
         }
       }
     }
 
     .preview-more {
-      font-size: 0.75rem;
+      font-size: $text-2xs;
       color: #6a6a7a;
       text-align: center;
       margin-top: 8px;
@@ -629,14 +631,14 @@
     margin-bottom: 16px;
 
     h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
+      font-size: $text-lg;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0;
     }
 
     .release-count {
-      font-size: 0.85rem;
+      font-size: $text-sm;
       color: #8a8a9a;
     }
   }
@@ -674,8 +676,8 @@
     min-width: 0;
 
     .release-name {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: $text-base;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 4px 0;
       white-space: nowrap;
@@ -684,7 +686,7 @@
     }
 
     .release-artist {
-      font-size: 0.85rem;
+      font-size: $text-sm;
       color: #8a8a9a;
       margin: 0 0 8px 0;
 
@@ -755,8 +757,8 @@
 .type-badge {
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
   text-transform: uppercase;
 
   &.album {
@@ -771,7 +773,7 @@
 }
 
 .track-count {
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: #6a6a7a;
 }
 
@@ -793,7 +795,7 @@
     align-items: center;
     gap: 8px;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.82rem;
+    font-size: $text-xs;
 
     svg {
       color: #1db954;
@@ -818,8 +820,8 @@
     border: none;
     border-radius: 16px;
     color: #000;
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -845,11 +847,11 @@
   align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #6a6a7a;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
 }
 
 // Releases List
@@ -888,7 +890,7 @@
   }
 
   .col-num {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #6a6a7a;
     text-align: center;
   }
@@ -908,8 +910,8 @@
     }
 
     .release-name {
-      font-size: 0.95rem;
-      font-weight: 500;
+      font-size: $text-base;
+      font-weight: $font-weight-medium;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -922,7 +924,7 @@
     min-width: 0;
 
     a {
-      font-size: 0.9rem;
+      font-size: $text-sm;
       color: #8a8a9a;
       text-decoration: none;
       white-space: nowrap;
@@ -942,10 +944,10 @@
       display: inline-block;
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: 600;
+      font-size: $text-3xs;
+      font-weight: $font-weight-semibold;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: $tracking-wide;
 
       &.album {
         background: rgba(156, 10, 191, 0.2);
@@ -965,23 +967,23 @@
     gap: 2px;
 
     .date-text {
-      font-size: 0.85rem;
+      font-size: $text-sm;
       color: #b0b0b0;
     }
 
     .relative-date {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
       color: #6a6a7a;
 
       &.upcoming {
         color: #1bdc6f;
-        font-weight: 500;
+        font-weight: $font-weight-medium;
       }
     }
   }
 
   .col-tracks {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     text-align: center;
   }
@@ -1048,7 +1050,7 @@
 
   p {
     margin: 0 0 16px 0;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 
   .try-other-week {
@@ -1057,7 +1059,7 @@
     color: #9c0abf;
     padding: 10px 24px;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -1089,14 +1091,14 @@
   }
 
   h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: $text-xl;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -1114,7 +1116,7 @@
   }
 
   .page-header .page-title {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
     gap: 8px;
 
     svg {
@@ -1150,11 +1152,11 @@
     padding: 12px 8px;
 
     .stat-value {
-      font-size: 1.4rem;
+      font-size: $text-xl;
     }
 
     .stat-label {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
     }
   }
 
@@ -1211,14 +1213,14 @@
 
     .month-title {
       h2 {
-        font-size: 1rem;
+        font-size: $text-base;
         margin-bottom: 2px;
       }
     }
 
     .today-btn {
       padding: 3px 10px;
-      font-size: 0.65rem;
+      font-size: $text-3xs;
     }
   }
 
@@ -1230,7 +1232,7 @@
     justify-content: center;
 
     .week-day {
-      font-size: 0.6rem;
+      font-size: $text-3xs;
       padding: 2px 0;
       text-align: center;
       width: var(--cell-size);
@@ -1256,7 +1258,7 @@
     aspect-ratio: unset;
 
     .day-number {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
       line-height: 1.2;
     }
 
@@ -1272,7 +1274,7 @@
       }
 
       .more-dot {
-        font-size: 0.45rem;
+        font-size: $text-3xs;
       }
     }
 
@@ -1286,7 +1288,7 @@
     margin-top: 16px;
 
     .detail-header h3 {
-      font-size: 1rem;
+      font-size: $text-base;
     }
   }
 
@@ -1300,7 +1302,7 @@
     }
 
     .release-info .release-name {
-      font-size: 0.9rem;
+      font-size: $text-sm;
     }
   }
 
@@ -1354,7 +1356,7 @@
       align-items: center;
 
       .date-text {
-        font-size: 0.8rem;
+        font-size: $text-xs;
       }
 
       .relative-date {
@@ -1373,7 +1375,7 @@
 
       &::after {
         content: " tracks";
-        font-size: 0.75rem;
+        font-size: $text-2xs;
         color: #6a6a7a;
       }
     }
@@ -1415,11 +1417,11 @@
     padding: 8px 4px;
 
     .stat-value {
-      font-size: 1.1rem;
+      font-size: $text-md;
     }
 
     .stat-label {
-      font-size: 0.6rem;
+      font-size: $text-3xs;
     }
   }
 
@@ -1441,22 +1443,22 @@
     }
 
     .month-title h2 {
-      font-size: 0.9rem;
+      font-size: $text-sm;
     }
 
     .today-btn {
       padding: 2px 8px;
-      font-size: 0.6rem;
+      font-size: $text-3xs;
     }
   }
 
   .week-headers .week-day {
-    font-size: 0.5rem;
+    font-size: $text-3xs;
   }
 
   .calendar-day {
     .day-number {
-      font-size: 0.6rem;
+      font-size: $text-3xs;
     }
 
     .release-dots {
@@ -1473,13 +1475,13 @@
 
   .week-filter {
     .week-select {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       padding: 8px 12px;
       min-width: 120px;
     }
 
     .week-count {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
     }
   }
 }

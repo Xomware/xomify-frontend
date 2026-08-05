@@ -2,6 +2,8 @@
 /* Purple: #9c0abf | Green: #1bdc6f */
 @use "styles/theme";
 
+@import 'tokens';
+
 /* Reset & Base */
 *,
 *::before,
@@ -20,7 +22,7 @@ body {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: $text-base;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -35,7 +37,7 @@ h4,
 h5,
 h6 {
   margin-top: 0;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   line-height: 1.3;
 }
 
@@ -201,8 +203,8 @@ app-footer {
     color: #fff;
     border-radius: var(--radius-md);
     z-index: 10000;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     text-decoration: none;
   }
 }
@@ -286,8 +288,8 @@ textarea:focus-visible {
   border: none;
   border-radius: var(--radius-md);
   padding: 10px 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: background var(--transition), box-shadow var(--transition);
   box-shadow: var(--shadow-xs);
@@ -311,8 +313,8 @@ textarea:focus-visible {
   border: none;
   border-radius: var(--radius-md);
   padding: 10px 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: background var(--transition), box-shadow var(--transition);
   box-shadow: var(--shadow-xs);
@@ -330,8 +332,8 @@ textarea:focus-visible {
   color: var(--text-primary);
   border-radius: var(--radius-md);
   padding: 9px 19px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: background var(--transition), border-color var(--transition), color var(--transition);
 
@@ -358,8 +360,8 @@ textarea:focus-visible {
   border-radius: var(--radius-md);
   padding: 8px 18px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
   white-space: nowrap;
 
@@ -399,7 +401,7 @@ textarea:focus-visible {
 
   .term-button {
     padding: 7px 14px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
   }
 }
 
@@ -416,8 +418,8 @@ textarea:focus-visible {
   background: var(--surface-raised);
   border: 1px solid var(--border-strong);
   color: var(--text-primary);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: $text-2xs;
+  font-weight: $font-weight-medium;
   line-height: 1.35;
   text-align: center;
   pointer-events: none;

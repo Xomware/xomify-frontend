@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Users panel — reads the `var(--ax-*)` tokens set on `.ax-page`
 // (see `admin.component.scss` / `src/styles/_admin-theme.scss`).
 
@@ -19,14 +21,14 @@
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1rem;
+    font-size: $text-base;
     color: var(--ax-text);
   }
 
   p {
     margin: 0;
     max-width: 46ch;
-    font-size: 0.84rem;
+    font-size: $text-xs;
   }
 
   &--error {
@@ -44,8 +46,8 @@
   border-radius: var(--ax-radius-sm);
   background: var(--ax-accent);
   color: #fff;
-  font-weight: 600;
-  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-2xs;
   border: none;
   cursor: pointer;
 
@@ -60,7 +62,7 @@
   &--sm {
     margin-top: 0;
     padding: 4px 10px;
-    font-size: 0.72rem;
+    font-size: $text-2xs;
   }
 
   &--secondary {
@@ -107,7 +109,7 @@
   padding: 0;
   color: var(--ax-accent-text);
   font: inherit;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   text-decoration: underline;
   cursor: pointer;
 
@@ -119,7 +121,7 @@
 
 .ax-count {
   margin: 0 0 8px;
-  font-size: 0.76rem;
+  font-size: $text-2xs;
   color: var(--ax-text-tertiary);
 }
 
@@ -133,7 +135,7 @@
 .ax-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: $text-xs;
 
   th,
   td {
@@ -144,9 +146,9 @@
 
   thead th {
     background: rgba(255, 255, 255, 0.02);
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: var(--ax-text-tertiary);
     border-bottom: 1px solid var(--ax-hairline);
@@ -179,7 +181,7 @@
 
 .ax-cell-email {
   color: var(--ax-text);
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   white-space: normal;
   word-break: break-word;
 }
@@ -193,8 +195,8 @@
   align-items: center;
   padding: 1px 8px;
   border-radius: var(--ax-radius-sm);
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
   background: rgba(255, 255, 255, 0.06);
   color: var(--ax-text-secondary);
   border: 1px solid var(--ax-hairline);
@@ -233,9 +235,9 @@
 
   h3 {
     margin: 0 0 6px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: var(--ax-text-tertiary);
   }
@@ -245,7 +247,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: var(--ax-text-secondary);
 
   app-icon {
@@ -256,7 +258,7 @@
 
 .ax-drawer-empty {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: var(--ax-text-tertiary);
 }
 
@@ -277,7 +279,7 @@
     padding: 4px 8px;
     border-radius: var(--ax-radius-sm);
     background: rgba(255, 255, 255, 0.03);
-    font-size: 0.76rem;
+    font-size: $text-2xs;
   }
 }
 

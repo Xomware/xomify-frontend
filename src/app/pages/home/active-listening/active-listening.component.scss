@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .dashboard-module {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -16,14 +18,14 @@
 
 .module-title {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
   color: #fff;
 }
 
 .module-link {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #d68bff;
   text-decoration: none;
 
@@ -81,7 +83,7 @@
 .module-error,
 .module-empty {
   color: #8a8a9a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   text-align: center;
   padding: 16px 0;
   margin: 0;
@@ -183,8 +185,8 @@
 }
 
 .listening-name {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -192,7 +194,7 @@
 }
 
 .listening-artist {
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
   white-space: nowrap;
   overflow: hidden;
@@ -200,7 +202,7 @@
 }
 
 .listening-time {
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: #5a5a6a;
 }
 

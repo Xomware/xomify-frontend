@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xt-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -58,7 +60,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  font-size: 1.3rem;
+  font-size: $text-lg;
 
   &:hover {
     background: rgba(255, 255, 255, 0.16);
@@ -96,7 +98,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.4rem;
+  font-size: $text-4xl;
   color: rgba(255, 255, 255, 0.25);
   background: radial-gradient(circle at 30% 20%, rgba(156, 10, 191, 0.25), transparent 60%);
 }
@@ -113,8 +115,8 @@
   align-self: flex-start;
   padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: rgba(255, 255, 255, 0.12);
 
@@ -125,21 +127,21 @@
 
 .xt-detail-title {
   margin: 4px 0 0;
-  font-size: 1.3rem;
-  font-weight: 800;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   line-height: 1.25;
 }
 
 .xt-detail-artist {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: $text-base;
   color: #d8d8e2;
 }
 
 .xt-detail-album {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: #8a8a9a;
 }
 
@@ -153,15 +155,15 @@
 .xt-stat-pill {
   padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: rgba(156, 10, 191, 0.3);
 
   &--muted {
     background: rgba(255, 255, 255, 0.08);
     color: #b8b8c6;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
   }
 }
 
@@ -173,8 +175,8 @@
 }
 
 .xt-rate-label {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #8a8a9a;
   border-bottom: 1px dotted rgba(255, 255, 255, 0.25);
   cursor: help;
@@ -188,8 +190,8 @@
 }
 
 .xt-preview-label {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #9a9aab;
 }
 
@@ -201,8 +203,8 @@
   align-self: flex-start;
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: linear-gradient(135deg, #1bdc6f 0%, #17b75b 100%);
   box-shadow: 0 4px 15px rgba(27, 220, 111, 0.3);
@@ -238,18 +240,18 @@
   background: rgba(255, 255, 255, 0.04);
 
   dt {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: #6d6d7d;
     margin-bottom: 3px;
   }
   dd {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #fff;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -266,8 +268,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
   flex-shrink: 0;
@@ -291,16 +293,16 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 10px;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: #fff;
 }
 
 .xt-count-badge {
   padding: 2px 8px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 800;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: rgba(156, 10, 191, 0.6);
 }
@@ -322,7 +324,7 @@
   gap: 8px;
   padding: 8px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 0.82rem;
+  font-size: $text-xs;
 
   &:last-child {
     border-bottom: none;
@@ -333,7 +335,7 @@
   flex: 1;
   min-width: 0;
   color: #d8d8e2;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -341,7 +343,7 @@
 
 .xt-breakdown-date {
   color: #6d6d7d;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   flex-shrink: 0;
 }
 

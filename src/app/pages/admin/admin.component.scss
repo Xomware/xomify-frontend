@@ -6,6 +6,8 @@
 // import anything itself.
 @use '../../../styles/admin-theme' as theme;
 
+@import 'tokens';
+
 .ax-page {
   @include theme.ax-theme-tokens;
 
@@ -42,15 +44,15 @@
 
   h1 {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
     color: var(--ax-text);
   }
 }
 
 .ax-nav-sub {
   margin: 2px 0 0;
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: var(--ax-text-tertiary);
 }
 
@@ -65,8 +67,8 @@
   border-radius: var(--ax-radius-sm);
   padding: 7px 9px;
   color: var(--ax-text-secondary);
-  font-size: 0.84rem;
-  font-weight: 500;
+  font-size: $text-xs;
+  font-weight: $font-weight-medium;
   text-align: left;
   transition: background var(--ax-transition), color var(--ax-transition);
 
@@ -89,7 +91,7 @@
     background: var(--ax-accent-muted);
     border-left-color: var(--ax-accent);
     color: var(--ax-text);
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
 
     app-icon {
       color: var(--ax-accent-text);
@@ -106,8 +108,8 @@
   border-top: 1px solid var(--ax-hairline);
   border-radius: var(--ax-radius-sm);
   color: var(--ax-text-secondary);
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: $text-xs;
+  font-weight: $font-weight-medium;
   text-decoration: none;
 
   app-icon {

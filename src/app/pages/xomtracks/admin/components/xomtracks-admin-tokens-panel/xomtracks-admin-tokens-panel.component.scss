@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xta-state-block {
   display: flex;
   flex-direction: column;
@@ -8,12 +10,12 @@
   color: #8a8a9a;
 
   div:first-child {
-    font-size: 2.2rem;
+    font-size: $text-4xl;
   }
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1.05rem;
+    font-size: $text-base;
     color: #fff;
   }
 
@@ -28,8 +30,8 @@
   border-radius: 20px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.82rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-xs;
   border: none;
   margin-top: 10px;
 
@@ -48,7 +50,7 @@
   &--sm {
     margin-top: 0;
     padding: 6px 14px;
-    font-size: 0.75rem;
+    font-size: $text-2xs;
   }
 
   &--danger {
@@ -63,7 +65,7 @@
   background: rgba(255, 55, 80, 0.12);
   border: 1px solid rgba(255, 55, 80, 0.4);
   color: #ff8fa0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
 }
 
 .xta-owner-group {
@@ -72,7 +74,7 @@
 
 .xta-owner-heading {
   margin: 0 0 8px;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: #fff;
 }
 
@@ -85,7 +87,7 @@
 .xta-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 
   th,
   td {
@@ -96,9 +98,9 @@
 
   thead th {
     background: rgba(255, 255, 255, 0.03);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: #6d6d7d;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -117,8 +119,8 @@
   display: inline-flex;
   padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #b9f7d3;
   background: rgba(27, 220, 111, 0.15);
   border: 1px solid rgba(27, 220, 111, 0.4);
@@ -168,8 +170,8 @@
   background: none;
   border: none;
   color: #8a8a9a;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
 
   &:hover {
@@ -177,7 +179,7 @@
   }
 
   span {
-    font-weight: 800;
+    font-weight: $font-weight-extrabold;
   }
 }
 
@@ -197,7 +199,7 @@
   padding: 6px 12px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #c2c2c9;
   white-space: nowrap;
   overflow-x: auto;
@@ -224,7 +226,7 @@
 
 @media (max-width: 640px) {
   .xta-table {
-    font-size: 0.78rem;
+    font-size: $text-2xs;
 
     th,
     td {

@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .news-card {
   display: flex;
   flex-direction: column;
@@ -35,8 +37,8 @@
   }
 
   &__title {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -49,17 +51,17 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #9ca3af;
   }
 
   &__source {
     color: #1db954;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
   }
 
   &__description {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #d1d5db;
     line-height: 1.5;
     display: -webkit-box;

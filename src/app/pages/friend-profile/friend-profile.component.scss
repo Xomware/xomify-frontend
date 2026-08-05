@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -30,7 +32,7 @@
   }
 
   h3 {
-    font-size: 1.3rem;
+    font-size: $text-lg;
     color: #fff;
     margin: 0 0 20px 0;
   }
@@ -41,8 +43,8 @@
     color: #9c0abf;
     border-radius: 25px;
     padding: 10px 24px;
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -90,7 +92,7 @@
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 20px;
@@ -143,15 +145,15 @@
 }
 
 .user-name {
-  font-size: 2.2rem;
-  font-weight: 800;
+  font-size: $text-4xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   margin: 0 0 8px 0;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .user-email {
-  font-size: 1rem;
+  font-size: $text-base;
   color: #8a8a9a;
   margin: 0 0 16px 0;
 }
@@ -181,8 +183,8 @@
   }
 
   .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -190,10 +192,10 @@
   }
 
   .stat-label {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
 
   .stat-divider {
@@ -213,8 +215,8 @@
     gap: 8px;
     padding: 10px 24px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
@@ -296,8 +298,8 @@
     button {
       padding: 10px 20px;
       border-radius: 25px;
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: $text-base;
+      font-weight: $font-weight-semibold;
       cursor: pointer;
       transition: all 0.3s ease;
       border: none;
@@ -366,8 +368,8 @@
   color: #8a8a9a;
   padding: 10px 16px;
   border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -404,8 +406,8 @@
   color: #8a8a9a;
   padding: 8px 16px;
   border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -482,8 +484,8 @@
 
 .track-rank {
   width: 28px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: #6a6a7a;
   text-align: center;
   flex-shrink: 0;
@@ -526,8 +528,8 @@
   min-width: 0;
 
   .track-name {
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     color: #fff;
     margin: 0 0 4px 0;
     white-space: nowrap;
@@ -536,7 +538,7 @@
   }
 
   .track-artist {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     margin: 0;
 
@@ -552,7 +554,7 @@
 }
 
 .track-duration {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #6a6a7a;
   flex-shrink: 0;
 }
@@ -608,8 +610,8 @@
         border-radius: 16px;
 
         .rating-value {
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: $text-3xs;
+          font-weight: $font-weight-semibold;
         }
       }
     }
@@ -651,8 +653,8 @@
   height: 24px;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: #fff;
   display: flex;
   align-items: center;
@@ -694,8 +696,8 @@
 
 .artist-info {
   .artist-name {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 4px 0;
     white-space: nowrap;
@@ -704,7 +706,7 @@
   }
 
   .artist-meta {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #8a8a9a;
     margin: 0 0 8px 0;
   }
@@ -716,7 +718,7 @@
     gap: 4px;
 
     .genre-tag {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
       color: #8a8a9a;
       background: rgba(255, 255, 255, 0.05);
       padding: 3px 8px;
@@ -745,8 +747,8 @@
 
 .genre-rank {
   width: 28px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: #6a6a7a;
   text-align: center;
   flex-shrink: 0;
@@ -757,8 +759,8 @@
   min-width: 0;
 
   .genre-name {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     color: #fff;
     margin: 0 0 8px 0;
     text-transform: capitalize;
@@ -780,8 +782,8 @@
 }
 
 .genre-percentage {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: #1bdc6f;
   flex-shrink: 0;
   min-width: 50px;
@@ -809,14 +811,14 @@
   }
 
   h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $text-md;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     margin: 0;
   }
@@ -844,18 +846,18 @@
   }
 
   .user-name {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
   }
 
   .profile-stats {
     gap: 16px;
 
     .stat-value {
-      font-size: 1.2rem;
+      font-size: $text-lg;
     }
 
     .stat-label {
-      font-size: 0.75rem;
+      font-size: $text-2xs;
     }
 
     .stat-divider {
@@ -963,8 +965,8 @@
 
   .playlist-info {
     .playlist-name {
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: $text-base;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 4px 0;
       white-space: nowrap;
@@ -973,7 +975,7 @@
     }
 
     .playlist-meta {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       margin: 0;
     }
@@ -1007,8 +1009,8 @@
   background: rgba(0, 0, 0, 0.3);
 
   .score-value {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -1016,13 +1018,13 @@
   flex: 1;
 
   .score-label {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 8px 0;
   }
 
   .score-description {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -1035,8 +1037,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $text-md;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 16px 0;
 
@@ -1074,8 +1076,8 @@
   }
 
   .shared-item-name {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     color: #fff;
     text-align: center;
     white-space: nowrap;
@@ -1123,8 +1125,8 @@
     gap: 2px;
 
     .shared-song-name {
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: $text-sm;
+      font-weight: $font-weight-medium;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -1132,7 +1134,7 @@
     }
 
     .shared-song-artist {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
     }
   }
@@ -1175,8 +1177,8 @@
   color: #fff;
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   text-transform: capitalize;
   transition: all 0.2s ease;
 
@@ -1196,7 +1198,7 @@
 
   .score-info {
     .score-label {
-      font-size: 1.3rem;
+      font-size: $text-lg;
     }
   }
 
@@ -1212,7 +1214,7 @@
     }
 
     .shared-item-name {
-      font-size: 0.75rem;
+      font-size: $text-2xs;
     }
   }
 
@@ -1222,6 +1224,6 @@
 
   .shared-genre-tag {
     padding: 6px 12px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
   }
 }

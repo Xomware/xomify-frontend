@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .fav-list {
   background: linear-gradient(
     135deg,
@@ -25,14 +27,14 @@
 
 .fav-list-title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: #fff;
 }
 
 .fav-list-subtitle {
   margin: 2px 0 0;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: #8a8a9a;
 }
 
@@ -44,8 +46,8 @@
 }
 
 .fav-list-count {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #b0b0b0;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
@@ -87,8 +89,8 @@
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
   border-radius: 50%;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
 }
 
 .fav-item-art {
@@ -116,7 +118,7 @@
 
 .fav-item-art-fallback {
   color: #6a6a7a;
-  font-size: 1rem;
+  font-size: $text-base;
 }
 
 .fav-item-text {
@@ -127,8 +129,8 @@
 }
 
 .fav-item-name {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -136,7 +138,7 @@
 }
 
 .fav-item-artist {
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
   white-space: nowrap;
   overflow: hidden;
@@ -148,8 +150,8 @@
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   padding: 2px 6px;
   border-radius: 10px;
   color: #8a8a9a;
@@ -176,7 +178,7 @@
   background: transparent;
   border: none;
   color: #8a8a9a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   border-radius: 6px;
   padding: 4px 6px;
   transition: all 0.2s ease;
@@ -208,7 +210,7 @@
   border: none;
   border-radius: 6px;
   color: #b0b0b0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
@@ -245,7 +247,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: #b0b0b0;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
@@ -259,7 +261,7 @@
 }
 
 .fav-timeline-rank {
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   color: #fff;
 }
 
@@ -267,7 +269,7 @@
   margin: 0;
   padding: 14px 0;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #6a6a7a;
 }
 
@@ -288,8 +290,8 @@
   border: none;
   border-radius: 18px;
   padding: 7px 16px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
@@ -307,8 +309,8 @@
   background: transparent;
   border: none;
   color: #8a8a9a;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -336,8 +338,8 @@
   color: #8a8a9a;
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -356,7 +358,7 @@
 .fav-suggestions-loading,
 .fav-suggestions-empty {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: #6a6a7a;
 }
 

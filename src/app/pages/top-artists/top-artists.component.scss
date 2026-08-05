@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -9,8 +11,8 @@
   margin-bottom: 32px;
   
   .page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: $text-4xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 8px 0;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -20,7 +22,7 @@
   }
   
   .page-subtitle {
-    font-size: 1.1rem;
+    font-size: $text-md;
     color: #8a8a9a;
     margin: 0;
   }
@@ -35,7 +37,7 @@
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fcd97a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   text-align: center;
 }
 
@@ -53,8 +55,8 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 25px;
   color: #b0b0b0;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: $text-base;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
   
@@ -120,8 +122,8 @@
   left: 16px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
   padding: 6px 12px;
   border-radius: 20px;
   z-index: 2;
@@ -155,16 +157,16 @@
     
     .view-profile {
       color: #1bdc6f;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: $text-sm;
+      font-weight: $font-weight-medium;
     }
   }
 }
 
 .artist-info {
   .artist-name {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $text-md;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 6px 0;
     white-space: nowrap;
@@ -173,7 +175,7 @@
   }
   
   .artist-genre {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #9c0abf;
     margin: 0 0 12px 0;
     text-transform: capitalize;
@@ -197,7 +199,7 @@
   }
   
   .popularity-label {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #6a6a7a;
   }
 }
@@ -209,7 +211,7 @@
   }
   
   .page-header .page-title {
-    font-size: 1.8rem;
+    font-size: $text-2xl;
   }
   
   .term-selector {
@@ -219,7 +221,7 @@
   
   .term-btn {
     padding: 10px 20px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
   }
   
   .artists-grid {

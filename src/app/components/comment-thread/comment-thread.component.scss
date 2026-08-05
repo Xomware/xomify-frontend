@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .comment-thread {
   display: flex;
   flex-direction: column;
@@ -16,16 +18,16 @@
   }
 
   .thread-title {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     margin: 0;
     color: #ffffff;
   }
 
   .thread-count {
     margin-left: 2px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
     color: #cfcfdc;
     padding: 2px 8px;
     background: rgba(255, 255, 255, 0.08);
@@ -50,7 +52,7 @@
   border-radius: 10px;
   color: #ffffff;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: $text-base;
   line-height: 1.4;
   resize: vertical;
   transition: border-color 0.15s ease, background 0.15s ease;
@@ -116,7 +118,7 @@
 
 .composer-error {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: #ffb74d;
 }
 
@@ -125,7 +127,7 @@
   align-items: center;
   gap: 8px;
   color: #8a8a9a;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   padding: 12px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
@@ -141,7 +143,7 @@
 }
 
 .thread-empty {
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: #8a8a9a;
   background: rgba(255, 255, 255, 0.04);
   padding: 12px;
@@ -149,7 +151,7 @@
 }
 
 .thread-error {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #ffb74d;
   background: rgba(255, 183, 77, 0.1);
   padding: 10px 12px;
@@ -184,8 +186,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-base;
   overflow: hidden;
 
   img {
@@ -211,11 +213,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: $text-xs;
 
   .comment-author {
     color: #ffffff;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -259,7 +261,7 @@
 
 .comment-text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: $text-sm;
   color: #cfcfdc;
   line-height: 1.45;
   white-space: pre-wrap;

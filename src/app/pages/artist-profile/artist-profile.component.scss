@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -14,7 +16,7 @@
   border-radius: 25px;
   color: #b0b0b0;
   padding: 10px 20px;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 24px;
@@ -105,14 +107,14 @@
   color: #fff;
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: $text-xs;
+  font-weight: $font-weight-medium;
   margin-bottom: 12px;
 }
 
 .artist-name {
-  font-size: 3rem;
-  font-weight: 800;
+  font-size: $text-5xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   margin: 0 0 16px 0;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -131,18 +133,18 @@
     align-items: center;
   }
   .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: $text-xl;
+    font-weight: $font-weight-bold;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   .stat-label {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
   .stat-divider {
     width: 1px;
@@ -164,7 +166,7 @@
     color: #c77ddb;
     padding: 6px 16px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     text-transform: capitalize;
   }
 }
@@ -185,8 +187,8 @@
   color: #fff;
   padding: 12px 24px;
   border-radius: 30px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -218,8 +220,8 @@
   color: #fff;
   padding: 14px 28px;
   border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   text-decoration: none;
   transition: all 0.3s ease;
   &:hover {
@@ -236,13 +238,13 @@
 .section-header {
   margin-bottom: 24px;
   .section-title {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 4px 0;
   }
   .section-subtitle {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #8a8a9a;
   }
 }
@@ -276,8 +278,8 @@
 }
 
 .track-rank {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: #6a6a7a;
   text-align: center;
 }
@@ -359,8 +361,8 @@
         border-radius: 16px;
 
         .rating-value {
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: $text-3xs;
+          font-weight: $font-weight-semibold;
         }
       }
     }
@@ -372,15 +374,15 @@
   flex-direction: column;
   min-width: 0;
   .track-name {
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .track-album {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #8a8a9a;
     white-space: nowrap;
     overflow: hidden;
@@ -389,7 +391,7 @@
 }
 
 .track-duration {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #6a6a7a;
   text-align: right;
 }
@@ -520,10 +522,10 @@
     color: #fff;
     padding: 4px 10px;
     border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: $text-3xs;
+    font-weight: $font-weight-semibold;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
 
     &.single {
       background: rgba(27, 220, 111, 0.9);
@@ -536,8 +538,8 @@
 
   .album-name {
     display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin-bottom: 4px;
     white-space: nowrap;
@@ -546,7 +548,7 @@
   }
 
   .album-year {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #8a8a9a;
   }
 }
@@ -577,7 +579,7 @@
   }
   .loading-text {
     color: #8a8a9a;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 }
 
@@ -600,7 +602,7 @@
   text-align: center;
   .error-text {
     color: #ff4757;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 20px 0;
   }
   .retry-btn {
@@ -609,8 +611,8 @@
     border: none;
     padding: 12px 28px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
     &:hover {
@@ -638,12 +640,12 @@
     height: 150px;
   }
   .artist-name {
-    font-size: 2rem;
+    font-size: $text-3xl;
   }
   .artist-stats {
     gap: 20px;
     .stat-value {
-      font-size: 1.2rem;
+      font-size: $text-lg;
     }
   }
   .action-buttons {
@@ -676,7 +678,7 @@
 
 @media (max-width: 480px) {
   .artist-name {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
   }
   .artist-stats {
     flex-direction: column;
@@ -697,6 +699,6 @@
     height: 40px;
   }
   .section-header .section-title {
-    font-size: 1.4rem;
+    font-size: $text-xl;
   }
 }

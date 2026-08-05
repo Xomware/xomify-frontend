@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xta-segmented {
   display: flex;
   gap: 6px;
@@ -10,8 +12,8 @@
   color: #8a8a9a;
   padding: 9px 16px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover {
@@ -41,12 +43,12 @@
   color: #8a8a9a;
 
   div:first-child {
-    font-size: 2rem;
+    font-size: $text-3xl;
   }
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1.05rem;
+    font-size: $text-base;
     color: #fff;
   }
 
@@ -62,8 +64,8 @@
   border-radius: 20px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.82rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-xs;
   border: none;
 
   &:hover {
@@ -94,16 +96,16 @@
 }
 
 .xta-summary-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: #6d6d7d;
 }
 
 .xta-summary-value {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: $text-2xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
 
   &--warn {
@@ -117,7 +119,7 @@
 
   h2 {
     margin: 0 0 10px;
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #fff;
   }
 }
@@ -131,7 +133,7 @@
 .xta-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 
   th,
   td {
@@ -142,9 +144,9 @@
 
   thead th {
     background: rgba(255, 255, 255, 0.03);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: #6d6d7d;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -161,7 +163,7 @@
 
   .xta-cell-warn {
     color: #ff8fa0;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -178,7 +180,7 @@
   gap: 6px;
   padding: 6px 12px;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #b9f7d3;
   background: rgba(27, 220, 111, 0.12);
   border: 1px solid rgba(27, 220, 111, 0.35);
@@ -212,7 +214,7 @@
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 
   &:first-child {
@@ -226,7 +228,7 @@
 }
 
 .xta-error-status {
-  font-weight: 800;
+  font-weight: $font-weight-extrabold;
   color: #ff8fa0;
 }
 

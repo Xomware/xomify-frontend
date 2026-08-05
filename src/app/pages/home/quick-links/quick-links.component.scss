@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .quick-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -54,8 +56,8 @@
 }
 
 .quick-link-label {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: #fff;
   display: flex;
   align-items: center;
@@ -64,16 +66,16 @@
 }
 
 .quick-link-description {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
   line-height: 1.4;
 }
 
 .coming-soon-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: $tracking-wide;
   color: #fcd97a;
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.35);

@@ -10,7 +10,8 @@
     "test": "ng test",
     "version:patch": "node scripts/version-bump.js patch",
     "version:minor": "node scripts/version-bump.js minor",
-    "version:major": "node scripts/version-bump.js major"
+    "version:major": "node scripts/version-bump.js major",
+    "lint:css": "stylelint \"src/**/*.scss\""
   },
   "private": true,
   "dependencies": {
@@ -40,6 +41,8 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
+    "postcss-scss": "^4.0.9",
+    "stylelint": "^16.26.1",
     "typescript": "~5.5.4"
   }
 }

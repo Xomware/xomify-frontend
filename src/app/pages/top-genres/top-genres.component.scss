@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -9,8 +11,8 @@
   margin-bottom: 32px;
 
   .page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: $text-4xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 8px 0;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -20,7 +22,7 @@
   }
 
   .page-subtitle {
-    font-size: 1.1rem;
+    font-size: $text-md;
     color: #8a8a9a;
     margin: 0;
   }
@@ -35,7 +37,7 @@
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fcd97a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   text-align: center;
 }
 
@@ -53,8 +55,8 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 25px;
   color: #b0b0b0;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: $text-base;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -88,8 +90,8 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     color: #8a8a9a;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -165,7 +167,7 @@
     order: 2;
 
     .genre-name {
-      font-size: 1.2rem;
+      font-size: $text-lg;
     }
   }
 
@@ -217,30 +219,30 @@
   }
 
   .genre-emoji {
-    font-size: 2.5rem;
+    font-size: $text-4xl;
   }
 
   .genre-emoji--rank {
-    font-weight: 800;
+    font-weight: $font-weight-extrabold;
     color: rgba(0, 0, 0, 0.55);
   }
 }
 
 .podium-item .genre-name {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: #fff;
   margin: 0 0 6px 0;
 }
 
 .podium-item .genre-count {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
   margin: 0;
 }
 
 .podium-item .genre-subgenres {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: #6a6a7a;
   margin: 4px 0 0 0;
 }
@@ -248,10 +250,10 @@
 // Genres List
 .genres-list {
   .section-title {
-    font-size: 1.3rem;
+    font-size: $text-lg;
     color: #fff;
     margin: 0 0 20px 0;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -291,8 +293,8 @@
 }
 
 .genre-rank {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: #9c0abf;
   min-width: 30px;
   text-align: center;
@@ -306,8 +308,8 @@
 
   .genre-name {
     display: block;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -316,7 +318,7 @@
 
   .genre-artists {
     display: block;
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #6a6a7a;
     white-space: nowrap;
     overflow: hidden;
@@ -345,8 +347,8 @@
 }
 
 .genre-percentage {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #1bdc6f;
   // A fixed width here can be narrower than the rendered text (varies by
   // font metrics/zoom), pushing the number outside the box to the right.
@@ -406,15 +408,15 @@
   }
 
   .group-icon {
-    font-size: 1.5rem;
+    font-size: $text-xl;
     flex-shrink: 0;
   }
 
   .genre-name {
     flex: 0 0 120px;
     min-width: 0;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -422,7 +424,7 @@
   }
 
   .group-stats {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #8a8a9a;
     flex-shrink: 0;
     // Same fixed-width overflow risk as .genre-percentage above — let the
@@ -473,7 +475,7 @@
     background: rgba(156, 10, 191, 0.15);
     border: 1px solid rgba(156, 10, 191, 0.25);
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #c77dff;
     transition: all 0.2s ease;
 
@@ -485,7 +487,7 @@
 }
 
 .group-artists {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 
   .artists-label {
@@ -503,7 +505,7 @@
   text-align: center;
   padding: 60px 20px;
   color: #8a8a9a;
-  font-size: 1.1rem;
+  font-size: $text-md;
 }
 
 // Mobile Responsive
@@ -513,7 +515,7 @@
   }
 
   .page-header .page-title {
-    font-size: 1.8rem;
+    font-size: $text-2xl;
   }
 
   .term-selector {
@@ -523,7 +525,7 @@
 
   .term-btn {
     padding: 10px 20px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
   }
 
   .view-toggle {
@@ -606,7 +608,7 @@
   .sub-genres {
     .sub-genre {
       padding: 5px 12px;
-      font-size: 0.75rem;
+      font-size: $text-2xs;
     }
   }
 }

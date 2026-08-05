@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .fav-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -45,7 +47,7 @@
   border: none;
   border-radius: 50%;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: $text-lg;
   transition: background 0.2s ease;
 
   &:hover:not(:disabled) {
@@ -55,8 +57,8 @@
 
 .fav-modal-title {
   margin: 0 0 18px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
   color: #fff;
   padding-right: 32px;
 }
@@ -71,11 +73,11 @@
 
   legend,
   .fav-field-label {
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
     color: #b0b0b0;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: $tracking-wide;
     padding: 0;
     margin-bottom: 6px;
   }
@@ -86,7 +88,7 @@
     border-radius: 10px;
     padding: 10px 12px;
     color: #fff;
-    font-size: 0.92rem;
+    font-size: $text-sm;
 
     &:focus {
       outline: none;
@@ -101,7 +103,7 @@
 
 .fav-field-hint {
   align-self: flex-end;
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: #6a6a7a;
 }
 
@@ -119,7 +121,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 7px 14px;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #b0b0b0;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -152,8 +154,8 @@
   border: none;
   border-radius: 20px;
   padding: 9px 20px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
@@ -173,8 +175,8 @@
   border: none;
   border-radius: 20px;
   padding: 9px 18px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
 
   &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.12);

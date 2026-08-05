@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -18,7 +20,7 @@
   border-radius: 25px;
   color: #b0b0b0;
   padding: 10px 20px;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 24px;
@@ -84,17 +86,17 @@
   justify-content: center;
 
   .album-type {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
     color: #9c0abf;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: $tracking-wide;
     margin-bottom: 8px;
   }
 
   .album-name {
-    font-size: 2.8rem;
-    font-weight: 800;
+    font-size: $text-5xl;
+    font-weight: $font-weight-extrabold;
     color: #fff;
     margin: 0 0 16px 0;
     line-height: 1.1;
@@ -105,8 +107,8 @@
     margin-bottom: 12px;
 
     .artist-link {
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: $text-md;
+      font-weight: $font-weight-semibold;
       color: #fff;
       cursor: pointer;
       transition: color 0.2s ease;
@@ -125,7 +127,7 @@
     margin-bottom: 16px;
 
     span {
-      font-size: 0.95rem;
+      font-size: $text-base;
       color: #8a8a9a;
     }
 
@@ -142,7 +144,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #6a6a7a;
     margin-bottom: 24px;
 
@@ -165,8 +167,8 @@
   color: #fff;
   padding: 14px 28px;
   border-radius: 30px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   text-decoration: none;
   transition: all 0.3s ease;
 
@@ -197,10 +199,10 @@
   padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   color: #6a6a7a;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: $tracking-wide;
 
   .col-play {
     // Empty header for play button column
@@ -258,8 +260,8 @@
 }
 
 .track-num {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: $text-base;
+  font-weight: $font-weight-medium;
   color: #6a6a7a;
   text-align: center;
 }
@@ -281,8 +283,8 @@
   }
 
   .track-name {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -298,13 +300,13 @@
     height: 18px;
     background: rgba(255, 255, 255, 0.2);
     color: #b0b0b0;
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
     border-radius: 3px;
   }
 
   .track-artists {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     white-space: nowrap;
     overflow: hidden;
@@ -324,7 +326,7 @@
 }
 
 .track-duration {
-  font-size: 0.9rem;
+  font-size: $text-sm;
   color: #6a6a7a;
   text-align: right;
 }
@@ -386,8 +388,8 @@
         border-radius: 16px;
 
         .rating-value {
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: $text-3xs;
+          font-weight: $font-weight-semibold;
         }
       }
     }
@@ -400,13 +402,13 @@
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 
   .release-date {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #b0b0b0;
     margin: 0 0 8px 0;
   }
 
   .copyright {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #6a6a7a;
     margin: 4px 0;
     line-height: 1.4;
@@ -424,7 +426,7 @@
 
   .error-text {
     color: #ff4757;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 20px 0;
   }
 
@@ -434,8 +436,8 @@
     border: none;
     padding: 12px 28px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -472,7 +474,7 @@
     align-items: center;
 
     .album-name {
-      font-size: 1.8rem;
+      font-size: $text-2xl;
     }
 
     .album-meta {
@@ -492,7 +494,7 @@
   }
 
   .track-info .track-name {
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 }
 
@@ -503,7 +505,7 @@
   }
 
   .album-details .album-name {
-    font-size: 1.5rem;
+    font-size: $text-xl;
   }
 
   .tracks-header,

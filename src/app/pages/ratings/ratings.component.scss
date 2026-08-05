@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -18,8 +20,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: $text-3xl;
+    font-weight: $font-weight-extrabold;
     color: #fff;
     margin: 0;
 
@@ -32,7 +34,7 @@
     width: 100%;
     color: #8a8a9a;
     margin: 0;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 
   .refresh-btn {
@@ -93,8 +95,8 @@
 
   .stat-value {
     display: block;
-    font-size: 36px;
-    font-weight: 800;
+    font-size: $text-4xl;
+    font-weight: $font-weight-extrabold;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -104,10 +106,10 @@
 
   .stat-label {
     color: #8a8a9a;
-    font-size: 12px;
+    font-size: $text-2xs;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 500;
+    letter-spacing: $tracking-wide;
+    font-weight: $font-weight-medium;
   }
 }
 
@@ -146,7 +148,7 @@
     border: 1px solid rgba(156, 10, 191, 0.2);
     border-radius: 25px;
     color: #fff;
-    font-size: 14px;
+    font-size: $text-sm;
     transition: all 0.3s ease;
 
     &::placeholder {
@@ -196,11 +198,11 @@
   gap: 8px;
 
   .filter-label {
-    font-size: 11px;
+    font-size: $text-3xs;
     color: #c77ddb;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: $tracking-wide;
+    font-weight: $font-weight-semibold;
     padding-left: 4px;
   }
 
@@ -210,8 +212,8 @@
     border: 1px solid rgba(156, 10, 191, 0.25);
     border-radius: 12px;
     color: #fff;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239c0abf' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -278,7 +280,7 @@
 
   .loading-text {
     color: #8a8a9a;
-    font-size: 14px;
+    font-size: $text-sm;
   }
 }
 
@@ -299,14 +301,14 @@
 
   h3 {
     color: #fff;
-    font-size: 22px;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
     margin: 20px 0 10px;
   }
 
   p {
     color: #8a8a9a;
-    font-size: 14px;
+    font-size: $text-sm;
     max-width: 320px;
     margin: 0;
     line-height: 1.5;
@@ -319,8 +321,8 @@
     border: none;
     border-radius: 25px;
     color: #fff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -419,8 +421,8 @@
 
   .track-name {
     margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -429,7 +431,7 @@
 
   .artist-name {
     margin: 0 0 6px;
-    font-size: 13px;
+    font-size: $text-xs;
     color: #b3b3b3;
     white-space: nowrap;
     overflow: hidden;
@@ -437,7 +439,7 @@
   }
 
   .rated-at {
-    font-size: 11px;
+    font-size: $text-3xs;
     color: #6a6a7a;
     font-style: italic;
   }
@@ -475,7 +477,7 @@
     gap: 8px;
 
     .page-title {
-      font-size: 1.4rem;
+      font-size: $text-xl;
       gap: 8px;
 
       svg {
@@ -485,7 +487,7 @@
     }
 
     .page-subtitle {
-      font-size: 0.85rem;
+      font-size: $text-sm;
     }
 
     .refresh-btn {
@@ -505,12 +507,12 @@
     border-radius: 12px;
 
     .stat-value {
-      font-size: 20px;
+      font-size: $text-lg;
     }
 
     .stat-label {
-      font-size: 9px;
-      letter-spacing: 0.5px;
+      font-size: $text-3xs;
+      letter-spacing: $tracking-wide;
     }
   }
 
@@ -523,7 +525,7 @@
 
   .search-container .search-input {
     padding: 10px 40px;
-    font-size: 13px;
+    font-size: $text-xs;
   }
 
   .filter-controls {
@@ -535,13 +537,13 @@
     gap: 4px;
 
     .filter-label {
-      font-size: 9px;
+      font-size: $text-3xs;
       padding-left: 2px;
     }
 
     .filter-select {
       padding: 8px 28px 8px 10px;
-      font-size: 12px;
+      font-size: $text-2xs;
       border-radius: 8px;
       background-position: right 8px center;
     }
@@ -565,17 +567,17 @@
 
   .track-info {
     .track-name {
-      font-size: 14px;
+      font-size: $text-sm;
       margin-bottom: 2px;
     }
 
     .artist-name {
-      font-size: 12px;
+      font-size: $text-2xs;
       margin-bottom: 4px;
     }
 
     .rated-at {
-      font-size: 10px;
+      font-size: $text-3xs;
     }
   }
 
@@ -589,12 +591,12 @@
     padding: 40px 16px;
 
     h3 {
-      font-size: 18px;
+      font-size: $text-md;
       margin: 12px 0 8px;
     }
 
     p {
-      font-size: 13px;
+      font-size: $text-xs;
     }
   }
 
@@ -608,11 +610,11 @@
     padding: 10px 6px;
 
     .stat-value {
-      font-size: 18px;
+      font-size: $text-md;
     }
 
     .stat-label {
-      font-size: 8px;
+      font-size: $text-3xs;
     }
   }
 

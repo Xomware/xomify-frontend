@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -40,17 +42,17 @@
   }
 
   h2 {
-    font-size: 1.15rem;
+    font-size: $text-md;
     margin: 0;
     color: #ffffff;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
   }
 
   .track-name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #cfcfdc;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -58,7 +60,7 @@
 
   .count-label {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #8a8a9a;
   }
 }
@@ -97,7 +99,7 @@
   background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
   color: #8a8a9a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
 }
 
 .listener-list {
@@ -129,8 +131,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-base;
   overflow: hidden;
 
   img {
@@ -144,8 +146,8 @@
   flex: 1;
   min-width: 0;
   color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
