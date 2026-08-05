@@ -5,7 +5,7 @@
 // GENERATED — DO NOT EDIT IN CONSUMER REPOS.
 // Canonical source: xomware-frontend/src/styles/_tokens.scss
 // Sync with:        node scripts/sync-tokens.mjs   (from xomware-frontend)
-// Source hash:      80210ab19a67
+// Source hash:      201003166470
 //
 // Structure only — type, spacing, radius, motion. NO COLOUR.
 // Each app keeps its own brand palette in its own _variables.scss; that is a
@@ -70,11 +70,16 @@ $spacing-3xl: 64px;
 $spacing-4xl: 96px;
 
 // ── Border Radius ────────────────────────────────
-$radius-sm: 4px;
-$radius-md: 8px;
-$radius-lg: 12px;
-$radius-xl: 20px;
-$radius-2xl: 24px;
+// Tightened from 4/8/12/20/24. The reference comparison that started this work
+// uses near-zero corners; going all the way to 0 would fight the rest of this
+// design (glass cards, soft ambient blobs, a cartoon mascot), so this is a
+// step toward crisper rather than a wholesale identity change.
+// Pills are unchanged — they are a shape, not a corner treatment.
+$radius-sm: 3px;
+$radius-md: 6px;
+$radius-lg: 8px;
+$radius-xl: 12px;
+$radius-2xl: 16px;
 $radius-pill: 100px;
 
 // ── Transitions ──────────────────────────────────
