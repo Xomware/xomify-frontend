@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -40,17 +42,17 @@
   }
 
   h2 {
-    font-size: 1.15rem;
+    font-size: $text-md;
     margin: 0;
     color: #ffffff;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
   }
 
   .track-name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #cfcfdc;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -58,7 +60,7 @@
 
   .count-label {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #8a8a9a;
   }
 }
@@ -119,13 +121,13 @@
     gap: 2px;
 
     strong {
-      font-size: 1.1rem;
+      font-size: $text-md;
       color: #ffffff;
-      font-weight: 700;
+      font-weight: $font-weight-bold;
     }
 
     span {
-      font-size: 0.78rem;
+      font-size: $text-2xs;
       color: #8a8a9a;
     }
   }
@@ -136,7 +138,7 @@
   background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
   color: #8a8a9a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
 }
 
 .rating-list {
@@ -168,8 +170,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-base;
   overflow: hidden;
 
   img {
@@ -188,8 +190,8 @@
 
   .row-author {
     color: #ffffff;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-base;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -198,7 +200,7 @@
   .row-review {
     margin: 0;
     color: #cfcfdc;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     line-height: 1.45;
     white-space: pre-wrap;
     word-break: break-word;
@@ -213,8 +215,8 @@
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   color: #ffffff;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-xs;
   flex-shrink: 0;
 
   svg {

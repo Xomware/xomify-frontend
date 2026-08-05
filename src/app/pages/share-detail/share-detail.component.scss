@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -28,8 +30,8 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
   &:hover {
@@ -66,7 +68,7 @@
     color: #ffffff;
     padding: 8px 18px;
     border-radius: 10px;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: transform 0.15s ease;
 
@@ -145,22 +147,22 @@
   .track-name {
     margin: 0;
     color: #ffffff;
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
     line-height: 1.2;
   }
 
   .track-artist {
     margin: 0;
     color: #cfcfdc;
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
   }
 
   .track-album {
     margin: 0;
     color: #8a8a9a;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 
   .tag-row {
@@ -172,9 +174,9 @@
     .chip {
       display: inline-flex;
       align-items: center;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-size: $text-2xs;
+      font-weight: $font-weight-semibold;
+      letter-spacing: $tracking-normal;
       padding: 4px 10px;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -220,8 +222,8 @@
   background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
   color: #ffffff;
   border: none;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-base;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -257,8 +259,8 @@
 
   .sharer-name {
     color: #ffffff;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-base;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -266,7 +268,7 @@
 
   .sharer-time {
     color: #8a8a9a;
-    font-size: 0.8rem;
+    font-size: $text-xs;
   }
 }
 
@@ -278,8 +280,8 @@
   background: rgba(27, 220, 111, 0.15);
   color: #1bdc6f;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   flex-shrink: 0;
 
   svg {
@@ -290,7 +292,7 @@
 .sharer-caption {
   margin: 0;
   color: rgba(255, 255, 255, 0.92);
-  font-size: 0.95rem;
+  font-size: $text-base;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -340,21 +342,21 @@
 
   .stat-value {
     color: #ffffff;
-    font-weight: 700;
-    font-size: 1.15rem;
+    font-weight: $font-weight-bold;
+    font-size: $text-md;
     font-variant-numeric: tabular-nums;
   }
 
   .stat-label {
     color: #8a8a9a;
-    font-size: 0.72rem;
+    font-size: $text-2xs;
     line-height: 1.25;
   }
 
   .stat-sublabel {
     color: #1bdc6f;
-    font-weight: 600;
-    font-size: 0.72rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-2xs;
   }
 }
 
@@ -365,7 +367,7 @@
 
   .reactions-error {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: #ffb74d;
   }
 }

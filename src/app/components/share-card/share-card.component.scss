@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .share-card {
   display: flex;
   flex-direction: column;
@@ -60,12 +62,12 @@
     border-radius: 50%;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
     color: #fff;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 1rem;
+    font-size: $text-base;
     overflow: hidden;
 
     img {
@@ -87,8 +89,8 @@
 
     .author-name {
       color: #fff;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: $font-weight-semibold;
+      font-size: $text-base;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -99,15 +101,15 @@
 
     .created-at {
       color: #8a8a9a;
-      font-size: 0.8rem;
+      font-size: $text-xs;
     }
   }
 
   .type-badge {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: $tracking-wide;
     padding: 4px 10px;
     border-radius: 10px;
     background: rgba(255, 183, 77, 0.15);
@@ -180,8 +182,8 @@
 
   .track-name {
     color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-base;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -189,7 +191,7 @@
 
   .track-artist {
     color: #cfcfdc;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -197,7 +199,7 @@
 
   .track-album {
     color: #8a8a9a;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -205,7 +207,7 @@
 }
 
 .caption {
-  font-size: 0.95rem;
+  font-size: $text-base;
   color: #cfcfdc;
   margin: 0;
   line-height: 1.45;
@@ -219,9 +221,9 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $tracking-normal;
     padding: 4px 10px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -283,8 +285,8 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #cfcfdc;
     border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease,
       border-color 0.15s ease;
@@ -356,7 +358,7 @@
       background: none;
       border: none;
       color: #cfcfdc;
-      font-size: 0.9rem;
+      font-size: $text-sm;
       padding: 10px 16px;
       cursor: pointer;
       text-align: left;

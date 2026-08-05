@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xt-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -17,7 +19,7 @@
 
 .xt-sub {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 }
 
@@ -54,7 +56,7 @@
     appearance: none;
     -webkit-appearance: none;
     color: #fff;
-    font-size: 0.88rem;
+    font-size: $text-sm;
 
     &::placeholder {
       color: #6d6d7d;
@@ -72,7 +74,7 @@
 
 .xt-search-clear {
   color: #8a8a9a;
-  font-size: 1.1rem;
+  font-size: $text-md;
   line-height: 1;
 
   &:hover {
@@ -104,17 +106,17 @@
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.8rem;
+  font-size: $text-xs;
 
   span {
     color: #8a8a9a;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 
   select {
     background: transparent;
     color: #fff;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     border: none;
 
     option {
@@ -135,8 +137,8 @@
   color: #8a8a9a;
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover {
@@ -162,8 +164,8 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #8a8a9a;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
 
   span {
     width: 7px;
@@ -242,9 +244,9 @@
   grid-template-columns: 48px 1fr 110px 160px 160px 44px;
   gap: 12px;
   padding: 10px 16px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: #6d6d7d;
   background: rgba(255, 255, 255, 0.03);
@@ -315,8 +317,8 @@
 }
 
 .xt-row-title {
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   color: #fff;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -326,15 +328,15 @@
 .xt-count-badge--inline {
   padding: 1px 7px;
   border-radius: 20px;
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: rgba(156, 10, 191, 0.7);
   flex-shrink: 0;
 }
 
 .xt-row-artist {
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -349,8 +351,8 @@
 .xt-platform-badge {
   padding: 3px 9px;
   border-radius: 20px;
-  font-size: 0.66rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
 
@@ -366,7 +368,7 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: #c4c4d2;
 
   span:last-child {
@@ -383,8 +385,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  font-size: 0.6rem;
-  font-weight: 800;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
   flex-shrink: 0;
@@ -405,8 +407,8 @@
   gap: 4px;
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #8a8a9a;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -419,7 +421,7 @@
 }
 
 .xt-col-date {
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: #6d6d7d;
   white-space: nowrap;
 }
@@ -442,7 +444,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #fff;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -478,12 +480,12 @@
   color: #8a8a9a;
 
   div:first-child {
-    font-size: 2.4rem;
+    font-size: $text-4xl;
   }
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1.15rem;
+    font-size: $text-md;
     color: #fff;
   }
 
@@ -499,8 +501,8 @@
   border-radius: 20px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-sm;
 
   &:hover {
     filter: brightness(1.08);

@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Health panel — reads the `var(--ax-*)` tokens set on `.ax-page`
 // (see `admin.component.scss` / `src/styles/_admin-theme.scss`).
 
@@ -14,8 +16,8 @@
   color: var(--ax-text-secondary);
   padding: 5px 12px;
   border-radius: var(--ax-radius-sm);
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   transition: background var(--ax-transition), color var(--ax-transition);
 
   &:hover {
@@ -52,14 +54,14 @@
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1rem;
+    font-size: $text-base;
     color: var(--ax-text);
   }
 
   p {
     margin: 0;
     max-width: 46ch;
-    font-size: 0.84rem;
+    font-size: $text-xs;
   }
 
   &--compact {
@@ -91,8 +93,8 @@
   border-radius: var(--ax-radius-sm);
   background: var(--ax-accent);
   color: #fff;
-  font-weight: 600;
-  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-2xs;
   border: none;
   cursor: pointer;
 
@@ -126,16 +128,16 @@
 }
 
 .ax-summary-label {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: var(--ax-text-tertiary);
 }
 
 .ax-summary-value {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: $text-lg;
+  font-weight: $font-weight-bold;
   color: var(--ax-text);
   font-variant-numeric: tabular-nums;
 
@@ -150,8 +152,8 @@
 
   h2 {
     margin: 0 0 8px;
-    font-size: 0.84rem;
-    font-weight: 700;
+    font-size: $text-xs;
+    font-weight: $font-weight-bold;
     color: var(--ax-text);
   }
 }
@@ -166,7 +168,7 @@
 .ax-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: $text-xs;
 
   th,
   td {
@@ -177,9 +179,9 @@
 
   thead th {
     background: rgba(255, 255, 255, 0.02);
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: var(--ax-text-tertiary);
     border-bottom: 1px solid var(--ax-hairline);
@@ -217,7 +219,7 @@
 
   .ax-cell-warn {
     color: var(--ax-negative);
-    font-weight: 700;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -226,8 +228,8 @@
   align-items: center;
   padding: 1px 8px;
   border-radius: var(--ax-radius-sm);
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   background: var(--ax-positive-muted);
   color: var(--ax-positive);
   border: 1px solid rgba(52, 199, 123, 0.35);

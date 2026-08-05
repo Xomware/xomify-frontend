@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .goals-page {
   min-height: 100vh;
   background: #0a0a14;
@@ -19,8 +21,8 @@
   }
 
   .page-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 6px;
     background: linear-gradient(135deg, #00b4d8, #22c55e);
     -webkit-background-clip: text;
@@ -29,10 +31,10 @@
   }
 
   .page-subtitle {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #f59e0b;
     margin: 0;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 
   .btn-create {
@@ -41,8 +43,8 @@
     border-radius: 10px;
     background: linear-gradient(135deg, #00b4d8, #0077b6);
     color: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     cursor: pointer;
     transition: opacity 0.2s;
     white-space: nowrap;
@@ -93,7 +95,7 @@
       background: none;
       border: none;
       color: #555;
-      font-size: 0.8rem;
+      font-size: $text-xs;
       cursor: pointer;
       opacity: 0;
       transition: opacity 0.2s;
@@ -105,7 +107,7 @@
   }
 
   .goal-icon {
-    font-size: 2rem;
+    font-size: $text-3xl;
     flex-shrink: 0;
   }
 
@@ -118,13 +120,13 @@
   }
 
   .goal-label {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-base;
     color: #fff;
   }
 
   .goal-progress-text {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #a0a0b8;
   }
 
@@ -166,8 +168,8 @@
   }
 
   .section-title {
-    font-size: 1.3rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     margin: 0 0 16px;
     color: #fff;
   }
@@ -190,11 +192,11 @@
 
   .history-week {
     color: #a0a0b8;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 
   .history-result {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #ff6b6b;
 
     &.all-met {

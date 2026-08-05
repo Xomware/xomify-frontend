@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Wrapper positions + vertically centers the pair of edge tabs as a unit and
 // owns the open/close slide — each button below only handles its own
 // rotation, so the two-tab split doesn't have to duplicate the fixed
@@ -38,8 +40,8 @@
   // feed's card accent bar and the playlist card's top border.
   background: linear-gradient(135deg, #1bdc6f 0%, #159e57 100%);
   color: #fff;
-  font-size: 0.74rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   box-shadow: -4px 4px 18px rgba(0, 0, 0, 0.35);
@@ -98,9 +100,9 @@
 
 .xt-panel-eyebrow {
   display: block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
   // Matches the "Shared With Me" tab/card accent (green) by default; the
   // header swaps to purple when opened from the "Shared By Me" tab, so the
@@ -114,8 +116,8 @@
 
 .xt-panel-title {
   margin: 2px 0 0;
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: $text-md;
+  font-weight: $font-weight-extrabold;
   color: #fff;
 }
 
@@ -128,7 +130,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  font-size: 1.2rem;
+  font-size: $text-lg;
 
   &:hover {
     background: rgba(255, 255, 255, 0.16);
@@ -160,7 +162,7 @@
 
 .xt-playlist-blurb {
   margin: 0 0 12px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
 }
 
@@ -174,9 +176,9 @@
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-wide;
   text-transform: uppercase;
 }
 
@@ -194,7 +196,7 @@
   padding: 32px 4px;
   text-align: center;
   color: #8a8a9a;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 
   p {
     margin: 0;
@@ -211,8 +213,8 @@
   border-radius: 20px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-sm;
 
   &:hover {
     filter: brightness(1.08);
@@ -233,8 +235,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
   color: #1bdc6f;
 
   &:hover {
@@ -270,7 +272,7 @@
   }
 
   .xt-panel-tab-icon {
-    font-size: 1.1rem;
+    font-size: $text-md;
   }
 }
 

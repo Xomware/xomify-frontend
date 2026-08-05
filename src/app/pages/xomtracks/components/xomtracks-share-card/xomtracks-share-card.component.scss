@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .xt-card {
   position: relative;
   display: flex;
@@ -61,7 +63,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: $text-4xl;
   color: rgba(255, 255, 255, 0.25);
   background: radial-gradient(circle at 30% 20%, rgba(156, 10, 191, 0.25), transparent 60%);
 }
@@ -73,9 +75,9 @@
   z-index: 2;
   padding: 3px 9px;
   border-radius: 20px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-normal;
   color: #fff;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(4px);
@@ -98,8 +100,8 @@
   z-index: 2;
   padding: 3px 8px;
   border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: $text-2xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: rgba(156, 10, 191, 0.85);
 }
@@ -134,8 +136,8 @@
   gap: 5px;
   padding: 5px 10px;
   border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #e4e4ec;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -176,7 +178,7 @@
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(4px);
-  font-size: 0.85rem;
+  font-size: $text-sm;
   transition: background 0.15s ease, border-color 0.15s ease;
 
   &[data-platform='spotify'] { border-color: rgba(29, 185, 84, 0.6); color: #4be089; }
@@ -212,8 +214,8 @@
 
 .xt-track-title {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -222,7 +224,7 @@
 
 .xt-track-artist {
   margin: 2px 0 0;
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: #a6a6b8;
   white-space: nowrap;
   overflow: hidden;
@@ -237,8 +239,8 @@
   align-self: flex-start;
   padding: 2px 9px;
   border-radius: 20px;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
 
   &[data-kind='unmatched'] {
     background: rgba(255, 55, 80, 0.15);
@@ -254,7 +256,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
 }
 
@@ -278,8 +280,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  font-size: 0.62rem;
-  font-weight: 800;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
   flex-shrink: 0;
@@ -298,8 +300,8 @@
   align-items: center;
   gap: 4px;
   margin-top: 2px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: #8a8a9a;
 }
 

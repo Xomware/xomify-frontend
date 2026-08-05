@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // ── State blocks (shared shape with the other admin panels) ─────────
 .xta-state-block {
   display: flex;
@@ -9,12 +11,12 @@
   color: #8a8a9a;
 
   div:first-child {
-    font-size: 2.2rem;
+    font-size: $text-4xl;
   }
 
   h2 {
     margin: 4px 0 0;
-    font-size: 1.05rem;
+    font-size: $text-base;
     color: #fff;
   }
 
@@ -30,8 +32,8 @@
   border-radius: 20px;
   background: linear-gradient(135deg, #9c0abf 0%, #7a0896 100%);
   color: #fff;
-  font-weight: 700;
-  font-size: 0.82rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-xs;
   border: none;
 
   &:hover {
@@ -63,9 +65,9 @@
   min-width: 220px;
 
   span {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     text-transform: uppercase;
     color: #8a8a9a;
   }
@@ -77,7 +79,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 0.85rem;
+    font-size: $text-sm;
 
     &:focus-visible {
       outline: 2px solid #1bdc6f;
@@ -101,8 +103,8 @@
   color: #8a8a9a;
   padding: 9px 16px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover {
@@ -134,7 +136,7 @@
   background: rgba(27, 220, 111, 0.1);
   border: 1px solid rgba(27, 220, 111, 0.35);
   color: #b9f7d3;
-  font-size: 0.85rem;
+  font-size: $text-sm;
 
   strong {
     color: #fff;
@@ -143,8 +145,8 @@
 
 .xta-viewas-exit {
   color: #b9f7d3;
-  font-weight: 700;
-  font-size: 0.8rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-xs;
   text-decoration: underline;
   flex-shrink: 0;
 
@@ -210,8 +212,8 @@
 }
 
 .xta-viewas-title {
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   color: #fff;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -219,7 +221,7 @@
 }
 
 .xta-viewas-sub {
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: #8a8a9a;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -228,7 +230,7 @@
 
 .xta-viewas-rating {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: $text-2xs;
   color: #c4c4d2;
   white-space: nowrap;
 }
@@ -238,8 +240,8 @@
   display: inline-flex;
   padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #8a8a9a;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -253,7 +255,7 @@
 
 .xta-viewas-date {
   flex-shrink: 0;
-  font-size: 0.72rem;
+  font-size: $text-2xs;
   color: #6d6d7d;
   white-space: nowrap;
 }
@@ -266,7 +268,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #fff;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);

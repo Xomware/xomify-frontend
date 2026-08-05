@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // Broadcasts panel — reads the `var(--ax-*)` tokens set on `.ax-page`
 // (see `admin.component.scss` / `src/styles/_admin-theme.scss`). Scoped
 // `axb-` (Admin / Xomify / Broadcasts) so nothing collides.
@@ -17,15 +19,15 @@
 
   h2 {
     margin: 0;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
     color: var(--ax-text);
   }
 }
 
 .axb-form-sub {
   margin: 3px 0 14px;
-  font-size: 0.78rem;
+  font-size: $text-2xs;
   color: var(--ax-text-tertiary);
 }
 
@@ -36,13 +38,13 @@
   margin-bottom: 12px;
 
   label {
-    font-size: 0.76rem;
-    font-weight: 600;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
     color: var(--ax-text-secondary);
   }
 
   .axb-optional {
-    font-weight: 400;
+    font-weight: $font-weight-regular;
     color: var(--ax-text-tertiary);
   }
 
@@ -53,7 +55,7 @@
     border-radius: var(--ax-radius-sm);
     padding: 8px 10px;
     color: var(--ax-text);
-    font-size: 0.86rem;
+    font-size: $text-sm;
     font-family: inherit;
     resize: vertical;
 
@@ -82,8 +84,8 @@
   border-radius: var(--ax-radius-sm);
   background: var(--ax-accent);
   color: #fff;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-xs;
   border: none;
   cursor: pointer;
 
@@ -101,7 +103,7 @@
 
   &--sm {
     padding: 4px 12px;
-    font-size: 0.72rem;
+    font-size: $text-2xs;
   }
 
   &--danger {
@@ -116,13 +118,13 @@
   background: var(--ax-negative-muted);
   border: 1px solid rgba(240, 89, 107, 0.4);
   color: var(--ax-negative);
-  font-size: 0.8rem;
+  font-size: $text-xs;
 }
 
 .axb-list-section h2 {
   margin: 0 0 10px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   color: var(--ax-text);
 }
 
@@ -144,14 +146,14 @@
 
   h3 {
     margin: 4px 0 0;
-    font-size: 0.92rem;
+    font-size: $text-sm;
     color: var(--ax-text);
   }
 
   p {
     margin: 0;
     max-width: 46ch;
-    font-size: 0.82rem;
+    font-size: $text-xs;
   }
 
   &--error {
@@ -188,20 +190,20 @@
 
   h3 {
     margin: 0 0 4px;
-    font-size: 0.88rem;
+    font-size: $text-sm;
     color: var(--ax-text);
   }
 
   p {
     margin: 0 0 5px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: var(--ax-text-secondary);
     white-space: pre-wrap;
   }
 }
 
 .axb-item-meta {
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: var(--ax-text-tertiary);
   display: flex;
   gap: 4px;

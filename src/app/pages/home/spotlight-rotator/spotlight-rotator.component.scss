@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .spotlight {
   margin-bottom: 24px;
 }
@@ -115,17 +117,17 @@
 }
 
 .spotlight-eyebrow {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
   color: #d68bff;
 }
 
 .spotlight-title {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: $text-md;
+  font-weight: $font-weight-bold;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -134,7 +136,7 @@
 
 .spotlight-subtitle {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #c0c0cc;
   white-space: nowrap;
   overflow: hidden;
@@ -143,8 +145,8 @@
 
 .spotlight-cta {
   margin-top: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: #1bdc6f;
 }
 
@@ -210,6 +212,6 @@
   }
 
   .spotlight-title {
-    font-size: 1rem;
+    font-size: $text-base;
   }
 }

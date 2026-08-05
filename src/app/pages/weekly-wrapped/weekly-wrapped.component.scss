@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .weekly-wrapped-page {
   min-height: 100vh;
   background: #0a0a14;
@@ -20,8 +22,8 @@
   }
 
   .page-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 6px;
     background: linear-gradient(135deg, #1db954, #7c3aed);
     -webkit-background-clip: text;
@@ -30,7 +32,7 @@
   }
 
   .page-subtitle {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #a0a0b8;
     margin: 0;
   }
@@ -42,7 +44,7 @@
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     white-space: nowrap;
     transition: background 0.2s;
     flex-shrink: 0;
@@ -65,7 +67,7 @@
     color: #a78bfa;
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     margin-bottom: 20px;
   }
 
@@ -114,22 +116,22 @@
   }
 
   .brand-logo {
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: $text-sm;
+    font-weight: $font-weight-bold;
     color: rgba(255, 255, 255, 0.5);
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
 
   .brand-week {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: $tracking-wide;
   }
 
   .card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: $text-md;
+    font-weight: $font-weight-semibold;
     color: rgba(255, 255, 255, 0.7);
     margin: 0;
     position: relative;
@@ -146,8 +148,8 @@
 
   .hero-value {
     display: block;
-    font-size: 3.5rem;
-    font-weight: 800;
+    font-size: $text-5xl;
+    font-weight: $font-weight-extrabold;
     background: linear-gradient(135deg, #1db954, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -157,7 +159,7 @@
 
   .hero-label {
     display: block;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: rgba(255, 255, 255, 0.5);
     margin-top: 4px;
   }
@@ -170,9 +172,9 @@
 
   .section-label {
     display: block;
-    font-size: 0.7rem;
+    font-size: $text-3xs;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: $tracking-wide;
     color: rgba(255, 255, 255, 0.35);
     margin-bottom: 8px;
   }
@@ -184,13 +186,13 @@
   }
 
   .artist-name {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
     color: #fff;
   }
 
   .artist-plays {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: rgba(255, 255, 255, 0.4);
   }
 
@@ -207,8 +209,8 @@
   }
 
   .song-rank {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: $text-md;
+    font-weight: $font-weight-bold;
     color: rgba(255, 255, 255, 0.3);
     width: 20px;
     text-align: center;
@@ -230,8 +232,8 @@
 
   .song-name {
     display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -240,7 +242,7 @@
 
   .song-artist {
     display: block;
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: rgba(255, 255, 255, 0.4);
     white-space: nowrap;
     overflow: hidden;
@@ -248,7 +250,7 @@
   }
 
   .song-plays {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: rgba(255, 255, 255, 0.35);
     flex-shrink: 0;
   }
@@ -269,17 +271,17 @@
 
   .mini-value {
     display: block;
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
     color: #fff;
   }
 
   .mini-label {
     display: block;
-    font-size: 0.7rem;
+    font-size: $text-3xs;
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
 
   // ─── Empty State ──────────────────────────────
@@ -288,19 +290,19 @@
     padding: 80px 20px;
 
     .empty-icon {
-      font-size: 4rem;
+      font-size: $text-5xl;
       margin-bottom: 16px;
     }
 
     h2 {
-      font-size: 1.4rem;
-      font-weight: 600;
+      font-size: $text-xl;
+      font-weight: $font-weight-semibold;
       margin: 0 0 8px;
     }
 
     p {
       color: #a0a0b8;
-      font-size: 0.95rem;
+      font-size: $text-base;
     }
   }
 
@@ -322,7 +324,7 @@
     padding: 10px 24px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: $text-base;
 
     &:hover {
       background: #6d28d9;
@@ -335,8 +337,8 @@
   }
 
   .section-heading {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     margin: 0 0 16px;
     color: #a0a0b8;
   }
@@ -357,14 +359,14 @@
   }
 
   .past-label {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: $font-weight-semibold;
+    font-size: $text-base;
   }
 
   .past-minutes {
     color: #1db954;
-    font-weight: 700;
-    font-size: 0.95rem;
+    font-weight: $font-weight-bold;
+    font-size: $text-base;
   }
 
   .past-songs {
@@ -374,7 +376,7 @@
   }
 
   .past-song {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
     overflow: hidden;
@@ -382,7 +384,7 @@
   }
 
   .past-artist {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: rgba(255, 255, 255, 0.35);
     margin-top: 6px;
   }

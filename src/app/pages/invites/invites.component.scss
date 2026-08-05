@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -25,8 +27,8 @@
   }
 
   .page-title {
-    font-size: 2.25rem;
-    font-weight: 700;
+    font-size: $text-4xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 6px 0;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -36,7 +38,7 @@
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -93,8 +95,8 @@
   color: #8a8a9a;
   padding: 11px 16px;
   border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: $text-base;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.25s ease;
 
@@ -122,8 +124,8 @@
     color: #1bdc6f;
     padding: 2px 8px;
     border-radius: 10px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: $text-xs;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -182,14 +184,14 @@
     min-width: 0;
 
     h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: $text-md;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 4px 0;
     }
 
     p {
-      font-size: 0.9rem;
+      font-size: $text-sm;
       color: #8a8a9a;
       margin: 0;
     }
@@ -209,15 +211,15 @@
     gap: 12px;
 
     .label {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: $tracking-wide;
     }
 
     .code {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: $text-base;
+      font-weight: $font-weight-bold;
       color: #1bdc6f;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
         monospace;
@@ -226,7 +228,7 @@
 
   .last-created-url {
     margin: 8px 0 0;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #cfcfdc;
     word-break: break-all;
   }
@@ -279,8 +281,8 @@
   flex-wrap: wrap;
 
   .code {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: $text-base;
+    font-weight: $font-weight-bold;
     color: #fff;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
       monospace;
@@ -288,8 +290,8 @@
 }
 
 .expiry-pill {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: $text-2xs;
+  font-weight: $font-weight-medium;
   padding: 3px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
@@ -302,7 +304,7 @@
 }
 
 .invite-meta {
-  font-size: 0.82rem;
+  font-size: $text-xs;
   color: #8a8a9a;
   margin: 6px 0 0;
 }
@@ -324,8 +326,8 @@
   color: #fff;
   padding: 11px 20px;
   border-radius: 999px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 
@@ -351,8 +353,8 @@
   color: #cfcfdc;
   padding: 8px 14px;
   border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -379,8 +381,8 @@
   color: #ff8391;
   padding: 8px 14px;
   border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -422,14 +424,14 @@
   }
 
   h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 0 0 6px 0;
   }
 
   p {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #8a8a9a;
     margin: 0;
   }
@@ -452,12 +454,12 @@
 
 .accept-label {
   display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #cfcfdc;
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
 }
 
 .accept-row {
@@ -473,7 +475,7 @@
     color: #fff;
     border-radius: 12px;
     padding: 12px 14px;
-    font-size: 1rem;
+    font-size: $text-base;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
       monospace;
     transition: border-color 0.2s ease, background 0.2s ease;
@@ -497,7 +499,7 @@
 
 .accept-hint {
   margin: 12px 0 0;
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 }
 
@@ -512,16 +514,16 @@
 
   .page-header {
     .page-title {
-      font-size: 1.6rem;
+      font-size: $text-2xl;
     }
     .page-subtitle {
-      font-size: 0.85rem;
+      font-size: $text-sm;
     }
   }
 
   .tab-btn {
     padding: 10px 12px;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 
   .create-panel {

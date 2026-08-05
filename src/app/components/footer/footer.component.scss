@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .footer {
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -22,8 +24,8 @@
 
   .credit {
     color: var(--text-tertiary);
-    font-size: 0.9rem;
-    font-weight: 400;
+    font-size: $text-sm;
+    font-weight: $font-weight-regular;
   }
 }
 
@@ -45,8 +47,8 @@
   gap: 8px;
   padding: 8px 16px;
   border-radius: var(--radius-md);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   border: none;
@@ -90,7 +92,7 @@
     flex: 0 0 auto;
 
     .credit {
-      font-size: 0.7rem;
+      font-size: $text-3xs;
     }
   }
 
@@ -99,7 +101,7 @@
 
     .action-btn {
       padding: 6px 12px;
-      font-size: 0.75rem;
+      font-size: $text-2xs;
     }
   }
 
@@ -109,7 +111,7 @@
 
   .footer-button {
     padding: 6px 10px;
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     gap: 4px;
 
     .github-icon {

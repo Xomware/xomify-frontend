@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .mood-timeline-page {
   max-width: 900px;
   margin: 0 auto;
@@ -10,14 +12,14 @@
   margin-bottom: 24px;
 
   h1 {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 8px;
   }
 
   .subtitle {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 14px;
+    font-size: $text-sm;
     margin: 0;
   }
 }
@@ -35,7 +37,7 @@
     color: rgba(255, 255, 255, 0.7);
     padding: 8px 20px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: $text-xs;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -48,7 +50,7 @@
       background: linear-gradient(135deg, #00b4d8, #a855f7);
       color: #fff;
       border-color: transparent;
-      font-weight: 600;
+      font-weight: $font-weight-semibold;
     }
   }
 }
@@ -90,13 +92,13 @@
   backdrop-filter: blur(8px);
 
   .tooltip-hour {
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: $font-weight-bold;
+    font-size: $text-sm;
     margin-bottom: 6px;
   }
 
   .tooltip-row {
-    font-size: 12px;
+    font-size: $text-2xs;
     margin-bottom: 3px;
     display: flex;
     align-items: center;
@@ -119,13 +121,13 @@
   }
 
   .tooltip-tracks {
-    font-size: 11px;
+    font-size: $text-3xs;
     color: rgba(255, 255, 255, 0.5);
     margin-top: 6px;
   }
 
   .tooltip-track {
-    font-size: 11px;
+    font-size: $text-3xs;
     color: rgba(255, 255, 255, 0.7);
     margin-top: 2px;
     white-space: nowrap;
@@ -146,7 +148,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: $text-xs;
     color: rgba(255, 255, 255, 0.7);
   }
 
@@ -238,21 +240,21 @@
   text-align: center;
 
   .card-icon {
-    font-size: 28px;
+    font-size: $text-2xl;
     margin-bottom: 8px;
   }
 
   .card-label {
-    font-size: 12px;
+    font-size: $text-2xs;
     color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
     margin-bottom: 4px;
   }
 
   .card-value {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -261,8 +263,8 @@
   margin-top: 8px;
 
   h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: $text-lg;
+    font-weight: $font-weight-bold;
     margin: 0 0 16px;
   }
 }
@@ -288,17 +290,17 @@
     border-bottom: 2px solid;
 
     .quadrant-emoji {
-      font-size: 20px;
+      font-size: $text-lg;
     }
 
     .quadrant-name {
-      font-weight: 600;
-      font-size: 15px;
+      font-weight: $font-weight-semibold;
+      font-size: $text-sm;
     }
   }
 
   .quadrant-desc {
-    font-size: 12px;
+    font-size: $text-2xs;
     color: rgba(255, 255, 255, 0.5);
   }
 }
@@ -310,7 +312,7 @@
   }
 
   .page-header h1 {
-    font-size: 22px;
+    font-size: $text-lg;
   }
 
   .summary-cards {

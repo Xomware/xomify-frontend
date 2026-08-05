@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .fav-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -17,15 +19,15 @@
 
 .fav-page-title {
   margin: 0 0 4px;
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: $text-3xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
 }
 
 .fav-page-sub {
   margin: 0;
   color: #8a8a9a;
-  font-size: 0.95rem;
+  font-size: $text-base;
 }
 
 .fav-year-select {
@@ -35,11 +37,11 @@
 }
 
 .fav-year-label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   color: #8a8a9a;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: $tracking-wide;
 }
 
 .fav-year-select select {
@@ -48,8 +50,8 @@
   border-radius: 12px;
   padding: 10px 14px;
   color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
 
   &:focus-visible {
     outline: 2px solid #9c0abf;
@@ -72,13 +74,13 @@
 
 .fav-section-title {
   margin: 0 0 2px;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: $text-lg;
+  font-weight: $font-weight-bold;
   color: #fff;
 }
 
 .fav-section-sub {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: #8a8a9a;
 }
 
@@ -91,8 +93,8 @@
   border: none;
   border-radius: 20px;
   padding: 9px 18px;
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   transition: all 0.2s ease;
 
   &:hover {
@@ -103,7 +105,7 @@
 
 .fav-empty-lists {
   color: #6a6a7a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   text-align: center;
   padding: 24px 0;
   border: 1px dashed rgba(255, 255, 255, 0.1);
@@ -131,7 +133,7 @@
 
     h2 {
       margin: 0;
-      font-size: 1.2rem;
+      font-size: $text-lg;
     }
 
     p {
@@ -171,8 +173,8 @@
   border: none;
   padding: 10px 24px;
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   transition: all 0.2s ease;
 
   &:hover {
@@ -193,7 +195,7 @@
   }
 
   .fav-page-title {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
   }
 
   .fav-grid {

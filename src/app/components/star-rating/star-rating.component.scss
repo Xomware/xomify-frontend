@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .star-rating {
   display: inline-flex;
   align-items: center;
@@ -14,7 +16,7 @@
       height: 16px;
     }
     .rating-text {
-      font-size: 12px;
+      font-size: $text-2xs;
       margin-left: 4px;
     }
   }
@@ -25,7 +27,7 @@
       height: 24px;
     }
     .rating-text {
-      font-size: 14px;
+      font-size: $text-sm;
       margin-left: 6px;
     }
   }
@@ -36,7 +38,7 @@
       height: 32px;
     }
     .rating-text {
-      font-size: 16px;
+      font-size: $text-base;
       margin-left: 8px;
     }
   }
@@ -102,7 +104,7 @@
 
 .rating-text {
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: $font-weight-medium;
 }
 
 // Readonly mode styling

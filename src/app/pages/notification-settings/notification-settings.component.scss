@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -13,8 +15,8 @@
   margin-bottom: 26px;
 
   .page-title {
-    font-size: 2.1rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     color: #fff;
     margin: 0 0 6px 0;
     background: linear-gradient(135deg, #9c0abf 0%, #1bdc6f 100%);
@@ -24,7 +26,7 @@
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -47,8 +49,8 @@
   color: #8a8a9a;
   padding: 10px 14px;
   border-radius: 10px;
-  font-size: 0.92rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.25s ease;
 
@@ -82,14 +84,14 @@
 
   p {
     margin: 0;
-    font-size: 0.88rem;
+    font-size: $text-sm;
     line-height: 1.4;
   }
 
   em {
     color: #1bdc6f;
     font-style: normal;
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -106,12 +108,12 @@
 
 .field-label {
   display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: #cfcfdc;
   margin: 0 0 8px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
 
   &:not(:first-of-type) {
     margin-top: 18px;
@@ -125,7 +127,7 @@
   color: #fff;
   border-radius: 12px;
   padding: 11px 14px;
-  font-size: 0.95rem;
+  font-size: $text-base;
   font-family: inherit;
   transition: border-color 0.2s ease, background 0.2s ease;
 
@@ -147,7 +149,7 @@
 
 .field-hint {
   margin: 10px 0 0;
-  font-size: 0.83rem;
+  font-size: $text-xs;
   color: #8a8a9a;
 }
 
@@ -163,8 +165,8 @@
   color: #fff;
   padding: 11px 22px;
   border-radius: 999px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 
@@ -190,7 +192,7 @@
   }
 
   .page-header .page-title {
-    font-size: 1.55rem;
+    font-size: $text-xl;
   }
 
   .panel {

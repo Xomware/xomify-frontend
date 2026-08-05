@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .concert-discovery-page {
   min-height: 100vh;
   background: #0a0a14;
@@ -20,8 +22,8 @@
   }
 
   .page-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 6px;
     background: linear-gradient(135deg, #ec4899, #f59e0b);
     -webkit-background-clip: text;
@@ -30,7 +32,7 @@
   }
 
   .page-subtitle {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #a0a0b8;
     margin: 0;
   }
@@ -42,7 +44,7 @@
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: $text-sm;
     white-space: nowrap;
     transition: background 0.2s;
     flex-shrink: 0;
@@ -73,17 +75,17 @@
     flex: 1;
 
     .card-emoji {
-      font-size: 1.5rem;
+      font-size: $text-xl;
     }
     .card-value {
-      font-size: 1.8rem;
-      font-weight: 700;
+      font-size: $text-2xl;
+      font-weight: $font-weight-bold;
     }
     .card-label {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #a0a0b8;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: $tracking-wide;
     }
   }
 
@@ -97,7 +99,7 @@
   }
 
   .filter-label {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #a0a0b8;
   }
 
@@ -113,7 +115,7 @@
     padding: 6px 14px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     transition: all 0.2s;
 
     &:hover {
@@ -135,18 +137,18 @@
   }
 
   .empty-icon {
-    font-size: 3rem;
+    font-size: $text-5xl;
     margin-bottom: 16px;
   }
 
   .empty-title {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
     margin: 0 0 8px;
   }
 
   .empty-subtitle {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #a0a0b8;
     margin: 0;
   }
@@ -196,15 +198,15 @@
   }
 
   .badge-name {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: $text-sm;
+    font-weight: $font-weight-medium;
   }
 
   .badge-count {
     background: #ec4899;
     color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -254,7 +256,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: $text-xl;
   }
 
   .event-details {
@@ -263,8 +265,8 @@
   }
 
   .event-name {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     margin: 0 0 6px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -274,14 +276,14 @@
   .event-meta {
     display: flex;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #a0a0b8;
     margin-bottom: 4px;
     flex-wrap: wrap;
   }
 
   .event-date {
-    font-size: 0.85rem;
+    font-size: $text-sm;
     color: #d4d4e0;
   }
 
@@ -302,8 +304,8 @@
     text-decoration: none;
     padding: 8px 16px;
     border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
     text-align: center;
     transition: opacity 0.2s;
 
@@ -319,7 +321,7 @@
     padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: $text-xs;
     transition: all 0.2s;
 
     &:hover {
@@ -351,7 +353,7 @@
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: $text-sm;
 
     &:hover {
       opacity: 0.85;

@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .page-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #0a0a14 0%, #121225 100%);
@@ -13,8 +15,8 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: $text-3xl;
+    font-weight: $font-weight-extrabold;
     color: #fff;
     margin: 0 0 8px 0;
 
@@ -24,7 +26,7 @@
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    font-size: $text-base;
     color: #8a8a9a;
     margin: 0;
   }
@@ -44,8 +46,8 @@
   color: #8a8a9a;
   padding: 10px 20px;
   border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -72,7 +74,7 @@
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fcd97a;
-  font-size: 0.9rem;
+  font-size: $text-sm;
   text-align: center;
 }
 
@@ -148,8 +150,8 @@
   color: #fff;
   padding: 6px 12px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
   z-index: 2;
   box-shadow: 0 2px 10px rgba(156, 10, 191, 0.4);
 }
@@ -220,8 +222,8 @@
     width: 20px;
     height: 20px;
     border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: $text-3xs;
+    font-weight: $font-weight-bold;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -252,8 +254,8 @@
     min-width: 0; // Allow text to truncate
 
     .song-name {
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: $text-base;
+      font-weight: $font-weight-semibold;
       color: #fff;
       margin: 0 0 4px 0;
       display: -webkit-box;
@@ -264,7 +266,7 @@
     }
 
     .artist-names {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #8a8a9a;
       margin: 0;
       white-space: nowrap;
@@ -320,7 +322,7 @@
   justify-content: center;
   gap: 6px;
   padding: 8px;
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: #6a6a7a;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 
@@ -385,14 +387,14 @@
     color: #fff;
     padding: 4px 10px;
     border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
   }
 }
 
 .back-title {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
   color: #fff;
   margin: 0 0 12px 0;
   display: -webkit-box;
@@ -408,10 +410,10 @@
 
   .section-label {
     display: block;
-    font-size: 0.65rem;
+    font-size: $text-3xs;
     color: #6a6a7a;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
     margin-bottom: 6px;
   }
 }
@@ -433,8 +435,8 @@
     color: #1bdc6f;
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: $text-xs;
+    font-weight: $font-weight-medium;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -456,8 +458,8 @@
   align-items: center;
   gap: 6px;
   color: #c77ddb;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: $text-xs;
+  font-weight: $font-weight-medium;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -469,7 +471,7 @@
 
 .album-year {
   display: block;
-  font-size: 0.7rem;
+  font-size: $text-3xs;
   color: #6a6a7a;
   margin-top: 2px;
 }
@@ -488,13 +490,13 @@
 
     .stat-value {
       display: block;
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: $text-base;
+      font-weight: $font-weight-bold;
       color: #fff;
     }
 
     .stat-label {
-      font-size: 0.65rem;
+      font-size: $text-3xs;
       color: #8a8a9a;
       text-transform: uppercase;
     }
@@ -536,8 +538,8 @@
   color: #ffd700;
   padding: 10px 12px;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -565,8 +567,8 @@
   border: none;
   padding: 10px 12px;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -607,7 +609,7 @@
 
   .loading-text {
     color: #8a8a9a;
-    font-size: 1rem;
+    font-size: $text-base;
   }
 }
 
@@ -632,7 +634,7 @@
 
   .error-text {
     color: #ff4757;
-    font-size: 1.1rem;
+    font-size: $text-md;
     margin: 20px 0;
   }
 
@@ -642,8 +644,8 @@
     border: none;
     padding: 12px 28px;
     border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: $text-base;
+    font-weight: $font-weight-medium;
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -664,8 +666,8 @@
   text-align: center;
 
   h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: $text-xl;
+    font-weight: $font-weight-semibold;
     color: #fff;
     margin: 20px 0 8px 0;
   }
@@ -683,7 +685,7 @@
   }
 
   .page-header .page-title {
-    font-size: 1.6rem;
+    font-size: $text-2xl;
   }
 
   .time-range-selector {
@@ -695,7 +697,7 @@
     min-width: 100px;
     text-align: center;
     padding: 10px 12px;
-    font-size: 0.8rem;
+    font-size: $text-xs;
   }
 
   .songs-grid {
@@ -708,11 +710,11 @@
   }
 
   .back-title {
-    font-size: 0.85rem;
+    font-size: $text-sm;
   }
 
   .artists-section .artist-link {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     padding: 5px 10px;
   }
 }
@@ -727,11 +729,11 @@
     padding: 10px;
 
     .song-name {
-      font-size: 0.85rem;
+      font-size: $text-sm;
     }
 
     .artist-names {
-      font-size: 0.75rem;
+      font-size: $text-2xs;
     }
   }
 

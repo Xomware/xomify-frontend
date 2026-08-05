@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .playlist-analysis-page {
   min-height: 100vh;
   background: #0a0a14;
@@ -15,8 +17,8 @@
   }
 
   .page-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: $text-3xl;
+    font-weight: $font-weight-bold;
     margin: 0 0 6px;
     background: linear-gradient(135deg, #7c3aed, #1bdc6f);
     -webkit-background-clip: text;
@@ -25,7 +27,7 @@
   }
 
   .page-subtitle {
-    font-size: 0.95rem;
+    font-size: $text-base;
     color: #a0a0b8;
     margin: 0;
   }
@@ -47,7 +49,7 @@
     color: #fff;
     padding: 10px 14px;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: $text-base;
     cursor: pointer;
     outline: none;
 
@@ -68,8 +70,8 @@
     padding: 10px 24px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: $text-base;
+    font-weight: $font-weight-semibold;
     transition: background 0.2s;
     white-space: nowrap;
 
@@ -90,7 +92,7 @@
     padding: 10px 24px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: $text-base;
 
     &:hover {
       background: #6d28d9;
@@ -117,7 +119,7 @@
   .analyzing-text {
     color: #a0a0b8;
     margin-top: 12px;
-    font-size: 0.9rem;
+    font-size: $text-sm;
   }
 
   // ─── Summary Cards ─────────────────────────────
@@ -126,7 +128,7 @@
   }
 
   .analysis-label {
-    font-size: 0.9rem;
+    font-size: $text-sm;
     color: #a0a0b8;
     margin-bottom: 20px;
 
@@ -162,7 +164,7 @@
   }
 
   .stat-emoji {
-    font-size: 1.8rem;
+    font-size: $text-2xl;
   }
 
   .explicit-badge {
@@ -171,24 +173,24 @@
     justify-content: center;
     width: 1.4rem;
     height: 1.4rem;
-    font-size: 0.85rem;
-    font-weight: 800;
+    font-size: $text-sm;
+    font-weight: $font-weight-extrabold;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
   }
 
   .stat-value {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: $text-2xl;
+    font-weight: $font-weight-bold;
     color: #7c3aed;
   }
 
   .stat-label {
-    font-size: 0.75rem;
+    font-size: $text-2xs;
     color: #a0a0b8;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: $tracking-wide;
   }
 
   // ─── Breakdown Grid ───────────────────────────
@@ -221,14 +223,14 @@
   }
 
   .block-icon {
-    font-size: 1.1rem;
+    font-size: $text-md;
   }
 
   .block-title {
     margin: 0;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.3px;
+    font-size: $text-base;
+    font-weight: $font-weight-bold;
+    letter-spacing: $tracking-wide;
     color: #fff;
   }
 
@@ -244,7 +246,7 @@
       gap: 10px;
       padding: 8px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      font-size: 0.9rem;
+      font-size: $text-sm;
 
       &:last-child {
         border-bottom: none;
@@ -253,8 +255,8 @@
   }
 
   .breakdown-rank {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
     color: #7c3aed;
     text-align: center;
     font-variant-numeric: tabular-nums;
@@ -268,8 +270,8 @@
   }
 
   .breakdown-count {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: $text-2xs;
+    font-weight: $font-weight-semibold;
     color: #a0a0b8;
     background: rgba(124, 58, 237, 0.12);
     border-radius: 999px;
@@ -303,10 +305,10 @@
     th {
       padding: 12px 14px;
       text-align: left;
-      font-size: 0.78rem;
+      font-size: $text-2xs;
       color: #a0a0b8;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: $tracking-wide;
       white-space: nowrap;
 
       &.sortable {
@@ -333,7 +335,7 @@
     td {
       padding: 10px 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 0.88rem;
+      font-size: $text-sm;
       vertical-align: middle;
 
       &.col-art {
@@ -391,7 +393,7 @@
   .track-link {
     color: #fff;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
 
     &:hover {
       color: #7c3aed;
@@ -405,7 +407,7 @@
     min-width: 90px;
 
     span {
-      font-size: 0.8rem;
+      font-size: $text-xs;
       color: #a0a0b8;
       min-width: 36px;
     }
@@ -437,7 +439,7 @@
   // ─── Responsive ───────────────────────────────
   @media (max-width: 600px) {
     .page-title {
-      font-size: 1.6rem;
+      font-size: $text-2xl;
     }
 
     .stat-card {
@@ -445,7 +447,7 @@
     }
 
     .stat-value {
-      font-size: 1.3rem;
+      font-size: $text-lg;
     }
   }
 }

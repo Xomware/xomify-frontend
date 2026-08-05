@@ -1,0 +1,90 @@
+// ================================================
+// XOMWARE SHARED DESIGN TOKENS
+// ================================================
+//
+// GENERATED — DO NOT EDIT IN CONSUMER REPOS.
+// Canonical source: xomware-frontend/src/styles/_tokens.scss
+// Sync with:        node scripts/sync-tokens.mjs   (from xomware-frontend)
+// Source hash:      80210ab19a67
+//
+// Structure only — type, spacing, radius, motion. NO COLOUR.
+// Each app keeps its own brand palette in its own _variables.scss; that is a
+// per-product decision and does not belong in a shared file.
+//
+// These values were derived by auditing xomware.com against a reference site
+// and are proven there: they took that codebase from ~30 ad-hoc font sizes and
+// 12+ letter-spacings down to a fixed ramp, with stylelint enforcing it.
+
+// ── Type Scale ───────────────────────────────────
+// Declared in rem so browser font-size preferences are respected; px
+// equivalents at a 16px root are in the comments.
+//
+// RULE: no font-size outside this scale. Enforce with stylelint
+// (declaration-property-value-allowed-list — see .stylelintrc.json).
+//
+// $text-3xs (11px) is an escape hatch for dense admin/dashboard chrome, not a
+// design choice. Public surfaces must not go below $text-2xs (12px).
+$text-3xs:  0.6875rem; // 11px — dense admin chrome ONLY
+$text-2xs:  0.75rem;   // 12px — smallest permitted on public surfaces
+$text-xs:   0.8125rem; // 13px
+$text-sm:   0.875rem;  // 14px
+$text-base: 1rem;      // 16px — body default
+$text-md:   1.125rem;  // 18px
+$text-lg:   1.25rem;   // 20px
+$text-xl:   1.5rem;    // 24px
+$text-2xl:  1.625rem;  // 26px
+$text-3xl:  2rem;      // 32px
+$text-4xl:  2.375rem;  // 38px
+$text-5xl:  3rem;      // 48px
+
+// ── Letter Spacing ───────────────────────────────
+// Four values. Never use px tracking — it does not scale with font size, so it
+// breaks at every size other than the one it was tuned for.
+//
+// WATCH OUT: 0.04em sits exactly between $tracking-normal and $tracking-wide.
+// Automatic nearest-match rounds it to 0 and silently strips tracking from
+// uppercase labels. This bit three separate components during the xomware
+// migration. Uppercase micro-labels want $tracking-wide.
+$tracking-tight:  -0.02em; // headings / large display type
+$tracking-normal: 0;
+$tracking-wide:   0.08em;  // uppercase labels, status pills, tags
+$tracking-wider:  0.15em;  // section eyebrows — smallest uppercase type
+
+// ── Font Weights ─────────────────────────────────
+// Only declare weights the app actually loads. Requesting a weight with no
+// matching face makes the browser synthesise faux-bold, which looks smeared.
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// ── Spacing (8px base grid) ──────────────────────
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+$spacing-3xl: 64px;
+$spacing-4xl: 96px;
+
+// ── Border Radius ────────────────────────────────
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 20px;
+$radius-2xl: 24px;
+$radius-pill: 100px;
+
+// ── Transitions ──────────────────────────────────
+$transition-fast: 150ms ease;
+$transition-base: 300ms ease;
+$transition-slow: 500ms ease;
+$transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ── Breakpoints ──────────────────────────────────
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;

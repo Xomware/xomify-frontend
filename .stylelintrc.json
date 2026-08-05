@@ -1,0 +1,14 @@
+{
+  "customSyntax": "postcss-scss",
+  "rules": {
+    "declaration-property-value-allowed-list": {
+      "font-size": ["/^\\$text-/", "/^clamp\\(/", "inherit", "1em"],
+      "letter-spacing": ["/^\\$tracking-/", "normal", "inherit"],
+      "font-weight": ["/^\\$font-weight-/", "inherit", "normal"]
+    }
+  },
+  "ignoreFiles": ["node_modules/**", "dist/**"],
+  "overrides": [
+    { "files": ["src/styles/_tokens.scss"], "rules": { "declaration-property-value-allowed-list": null } }
+  ]
+}
