@@ -1,35 +1,48 @@
-<div class="preview-card">
-  <div class="share-header">
-    <span class="avatar" aria-hidden="true">{{ share.from.charAt(0) }}</span>
-    <span class="share-from"><strong>{{ share.from }}</strong> sent you a song</span>
+<div class="preview-card feed-card">
+  <div class="preview-head">
+    <span class="preview-title">Shares</span>
+    <span class="preview-chip">From your friends</span>
   </div>
 
-  <div class="share-track">
-    <app-preview-art class="track-art" [art]="share.track.art" [label]="share.track.title" size="lg"></app-preview-art>
-    <span class="rank-text">
-      <span class="rank-title">{{ share.track.title }}</span>
-      <span class="rank-artist">{{ share.track.artist }}</span>
-    </span>
-  </div>
+  <!-- Fixed-height viewport; the track inside scrolls. -->
+  <div class="feed-viewport">
+    <div class="feed-track">
+      <article class="share-card" *ngFor="let post of posts; let i = index">
+        <header class="share-header">
+          <span class="avatar" aria-hidden="true">{{ post.from.charAt(0) }}</span>
+          <span class="share-from"><strong>{{ post.from }}</strong> sent you a song</span>
+          <span class="share-when">{{ post.when }}</span>
+        </header>
 
-  <div class="reactions">
-    <span class="reaction" *ngFor="let emoji of share.reactions">{{ emoji }}</span>
-  </div>
+        <div class="share-track">
+          <img class="track-art" [src]="post.track.cover" [alt]="post.track.album" loading="lazy" />
+          <span class="rank-text">
+            <span class="rank-title">{{ post.track.title }}</span>
+            <span class="rank-artist">{{ post.track.artist }}</span>
+            <span class="share-caption">“{{ post.caption }}”</span>
+          </span>
+        </div>
 
-  <div class="comment">
-    <span class="comment-author">{{ share.comment.author }}</span>
-    <span class="comment-body">{{ share.comment.body }}</span>
-  </div>
+        <div class="share-footer">
+          <span class="reactions">
+            <span class="reaction" *ngFor="let emoji of post.reactions">{{ emoji }}</span>
+          </span>
+          <span class="rating" [attr.aria-label]="post.rating + ' out of 5'">
+            <span
+              class="star"
+              [class.star--on]="star <= post.rating"
+              *ngFor="let star of stars"
+              aria-hidden="true"
+            >★</span>
+          </span>
+          <span class="listened" *ngIf="post.listened">Listened</span>
+        </div>
 
-  <div class="share-footer">
-    <span class="rating" [attr.aria-label]="share.rating + ' out of 5'">
-      <span
-        class="star"
-        [class.star--on]="star <= share.rating"
-        *ngFor="let star of stars"
-        aria-hidden="true"
-      >★</span>
-    </span>
-    <span class="listened">Listened</span>
+        <div class="comment" *ngIf="post.comment">
+          <span class="comment-author">{{ post.comment.author }}</span>
+          <span class="comment-body">{{ post.comment.body }}</span>
+        </div>
+      </article>
+    </div>
   </div>
 </div>

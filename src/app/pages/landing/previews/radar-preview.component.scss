@@ -22,7 +22,7 @@
 }
 
 .day-slot {
-  min-height: 118px;
+  min-height: 132px;
   border-radius: $radius-md;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
@@ -43,10 +43,15 @@
   min-width: 0;
 }
 
+// SQUARE. The previous version let the art stretch to the column width with a
+// fixed height, which letterboxed every cover into a wide sliver.
 .release-art {
   width: 100%;
+  max-width: 40px;
   aspect-ratio: 1;
-  max-width: 34px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  display: block;
 }
 
 .release-title {
@@ -55,8 +60,6 @@
   color: var(--text-primary);
   text-align: center;
   line-height: 1.15;
-  // Two lines then ellipsis — release titles vary wildly in length and a
-  // seven-column grid has no room to let one push the row taller.
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

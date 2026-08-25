@@ -1,7 +1,9 @@
 <div class="tiles">
   <div class="tile" *ngFor="let tile of tiles">
-    <app-preview-art class="tile-art" [art]="tile.art" [label]="tile.label" size="lg"></app-preview-art>
-    <span class="tile-label">{{ tile.label }}</span>
-    <span class="tile-detail">{{ tile.detail }}</span>
+    <img class="tile-art" [src]="tile.cover" [alt]="tile.label" loading="lazy" />
+    <span class="tile-text">
+      <span class="tile-label">{{ tile.label }}</span>
+      <span class="tile-detail">{{ tile.detail }}</span>
+    </span>
   </div>
 </div>

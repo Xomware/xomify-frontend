@@ -36,7 +36,14 @@ export abstract class PreviewBase implements AfterViewInit, OnDestroy {
   set active(value: boolean) {
     const was = this._active;
     this._active = value;
-    if (value && !was) this.play();
+    if (value && !was) {
+      this.play();
+    } else if (!value && was) {
+      // These timelines loop. Left running, every preview on the page would
+      // animate forever whether or not it is on screen — seven infinite
+      // timelines competing for the same frame budget.
+      this.pause();
+    }
   }
   get active(): boolean {
     return this._active;
@@ -74,6 +81,11 @@ export abstract class PreviewBase implements AfterViewInit, OnDestroy {
   private play(): void {
     if (!this.ready || !this.tl || this.reducedMotion) return;
     this.zone.runOutsideAngular(() => this.tl?.restart());
+  }
+
+  private pause(): void {
+    if (!this.tl || this.reducedMotion) return;
+    this.zone.runOutsideAngular(() => this.tl?.pause());
   }
 
   /** Query within this preview's own DOM — never the document. */

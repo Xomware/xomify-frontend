@@ -1,24 +1,37 @@
 <div class="preview-card">
   <div class="preview-head">
     <span class="preview-title">Monthly Wrapped</span>
-    <span class="preview-chip"><span class="wrapped-count">0</span> tracks</span>
+    <span class="preview-chip">Auto-generated</span>
   </div>
 
   <div class="months">
     <span
       class="month-chip"
-      [class.month-chip--active]="i === 0"
-      *ngFor="let month of months; let i = index"
-    >{{ month }}</span>
+      [class.month-chip--active]="i === index"
+      *ngFor="let m of months; let i = index"
+    >{{ m.month }}</span>
   </div>
 
-  <ol class="wrapped-list">
-    <li class="wrapped-row" *ngFor="let track of tracks">
-      <app-preview-art class="rank-art" [art]="track.art" [label]="track.title"></app-preview-art>
-      <span class="rank-text">
-        <span class="rank-title">{{ track.title }}</span>
-        <span class="rank-artist">{{ track.artist }}</span>
-      </span>
-    </li>
-  </ol>
+  <div class="wrapped-body">
+    <!-- The playlist as it actually lands in Spotify: cover, name, stats. -->
+    <div class="wrapped-playlist">
+      <img class="wrapped-cover" [src]="current.cover" [alt]="current.playlistName" />
+      <div class="wrapped-meta">
+        <span class="wrapped-name">{{ current.playlistName }}</span>
+        <span class="wrapped-sub">{{ current.tracks.length }} tracks · {{ current.minutes }} minutes</span>
+        <span class="wrapped-badge">In your Spotify</span>
+      </div>
+    </div>
+
+    <ol class="wrapped-list">
+      <li class="wrapped-row" *ngFor="let track of current.tracks; let i = index">
+        <span class="wrapped-rank">{{ i + 1 }}</span>
+        <img class="rank-art" [src]="track.cover" [alt]="track.album" loading="lazy" />
+        <span class="rank-text">
+          <span class="rank-title">{{ track.title }}</span>
+          <span class="rank-artist">{{ track.artist }}</span>
+        </span>
+      </li>
+    </ol>
+  </div>
 </div>

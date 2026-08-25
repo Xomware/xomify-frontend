@@ -1,16 +1,31 @@
 <div class="preview-card">
   <div class="preview-head">
-    <span class="preview-title">Top Songs</span>
-    <span class="window-chip">{{ windows[windowIndex] }}</span>
+    <span class="preview-title">Music Taste</span>
+    <span class="window-chip">{{ ranges[rangeIndex] }}</span>
   </div>
-  <ol class="rank-list">
-    <li class="rank-row" *ngFor="let entry of entries; let i = index">
-      <span class="rank-number">{{ i + 1 }}</span>
-      <app-preview-art class="rank-art" [art]="entry.art" [label]="entry.title"></app-preview-art>
+
+  <div class="taste-tabs">
+    <span
+      class="taste-tab"
+      [class.taste-tab--active]="i === tabIndex"
+      *ngFor="let tab of tabs; let i = index"
+    >{{ tab }}</span>
+  </div>
+
+  <!-- Fixed-height track: rows are positioned by rank, so the card's height
+       never depends on an animation being mid-flight. -->
+  <div class="rank-track" [style.height.px]="trackHeight">
+    <div
+      class="rank-row"
+      *ngFor="let row of rows; trackBy: trackByTitle"
+      [style.transform]="'translateY(' + offsetFor(row) + 'px)'"
+    >
+      <span class="rank-number">{{ row.ranks[rangeIndex] }}</span>
+      <img class="rank-art" [src]="row.cover" [alt]="row.title" loading="lazy" />
       <span class="rank-text">
-        <span class="rank-title">{{ entry.title }}</span>
-        <span class="rank-artist">{{ entry.artist }}</span>
+        <span class="rank-title">{{ row.title }}</span>
+        <span class="rank-artist">{{ row.artist }}</span>
       </span>
-    </li>
-  </ol>
+    </div>
+  </div>
 </div>

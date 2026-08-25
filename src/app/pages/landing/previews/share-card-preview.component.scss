@@ -1,15 +1,47 @@
 @import 'tokens';
 
+$card-h: 156px;
+$card-gap: 12px; // $card-h + $card-gap must equal CARD_H in the component
+
+.feed-viewport {
+  // Two cards tall, so it reads as a stream with more below rather than a
+  // single card in a box.
+  height: #{$card-h * 2 + $card-gap};
+  overflow: hidden;
+  position: relative;
+
+  // Fades the lower edge so cards leave the frame rather than being cut off.
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
+
+.feed-track {
+  display: flex;
+  flex-direction: column;
+  gap: #{$card-gap};
+  will-change: transform;
+}
+
+.share-card {
+  height: $card-h;
+  box-sizing: border-box;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-lg;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
 .share-header {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  margin-bottom: $spacing-md;
 }
 
 .avatar {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--accent-purple);
   color: #fff;
@@ -22,7 +54,7 @@
 }
 
 .share-from {
-  font-size: $text-xs;
+  font-size: $text-2xs;
   color: var(--text-secondary);
 
   strong {
@@ -31,21 +63,26 @@
   }
 }
 
+.share-when {
+  margin-left: auto;
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}
+
 .share-track {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-sm;
-  border-radius: $radius-lg;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  margin-bottom: $spacing-md;
+  gap: $spacing-sm;
 }
 
+// Square, and a real cover.
 .track-art {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
+  aspect-ratio: 1;
+  object-fit: cover;
   border-radius: $radius-md;
+  flex: 0 0 auto;
 }
 
 .rank-text {
@@ -55,61 +92,46 @@
 }
 
 .rank-title {
-  font-size: $text-sm;
+  font-size: $text-xs;
   font-weight: $font-weight-semibold;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rank-artist {
-  font-size: $text-2xs;
+  font-size: $text-3xs;
   color: var(--text-tertiary);
 }
 
-.reactions {
-  display: flex;
-  gap: $spacing-xs;
-  margin-bottom: $spacing-md;
-}
-
-.reaction {
-  font-size: $text-xs;
-  padding: 3px $spacing-sm;
-  border-radius: $radius-pill;
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
-}
-
-.comment {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: $spacing-sm;
-  border-radius: $radius-md;
-  background: rgba(255, 255, 255, 0.02);
-  margin-bottom: $spacing-md;
-}
-
-.comment-author {
+.share-caption {
   font-size: $text-3xs;
-  font-weight: $font-weight-semibold;
-  color: var(--accent-purple-text);
-}
-
-.comment-body {
-  font-size: $text-2xs;
   color: var(--text-secondary);
-  line-height: 1.45;
+  font-style: italic;
 }
 
 .share-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $spacing-md;
+  gap: $spacing-sm;
+}
+
+.reactions {
+  display: flex;
+  gap: 3px;
+}
+
+.reaction {
+  font-size: $text-3xs;
+  padding: 2px 6px;
+  border-radius: $radius-pill;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
 }
 
 .star {
-  font-size: $text-sm;
+  font-size: $text-2xs;
   color: var(--gray-700);
 }
 
@@ -118,9 +140,30 @@
 }
 
 .listened {
+  margin-left: auto;
   font-size: $text-3xs;
   font-weight: $font-weight-semibold;
   letter-spacing: $tracking-wide;
   text-transform: uppercase;
   color: #1bdc6f;
+}
+
+.comment {
+  display: flex;
+  gap: $spacing-xs;
+  font-size: $text-3xs;
+  line-height: 1.35;
+}
+
+.comment-author {
+  font-weight: $font-weight-semibold;
+  color: var(--accent-purple-text);
+  flex: 0 0 auto;
+}
+
+.comment-body {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

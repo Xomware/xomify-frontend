@@ -45,15 +45,15 @@
   white-space: nowrap;
 }
 
-// Generated cover art. Never a bitmap — see landing-fixtures.ts.
-.rank-art,
-.art-tile {
+// Real album covers (see landing-fixtures.ts). ALWAYS SQUARE — a cover in a
+// wide box letterboxes into a sliver, which is what made the first version
+// look broken.
+.rank-art {
   display: block;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1;
+  object-fit: cover;
   border-radius: $radius-sm;
   flex: 0 0 auto;
-}
-
-.rank-art {
-  width: 28px;
-  height: 28px;
 }

@@ -1,8 +1,30 @@
+<header class="landing-nav">
+  <a class="nav-brand" href="#top">
+    <img src="assets/img/banner-logo-x-rework.png" alt="Xomify" />
+  </a>
+
+  <nav class="nav-links" aria-label="Landing sections">
+    <button type="button" class="nav-link" (click)="scrollTo('overview')">Overview</button>
+    <button type="button" class="nav-link" (click)="scrollTo('how')">How it works</button>
+    <button type="button" class="nav-link" (click)="scrollTo('docs')">Docs</button>
+  </nav>
+
+  <div class="nav-actions">
+    <a
+      class="nav-ios"
+      [href]="iosApp.url"
+      target="_blank"
+      rel="noopener noreferrer"
+    >iOS</a>
+    <button type="button" class="nav-cta" (click)="login()">Sign in with Spotify</button>
+  </div>
+</header>
+
 <div class="landing">
   <app-scroll-journey (actChange)="onActChange($event)">
 
     <!-- 1 — Hero ------------------------------------------------------- -->
-    <section class="act act--hero" appJourneyAct="Xomify">
+    <section class="act act--hero" id="top" appJourneyAct="Xomify">
       <div class="act-inner act-inner--centered">
         <img
           src="assets/img/banner-logo-x-rework.png"
@@ -47,7 +69,7 @@
     </section>
 
     <!-- 2 — Music Taste ------------------------------------------------ -->
-    <section class="act" appJourneyAct="Music Taste">
+    <section class="act" id="overview" appJourneyAct="Music Taste">
       <div class="act-inner act-inner--split">
         <div class="act-copy">
           <span class="act-eyebrow">Music Taste</span>
@@ -183,7 +205,7 @@
     </section>
 
     <!-- 8 — How it works ----------------------------------------------- -->
-    <section class="act" appJourneyAct="How it works">
+    <section class="act" id="how" appJourneyAct="How it works">
       <div class="act-inner act-inner--centered">
         <span class="act-eyebrow">How it works</span>
         <h2 class="act-title">Four steps, then it runs itself</h2>
@@ -194,7 +216,7 @@
     </section>
 
     <!-- 9 — Docs ------------------------------------------------------- -->
-    <section class="act" appJourneyAct="Docs">
+    <section class="act" id="docs" appJourneyAct="Docs">
       <div class="act-inner act-inner--centered">
         <span class="act-eyebrow">Open source</span>
         <h2 class="act-title">All of it is readable</h2>

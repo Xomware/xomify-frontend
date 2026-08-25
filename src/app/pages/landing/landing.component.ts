@@ -42,6 +42,22 @@ export class LandingComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
+  /**
+   * Jump to a section from the top nav.
+   *
+   * Plain `scrollIntoView` on an id rather than a router fragment: the whole
+   * page is one route, and a fragment would push history entries for what is
+   * really just scrolling.
+   */
+  scrollTo(id: string): void {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }
+
   onActChange(index: number): void {
     this.activeAct = index;
     this.cdr.markForCheck();
