@@ -9,7 +9,7 @@
       <span class="day-label">{{ day }}</span>
       <div class="day-slot">
         <div class="release" *ngFor="let release of releasesFor(i)">
-          <span class="art-tile release-art" [style.background]="art(release.art)"></span>
+          <app-preview-art class="release-art" [art]="release.art" [label]="release.title"></app-preview-art>
           <span class="release-title">{{ release.title }}</span>
           <span class="release-kind">{{ release.kind }}</span>
         </div>

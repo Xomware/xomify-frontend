@@ -20,23 +20,27 @@ import { JourneyActDirective } from './journey-act.directive';
 gsap.registerPlugin(ScrollTrigger);
 
 /** Matches `$breakpoint-lg` in src/styles/_tokens.scss. */
-const PIN_BREAKPOINT = 992;
+const RAIL_BREAKPOINT = 992;
 
 /**
  * Scroll-driven act sequence.
  *
- * ABOVE `$breakpoint-lg`: the stage pins and acts cross-fade as you scroll,
- * one viewport-height of scroll per act.
+ * ACTS STAY IN NORMAL FLOW. Each is a full-height section, revealed as it
+ * scrolls into view, with a rail tracking position.
  *
- * BELOW IT: pinning is torn down entirely and acts render as ordinary stacked
- * sections with in-view reveals. Pinned scrub on a phone fights the browser's
- * own scroll physics and reads as jank rather than motion.
+ * WHY NOT PINNED (the first version was, and it broke in production): pinning
+ * the stage meant absolutely positioning every act inside it and cross-fading
+ * between them. Absolute children give their parent no height, so the stage
+ * collapsed to a single viewport, all ten acts stacked at the same coordinates,
+ * and the page footer rendered straight through the middle of them. The
+ * cross-fade was the only thing hiding nine of those ten acts — so the moment
+ * anything prevented it applying, every act was visible at once, on top of each
+ * other.
  *
- * Modelled on reeses-playoff-challenge's `scroll-journey.tsx`. The important
- * lesson carried over from that codebase: the WHOLE page is the journey. An
- * earlier version there was a vertical stack with one scrubbing section wedged
- * into the middle, and its own source comments record that it "read as two
- * different pages glued together."
+ * That is a layout whose correctness depends on an animation succeeding. This
+ * one cannot fail that way: if every tween here no-opped, the page would still
+ * be ten readable sections stacked vertically, in order, with the footer
+ * underneath.
  */
 @Component({
   selector: 'app-scroll-journey',
@@ -50,18 +54,13 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
   @ViewChild('journey', { static: true }) journeyRef!: ElementRef<HTMLElement>;
   @ViewChild('stage', { static: true }) stageRef!: ElementRef<HTMLElement>;
 
-  /**
-   * Emits the index of the act now in view. The landing page feeds this back
-   * down to the previews so each one plays when its act arrives rather than
-   * animating unseen behind a cross-fade.
-   */
+  /** Emits the index of the act now in view, so previews can play on arrival. */
   @Output() actChange = new EventEmitter<number>();
 
   acts: JourneyActDirective[] = [];
   activeIndex = 0;
 
-  private mm: gsap.MatchMedia | null = null;
-  private pinned = false;
+  private triggers: ScrollTrigger[] = [];
   private reducedMotion = false;
 
   constructor(private zone: NgZone, private cdr: ChangeDetectorRef) {}
@@ -74,25 +73,18 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (this.reducedMotion) {
-      // Every act visible, in document order, no pin. The still version has to
-      // be the informative one — a first frame of an unstarted animation is a
-      // blank page.
-      this.revealAll();
-      return;
-    }
-
-    // ScrollTrigger's own RAF plus our tweens have no business inside the
-    // Angular zone — they would fire change detection on every frame.
+    // Reduced motion still gets the rail and the active-act tracking — it just
+    // never animates anything. The content is identical either way, which is
+    // the point.
     this.zone.runOutsideAngular(() => this.build());
   }
 
   ngOnDestroy(): void {
-    this.mm?.revert();
-    this.mm = null;
-    // Belt and braces: matchMedia.revert() kills the triggers it created, but a
-    // route change out of the landing page must not leave ANY pin attached to a
-    // dead DOM.
+    window.removeEventListener('load', this.onLoadRefresh);
+    this.triggers.forEach((t) => t.kill());
+    this.triggers = [];
+    // A route change out of the landing page must not leave triggers attached
+    // to a dead DOM.
     ScrollTrigger.getAll().forEach((t) => t.kill());
   }
 
@@ -101,128 +93,88 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
   goToAct(index: number): void {
     const act = this.acts[index];
     if (!act) return;
-
-    // An explicit `behavior: 'smooth'` beats the CSS `scroll-behavior: auto`
-    // that styles.scss sets under reduced motion, so the check has to happen
-    // here rather than being left to the stylesheet.
-    const behavior: ScrollBehavior = this.reducedMotion ? 'auto' : 'smooth';
-
-    if (!this.pinned) {
-      act.host.nativeElement.scrollIntoView({ behavior, block: 'start' });
-      return;
-    }
-
-    // While pinned the acts are stacked at the same physical position, so
-    // scrolling to the element is meaningless — translate the act index into a
-    // scroll offset within the pinned range instead.
-    const journey = this.journeyRef.nativeElement;
-    const top = journey.offsetTop;
-    window.scrollTo({
-      top: top + index * window.innerHeight,
-      behavior,
+    act.host.nativeElement.scrollIntoView({
+      // An explicit 'smooth' overrides the CSS `scroll-behavior: auto` that
+      // styles.scss sets under reduced motion, so the check happens here.
+      behavior: this.reducedMotion ? 'auto' : 'smooth',
+      block: 'start',
     });
   }
 
   // ── Setup ─────────────────────────────────────────────────────────────
 
   private build(): void {
-    this.mm = gsap.matchMedia();
+    const els = this.acts.map((a) => a.host.nativeElement);
+    if (!els.length) return;
 
-    this.mm.add(`(min-width: ${PIN_BREAKPOINT}px)`, () => {
-      this.pinned = true;
-      const els = this.actEls();
-      const stage = this.stageRef.nativeElement;
-
-      gsap.set(els, { position: 'absolute', inset: 0, autoAlpha: 0 });
-      gsap.set(els[0], { autoAlpha: 1 });
-
-      const trigger = ScrollTrigger.create({
-        trigger: this.journeyRef.nativeElement,
-        start: 'top top',
-        end: () => `+=${els.length * window.innerHeight}`,
-        pin: stage,
-        pinSpacing: true,
-        scrub: true,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          // `length - 1` intervals across the range, so the last act lands
-          // exactly at progress 1 rather than a fraction short.
-          const raw = self.progress * (els.length - 1);
-          const index = Math.round(raw);
-          this.crossfade(els, raw);
-          this.setActive(index);
-        },
-      });
-
-      return () => {
-        trigger.kill();
-        gsap.set(els, { clearProps: 'position,inset,opacity,visibility' });
-        this.pinned = false;
-      };
-    });
-
-    this.mm.add(`(max-width: ${PIN_BREAKPOINT - 1}px)`, () => {
-      this.pinned = false;
-      const els = this.actEls();
-      const triggers = els.map((el, i) =>
+    els.forEach((el, index) => {
+      // Position tracking, always — this drives the rail and tells previews
+      // when to play. Independent of whether anything animates.
+      this.triggers.push(
         ScrollTrigger.create({
           trigger: el,
-          start: 'top 75%',
-          end: 'bottom 25%',
-          onEnter: () => this.setActive(i),
-          onEnterBack: () => this.setActive(i),
-          onToggle: (self) => {
-            if (self.isActive) gsap.to(el, { autoAlpha: 1, y: 0, duration: 0.5 });
+          start: 'top 60%',
+          end: 'bottom 40%',
+          onEnter: () => this.setActive(index),
+          onEnterBack: () => this.setActive(index),
+        })
+      );
+
+      if (this.reducedMotion) return;
+
+      // The reveal. Targets the act's own children, which always exist —
+      // nothing to remember to tag in the template.
+      //
+      // It animates FROM a transform rather than from `opacity: 0` in CSS: if
+      // scripting fails or ScrollTrigger never fires, the act is already
+      // visible in its resting state rather than permanently blank. That is
+      // the same principle the pinned version violated.
+      this.triggers.push(
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.from(el.querySelectorAll('.act-inner > *'), {
+              opacity: 0,
+              y: 28,
+              duration: 0.6,
+              stagger: 0.08,
+              ease: 'power2.out',
+              clearProps: 'transform',
+            });
           },
         })
       );
-      gsap.set(els, { autoAlpha: 0, y: 24 });
-      // The first act is above the fold — it must never wait for a scroll to
-      // become visible.
-      gsap.set(els[0], { autoAlpha: 1, y: 0 });
-
-      return () => {
-        triggers.forEach((t) => t.kill());
-        gsap.set(els, { clearProps: 'opacity,visibility,transform' });
-      };
     });
+
+    // First act is above the fold and must be active on load without waiting
+    // for a scroll event.
+    this.setActive(0);
+
+    // Refresh after layout settles. Fonts and the hero logo land after first
+    // paint and shift every subsequent act's offsets; without this the
+    // triggers are measured against a layout that no longer exists.
+    ScrollTrigger.refresh();
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', this.onLoadRefresh, { once: true });
+    }
   }
 
-  /**
-   * Cross-fades between the two acts either side of the scrub position. Only
-   * those two ever carry opacity, so no amount of scrubbing can leave a third
-   * act faintly visible underneath.
-   */
-  private crossfade(els: HTMLElement[], raw: number): void {
-    const lower = Math.floor(raw);
-    const frac = raw - lower;
-
-    els.forEach((el, i) => {
-      let alpha = 0;
-      if (i === lower) alpha = 1 - frac;
-      else if (i === lower + 1) alpha = frac;
-      gsap.set(el, { autoAlpha: alpha });
-    });
-  }
-
-  private revealAll(): void {
-    const els = this.actEls();
-    gsap.set(els, { autoAlpha: 1, clearProps: 'transform' });
-  }
-
-  private actEls(): HTMLElement[] {
-    return this.acts.map((a) => a.host.nativeElement);
-  }
+  private readonly onLoadRefresh = () => ScrollTrigger.refresh();
 
   private setActive(index: number): void {
     const clamped = Math.max(0, Math.min(index, this.acts.length - 1));
-    if (clamped === this.activeIndex) return;
+    if (clamped === this.activeIndex && this.actChange.observers.length) return;
     this.activeIndex = clamped;
-    // Back inside the zone just for this — the rail and the preview `active`
-    // bindings are the only Angular-bound things the scroll loop touches.
     this.zone.run(() => {
       this.actChange.emit(clamped);
       this.cdr.markForCheck();
     });
+  }
+
+  /** Rail is desktop-only — it has nowhere to live on a phone. */
+  get railVisible(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth >= RAIL_BREAKPOINT;
   }
 }

@@ -10,9 +10,20 @@
 .act {
   display: flex;
   align-items: center;
+  // `min-height`, never `height` — an act whose content is taller than the
+  // viewport must grow rather than clip. On a short laptop window several of
+  // these overflow a viewport comfortably.
   min-height: 100vh;
   padding: $spacing-3xl $spacing-lg;
   width: 100%;
+  position: relative;
+}
+
+// Desktop reserves the rail's column so long headings never run underneath it.
+@media (min-width: $breakpoint-lg) {
+  .act {
+    padding-left: $spacing-4xl;
+  }
 }
 
 .act-inner {

@@ -10,7 +10,11 @@
 
 .stage {
   position: relative;
-  min-height: 100vh;
+  // NO min-height and nothing absolutely positioned. The stage is exactly as
+  // tall as its acts, so the footer lands underneath them instead of through
+  // them. The previous version pinned this element and absolutely positioned
+  // every act inside it, which gave the stage no height at all.
+  display: block;
 }
 
 // ── Progress rail ───────────────────────────────────────────────────────

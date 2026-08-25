@@ -5,7 +5,7 @@
   </div>
 
   <div class="share-track">
-    <span class="art-tile track-art" [style.background]="art(share.track.art)"></span>
+    <app-preview-art class="track-art" [art]="share.track.art" [label]="share.track.title" size="lg"></app-preview-art>
     <span class="rank-text">
       <span class="rank-title">{{ share.track.title }}</span>
       <span class="rank-artist">{{ share.track.artist }}</span>

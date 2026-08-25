@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { LandingComponent } from './landing.component';
 import { ScrollJourneyComponent } from './scroll-journey/scroll-journey.component';
 import { JourneyActDirective } from './scroll-journey/journey-act.directive';
+import { PreviewArtComponent } from './previews/preview-art.component';
 import { RankListPreviewComponent } from './previews/rank-list-preview.component';
 import { WrappedPreviewComponent } from './previews/wrapped-preview.component';
 import { RadarPreviewComponent } from './previews/radar-preview.component';
@@ -27,6 +28,7 @@ import { HowItWorksPreviewComponent } from './previews/how-it-works-preview.comp
     LandingComponent,
     ScrollJourneyComponent,
     JourneyActDirective,
+    PreviewArtComponent,
     RankListPreviewComponent,
     WrappedPreviewComponent,
     RadarPreviewComponent,
