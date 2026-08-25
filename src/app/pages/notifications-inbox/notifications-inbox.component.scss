@@ -1,0 +1,162 @@
+@import 'tokens';
+
+.inbox-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.inbox-title {
+  font-size: $text-2xl;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
+  margin: 0 0 $spacing-xs;
+  color: var(--text-primary);
+}
+
+.inbox-subtitle {
+  font-size: $text-sm;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.mark-all,
+.retry,
+.load-more {
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-pill;
+  color: var(--text-secondary);
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  padding: $spacing-sm $spacing-md;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+    border-color: var(--accent-purple);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+  }
+}
+
+.inbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.inbox-row {
+  border-radius: $radius-lg;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+// Unread carries a left rule AND a dot. Colour alone is not an accessible
+// distinction, and a tint this subtle is easy to miss entirely.
+.inbox-row--unread {
+  border-left: 3px solid var(--accent-purple);
+  background: var(--surface-raised);
+}
+
+.inbox-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+  padding: $spacing-md;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: -2px;
+  }
+}
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-purple);
+  flex: 0 0 auto;
+}
+
+.inbox-art {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-md;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.inbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.inbox-row-title {
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.inbox-row-body {
+  font-size: $text-xs;
+  color: var(--text-secondary);
+}
+
+.inbox-row-time {
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}
+
+.inbox-empty,
+.inbox-error {
+  text-align: center;
+  padding: $spacing-3xl $spacing-lg;
+  color: var(--text-secondary);
+
+  h2 {
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    margin: 0 0 $spacing-sm;
+  }
+
+  p {
+    font-size: $text-sm;
+    margin: 0 auto $spacing-md;
+    max-width: 26rem;
+  }
+}
+
+.inbox-more {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-lg;
+}

@@ -207,3 +207,26 @@
     }
   }
 }
+
+.page-note {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-purple);
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.02);
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  p {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin: 0 0 $spacing-sm;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--accent-purple-text);
+  }
+}

@@ -9,6 +9,9 @@ import { SongDetailModalComponent } from '../components/song-detail-modal/song-d
 import { ActivityTimelineComponent } from '../components/activity-timeline/activity-timeline.component';
 import { IconComponent } from '../components/icon/icon.component';
 import { TooltipDirective } from '../directives/tooltip.directive';
+// Lives here rather than in a feature module: two NgModules cannot declare the
+// same pipe, and both `discovery` and `social` need it.
+import { RelativeTimePipe } from '../pipes/relative-time.pipe';
 
 @NgModule({
   declarations: [
@@ -20,6 +23,7 @@ import { TooltipDirective } from '../directives/tooltip.directive';
     ActivityTimelineComponent,
     IconComponent,
     TooltipDirective,
+    RelativeTimePipe,
   ],
   imports: [CommonModule, FormsModule],
   exports: [
@@ -31,6 +35,7 @@ import { TooltipDirective } from '../directives/tooltip.directive';
     ActivityTimelineComponent,
     IconComponent,
     TooltipDirective,
+    RelativeTimePipe,
   ],
 })
 export class SharedModule {}

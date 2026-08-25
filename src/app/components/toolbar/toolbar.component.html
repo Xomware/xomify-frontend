@@ -82,6 +82,28 @@
     </ng-container>
   </div>
 
+  <!-- Notifications bell. Web has no push, so this badge is the only way a
+       user learns something happened without opening the inbox. -->
+  <a
+    class="bell-link"
+    *ngIf="isLoggedIn()"
+    routerLink="/notifications"
+    routerLinkActive="bell-link--active"
+    [attr.aria-label]="unreadNotifications > 0
+      ? 'Notifications, ' + unreadNotifications + ' unread'
+      : 'Notifications'"
+  >
+    <svg class="bell-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-5.5-1.5-1.75V10a5.5 5.5 0 0 0-4.25-5.36V4a1.25 1.25 0 0 0-2.5 0v.64A5.5 5.5 0 0 0 6.5 10v4.75L5 16.5v1h14v-1Z"
+      />
+    </svg>
+    <span class="queue-badge" *ngIf="unreadNotifications > 0">
+      {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+    </span>
+  </a>
+
   <!-- Profile avatar chip + dropdown — visible on both desktop and mobile
        when logged in. Header shows username + email, then Profile, My
        Ratings, My Favorites, Settings, Log out, and (admin only) Admin. -->

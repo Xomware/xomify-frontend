@@ -451,3 +451,39 @@
     height: 30px;
   }
 }
+
+// ── Notifications bell ──────────────────────────────────────────────────
+.bell-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  text-decoration: none;
+  flex: 0 0 auto;
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+  }
+}
+
+.bell-link--active {
+  color: var(--accent-purple-text);
+}
+
+// Reuses .queue-badge so the count reads identically to the queue and
+// friends badges already in this bar.
+.bell-link .queue-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+}

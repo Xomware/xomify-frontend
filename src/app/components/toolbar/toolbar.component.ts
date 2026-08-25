@@ -8,6 +8,7 @@ import { XomifyAuthService } from '../../services/xomify-auth.service';
 import { isAdminEmail } from '../../config/admin.config';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
+import { NotificationsService } from 'src/app/services/notifications.service';
 
 /** A single navigable destination — either a leaf link or a group header. */
 export interface NavLink {
@@ -48,6 +49,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   isMobile = false;
   queueCount = 0;
   pendingFriendsCount = 0;
+  unreadNotifications = 0;
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
@@ -113,6 +115,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     private friendsService: FriendsService,
     private userService: UserService,
     private xomifyAuthService: XomifyAuthService,
+    private notificationsService: NotificationsService,
   ) {
     this.checkIfMobile();
     window.addEventListener('resize', this.checkIfMobile.bind(this));
@@ -131,8 +134,19 @@ export class ToolbarComponent implements OnInit, OnDestroy {
         this.pendingFriendsCount = count;
       });
 
+    this.notificationsService.unread$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((count) => {
+        this.unreadNotifications = count;
+      });
+
     if (this.authService.isLoggedIn()) {
       this.loadFriendsData();
+      // One fetch on mount. Deliberately NOT polled: the badge is a nicety,
+      // and a timer firing against the API for the whole session costs more
+      // than it's worth. The inbox refreshes it on open, and marking items
+      // read updates it locally through the same subject.
+      this.notificationsService.refreshUnreadCount().subscribe();
     }
   }
 

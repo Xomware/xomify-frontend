@@ -4,18 +4,11 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 
-import {
-  NotificationsService,
-  RegisterDeviceResponse,
-  UnregisterDeviceResponse,
-} from './notifications.service';
+import { NotificationsService } from './notifications.service';
 
-describe('NotificationsService', () => {
+describe('NotificationsService — inbox', () => {
   let service: NotificationsService;
   let httpMock: HttpTestingController;
-
-  const email = 'dom@example.com';
-  const token = 'abc123token';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -26,65 +19,114 @@ describe('NotificationsService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
+  afterEach(() => httpMock.verify());
+
+  it('unwraps a `data`-envelope feed response', () => {
+    let page: any;
+    service.getFeed().subscribe((p) => (page = p));
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/notifications/feed'));
+    req.flush({ data: { items: [{ tsId: 'a' }], nextCursor: 'b' } });
+
+    expect(page.items.length).toBe(1);
+    expect(page.nextCursor).toBe('b');
   });
 
-  it('registerDevice posts deviceToken + platform (defaults to ios) — caller comes from JWT', (done) => {
-    const mockResponse: RegisterDeviceResponse = {
-      ok: true,
-      deviceToken: token,
-    };
+  it('also accepts an unwrapped feed response', () => {
+    // Not every deployed handler version wraps in `data`; tolerating both
+    // beats a runtime shape error in the UI.
+    let page: any;
+    service.getFeed().subscribe((p) => (page = p));
 
-    service.registerDevice(email, token).subscribe((resp) => {
-      expect(resp.ok).toBe(true);
-      done();
-    });
+    httpMock
+      .expectOne((r) => r.url.endsWith('/notifications/feed'))
+      .flush({ items: [{ tsId: 'a' }], nextCursor: null });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.endsWith('/notifications/register'),
-    );
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({
-      deviceToken: token,
-      platform: 'ios',
-    });
-    // Caller email must NOT be sent — sourced from JWT context.
-    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
-    // Authorization header is attached globally by AuthInterceptor (sub-feature
-    // 0e). The interceptor is not registered in this isolated TestBed; header
-    // attachment is covered by `auth.interceptor.spec.ts`.
-    req.flush(mockResponse);
+    expect(page.items.length).toBe(1);
+    expect(page.nextCursor).toBeNull();
   });
 
-  it('registerDevice accepts a non-default platform', (done) => {
-    service.registerDevice(email, token, 'android').subscribe(() => done());
+  it('defaults a malformed feed response to an empty page', () => {
+    let page: any;
+    service.getFeed().subscribe((p) => (page = p));
 
-    const req = httpMock.expectOne((r) =>
-      r.url.endsWith('/notifications/register'),
-    );
-    expect(req.request.body.platform).toBe('android');
-    req.flush({ ok: true, deviceToken: token });
+    httpMock.expectOne((r) => r.url.endsWith('/notifications/feed')).flush({});
+
+    expect(page.items).toEqual([]);
+    expect(page.nextCursor).toBeNull();
   });
 
-  it('unregisterDevice posts deviceToken — caller comes from JWT', (done) => {
-    const mockResponse: UnregisterDeviceResponse = {
-      ok: true,
-      deviceToken: token,
-    };
+  it('sends the cursor as an encoded param, not raw in the URL', () => {
+    // A tsId contains '#'. Interpolated raw it terminates the query string and
+    // the cursor silently vanishes — the client then re-requests page one
+    // forever.
+    const cursor = '2026-08-25T00:00:00+00:00#abc';
+    service.getFeed(25, cursor).subscribe();
 
-    service.unregisterDevice(email, token).subscribe((resp) => {
-      expect(resp.ok).toBe(true);
-      done();
-    });
+    const req = httpMock.expectOne((r) => r.url.endsWith('/notifications/feed'));
+    expect(req.request.params.get('cursor')).toBe(cursor);
+    expect(req.request.urlWithParams).toContain('%23abc');
+    req.flush({ items: [], nextCursor: null });
+  });
 
-    const req = httpMock.expectOne((r) =>
-      r.url.endsWith('/notifications/unregister'),
-    );
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ deviceToken: token });
-    // Caller email must NOT be sent.
-    expect((req.request.body as Record<string, unknown>)['email']).toBeUndefined();
-    req.flush(mockResponse);
+  it('decrements the badge when one item is marked read', () => {
+    service.refreshUnreadCount().subscribe();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/notifications/unread-count'))
+      .flush({ data: { unread: 3 } });
+
+    let unread = 0;
+    service.unread$.subscribe((n) => (unread = n));
+    expect(unread).toBe(3);
+
+    service.markRead('t1').subscribe();
+    httpMock.expectOne((r) => r.url.endsWith('/notifications/read')).flush({});
+    expect(unread).toBe(2);
+  });
+
+  it('never lets the badge go negative', () => {
+    let unread = -1;
+    service.unread$.subscribe((n) => (unread = n));
+
+    service.markRead('t1').subscribe();
+    httpMock.expectOne((r) => r.url.endsWith('/notifications/read')).flush({});
+
+    expect(unread).toBe(0);
+  });
+
+  it('zeroes the badge on mark-all-read', () => {
+    service.refreshUnreadCount().subscribe();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/notifications/unread-count'))
+      .flush({ unread: 9 });
+
+    let unread = 0;
+    service.unread$.subscribe((n) => (unread = n));
+    expect(unread).toBe(9);
+
+    service.markAllRead().subscribe();
+    const req = httpMock.expectOne((r) => r.url.endsWith('/notifications/read'));
+    expect(req.request.body).toEqual({ all: true });
+    req.flush({});
+
+    expect(unread).toBe(0);
+  });
+
+  it('holds the previous count when the badge request fails', () => {
+    // A transient 500 must not blank a badge the user was relying on.
+    service.refreshUnreadCount().subscribe();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/notifications/unread-count'))
+      .flush({ unread: 5 });
+
+    let unread = 0;
+    service.unread$.subscribe((n) => (unread = n));
+
+    service.refreshUnreadCount().subscribe();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/notifications/unread-count'))
+      .flush('boom', { status: 500, statusText: 'Server Error' });
+
+    expect(unread).toBe(5);
   });
 });
