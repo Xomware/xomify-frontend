@@ -220,3 +220,73 @@
     }
   }
 }
+
+// ── Docs act ────────────────────────────────────────────────────────────
+.doc-groups {
+  display: grid;
+  gap: $spacing-xl;
+  grid-template-columns: 1fr;
+  text-align: left;
+  max-width: 42rem;
+  margin: $spacing-xl auto 0;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.doc-group {
+  padding: $spacing-lg;
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  background: var(--surface);
+}
+
+.doc-group-title {
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wider;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 $spacing-md;
+}
+
+.doc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  a {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-purple);
+      outline-offset: 2px;
+      border-radius: $radius-sm;
+    }
+  }
+}
+
+// Secondary CTA — outline rather than fill, so the Spotify button stays the
+// obvious primary action.
+.cta--secondary {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent-purple);
+  }
+}

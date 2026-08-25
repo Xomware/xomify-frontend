@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlaylistService } from 'src/app/services/playlist.service';
 import { SongService } from 'src/app/services/song.service';
@@ -6,6 +6,14 @@ import { UserService } from 'src/app/services/user.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
+import {
+  LinkEntry,
+  XOMIFY_DOCS,
+  XOMIFY_REPOS,
+  XOMWARE_APPS,
+  XOMWARE_URL,
+  XomwareApp,
+} from 'src/app/data/xomware-apps.data';
 
 @Component({
   selector: 'app-footer',
@@ -13,9 +21,24 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent implements OnInit, OnDestroy {
+  /**
+   * `compact` is the in-app footer — credit line, the route-dependent action
+   * button, and a single source link. Unchanged behaviour, and the default so
+   * every existing usage keeps working untouched.
+   *
+   * `full` is the landing page's three-column footer.
+   */
+  @Input() variant: 'full' | 'compact' = 'compact';
+
   showDynamicButton = false;
   footerButtonText = '';
-  githubRepoUrl = 'https://github.com/domgiordano/xomify-frontend';
+  githubRepoUrl = 'https://github.com/Xomware/xomify-frontend';
+
+  readonly xomwareUrl = XOMWARE_URL;
+  readonly xomwareApps: readonly XomwareApp[] = XOMWARE_APPS;
+  readonly repos: readonly LinkEntry[] = XOMIFY_REPOS;
+  readonly docs: readonly LinkEntry[] = XOMIFY_DOCS;
+  readonly year = new Date().getFullYear();
   userId = '';
   private destroy$ = new Subject<void>();
 

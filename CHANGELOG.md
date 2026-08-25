@@ -8,79 +8,103 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
--
+- Public landing page for signed-out visitors: ten-act scroll journey with animated feature previews, docs section, three-column footer
+- Canvas space background (parallax star layers, drifting nebula, shooting stars) replacing the GSAP blob background
+- My Favorites: curated best-of lists with rank history, recommendations and a profile summary
+- Full tabbed Admin Portal — Health, Users, Crons, Notifications, Broadcasts, plus an Overview tab
+- Admin extractor-status view with last-scan, stale flag, playlist status and a run-history feed
+- Full impersonation mode ("View As"), using the target user's real Spotify data
+- Home rebuilt as a logged-in dashboard, with a live Now Playing widget
+- Shares: 3-phase self-serve onboarding Connection panel
+- `/search` page and toolbar search entry point
+- Share-detail page with comments, reactions and friend drilldowns
+- `/share?trackId` deep-link route (desktop Spotify share parity)
+- `user-read-recently-played` scope for the now-playing fallback
 
 ### Changed
--
+- Folded Xomtracks into Xomify, replacing the Feed and Groups features
+- Renamed the Shares route from `/xomtracks` to `/shares`
+- Adopted the shared Xomware design tokens and the tightened radius scale
+- Established global design tokens and de-bubbled the shared components
+- Restyled the Admin Portal to a macOS pro-tool look; consolidated icons
+- Restructured navigation into a user-avatar dropdown
+- Removed all emoji glyphs from the UI
+- Replaced the broken Web Playback SDK playback with a shared 30-second preview player
+- Auth tokens now persist across browser restarts
+- Redesigned the Wrapped and Release Radar opt-in flow
 
 ### Fixed
--
+- Blurry album art — now selects a higher-resolution Spotify image
+- 401s on direct Spotify API calls from a stale localStorage access token
+- Home dashboard spotlight rendering blank instead of a loading skeleton
+- Post-login redirect, Home nav highlight, mood-timeline icon, genre number overflow
+- Flaky Wrapped/Release Radar enrollment
+- `likes_count` snake_case mismatch on the web profile
+- My Profile tab switcher moved into a dropdown off the profile name
+- Shares: untitled shares filtered, playlist tabs split correctly, search box cleaned up
+- Playlist detail: Spotify-only action row replaced with builder + share buttons
+- `user/update` call now falls back to email
+- Deploy hardened: fail-fast on empty SSM credentials, with injection verified
+
+## [2.5.0] - 2026-04-28
+
+Version bump only — no functional changes in this release.
+
+**Note**: `package.json` currently reports `2.4.3` while a `v2.5.0` tag exists.
+The two need reconciling; the tag is the later of the pair.
 
 ## [2.4.3] - 2026-04-28
 
-### Added
--
-
-### Changed
--
-
 ### Fixed
--
+- `likes_count` snake_case mismatch on the web profile
 
 ## [2.4.2] - 2026-04-28
 
-### Added
--
-
-### Changed
--
-
-### Fixed
--
+Version bump only — no functional changes in this release.
 
 ## [2.4.1] - 2026-04-28
 
 ### Added
--
+- `/search` page with a toolbar magnifying-glass entry point
+- Share-detail page with comments, reactions and friends drilldowns
+- Recent tab on My Profile, plus Ratings/Posts header counts
+- Likes surfaced in the navigation
 
 ### Changed
--
+- Feed: dropped the sticky page header and collapsed three action rows into one
+- Feed: grid layout, smaller side-by-side hero, sharer identity, delete-share
+- Composer pre-fills the rating; supports group-or-public targeting
+- Renamed "Create Share" to "Share Song"
+- Self-likes now go straight to Spotify, mirroring the iOS path
+- `/likes/push` batch size dropped from 100 to 25 (WAF body limit)
 
 ### Fixed
--
+- Friend profile and Following — five bundled fixes from the diagnostic pass
+- Likes push body fields, live count and hydrated compatibility
+- `getUserTracks` signature widened with a limit param, plus token refresh
+- Web tolerates an unwrapped `/auth/login` response (no envelope)
+- `hasJwt` validates claims and expiry, rejecting stale or legacy tokens
+- Xomify JWT minted on bootstrap with a fresh Spotify token
+- Toolbar avatar chip; My Profile now uses `TopItemsService`
+- `/user/top-items` raw shape parsed; real name and avatar shown on feed cards
+- Horizontal kebab, removed a misleading Queue action, `/likes` pagination
 
 ## [2.4.0] - 2026-04-27
 
 ### Added
--
-
-### Changed
--
-
-### Fixed
--
+- Web Likes parity: likes service, `/likes` page, profile chips and a privacy toggle
+- Likes push coordinator
 
 ## [2.3.0] - 2026-04-27
 
-### Added
--
-
 ### Changed
--
-
-### Fixed
--
+- Replaced the per-card Share button with a 3-dot kebab actions menu
+- Fixed the feed card author header
 
 ## [2.2.1] - 2026-04-27
 
 ### Added
--
-
-### Changed
--
-
-### Fixed
--
+- Preemptive Xomify JWT mint on app boot, so restored sessions no longer 401 on their first API call
 
 ## [2.2.0] - 2026-01-13
 

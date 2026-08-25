@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
+import {
+  LinkEntry,
+  XOMIFY_DOCS,
+  XOMIFY_IOS,
+  XOMIFY_REPOS,
+} from 'src/app/data/xomware-apps.data';
 
 /**
  * The signed-out landing page.
@@ -24,6 +30,12 @@ export class LandingComponent {
    * rather than destroys), so this is what tells one to play.
    */
   activeAct = 0;
+
+  /** Sourced from the registry, not hardcoded — A2 left this slot empty on
+   * purpose so the TestFlight URL lives in exactly one place. */
+  readonly iosApp = XOMIFY_IOS;
+  readonly repos: readonly LinkEntry[] = XOMIFY_REPOS;
+  readonly docs: readonly LinkEntry[] = XOMIFY_DOCS;
 
   constructor(
     private authService: AuthService,
