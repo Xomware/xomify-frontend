@@ -351,6 +351,13 @@ written up front so the landing page could be reviewed as one design. Tracks B a
 
 **Execution mode**: parallel within each wave.
 
+**Track A is complete** as of 2026-08-25 on `feature/landing-page` — A1–A5 all `Done`,
+513/513 tests passing, lint and production build clean. Five commits, one per sub-feature.
+Lighthouse, contrast and cross-browser remain unverified; see `landing-polish/PLAN.md`.
+
+Tracks B and C have not started — this session has no write access to `xomify-backend`,
+`xomify-infrastructure` or `xomify-ios`, so their 12 stubs are staged rather than installed.
+
 | ID | Slug | Repo | Wave | Depends on |
 |----|------|------|------|------------|
 | A1 | `landing-space-background` | frontend | 1 | — |

@@ -3,7 +3,7 @@
 **Epic**: [xomify-relaunch](../xomify-relaunch/PLAN.md)
 **Sub-feature ID**: A1 (`landing-space-background`)
 **Track**: A — Public Landing Page
-**Status**: Ready
+**Status**: Done
 **Created**: 2026-08-24
 **Last updated**: 2026-08-24
 **Scope size**: M
