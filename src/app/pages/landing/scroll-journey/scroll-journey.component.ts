@@ -62,6 +62,7 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
 
   private mm: gsap.MatchMedia | null = null;
   private pinned = false;
+  private reducedMotion = false;
 
   constructor(private zone: NgZone, private cdr: ChangeDetectorRef) {}
 
@@ -69,11 +70,11 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
     this.acts = this.actQuery.toArray();
     this.cdr.markForCheck();
 
-    const reduced =
+    this.reducedMotion =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (reduced) {
+    if (this.reducedMotion) {
       // Every act visible, in document order, no pin. The still version has to
       // be the informative one — a first frame of an unstarted animation is a
       // blank page.
@@ -101,8 +102,13 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
     const act = this.acts[index];
     if (!act) return;
 
+    // An explicit `behavior: 'smooth'` beats the CSS `scroll-behavior: auto`
+    // that styles.scss sets under reduced motion, so the check has to happen
+    // here rather than being left to the stylesheet.
+    const behavior: ScrollBehavior = this.reducedMotion ? 'auto' : 'smooth';
+
     if (!this.pinned) {
-      act.host.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      act.host.nativeElement.scrollIntoView({ behavior, block: 'start' });
       return;
     }
 
@@ -113,7 +119,7 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
     const top = journey.offsetTop;
     window.scrollTo({
       top: top + index * window.innerHeight,
-      behavior: 'smooth',
+      behavior,
     });
   }
 

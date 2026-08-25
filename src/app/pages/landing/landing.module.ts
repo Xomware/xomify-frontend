@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { LandingComponent } from './landing.component';
 import { ScrollJourneyComponent } from './scroll-journey/scroll-journey.component';
@@ -13,9 +14,13 @@ import { DiscoveryPreviewComponent } from './previews/discovery-preview.componen
 import { HowItWorksPreviewComponent } from './previews/how-it-works-preview.component';
 
 /**
- * Eagerly imported by AppModule rather than lazy-loaded: this IS the first
- * paint for a signed-out visitor, so a lazy chunk would only add a round trip
- * before anything renders.
+ * Lazy-loaded, and deliberately so.
+ *
+ * This module pulls in GSAP ScrollTrigger and Flip. Eagerly importing it put
+ * ~58 kB of transfer into the initial bundle for EVERY user — including signed-in
+ * ones, who never see the landing page. The route split in AppRoutingModule
+ * (`canMatch`) means the chunk is only fetched for a visitor who is actually
+ * logged out.
  */
 @NgModule({
   declarations: [
@@ -30,7 +35,9 @@ import { HowItWorksPreviewComponent } from './previews/how-it-works-preview.comp
     DiscoveryPreviewComponent,
     HowItWorksPreviewComponent,
   ],
-  imports: [CommonModule],
-  exports: [LandingComponent],
+  imports: [
+    CommonModule,
+    RouterModule.forChild([{ path: '', component: LandingComponent }]),
+  ],
 })
 export class LandingModule {}

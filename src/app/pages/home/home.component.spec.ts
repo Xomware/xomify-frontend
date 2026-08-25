@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -35,7 +36,14 @@ describe('HomeComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [HomeComponent],
-      schemas: [],
+      // The dashboard markup used to live inside an `<ng-template #dashboard>`,
+      // so its child components were only ever validated if a test actually
+      // rendered that embedded view. HomeComponent is now dashboard-only (the
+      // logged-out branch became a route to LandingComponent), which puts
+      // `app-home-broadcast-banner` and friends in the root template where
+      // Angular checks them at create time. This is a shallow test of
+      // HomeComponent's own logic, not of its children.
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: UserService, useValue: userServiceSpy },

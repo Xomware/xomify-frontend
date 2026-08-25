@@ -1,8 +1,3 @@
-<ng-container *ngIf="!isLoggedIn; else dashboard">
-  <app-landing></app-landing>
-</ng-container>
-
-<ng-template #dashboard>
   <div class="page-container dashboard">
     <app-home-broadcast-banner [broadcasts]="broadcasts"></app-home-broadcast-banner>
 
@@ -35,4 +30,3 @@
       <app-home-quick-links [favoritesAvailable]="favoritesAvailable"></app-home-quick-links>
     </section>
   </div>
-</ng-template>

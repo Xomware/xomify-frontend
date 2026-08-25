@@ -263,6 +263,15 @@ textarea:focus-visible {
   .slide-up {
     animation: none;
   }
+
+  // `scroll-behavior: smooth` is set unconditionally on html above, which
+  // animates every anchor jump and every scrollIntoView for a user who asked
+  // for no motion. Note that CSS alone is not enough: a script passing
+  // `behavior: 'smooth'` explicitly overrides this, so JS-driven scrolling has
+  // to check the media query too (see ScrollJourneyComponent.goToAct).
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Card Styles (shared across pages) — flat surface, hairline border, small

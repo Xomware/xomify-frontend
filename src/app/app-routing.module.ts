@@ -1,6 +1,7 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { inject, NgModule } from '@angular/core';
+import { CanMatchFn, RouterModule, Routes, UrlSegment } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { AuthService } from './services/auth.service';
 import { AdminGuard } from './guards/admin.guard';
 
 import { HomeComponent } from './pages/home/home.component';
@@ -21,8 +22,42 @@ import { RatingsComponent } from './pages/ratings/ratings.component';
 import { SearchComponent } from './pages/search/search.component';
 import { ShareDeeplinkComponent } from './pages/share-deeplink/share-deeplink.component';
 
+/**
+ * `canMatch`, not `canActivate` — the difference is the whole point. A failing
+ * `canActivate` blocks navigation; a failing `canMatch` makes the router move
+ * on to the NEXT route config. That is what lets `/` resolve to two completely
+ * different things depending on auth, without either one knowing about the
+ * other.
+ */
+const isAuthenticated: CanMatchFn = () => inject(AuthService).isLoggedIn();
+
+/**
+ * The landing route is `path: ''` with `loadChildren`, which matches by PREFIX
+ * — left unqualified it would shadow `/callback`, `/my-profile` and everything
+ * else below it, and Angular fetches the lazy chunk BEFORE discovering no child
+ * route matches. Checking the segment count keeps the chunk to the one URL that
+ * actually renders it.
+ */
+const isSignedOutRoot: CanMatchFn = (_route, segments: UrlSegment[]) =>
+  segments.length === 0 && !inject(AuthService).isLoggedIn();
+
 const routes: Routes = [
-  { path: '', component: HomeComponent },
+  // Signed IN: the dashboard.
+  {
+    path: '',
+    pathMatch: 'full',
+    component: HomeComponent,
+    canMatch: [isAuthenticated],
+  },
+  // Signed OUT: the landing page, lazily fetched. Keeping GSAP out of the
+  // initial bundle for authed users is the reason this is a route split rather
+  // than an *ngIf inside HomeComponent.
+  {
+    path: '',
+    canMatch: [isSignedOutRoot],
+    loadChildren: () =>
+      import('./pages/landing/landing.module').then((m) => m.LandingModule),
+  },
   { path: 'callback', component: CallbackComponent },
   {
     path: 'my-profile',

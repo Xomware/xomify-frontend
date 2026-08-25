@@ -48,7 +48,6 @@ import { ShareDeeplinkComponent } from './pages/share-deeplink/share-deeplink.co
 
 import { AuthService } from './services/auth.service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { LandingModule } from './pages/landing/landing.module';
 
 @NgModule({
   declarations: [
@@ -84,7 +83,6 @@ import { LandingModule } from './pages/landing/landing.module';
   ],
   bootstrap: [AppComponent],
   imports: [
-    LandingModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
