@@ -19,7 +19,7 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { CallbackComponent } from './components/callback/callback.component';
-import { AmbientBackgroundComponent } from './components/ambient-background/ambient-background.component';
+import { SpaceBackgroundComponent } from './components/space-background/space-background.component';
 import { ImpersonationBannerComponent } from './components/impersonation-banner/impersonation-banner.component';
 
 // Eagerly-loaded pages (core navigation)
@@ -56,7 +56,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     FooterComponent,
     ToastComponent,
     CallbackComponent,
-    AmbientBackgroundComponent,
+    SpaceBackgroundComponent,
     ImpersonationBannerComponent,
     HomeComponent,
     BroadcastBannerComponent,

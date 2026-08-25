@@ -23,6 +23,16 @@ export class AppComponent implements OnDestroy, OnInit {
    * toolbar + page content down to stay clear of it. */
   readonly isImpersonating$: Observable<boolean>;
 
+  /**
+   * Drives background intensity (see app.component.html). The landing page —
+   * signed-out `/` — gets the full parallax treatment; everywhere else gets
+   * the quiet ambient field so it never competes with page content.
+   *
+   * Both halves of the check matter: signed-in `/` is the dashboard, not the
+   * landing page.
+   */
+  isLanding = false;
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -67,6 +77,19 @@ export class AppComponent implements OnDestroy, OnInit {
         this.previewPlayer.stop();
       });
 
+    // Keep background intensity in step with the route. Seeded before the
+    // first NavigationEnd so a direct load of `/` paints `full` on the first
+    // frame rather than flipping a beat later.
+    this.updateIsLanding(this.router.url);
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        this.updateIsLanding(event.urlAfterRedirects);
+      });
+
     // Move focus to main content on route change for accessibility
     this.router.events
       .pipe(
@@ -91,6 +114,11 @@ export class AppComponent implements OnDestroy, OnInit {
         const path = event.urlAfterRedirects.split('?')[0].split('#')[0];
         this.visitTracker.log(path);
       });
+  }
+
+  private updateIsLanding(url: string): void {
+    const path = url.split('?')[0].split('#')[0];
+    this.isLanding = (path === '/' || path === '') && !this.authService.isLoggedIn();
   }
 
   ngOnDestroy(): void {

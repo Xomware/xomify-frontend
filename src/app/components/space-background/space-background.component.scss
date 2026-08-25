@@ -1,0 +1,13 @@
+// The host is positioned by app.component.scss (fixed, inset 0, z-index 0,
+// pointer-events none) — matched by ELEMENT NAME, so renaming this component's
+// selector without updating that block silently un-fixes the background and it
+// starts scrolling with the page.
+:host {
+  display: block;
+}
+
+.sky {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
