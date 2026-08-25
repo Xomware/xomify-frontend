@@ -1,6 +1,6 @@
 <div class="tiles">
   <div class="tile" *ngFor="let tile of tiles">
-    <span class="tile-art" [style.background]="art(tile.art)"></span>
+    <app-preview-art class="tile-art" [art]="tile.art" [label]="tile.label" size="lg"></app-preview-art>
     <span class="tile-label">{{ tile.label }}</span>
     <span class="tile-detail">{{ tile.detail }}</span>
   </div>
