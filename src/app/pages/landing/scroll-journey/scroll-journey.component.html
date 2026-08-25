@@ -1,0 +1,26 @@
+<div class="journey" #journey>
+  <nav
+    class="rail"
+    aria-label="Page sections"
+    *ngIf="acts.length > 1"
+  >
+    <ol class="rail-list">
+      <li *ngFor="let act of acts; let i = index" class="rail-item">
+        <button
+          type="button"
+          class="rail-button"
+          [class.rail-button--active]="i === activeIndex"
+          [attr.aria-current]="i === activeIndex ? 'true' : null"
+          (click)="goToAct(i)"
+        >
+          <span class="rail-dot" aria-hidden="true"></span>
+          <span class="rail-label">{{ act.label }}</span>
+        </button>
+      </li>
+    </ol>
+  </nav>
+
+  <div class="stage" #stage>
+    <ng-content></ng-content>
+  </div>
+</div>

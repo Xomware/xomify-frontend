@@ -1,0 +1,126 @@
+@import 'tokens';
+
+.share-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-purple);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  flex: 0 0 auto;
+}
+
+.share-from {
+  font-size: $text-xs;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.share-track {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  margin-bottom: $spacing-md;
+}
+
+.track-art {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-md;
+}
+
+.rank-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rank-title {
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.rank-artist {
+  font-size: $text-2xs;
+  color: var(--text-tertiary);
+}
+
+.reactions {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.reaction {
+  font-size: $text-xs;
+  padding: 3px $spacing-sm;
+  border-radius: $radius-pill;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+}
+
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: $spacing-md;
+}
+
+.comment-author {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  color: var(--accent-purple-text);
+}
+
+.comment-body {
+  font-size: $text-2xs;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.share-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.star {
+  font-size: $text-sm;
+  color: var(--gray-700);
+}
+
+.star--on {
+  color: #f5c518;
+}
+
+.listened {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: #1bdc6f;
+}

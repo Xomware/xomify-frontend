@@ -1,0 +1,36 @@
+@import 'tokens';
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  padding: $spacing-md;
+  border-radius: $radius-xl;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.tile-art {
+  display: block;
+  width: 100%;
+  height: 56px;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-xs;
+}
+
+.tile-label {
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.tile-detail {
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}

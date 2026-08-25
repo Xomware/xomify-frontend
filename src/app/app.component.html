@@ -1,4 +1,4 @@
-<app-ambient-background></app-ambient-background>
+<app-space-background [intensity]="isLanding ? 'full' : 'ambient'"></app-space-background>
 <app-impersonation-banner></app-impersonation-banner>
 <div class="app-container" [class.app-container--impersonating]="isImpersonating$ | async">
   <app-toolbar></app-toolbar>
@@ -6,5 +6,5 @@
     <app-toast></app-toast>
     <router-outlet></router-outlet>
   </main>
-  <app-footer></app-footer>
+  <app-footer [variant]="isLanding ? 'full' : 'compact'"></app-footer>
 </div>

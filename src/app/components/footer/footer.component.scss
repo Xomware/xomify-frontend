@@ -127,3 +127,103 @@
     }
   }
 }
+
+// ── Full (landing) variant ──────────────────────────────────────────────
+// The compact rules above are untouched — they still drive every authed page.
+.footer--full {
+  display: block;
+  padding-top: $spacing-3xl;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.footer-columns {
+  display: grid;
+  gap: $spacing-2xl;
+  grid-template-columns: 1fr;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg $spacing-2xl;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: $spacing-xl;
+  }
+}
+
+.brand-mark {
+  display: block;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-wide;
+  background: linear-gradient(100deg, var(--accent-purple-text) 0%, #1bdc6f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: $spacing-sm;
+}
+
+.brand-line {
+  font-size: $text-sm;
+  color: var(--text-secondary);
+  margin: 0 0 $spacing-md;
+  max-width: 22rem;
+}
+
+.brand-back {
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--accent-purple-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.column-title {
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wider;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 $spacing-md;
+}
+
+.column-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-purple);
+      outline-offset: 2px;
+      border-radius: $radius-sm;
+    }
+  }
+}
+
+.platform-tag {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  padding: 1px 5px;
+  border-radius: $radius-sm;
+  background: var(--accent-purple-muted);
+  color: var(--accent-purple-text);
+}
