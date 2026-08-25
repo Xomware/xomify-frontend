@@ -1,5 +1,7 @@
 @import 'tokens';
 
+// COMPACT is a fixed bar pinned to the bottom of the viewport. That is fine at
+// ~40px tall, which is all it ever was.
 .footer {
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -8,6 +10,18 @@
   left: 0;
   right: 0;
   z-index: 999;
+}
+
+// FULL must NOT be fixed, and this is the whole bug the landing page shipped
+// with: the full variant adds three tall columns to the SAME element, turning
+// a 40px bar into a ~500px overlay pinned over the page at z-index 999. It
+// covered the content permanently.
+//
+// A page-ending footer belongs in normal flow, after the content.
+.footer--full {
+  position: static;
+  z-index: auto;
+  border-top: 1px solid var(--border);
 }
 
 .footer-content {
@@ -133,7 +147,6 @@
 .footer--full {
   display: block;
   padding-top: $spacing-3xl;
-  border-top: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.35);
 }
 
