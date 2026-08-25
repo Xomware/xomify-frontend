@@ -301,3 +301,105 @@
     border-color: var(--accent-purple);
   }
 }
+
+// ── Top nav ─────────────────────────────────────────────────────────────
+// Sticky, not fixed: it participates in flow, so it can never end up as an
+// overlay sitting on top of the page — which is exactly what went wrong with
+// the footer.
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-lg;
+  background: rgba(10, 10, 13, 0.72);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+
+  img {
+    height: 26px;
+    width: auto;
+  }
+}
+
+.nav-links {
+  display: none;
+  gap: $spacing-xs;
+  margin-left: $spacing-md;
+
+  @media (min-width: $breakpoint-md) {
+    display: flex;
+  }
+}
+
+.nav-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+  }
+}
+
+.nav-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.nav-ios {
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: var(--accent-purple-text);
+  text-decoration: none;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-pill;
+  border: 1px solid var(--border-strong);
+
+  &:hover {
+    border-color: var(--accent-purple);
+  }
+}
+
+.nav-cta {
+  border: 0;
+  cursor: pointer;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+  background: #1bdc6f;
+  color: #04120a;
+  font-size: $text-sm;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+
+  &:hover {
+    background: #35e783;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 3px;
+  }
+}

@@ -6,22 +6,33 @@
   gap: $spacing-md;
 }
 
+// Art beside the label rather than a wide banner above it. The banner version
+// stretched square covers into flat slivers, which is what looked strange.
 .tile {
   display: flex;
-  flex-direction: column;
-  gap: $spacing-xs;
-  padding: $spacing-md;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
   border-radius: $radius-xl;
   border: 1px solid var(--border);
   background: var(--surface);
+  min-width: 0;
 }
 
 .tile-art {
-  display: block;
-  width: 100%;
-  height: 56px;
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1;
+  object-fit: cover;
   border-radius: $radius-md;
-  margin-bottom: $spacing-xs;
+  flex: 0 0 auto;
+}
+
+.tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .tile-label {
@@ -33,4 +44,7 @@
 .tile-detail {
   font-size: $text-3xs;
   color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -1,24 +1,54 @@
 @import 'tokens';
 
-.rank-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+$row-h: 40px; // must match RankListPreviewComponent.ROW_H
+
+.taste-tabs {
   display: flex;
-  flex-direction: column;
   gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.taste-tab {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  padding: 3px $spacing-sm;
+  border-radius: $radius-pill;
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  transition: background-color $transition-fast, color $transition-fast;
+}
+
+.taste-tab--active {
+  background: var(--accent-purple);
+  border-color: transparent;
+  color: #fff;
+}
+
+.rank-track {
+  position: relative;
 }
 
 .rank-row {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: $row-h;
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  padding: $spacing-xs;
+  padding: 0 $spacing-xs;
   border-radius: $radius-md;
+  // Every row carries its own surface, so a reorder can never leave one row
+  // painted and the rest bare.
+  background: rgba(255, 255, 255, 0.03);
+  transition: transform $transition-base;
+  will-change: transform;
 }
 
 .rank-number {
-  width: 1.25rem;
+  width: 1.1rem;
   text-align: right;
   font-size: $text-2xs;
   font-weight: $font-weight-bold;
@@ -44,4 +74,11 @@
 .rank-artist {
   font-size: $text-3xs;
   color: var(--text-tertiary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rank-row,
+  .taste-tab {
+    transition: none;
+  }
 }

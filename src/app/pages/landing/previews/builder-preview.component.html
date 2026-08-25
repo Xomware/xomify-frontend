@@ -1,24 +1,31 @@
 <div class="preview-card">
   <div class="preview-head">
     <span class="preview-title">Playlist Builder</span>
-    <span class="preview-chip">{{ queue.length }} queued</span>
+    <span class="preview-chip">{{ count }} · {{ duration }}</span>
   </div>
 
-  <ol class="queue">
-    <li class="queue-row" *ngFor="let track of queue">
-      <span class="grip" aria-hidden="true"></span>
-      <app-preview-art class="rank-art" [art]="track.art" [label]="track.title"></app-preview-art>
-      <span class="rank-text">
-        <span class="rank-title">{{ track.title }}</span>
-        <span class="rank-artist">{{ track.artist }}</span>
-      </span>
-    </li>
-  </ol>
+  <div class="builder-body">
+    <ol class="queue">
+      <li class="queue-row" *ngFor="let track of visible">
+        <span class="grip" aria-hidden="true"></span>
+        <img class="rank-art" [src]="track.cover" [alt]="track.album" loading="lazy" />
+        <span class="rank-text">
+          <span class="rank-title">{{ track.title }}</span>
+          <span class="rank-artist">{{ track.artist }}</span>
+        </span>
+      </li>
+      <li class="queue-empty" *ngIf="count === 0">Drag tracks in from anywhere</li>
+    </ol>
 
-  <div class="analysis">
-    <div class="bar" *ngFor="let row of analysis">
-      <span class="bar-label">{{ row.label }}</span>
-      <span class="bar-track"><span class="bar-fill"></span></span>
+    <div class="analysis">
+      <div class="bar" *ngFor="let row of analysis">
+        <span class="bar-label">{{ row.label }}</span>
+        <span class="bar-track"><span class="bar-fill"></span></span>
+      </div>
+    </div>
+
+    <div class="save-row">
+      <span class="save-pill" *ngIf="saved">Saved to Spotify</span>
     </div>
   </div>
 </div>

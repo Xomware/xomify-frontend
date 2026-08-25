@@ -38,6 +38,7 @@ export class HowItWorksPreviewComponent extends PreviewBase {
   }
 
   protected buildTimeline(tl: gsap.core.Timeline): void {
+    tl.repeat(-1).repeatDelay(2.6);
     tl.fromTo(
       this.q('.connector'),
       { scaleX: 0 },

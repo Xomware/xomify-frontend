@@ -22,6 +22,59 @@
   color: #fff;
 }
 
+.wrapped-playlist {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  margin-bottom: $spacing-md;
+}
+
+// Square. Album art is square everywhere — a wide box reads as a broken
+// letterboxed image, which is exactly how the first version looked.
+.wrapped-cover {
+  width: 72px;
+  height: 72px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: $radius-md;
+  flex: 0 0 auto;
+}
+
+.wrapped-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.wrapped-name {
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary);
+}
+
+.wrapped-sub {
+  font-size: $text-2xs;
+  color: var(--text-tertiary);
+}
+
+.wrapped-badge {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  padding: 2px $spacing-sm;
+  border-radius: $radius-pill;
+  background: rgba(27, 220, 111, 0.16);
+  color: #35e783;
+}
+
 .wrapped-list {
   list-style: none;
   margin: 0;
@@ -40,6 +93,15 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.wrapped-rank {
+  width: 1rem;
+  text-align: right;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  color: var(--text-tertiary);
+  flex: 0 0 auto;
+}
+
 .rank-text {
   display: flex;
   flex-direction: column;
@@ -50,6 +112,9 @@
   font-size: $text-xs;
   font-weight: $font-weight-semibold;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rank-artist {
