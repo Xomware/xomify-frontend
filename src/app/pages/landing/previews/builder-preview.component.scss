@@ -1,0 +1,90 @@
+@import 'tokens';
+
+.queue {
+  list-style: none;
+  margin: 0 0 $spacing-lg;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.queue-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+}
+
+// The drag affordance, drawn rather than iconised — three hairlines read as a
+// grip at this size and cost nothing.
+.grip {
+  width: 10px;
+  height: 12px;
+  flex: 0 0 auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--gray-600) 0,
+    var(--gray-600) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+}
+
+.rank-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rank-title {
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.rank-artist {
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}
+
+.analysis {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.bar-label {
+  font-size: $text-3xs;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.bar-track {
+  height: 5px;
+  border-radius: $radius-pill;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  // Zero by default: the timeline animates width up to the real value, and a
+  // block child would otherwise fill its track on first paint — a flash of
+  // every bar at 100% before the animation pulls them back down.
+  width: 0;
+  border-radius: $radius-pill;
+  background: linear-gradient(90deg, var(--accent-purple) 0%, #1bdc6f 100%);
+}

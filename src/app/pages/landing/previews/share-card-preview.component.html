@@ -1,0 +1,35 @@
+<div class="preview-card">
+  <div class="share-header">
+    <span class="avatar" aria-hidden="true">{{ share.from.charAt(0) }}</span>
+    <span class="share-from"><strong>{{ share.from }}</strong> sent you a song</span>
+  </div>
+
+  <div class="share-track">
+    <span class="art-tile track-art" [style.background]="art(share.track.art)"></span>
+    <span class="rank-text">
+      <span class="rank-title">{{ share.track.title }}</span>
+      <span class="rank-artist">{{ share.track.artist }}</span>
+    </span>
+  </div>
+
+  <div class="reactions">
+    <span class="reaction" *ngFor="let emoji of share.reactions">{{ emoji }}</span>
+  </div>
+
+  <div class="comment">
+    <span class="comment-author">{{ share.comment.author }}</span>
+    <span class="comment-body">{{ share.comment.body }}</span>
+  </div>
+
+  <div class="share-footer">
+    <span class="rating" [attr.aria-label]="share.rating + ' out of 5'">
+      <span
+        class="star"
+        [class.star--on]="star <= share.rating"
+        *ngFor="let star of stars"
+        aria-hidden="true"
+      >★</span>
+    </span>
+    <span class="listened">Listened</span>
+  </div>
+</div>

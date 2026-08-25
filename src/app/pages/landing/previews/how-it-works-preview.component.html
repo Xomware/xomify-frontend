@@ -1,0 +1,10 @@
+<div class="how">
+  <span class="connector" aria-hidden="true"></span>
+  <ol class="steps">
+    <li class="step" *ngFor="let step of steps; let i = index">
+      <span class="step-number">{{ i + 1 }}</span>
+      <h3 class="step-title">{{ step.title }}</h3>
+      <p class="step-body">{{ step.body }}</p>
+    </li>
+  </ol>
+</div>

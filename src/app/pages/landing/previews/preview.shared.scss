@@ -1,0 +1,59 @@
+@import 'tokens';
+
+// Shared chrome for every landing preview, so all six read as the same product
+// rather than six mockups drawn by different hands.
+:host {
+  display: block;
+  width: 100%;
+}
+
+.preview-card {
+  border: 1px solid var(--border);
+  border-radius: $radius-2xl;
+  background: var(--surface);
+  padding: $spacing-lg;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.preview-title {
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.window-chip,
+.preview-chip {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  padding: 3px $spacing-sm;
+  border-radius: $radius-pill;
+  background: var(--accent-purple-muted);
+  color: var(--accent-purple-text);
+  white-space: nowrap;
+}
+
+// Generated cover art. Never a bitmap — see landing-fixtures.ts.
+.rank-art,
+.art-tile {
+  display: block;
+  border-radius: $radius-sm;
+  flex: 0 0 auto;
+}
+
+.rank-art {
+  width: 28px;
+  height: 28px;
+}

@@ -1,0 +1,19 @@
+<div class="preview-card">
+  <div class="preview-head">
+    <span class="preview-title">Release Radar</span>
+    <span class="preview-chip">This week</span>
+  </div>
+
+  <div class="calendar">
+    <div class="day-column" *ngFor="let day of days; let i = index">
+      <span class="day-label">{{ day }}</span>
+      <div class="day-slot">
+        <div class="release" *ngFor="let release of releasesFor(i)">
+          <span class="art-tile release-art" [style.background]="art(release.art)"></span>
+          <span class="release-title">{{ release.title }}</span>
+          <span class="release-kind">{{ release.kind }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

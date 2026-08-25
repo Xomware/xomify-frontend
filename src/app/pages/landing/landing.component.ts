@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 
 /**
@@ -18,7 +18,22 @@ import { AuthService } from 'src/app/services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
-  constructor(private authService: AuthService) {}
+  /**
+   * Index of the act currently in view, fed to each preview's `active` input.
+   * Previews stay mounted for the life of the page (the journey cross-fades
+   * rather than destroys), so this is what tells one to play.
+   */
+  activeAct = 0;
+
+  constructor(
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  onActChange(index: number): void {
+    this.activeAct = index;
+    this.cdr.markForCheck();
+  }
 
   login(): void {
     this.authService.login();

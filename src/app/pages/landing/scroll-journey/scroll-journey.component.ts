@@ -5,8 +5,10 @@ import {
   Component,
   ContentChildren,
   ElementRef,
+  EventEmitter,
   NgZone,
   OnDestroy,
+  Output,
   QueryList,
   ViewChild,
 } from '@angular/core';
@@ -47,6 +49,13 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
 
   @ViewChild('journey', { static: true }) journeyRef!: ElementRef<HTMLElement>;
   @ViewChild('stage', { static: true }) stageRef!: ElementRef<HTMLElement>;
+
+  /**
+   * Emits the index of the act now in view. The landing page feeds this back
+   * down to the previews so each one plays when its act arrives rather than
+   * animating unseen behind a cross-fade.
+   */
+  @Output() actChange = new EventEmitter<number>();
 
   acts: JourneyActDirective[] = [];
   activeIndex = 0;
@@ -203,8 +212,11 @@ export class ScrollJourneyComponent implements AfterContentInit, OnDestroy {
     const clamped = Math.max(0, Math.min(index, this.acts.length - 1));
     if (clamped === this.activeIndex) return;
     this.activeIndex = clamped;
-    // Back inside the zone just for this — the rail is the only Angular-bound
-    // thing the scroll loop touches.
-    this.zone.run(() => this.cdr.markForCheck());
+    // Back inside the zone just for this — the rail and the preview `active`
+    // bindings are the only Angular-bound things the scroll loop touches.
+    this.zone.run(() => {
+      this.actChange.emit(clamped);
+      this.cdr.markForCheck();
+    });
   }
 }

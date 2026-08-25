@@ -1,5 +1,5 @@
 <div class="landing">
-  <app-scroll-journey>
+  <app-scroll-journey (actChange)="onActChange($event)">
 
     <!-- 1 — Hero ------------------------------------------------------- -->
     <section class="act act--hero" appJourneyAct="Xomify">
@@ -53,7 +53,9 @@
             <li>Jump from any artist straight into their albums and singles</li>
           </ul>
         </div>
-        <div class="act-visual" data-preview="rank-list"></div>
+        <div class="act-visual act-visual--filled">
+          <app-rank-list-preview [active]="activeAct === 1"></app-rank-list-preview>
+        </div>
       </div>
     </section>
 
@@ -75,7 +77,9 @@
             <li>Email and push when a new one lands</li>
           </ul>
         </div>
-        <div class="act-visual" data-preview="wrapped"></div>
+        <div class="act-visual act-visual--filled">
+          <app-wrapped-preview [active]="activeAct === 2"></app-wrapped-preview>
+        </div>
       </div>
     </section>
 
@@ -97,7 +101,9 @@
             <li>Full history of previous weeks</li>
           </ul>
         </div>
-        <div class="act-visual" data-preview="radar"></div>
+        <div class="act-visual act-visual--filled">
+          <app-radar-preview [active]="activeAct === 3"></app-radar-preview>
+        </div>
       </div>
     </section>
 
@@ -118,7 +124,9 @@
             <li>Mood picks when you know the feeling but not the songs</li>
           </ul>
         </div>
-        <div class="act-visual" data-preview="builder"></div>
+        <div class="act-visual act-visual--filled">
+          <app-builder-preview [active]="activeAct === 4"></app-builder-preview>
+        </div>
       </div>
     </section>
 
@@ -139,7 +147,9 @@
             <li>Notified the moment someone listens or rates</li>
           </ul>
         </div>
-        <div class="act-visual" data-preview="share-card"></div>
+        <div class="act-visual act-visual--filled">
+          <app-share-card-preview [active]="activeAct === 5"></app-share-card-preview>
+        </div>
       </div>
     </section>
 
@@ -155,7 +165,9 @@
             worth opening when you're not looking for anything in particular.
           </p>
         </div>
-        <div class="act-visual" data-preview="discovery"></div>
+        <div class="act-visual act-visual--filled">
+          <app-discovery-preview [active]="activeAct === 6"></app-discovery-preview>
+        </div>
       </div>
     </section>
 
@@ -164,29 +176,8 @@
       <div class="act-inner act-inner--centered">
         <span class="act-eyebrow">How it works</span>
         <h2 class="act-title">Four steps, then it runs itself</h2>
-        <div class="act-visual act-visual--wide" data-preview="how-it-works">
-          <ol class="steps">
-            <li class="step">
-              <span class="step-number">1</span>
-              <h3 class="step-title">Connect Spotify</h3>
-              <p class="step-body">One OAuth handshake. No password ever touches Xomify.</p>
-            </li>
-            <li class="step">
-              <span class="step-number">2</span>
-              <h3 class="step-title">It watches</h3>
-              <p class="step-body">Your plays, tops and likes get snapshotted over time.</p>
-            </li>
-            <li class="step">
-              <span class="step-number">3</span>
-              <h3 class="step-title">Playlists appear</h3>
-              <p class="step-body">Wrapped monthly, Release Radar weekly, straight into Spotify.</p>
-            </li>
-            <li class="step">
-              <span class="step-number">4</span>
-              <h3 class="step-title">Share and compare</h3>
-              <p class="step-body">Push songs at friends and find out what they made of them.</p>
-            </li>
-          </ol>
+        <div class="act-visual act-visual--wide">
+          <app-how-it-works-preview [active]="activeAct === 7"></app-how-it-works-preview>
         </div>
       </div>
     </section>

@@ -1,0 +1,64 @@
+@import 'tokens';
+
+.months {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.month-chip {
+  font-size: $text-3xs;
+  font-weight: $font-weight-semibold;
+  padding: 3px $spacing-sm;
+  border-radius: $radius-pill;
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  transition: background-color $transition-fast, color $transition-fast;
+}
+
+.month-chip--active {
+  background: var(--accent-purple);
+  border-color: transparent;
+  color: #fff;
+}
+
+.wrapped-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.wrapped-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rank-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rank-title {
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.rank-artist {
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .month-chip {
+    transition: none;
+  }
+}

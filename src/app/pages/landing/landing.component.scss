@@ -144,6 +144,8 @@
 // ── Visual slot ─────────────────────────────────────────────────────────
 // A3 fills these. Until then the slot reserves its space so the split layout
 // is already correct rather than collapsing and re-flowing later.
+// Empty slots reserve their space so the split layout is correct before the
+// preview mounts, rather than collapsing and re-flowing.
 .act-visual {
   min-height: 320px;
   border-radius: $radius-2xl;
@@ -151,61 +153,19 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+// Once a preview is in, it brings its own card chrome — a second border around
+// it reads as a box in a box.
+.act-visual--filled {
+  min-height: 0;
+  border: 0;
+  background: none;
+}
+
 .act-visual--wide {
   width: 100%;
   border: 0;
   background: none;
   min-height: 0;
-}
-
-// ── How it works ────────────────────────────────────────────────────────
-.steps {
-  list-style: none;
-  margin: $spacing-xl 0 0;
-  padding: 0;
-  display: grid;
-  gap: $spacing-lg;
-  grid-template-columns: 1fr;
-  text-align: left;
-
-  @media (min-width: $breakpoint-md) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.step {
-  padding: $spacing-lg;
-  border: 1px solid var(--border);
-  border-radius: $radius-xl;
-  background: var(--surface);
-}
-
-.step-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--accent-purple-muted);
-  color: var(--accent-purple-text);
-  font-size: $text-xs;
-  font-weight: $font-weight-bold;
-  margin-bottom: $spacing-md;
-}
-
-.step-title {
-  font-size: $text-base;
-  font-weight: $font-weight-semibold;
-  margin: 0 0 $spacing-xs;
-  color: var(--text-primary);
-}
-
-.step-body {
-  font-size: $text-sm;
-  line-height: 1.55;
-  color: var(--text-secondary);
-  margin: 0;
 }
 
 // ── CTAs ────────────────────────────────────────────────────────────────

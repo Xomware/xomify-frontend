@@ -1,0 +1,24 @@
+<div class="preview-card">
+  <div class="preview-head">
+    <span class="preview-title">Monthly Wrapped</span>
+    <span class="preview-chip"><span class="wrapped-count">0</span> tracks</span>
+  </div>
+
+  <div class="months">
+    <span
+      class="month-chip"
+      [class.month-chip--active]="i === 0"
+      *ngFor="let month of months; let i = index"
+    >{{ month }}</span>
+  </div>
+
+  <ol class="wrapped-list">
+    <li class="wrapped-row" *ngFor="let track of tracks">
+      <span class="rank-art" [style.background]="art(track.art)"></span>
+      <span class="rank-text">
+        <span class="rank-title">{{ track.title }}</span>
+        <span class="rank-artist">{{ track.artist }}</span>
+      </span>
+    </li>
+  </ol>
+</div>

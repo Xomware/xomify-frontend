@@ -1,0 +1,16 @@
+<div class="preview-card">
+  <div class="preview-head">
+    <span class="preview-title">Top Songs</span>
+    <span class="window-chip">{{ windows[windowIndex] }}</span>
+  </div>
+  <ol class="rank-list">
+    <li class="rank-row" *ngFor="let entry of entries; let i = index">
+      <span class="rank-number">{{ i + 1 }}</span>
+      <span class="rank-art" [style.background]="art(entry.art)"></span>
+      <span class="rank-text">
+        <span class="rank-title">{{ entry.title }}</span>
+        <span class="rank-artist">{{ entry.artist }}</span>
+      </span>
+    </li>
+  </ol>
+</div>

@@ -1,0 +1,47 @@
+@import 'tokens';
+
+.rank-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs;
+  border-radius: $radius-md;
+}
+
+.rank-number {
+  width: 1.25rem;
+  text-align: right;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  color: var(--text-tertiary);
+  flex: 0 0 auto;
+}
+
+.rank-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rank-title {
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-artist {
+  font-size: $text-3xs;
+  color: var(--text-tertiary);
+}
