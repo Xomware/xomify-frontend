@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+-
+
+### Changed
+-
+
+### Fixed
+-
+
+## [2.6.0] - 2026-08-25
+
+### Added
+- Public landing page: ten-act scroll journey with live, looping previews of every feature
+- Real album art on the landing page, from the Cover Art Archive
+- Landing top navigation — Overview, How it works, Docs, iOS, Sign in
+- Notifications inbox at `/notifications`, with an unread badge in the toolbar
+- Three-column sourced footer mirroring the Xomware app registry, plus a TestFlight CTA
 - Public landing page for signed-out visitors: ten-act scroll journey with animated feature previews, docs section, three-column footer
 - Canvas space background (parallax star layers, drifting nebula, shooting stars) replacing the GSAP blob background
 - My Favorites: curated best-of lists with rank history, recommendations and a profile summary
@@ -22,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `user-read-recently-played` scope for the now-playing fallback
 
 ### Changed
+- `NotificationsService` extended with inbox feed, mark-read and unread-count
+- `RelativeTimePipe` moved to `SharedModule`
+- Notification settings page relabelled "Device registrations" — it is a maintenance tool, not preferences
 - Folded Xomtracks into Xomify, replacing the Feed and Groups features
 - Renamed the Shares route from `/xomtracks` to `/shares`
 - Adopted the shared Xomware design tokens and the tightened radius scale
@@ -34,6 +53,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redesigned the Wrapped and Release Radar opt-in flow
 
 ### Fixed
+- Footer rendered as a fixed full-height overlay on the landing page, covering the content
+- Landing acts stacked on top of one another when the pinned journey collapsed
+- Album art stretched into flat slivers instead of staying square
+- `getFeed` dropped its pagination cursor: a `tsId` contains `#`, which terminated the query string
+- "View Source" pointed at a repository that does not exist (`domgiordano/` rather than `Xomware/`)
+- Global `scroll-behavior: smooth` was not guarded by `prefers-reduced-motion`
 - Blurry album art — now selects a higher-resolution Spotify image
 - 401s on direct Spotify API calls from a stale localStorage access token
 - Home dashboard spotlight rendering blank instead of a loading skeleton
@@ -50,8 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Version bump only — no functional changes in this release.
 
-**Note**: `package.json` currently reports `2.4.3` while a `v2.5.0` tag exists.
-The two need reconciling; the tag is the later of the pair.
+**Note**: `package.json` lagged at `2.4.3` while this tag existed. Reconciled in 2.6.0,
+which is the first release where the two agree.
 
 ## [2.4.3] - 2026-04-28
 
