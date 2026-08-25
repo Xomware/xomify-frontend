@@ -18,8 +18,8 @@ import { pickAlbumImage } from 'src/app/utils/spotify-image.util';
 const SPOTLIGHT_IMAGE_MIN_PX = 144;
 
 /**
- * Home — logged-out visitors get the existing Spotify login CTA; logged-in
- * users get a real dashboard (this used to just redirect straight to
+ * Home — logged-out visitors get the landing page (see LandingComponent);
+ * logged-in users get a real dashboard (this used to just redirect straight to
  * /my-profile).
  *
  * This component owns every network call the dashboard modules need
@@ -113,10 +113,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  login(): void {
-    this.authService.login();
   }
 
   private hasTopLevelRoute(path: string): boolean {

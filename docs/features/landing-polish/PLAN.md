@@ -37,6 +37,7 @@ work, something upstream was under-built and belongs back in A2–A4.
 - [ ] Step 4 — Profile the A1 canvas during a full scroll. Confirm the DPR cap holds and the star count is not being regenerated per frame.
 - [ ] Step 5 — Confirm the RAF loop stops when the tab is hidden.
 - [ ] Step 6 — Check the signed-out bundle. `/` must not pull authed feature chunks — the lazy modules (`social`, `analytics`, `discovery`, `favorites`, `shares`, `admin`) are all `AuthGuard`-gated and must stay unloaded for a visitor.
+- [ ] Step 6b — **Regression introduced in A2, measured**: initial bundle went 1.17 MB → 1.30 MB (229 → 274 kB transfer) because `LandingModule` is eagerly imported by `AppModule`, so ScrollTrigger now ships to every signed-*in* user who will never see the landing page. Fix by splitting `/` into a landing route and a dashboard route so the landing module can lazy-load, rather than branching inside `HomeComponent`'s template. Re-measure after: signed-in initial should return to ~229 kB.
 - [ ] Step 7 — Verify landing images are sized to their largest render and no larger.
 
 ### Accessibility

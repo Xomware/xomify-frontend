@@ -1,0 +1,109 @@
+@import 'tokens';
+
+:host {
+  display: block;
+}
+
+.journey {
+  position: relative;
+}
+
+.stage {
+  position: relative;
+  min-height: 100vh;
+}
+
+// ── Progress rail ───────────────────────────────────────────────────────
+// Hidden below the pin breakpoint: without pinning the acts are just stacked
+// sections, and a fixed rail floating over them costs more than it gives.
+.rail {
+  display: none;
+}
+
+@media (min-width: $breakpoint-lg) {
+  .rail {
+    display: block;
+    position: fixed;
+    left: $spacing-lg;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+  }
+
+  .rail-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .rail-button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    background: none;
+    border: 0;
+    padding: $spacing-xs $spacing-sm;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    font-size: $text-2xs;
+    letter-spacing: $tracking-wide;
+    text-transform: uppercase;
+    border-radius: $radius-pill;
+    transition: color $transition-fast, background-color $transition-fast;
+
+    &:hover {
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-purple);
+      outline-offset: 2px;
+    }
+  }
+
+  .rail-button--active {
+    color: var(--text-primary);
+
+    .rail-dot {
+      background: var(--accent-purple);
+      transform: scale(1.6);
+    }
+  }
+
+  .rail-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gray-600);
+    transition: background-color $transition-fast, transform $transition-fast;
+  }
+
+  // The label is the rail's whole point when you're reading it, and noise when
+  // you aren't — revealed on hover/focus of the rail, always shown for active.
+  .rail-label {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width $transition-base, opacity $transition-base;
+  }
+
+  .rail:hover .rail-label,
+  .rail-button:focus-visible .rail-label,
+  .rail-button--active .rail-label {
+    max-width: 12rem;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-button,
+  .rail-dot,
+  .rail-label {
+    transition: none;
+  }
+}
