@@ -1,11 +1,27 @@
 <div class="page-container">
   <div class="settings-content">
     <header class="page-header">
-      <h1 class="page-title">Notifications</h1>
+      <h1 class="page-title">Device registrations</h1>
       <p class="page-subtitle">
-        Manage push notification registrations for your devices.
+        Register or unregister a specific APNs device token.
       </p>
     </header>
+
+    <!-- Says plainly what this page is. It asks for a raw device token, which
+         is not something a normal user has; leaving it titled "Notifications"
+         next to a real inbox invites people to look for their preferences
+         here and conclude the app is broken. -->
+    <div class="page-note">
+      <p>
+        This is a maintenance tool, not your notification preferences. Per-type
+        settings live on each device, so they're managed in the Xomify iOS app —
+        the browser has no push registration of its own.
+      </p>
+      <p>
+        Looking for what happened while you were away?
+        <a routerLink="/notifications">Open your notifications</a>.
+      </p>
+    </div>
 
     <!-- Mode tabs -->
     <div class="tabs-nav" role="tablist">

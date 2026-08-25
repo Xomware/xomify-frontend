@@ -1,0 +1,64 @@
+<div class="page-container">
+  <header class="inbox-header">
+    <div>
+      <h1 class="inbox-title">Notifications</h1>
+      <p class="inbox-subtitle">
+        Everything that happened while you were away.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="mark-all"
+      *ngIf="hasUnread"
+      (click)="markAllRead()"
+    >
+      Mark all read
+    </button>
+  </header>
+
+  <app-loader *ngIf="loading"></app-loader>
+
+  <div class="inbox-error" *ngIf="!loading && error">
+    <p>Couldn't load your notifications.</p>
+    <button type="button" class="retry" (click)="loadFirstPage()">Try again</button>
+  </div>
+
+  <div class="inbox-empty" *ngIf="!loading && !error && items.length === 0">
+    <h2>Nothing yet</h2>
+    <p>
+      Share a song, add a friend, or wait for your next Wrapped — anything that
+      happens will show up here.
+    </p>
+  </div>
+
+  <ul class="inbox-list" *ngIf="!loading && items.length > 0">
+    <li
+      class="inbox-row"
+      [class.inbox-row--unread]="!item.read"
+      *ngFor="let item of items; trackBy: trackByTsId"
+    >
+      <button type="button" class="inbox-button" (click)="open(item)">
+        <span class="unread-dot" *ngIf="!item.read" aria-hidden="true"></span>
+
+        <img
+          class="inbox-art"
+          *ngIf="item.imageUrl"
+          [src]="item.imageUrl"
+          alt=""
+        />
+
+        <span class="inbox-text">
+          <span class="inbox-row-title">{{ item.title }}</span>
+          <span class="inbox-row-body">{{ item.body }}</span>
+          <span class="inbox-row-time">{{ item.createdAt | relativeTime }}</span>
+        </span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="inbox-more" *ngIf="hasMore && !loading">
+    <button type="button" class="load-more" (click)="loadMore()" [disabled]="loadingMore">
+      {{ loadingMore ? 'Loading…' : 'Load more' }}
+    </button>
+  </div>
+</div>

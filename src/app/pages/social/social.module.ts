@@ -15,6 +15,7 @@ import { ReactionsBarComponent } from '../../components/reactions-bar/reactions-
 import { CommentThreadComponent } from '../../components/comment-thread/comment-thread.component';
 import { FriendsRatedListComponent } from '../../components/friends-rated-list/friends-rated-list.component';
 import { FriendsQueuedListComponent } from '../../components/friends-queued-list/friends-queued-list.component';
+import { NotificationsInboxComponent } from '../notifications-inbox/notifications-inbox.component';
 import { TruncatePipe } from '../../pipes/truncate.pipe';
 
 // NOTE: the old "feed" (post/browse track shares among Xomify friends) and
@@ -26,6 +27,12 @@ const routes: Routes = [
   { path: 'friends', component: FriendsComponent },
   { path: 'friend/:email', component: FriendProfileComponent },
   { path: 'invites', component: InvitesComponent },
+  // The inbox. Web's ONLY notification surface — the browser has no APNs
+  // registration, so nothing reaches a user here except by their opening it.
+  { path: 'notifications', component: NotificationsInboxComponent },
+  // Device-token register/unregister. A developer utility, not a preferences
+  // screen: per-kind opt-ins live on the DEVICE-TOKEN row and the browser has
+  // no device token to attach them to.
   {
     path: 'settings/notifications',
     component: NotificationSettingsComponent,
@@ -43,6 +50,7 @@ const routes: Routes = [
     FriendProfileComponent,
     InvitesComponent,
     NotificationSettingsComponent,
+    NotificationsInboxComponent,
     LikesComponent,
     ShareDetailComponent,
     ShareCardComponent,
