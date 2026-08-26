@@ -60,6 +60,17 @@ export const XOMIFY_REPOS: readonly LinkEntry[] = [
   { name: 'Infrastructure', url: 'https://github.com/Xomware/xomify-infrastructure' },
 ];
 
+/**
+ * Personal links for the footer.
+ *
+ * ⚠️ The LinkedIn URL is a GUESS, matched to the GitHub handle. Correct it if
+ * it is wrong — a footer link to the wrong person is worse than none.
+ */
+export const SOCIAL_LINKS: readonly LinkEntry[] = [
+  { name: 'GitHub', url: 'https://github.com/domgiordano' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/in/domgiordano' },
+];
+
 export const XOMIFY_DOCS: readonly LinkEntry[] = [
   { name: 'README', url: 'https://github.com/Xomware/xomify-frontend#readme' },
   {

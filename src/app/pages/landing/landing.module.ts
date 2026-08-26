@@ -6,6 +6,7 @@ import { LandingComponent } from './landing.component';
 import { ScrollJourneyComponent } from './scroll-journey/scroll-journey.component';
 import { JourneyActDirective } from './scroll-journey/journey-act.directive';
 import { RankListPreviewComponent } from './previews/rank-list-preview.component';
+import { WrappedCoverComponent } from './previews/wrapped-cover.component';
 import { WrappedPreviewComponent } from './previews/wrapped-preview.component';
 import { RadarPreviewComponent } from './previews/radar-preview.component';
 import { BuilderPreviewComponent } from './previews/builder-preview.component';
@@ -28,6 +29,7 @@ import { HowItWorksPreviewComponent } from './previews/how-it-works-preview.comp
     ScrollJourneyComponent,
     JourneyActDirective,
     RankListPreviewComponent,
+    WrappedCoverComponent,
     WrappedPreviewComponent,
     RadarPreviewComponent,
     BuilderPreviewComponent,

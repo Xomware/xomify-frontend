@@ -1,12 +1,15 @@
 <div class="preview-card">
   <div class="preview-head">
-    <span class="preview-title">Release Radar</span>
+    <span class="preview-title">Release Radar · {{ week.monthLabel }}</span>
     <span class="preview-chip">{{ week.label }}</span>
   </div>
 
   <div class="calendar">
     <div class="day-column" *ngFor="let day of days; let i = index">
-      <span class="day-label">{{ day }}</span>
+      <span class="day-head" [class.day-head--today]="index === 0 && i === 4">
+        <span class="day-name">{{ day }}</span>
+        <span class="day-date">{{ week.dates[i] }}</span>
+      </span>
       <div class="day-slot">
         <div class="release" *ngFor="let release of releasesFor(i)">
           <img class="release-art" [src]="release.cover" [alt]="release.title" loading="lazy" />

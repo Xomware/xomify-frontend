@@ -15,7 +15,7 @@
   <div class="wrapped-body">
     <!-- The playlist as it actually lands in Spotify: cover, name, stats. -->
     <div class="wrapped-playlist">
-      <img class="wrapped-cover" [src]="current.cover" [alt]="current.playlistName" />
+      <app-wrapped-cover class="wrapped-cover" [month]="current.month" size="lg"></app-wrapped-cover>
       <div class="wrapped-meta">
         <span class="wrapped-name">{{ current.playlistName }}</span>
         <span class="wrapped-sub">{{ current.tracks.length }} tracks · {{ current.minutes }} minutes</span>

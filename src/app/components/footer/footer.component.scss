@@ -240,3 +240,62 @@
   background: var(--accent-purple-muted);
   color: var(--accent-purple-text);
 }
+
+// ── Slim persistent bar (landing only) ──────────────────────────────────
+// Fixed, but deliberately tiny — this is the one thing the old footer got
+// right at 40px and got catastrophically wrong once it grew three columns.
+// The full footer stays in normal flow at the end of the page.
+.footer--full .mini-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-xs $spacing-lg;
+  background: rgba(10, 10, 13, 0.82);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  font-size: $text-2xs;
+}
+
+.mini-brand {
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-wide;
+  color: var(--accent-purple-text);
+}
+
+.mini-links {
+  display: flex;
+  gap: $spacing-md;
+  margin-left: auto;
+
+  a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-purple);
+      outline-offset: 2px;
+      border-radius: $radius-sm;
+    }
+  }
+}
+
+// The full footer must clear the fixed mini-bar, or its last row sits under it.
+.footer--full .footer-content {
+  padding-bottom: $spacing-2xl;
+}
+
+@media (min-width: $breakpoint-md) {
+  .footer--full .footer-columns {
+    grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr;
+  }
+}

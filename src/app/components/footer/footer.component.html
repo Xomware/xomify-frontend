@@ -31,6 +31,15 @@
       </ul>
     </nav>
 
+    <nav class="footer-column" aria-labelledby="footer-social">
+      <h2 class="column-title" id="footer-social">Elsewhere</h2>
+      <ul class="column-list">
+        <li *ngFor="let link of social">
+          <a [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.name }}</a>
+        </li>
+      </ul>
+    </nav>
+
     <nav class="footer-column" aria-labelledby="footer-docs">
       <h2 class="column-title" id="footer-docs">Docs</h2>
       <ul class="column-list">
@@ -38,6 +47,18 @@
           <a [href]="doc.url" target="_blank" rel="noopener noreferrer">{{ doc.name }}</a>
         </li>
       </ul>
+    </nav>
+  </div>
+
+  <!-- Slim bar pinned to the bottom of the viewport while scrolling the
+       landing page. The full footer only appears once you reach the end, and
+       a visitor half-way down the journey should still have somewhere to go. -->
+  <div class="mini-bar" *ngIf="variant === 'full'">
+    <span class="mini-brand">XOMIFY</span>
+    <nav class="mini-links" aria-label="Quick links">
+      <a [href]="xomwareUrl" target="_blank" rel="noopener noreferrer">Xomware</a>
+      <a *ngFor="let repo of repos.slice(0, 1)" [href]="repo.url" target="_blank" rel="noopener noreferrer">Source</a>
+      <a *ngFor="let link of social" [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.name }}</a>
     </nav>
   </div>
 
