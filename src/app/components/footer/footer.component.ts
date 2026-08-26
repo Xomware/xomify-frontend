@@ -11,6 +11,7 @@ import {
   XOMIFY_DOCS,
   XOMIFY_REPOS,
   XOMWARE_APPS,
+  SOCIAL_LINKS,
   XOMWARE_URL,
   XomwareApp,
 } from 'src/app/data/xomware-apps.data';
@@ -38,6 +39,7 @@ export class FooterComponent implements OnInit, OnDestroy {
   readonly xomwareApps: readonly XomwareApp[] = XOMWARE_APPS;
   readonly repos: readonly LinkEntry[] = XOMIFY_REPOS;
   readonly docs: readonly LinkEntry[] = XOMIFY_DOCS;
+  readonly social: readonly LinkEntry[] = SOCIAL_LINKS;
   readonly year = new Date().getFullYear();
   userId = '';
   private destroy$ = new Subject<void>();

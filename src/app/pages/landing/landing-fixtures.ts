@@ -143,12 +143,18 @@ export interface PreviewRelease {
 
 export interface RadarWeek {
   readonly label: string;
+  /** Month shown in the header, e.g. "May 2026". */
+  readonly monthLabel: string;
+  /** Date number for each of the seven columns, Monday first. */
+  readonly dates: readonly number[];
   readonly releases: readonly PreviewRelease[];
 }
 
 export const RADAR_WEEKS: readonly RadarWeek[] = [
   {
     label: 'This week',
+    monthLabel: 'May 2026',
+    dates: [18, 19, 20, 21, 22, 23, 24],
     releases: [
       { day: 0, title: 'Dogrel', artist: 'Fontaines D.C.', kind: 'Album', cover: `${ART}/fontaines-dogrel.jpg` },
       { day: 2, title: 'Currents', artist: 'Tame Impala', kind: 'Album', cover: `${ART}/tame-currents.jpg` },
@@ -158,6 +164,8 @@ export const RADAR_WEEKS: readonly RadarWeek[] = [
   },
   {
     label: 'Last week',
+    monthLabel: 'May 2026',
+    dates: [11, 12, 13, 14, 15, 16, 17],
     releases: [
       { day: 1, title: 'In Rainbows', artist: 'Radiohead', kind: 'Album', cover: `${ART}/radiohead-inrainbows.jpg` },
       { day: 3, title: 'Blonde', artist: 'Frank Ocean', kind: 'Album', cover: `${ART}/frank-blonde.jpg` },
@@ -166,6 +174,8 @@ export const RADAR_WEEKS: readonly RadarWeek[] = [
   },
   {
     label: '2 weeks ago',
+    monthLabel: 'May 2026',
+    dates: [4, 5, 6, 7, 8, 9, 10],
     releases: [
       { day: 0, title: 'Demon Days', artist: 'Gorillaz', kind: 'Album', cover: `${ART}/gorillaz-demondays.jpg` },
       { day: 2, title: 'OutRun', artist: 'Kavinsky', kind: 'Single', cover: `${ART}/kavinsky-outrun.jpg` },

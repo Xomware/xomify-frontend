@@ -13,12 +13,37 @@
   min-width: 0;
 }
 
-.day-label {
-  text-align: center;
+// Day name above the date number, the way a calendar actually reads. Without
+// the number the grid was seven anonymous columns and the releases looked
+// randomly placed.
+.day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding-bottom: 2px;
+}
+
+.day-name {
   font-size: $text-3xs;
   font-weight: $font-weight-semibold;
   letter-spacing: $tracking-wide;
+  text-transform: uppercase;
   color: var(--text-tertiary);
+}
+
+.day-date {
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
+  color: var(--text-secondary);
+  min-width: 20px;
+  text-align: center;
+  border-radius: $radius-pill;
+}
+
+.day-head--today .day-date {
+  background: var(--accent-purple);
+  color: #fff;
 }
 
 .day-slot {
