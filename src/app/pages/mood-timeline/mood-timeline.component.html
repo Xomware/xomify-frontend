@@ -4,6 +4,17 @@
     <p class="subtitle">See how your music energy and vibes shift throughout the day</p>
   </div>
 
+  <!-- Says plainly when the curve is generic rather than measured. Spotify
+       deprecated /audio-features in Nov 2024; without it there is no way to
+       derive real energy or valence, and a hard-coded time-of-day curve
+       presented as "your listening mood" is a fabrication. -->
+  <div class="estimate-notice" *ngIf="summary?.isEstimated">
+    <strong>Estimated pattern.</strong>
+    Spotify no longer exposes per-track audio analysis, so this shows a typical
+    listening curve by hour rather than your own energy and mood. Track counts
+    and top tracks below are real.
+  </div>
+
   <!-- Day Selector Tabs -->
   <div class="mode-tabs">
     <button

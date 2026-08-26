@@ -323,3 +323,20 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.estimate-notice {
+  border: 1px solid var(--border);
+  border-left: 3px solid #f5c518;
+  border-radius: $radius-md;
+  background: rgba(245, 197, 24, 0.08);
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  font-size: $text-sm;
+  line-height: 1.55;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: $font-weight-semibold;
+  }
+}
