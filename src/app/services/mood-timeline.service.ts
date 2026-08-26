@@ -6,6 +6,17 @@ import { AuthService } from './auth.service';
 import { ListeningHistoryService, RecentlyPlayedItem } from './listening-history.service';
 
 export interface HourlyMood {
+  /**
+   * True when energy/valence are ESTIMATED from the hour of day rather than
+   * measured from the tracks.
+   *
+   * Spotify deprecated `/audio-features` in November 2024, and it returns 403
+   * for newer app registrations. When that happens this service falls back to
+   * a fixed time-of-day curve — which is a reasonable stand-in, but it is not
+   * the user's data, and the UI must say so rather than presenting a
+   * hard-coded sine wave as "your listening mood".
+   */
+  isEstimated?: boolean;
   hour: number;
   avgEnergy: number;
   avgValence: number;
@@ -17,6 +28,8 @@ export interface HourlyMood {
 export type MoodQuadrant = 'Euphoric' | 'Intense' | 'Peaceful' | 'Melancholy';
 
 export interface MoodSummary {
+  /** True when the summary is derived from estimated points — see HourlyMood. */
+  isEstimated?: boolean;
   peakEnergyHour: number;
   mostPositiveHour: number;
   overallMood: MoodQuadrant;
@@ -58,7 +71,7 @@ export class MoodTimelineService {
       map((response) => this.filterByMode(response.items, mode)),
       switchMap((items) => {
         if (items.length === 0) {
-          return of(this.generateMockData());
+          return of(this.generateEstimatedData());
         }
         return this.fetchAudioFeatures(items).pipe(
           map((features) => this.groupByHour(items, features, mode === 'weekly')),
@@ -66,7 +79,7 @@ export class MoodTimelineService {
         );
       }),
       tap((data) => this.cache.set(cacheKey, { data, timestamp: Date.now() })),
-      catchError(() => of(this.generateMockData()))
+      catchError(() => of(this.generateEstimatedData()))
     );
   }
 
@@ -182,9 +195,11 @@ export class MoodTimelineService {
 
     return Array.from(hourData.entries()).map(([hour, tracks]) => ({
       hour,
-      avgEnergy: this.mockEnergyForHour(hour),
-      avgValence: this.mockValenceForHour(hour),
-      avgDanceability: (this.mockEnergyForHour(hour) + this.mockValenceForHour(hour)) / 2,
+      avgEnergy: this.estimatedEnergyForHour(hour),
+      avgValence: this.estimatedValenceForHour(hour),
+      avgDanceability:
+        (this.estimatedEnergyForHour(hour) + this.estimatedValenceForHour(hour)) / 2,
+      isEstimated: true,
       trackCount: tracks.length,
       topTracks: tracks.slice(0, 3).map((t) => ({
         id: t.track.id,
@@ -195,18 +210,30 @@ export class MoodTimelineService {
     }));
   }
 
-  generateMockData(): HourlyMood[] {
+  /** Fully estimated 24-hour curve, used when there is nothing to measure. */
+  generateEstimatedData(): HourlyMood[] {
     return Array.from({ length: 24 }, (_, hour) => ({
       hour,
-      avgEnergy: this.mockEnergyForHour(hour),
-      avgValence: this.mockValenceForHour(hour),
-      avgDanceability: (this.mockEnergyForHour(hour) + this.mockValenceForHour(hour)) / 2,
-      trackCount: Math.max(0, Math.floor(Math.random() * 5)),
+      avgEnergy: this.estimatedEnergyForHour(hour),
+      avgValence: this.estimatedValenceForHour(hour),
+      avgDanceability:
+        (this.estimatedEnergyForHour(hour) + this.estimatedValenceForHour(hour)) / 2,
+      isEstimated: true,
+      // Zero, not a random number. The previous version invented a play count
+      // between 0 and 4 per hour, which rendered as a real-looking histogram
+      // of listening that never happened.
+      trackCount: 0,
       topTracks: [],
     }));
   }
 
-  private mockEnergyForHour(hour: number): number {
+  /**
+   * A generic listening-energy curve by hour — NOT this user's data.
+   *
+   * Only reached when `/audio-features` is unavailable. Any point built from
+   * this carries `isEstimated: true` so the UI can label it.
+   */
+  private estimatedEnergyForHour(hour: number): number {
     // Natural energy curve: low at night, peaks afternoon
     const curves: Record<number, number> = {
       0: 0.2, 1: 0.15, 2: 0.1, 3: 0.08, 4: 0.1, 5: 0.15,
@@ -217,7 +244,7 @@ export class MoodTimelineService {
     return curves[hour] ?? 0.5;
   }
 
-  private mockValenceForHour(hour: number): number {
+  private estimatedValenceForHour(hour: number): number {
     const curves: Record<number, number> = {
       0: 0.3, 1: 0.25, 2: 0.2, 3: 0.18, 4: 0.2, 5: 0.25,
       6: 0.35, 7: 0.5, 8: 0.6, 9: 0.65, 10: 0.7, 11: 0.72,
@@ -228,9 +255,11 @@ export class MoodTimelineService {
   }
 
   getSummary(data: HourlyMood[]): MoodSummary {
+    const estimated = data.some((point) => point.isEstimated);
     const withTracks = data.filter((d) => d.trackCount > 0 || d.avgEnergy > 0);
     if (withTracks.length === 0) {
       return {
+      isEstimated: estimated,
         peakEnergyHour: 14,
         mostPositiveHour: 16,
         overallMood: 'Euphoric',
