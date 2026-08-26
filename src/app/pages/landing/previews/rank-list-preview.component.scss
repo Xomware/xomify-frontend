@@ -43,7 +43,9 @@ $row-h: 40px; // must match RankListPreviewComponent.ROW_H
   // Every row carries its own surface, so a reorder can never leave one row
   // painted and the rest bare.
   background: rgba(255, 255, 255, 0.03);
-  transition: transform $transition-base;
+  // Slow and eased. The default 300ms linear-ish move across nine rows at
+  // once is what read as jerky.
+  transition: transform 620ms cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform;
 }
 

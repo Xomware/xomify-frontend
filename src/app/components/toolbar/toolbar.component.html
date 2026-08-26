@@ -16,6 +16,17 @@
 
   <!-- Desktop nav -->
   <div class="tabs" [ngClass]="{ hidden: dropdownVisible }">
+    <!-- Signed-out landing: section tabs. The toolbar is the only header on
+         the page, so these belong here rather than in a second bar below it. -->
+    <ng-container *ngIf="isLanding()">
+      <button
+        type="button"
+        class="tab-link"
+        *ngFor="let section of landingSections"
+        (click)="scrollToSection(section.id)"
+      >{{ section.label }}</button>
+    </ng-container>
+
     <ng-container *ngIf="isLoggedIn()">
       <ng-container *ngFor="let entry of navEntries">
         <!-- Leaf link -->
@@ -103,6 +114,20 @@
       {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
     </span>
   </a>
+
+  <!-- Signed-out landing actions. Both CTAs live in the toolbar so they are
+       reachable from any point in the scroll, not just the hero. -->
+  <div class="landing-actions" *ngIf="isLanding()">
+    <a
+      class="landing-ios"
+      [href]="iosApp.url"
+      target="_blank"
+      rel="noopener noreferrer"
+    >Download iOS app</a>
+    <button type="button" class="landing-cta" (click)="login()">
+      Connect with Spotify
+    </button>
+  </div>
 
   <!-- Profile avatar chip + dropdown — visible on both desktop and mobile
        when logged in. Header shows username + email, then Profile, My

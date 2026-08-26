@@ -1,25 +1,3 @@
-<header class="landing-nav">
-  <a class="nav-brand" href="#top">
-    <img src="assets/img/banner-logo-x-rework.png" alt="Xomify" />
-  </a>
-
-  <nav class="nav-links" aria-label="Landing sections">
-    <button type="button" class="nav-link" (click)="scrollTo('overview')">Overview</button>
-    <button type="button" class="nav-link" (click)="scrollTo('how')">How it works</button>
-    <button type="button" class="nav-link" (click)="scrollTo('docs')">Docs</button>
-  </nav>
-
-  <div class="nav-actions">
-    <a
-      class="nav-ios"
-      [href]="iosApp.url"
-      target="_blank"
-      rel="noopener noreferrer"
-    >iOS</a>
-    <button type="button" class="nav-cta" (click)="login()">Sign in with Spotify</button>
-  </div>
-</header>
-
 <div class="landing">
   <app-scroll-journey (actChange)="onActChange($event)">
 
