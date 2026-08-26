@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { XtMePlaylistsResponse } from '../models/xomtracks-playlists.model';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 interface XtApiEnvelope<T> {
   data: T;
@@ -32,6 +33,6 @@ export class XomtracksPlaylistsService {
   get(): Observable<XtMePlaylistsResponse> {
     return this.http
       .get<XtApiEnvelope<XtMePlaylistsResponse>>(this.url)
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 }

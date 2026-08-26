@@ -255,8 +255,18 @@ export class XomtracksSetupCardComponent implements OnInit, OnDestroy {
     this.keychainOpen = !this.keychainOpen;
   }
 
+  /**
+   * Escapes the characters that are special inside a double-quoted shell
+   * string (`\`, `$`, backtick, `"`), so a token containing one cannot break
+   * out of the quotes and inject a command when the snippet is pasted into a
+   * terminal.
+   */
+  private shellEscapeForDoubleQuotes(value: string): string {
+    return value.replace(/([\\$`"])/g, '\\$1');
+  }
+
   get keychainCommand(): string {
-    const token = this.plaintextToken ?? '<TOKEN>';
+    const token = this.shellEscapeForDoubleQuotes(this.plaintextToken ?? '<TOKEN>');
     return (
       'security add-generic-password ' +
       '-s "xomtracks-ingest" ' +

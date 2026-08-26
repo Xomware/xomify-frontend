@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { XtDirection, XtSharesListResponse, XtTimeWindow } from '../models/xomtracks-share.model';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 /**
  * The org-wide `{ data, error, meta }` envelope every xomtracks-backend
@@ -33,6 +34,6 @@ export class XomtracksSharesService {
     const params = new HttpParams().set('direction', direction).set('window', window);
     return this.http
       .get<XtApiEnvelope<XtSharesListResponse>>(`${this.baseUrl}/list`, { params })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 }

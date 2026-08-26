@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 interface XtApiEnvelope<T> {
   data: T;
@@ -60,14 +61,14 @@ export class XomtracksIngestTokensService {
     const body = label?.trim() ? { label: label.trim() } : {};
     return this.http
       .post<XtApiEnvelope<XtIngestToken>>(`${this.baseUrl}/create`, body)
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** POST /ingest-tokens/revoke — revoke a token by its (non-secret) hash. */
   revoke(tokenHash: string): Observable<XtIngestTokenRevokeResult> {
     return this.http
       .post<XtApiEnvelope<XtIngestTokenRevokeResult>>(`${this.baseUrl}/revoke`, { tokenHash })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** GET /ingest-tokens/list — the caller's own active devices (non-revoked
