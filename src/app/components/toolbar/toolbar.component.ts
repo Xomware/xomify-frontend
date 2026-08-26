@@ -56,16 +56,17 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   readonly iosApp = XOMIFY_IOS;
 
   /**
-   * Landing sections, shown in the toolbar for signed-out visitors on `/`.
+   * Public nav, shown to signed-out visitors.
    *
-   * They live HERE rather than in a second header inside the landing page: the
-   * app already renders a fixed toolbar on every route, so a landing-only bar
-   * underneath it was simply two stacked headers.
+   * REAL ROUTES, not scroll anchors. Scrolling the page from a nav bar looks
+   * like navigation and behaves like a jump — and "How it works" is gone as an
+   * entry entirely: the landing journey IS the explanation, and the written
+   * version lives on /docs. Two nav items pointing at the same explanation was
+   * the overlap.
    */
-  readonly landingSections = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'how', label: 'How it works' },
-    { id: 'docs', label: 'Docs' },
+  readonly publicNav = [
+    { route: '/', label: 'Overview', exact: true },
+    { route: '/docs', label: 'Docs', exact: false },
   ];
 
   /** Grouped nav — empty groups are hidden in the template. */
@@ -263,31 +264,18 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     return this.authService.isLoggedIn();
   }
 
-  /** True only for a signed-out visitor on the landing route. */
-  isLanding(): boolean {
-    const path = this.router.url.split('?')[0].split('#')[0];
-    return (path === '/' || path === '') && !this.isLoggedIn();
+  /**
+   * True for any signed-out visitor. The public nav follows them across the
+   * landing page and /docs rather than vanishing when they leave the root.
+   */
+  isPublic(): boolean {
+    return !this.isLoggedIn();
   }
 
   login(): void {
     this.authService.login();
   }
 
-  /**
-   * Scroll to a landing section.
-   *
-   * The toolbar reaches into the landing page's DOM by id, which is a liberty —
-   * but the alternative is a shared scroll service for three anchors on one
-   * route, and these buttons only exist while that route is showing.
-   */
-  scrollToSection(id: string): void {
-    const target = document.getElementById(id);
-    if (!target) return;
-    const reduced =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-  }
 
   /**
    * Avatar URL for the top-right chip. Falls back to the bundled default when

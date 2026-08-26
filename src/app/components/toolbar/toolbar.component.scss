@@ -495,6 +495,7 @@
   background: none;
   border: 0;
   cursor: pointer;
+  text-decoration: none;
   font-size: $text-sm;
   font-weight: $font-weight-medium;
   color: var(--text-secondary);
@@ -511,6 +512,24 @@
     outline: 2px solid var(--accent-purple);
     outline-offset: 2px;
   }
+}
+
+.tab-link--active {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+// Both CTAs carry their platform glyph, matching the buttons on the page
+// itself rather than being bare text in the bar.
+.action-glyph {
+  flex: 0 0 auto;
+}
+
+.landing-ios,
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .landing-actions {
@@ -569,8 +588,14 @@
     display: none;
   }
 
-  .landing-ios {
+  .landing-ios,
+  .landing-cta {
     padding: $spacing-xs $spacing-sm;
-    font-size: $text-3xs;
+  }
+
+  // Glyphs alone on a phone — two labelled pills plus a logo do not fit, and
+  // the glyphs are the recognisable part.
+  .action-label {
+    display: none;
   }
 }

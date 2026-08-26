@@ -58,6 +58,12 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/landing/landing.module').then((m) => m.LandingModule),
   },
+  // Public — deliberately NOT AuthGuard-gated. The point of this page is that
+  // someone who has not signed in can read what the app does first.
+  {
+    path: 'docs',
+    loadChildren: () => import('./pages/docs/docs.module').then((m) => m.DocsModule),
+  },
   { path: 'callback', component: CallbackComponent },
   {
     path: 'my-profile',
