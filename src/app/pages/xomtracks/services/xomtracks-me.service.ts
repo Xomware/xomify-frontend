@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { XtMeResponse } from '../models/xomtracks-admin.model';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 interface XtApiEnvelope<T> {
   data: T;
@@ -33,7 +34,7 @@ export class XomtracksMeService {
   get(): Observable<XtMeResponse> {
     if (!this.cached$) {
       this.cached$ = this.http.get<XtApiEnvelope<XtMeResponse>>(this.url).pipe(
-        map((res) => res.data),
+        map((res) => unwrapEnvelope(res)),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
     }

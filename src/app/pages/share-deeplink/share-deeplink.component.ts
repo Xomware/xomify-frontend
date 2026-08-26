@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 /**
  * Deep-link landing page for `/share?trackId=<id>`.
@@ -34,9 +34,18 @@ import { Router } from '@angular/router';
   `],
 })
 export class ShareDeeplinkComponent implements OnInit {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    // A plausible Spotify id is 22 base62 chars. When we have one, send the
+    // user to the track itself rather than silently dropping the parameter and
+    // landing them on their profile wondering what happened.
+    const trackId = this.route.snapshot.queryParamMap.get('trackId')?.trim();
+    if (trackId && /^[A-Za-z0-9]{22}$/.test(trackId)) {
+      window.location.href = `https://open.spotify.com/track/${trackId}`;
+      return;
+    }
+
     this.router.navigate(['/my-profile']);
   }
 }

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 interface XtApiEnvelope<T> {
   data: T;
@@ -32,6 +33,6 @@ export class XomtracksHeardService {
   set(trackKey: string, heard: boolean): Observable<XtHeardState> {
     return this.http
       .post<XtApiEnvelope<XtHeardState>>(`${this.baseUrl}/set`, { trackKey, heard })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 }

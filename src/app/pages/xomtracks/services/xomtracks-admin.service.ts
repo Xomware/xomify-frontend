@@ -12,6 +12,7 @@ import {
   XtAdminUserFeedResponse,
   XtAdminUsersResponse,
 } from '../models/xomtracks-admin.model';
+import { unwrapEnvelope } from './xomtracks-envelope';
 
 interface XtApiEnvelope<T> {
   data: T;
@@ -36,7 +37,7 @@ export class XomtracksAdminService {
   listUsers(): Observable<XtAdminUsersResponse> {
     return this.http
       .get<XtApiEnvelope<XtAdminUsersResponse>>(`${this.baseUrl}/users`)
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** GET /admin/user-feed — view-as (read-only): the target user's feed
@@ -53,7 +54,7 @@ export class XomtracksAdminService {
       .set('window', window);
     return this.http
       .get<XtApiEnvelope<XtAdminUserFeedResponse>>(`${this.baseUrl}/user-feed`, { params })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** GET /admin/calls — the calls & errors dashboard over a trailing window. */
@@ -63,27 +64,27 @@ export class XomtracksAdminService {
       .set('recentLimit', String(recentLimit));
     return this.http
       .get<XtApiEnvelope<XtAdminCallsSummary>>(`${this.baseUrl}/calls`, { params })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** GET /admin/tokens — every ingest token's metadata (never plaintext), grouped by owner. */
   listTokens(): Observable<XtAdminTokensResponse> {
     return this.http
       .get<XtApiEnvelope<XtAdminTokensResponse>>(`${this.baseUrl}/tokens`)
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** GET /admin/runs — recent extractor run summaries, grouped by owner. */
   listRuns(): Observable<XtAdminRunsResponse> {
     return this.http
       .get<XtApiEnvelope<XtAdminRunsResponse>>(`${this.baseUrl}/runs`)
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 
   /** POST /admin/revoke-token — admin override revoke of ANY user's ingest token by hash. */
   revokeToken(tokenHash: string): Observable<XtAdminRevokeTokenResult> {
     return this.http
       .post<XtApiEnvelope<XtAdminRevokeTokenResult>>(`${this.baseUrl}/revoke-token`, { tokenHash })
-      .pipe(map((res) => res.data));
+      .pipe(map((res) => unwrapEnvelope(res)));
   }
 }
