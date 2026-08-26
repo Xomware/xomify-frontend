@@ -487,3 +487,90 @@
   top: -2px;
   right: -2px;
 }
+
+// ── Signed-out landing ──────────────────────────────────────────────────
+// Section tabs styled to match the authed nav links, so the toolbar reads as
+// one bar rather than two modes bolted together.
+.tab-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-secondary);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+  }
+}
+
+.landing-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-left: auto;
+}
+
+.landing-ios {
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+  border: 1px solid var(--border-strong);
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-purple);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+  }
+}
+
+.landing-cta {
+  border: 0;
+  cursor: pointer;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-pill;
+  background: #1bdc6f;
+  color: #04120a;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
+  white-space: nowrap;
+
+  &:hover {
+    background: #35e783;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 3px;
+  }
+}
+
+// Below the phone breakpoint the section tabs would crowd out both CTAs, and
+// the CTAs are what actually matter.
+@media (max-width: $breakpoint-md) {
+  .tab-link {
+    display: none;
+  }
+
+  .landing-ios {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $text-3xs;
+  }
+}

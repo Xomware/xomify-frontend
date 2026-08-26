@@ -76,17 +76,27 @@ export class RankListPreviewComponent extends PreviewBase {
     tl.from(this.q('.rank-row'), {
       opacity: 0,
       x: -14,
-      duration: 0.35,
-      stagger: 0.06,
+      duration: 0.45,
+      stagger: 0.07,
       ease: 'power2.out',
     });
 
     // Walk every combination: three time ranges within each of three tabs.
-    // The plan's version stopped after two shuffles; this keeps going, which
-    // is what makes it read as a live surface rather than a stalled GIF.
     for (let step = 0; step < 9; step += 1) {
-      tl.to({}, { duration: 1.15 });
+      tl.to({}, { duration: 1.9 });
       tl.call(() => this.advance());
+      // Re-settle the rows AFTER the reorder, with a stagger.
+      //
+      // The reorder itself used to be a bare CSS transition on every row at
+      // once, which is what made it read as herky-jerky: nine rows starting
+      // and stopping in perfect lockstep looks mechanical, and a dataset swap
+      // on a tab change snapped rather than moved. Animating from a small
+      // offset with a stagger gives the movement a direction and a settle.
+      tl.fromTo(
+        () => this.q('.rank-row'),
+        { y: '+=10', opacity: 0.35 },
+        { y: '+=0', opacity: 1, duration: 0.55, stagger: 0.05, ease: 'power2.out', clearProps: 'opacity' },
+      );
     }
   }
 

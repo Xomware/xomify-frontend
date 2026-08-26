@@ -9,6 +9,7 @@ import { isAdminEmail } from '../../config/admin.config';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { NotificationsService } from 'src/app/services/notifications.service';
+import { XOMIFY_IOS } from 'src/app/data/xomware-apps.data';
 
 /** A single navigable destination — either a leaf link or a group header. */
 export interface NavLink {
@@ -50,6 +51,22 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   queueCount = 0;
   pendingFriendsCount = 0;
   unreadNotifications = 0;
+
+  /** Landing-page CTA target. Sourced, never hardcoded twice. */
+  readonly iosApp = XOMIFY_IOS;
+
+  /**
+   * Landing sections, shown in the toolbar for signed-out visitors on `/`.
+   *
+   * They live HERE rather than in a second header inside the landing page: the
+   * app already renders a fixed toolbar on every route, so a landing-only bar
+   * underneath it was simply two stacked headers.
+   */
+  readonly landingSections = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'how', label: 'How it works' },
+    { id: 'docs', label: 'Docs' },
+  ];
 
   /** Grouped nav — empty groups are hidden in the template. */
   readonly navEntries: NavEntry[] = [
@@ -244,6 +261,32 @@ export class ToolbarComponent implements OnInit, OnDestroy {
 
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
+  }
+
+  /** True only for a signed-out visitor on the landing route. */
+  isLanding(): boolean {
+    const path = this.router.url.split('?')[0].split('#')[0];
+    return (path === '/' || path === '') && !this.isLoggedIn();
+  }
+
+  login(): void {
+    this.authService.login();
+  }
+
+  /**
+   * Scroll to a landing section.
+   *
+   * The toolbar reaches into the landing page's DOM by id, which is a liberty —
+   * but the alternative is a shared scroll service for three anchors on one
+   * route, and these buttons only exist while that route is showing.
+   */
+  scrollToSection(id: string): void {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   }
 
   /**
