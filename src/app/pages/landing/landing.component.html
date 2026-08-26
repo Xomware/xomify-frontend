@@ -190,6 +190,7 @@
         <div class="act-visual act-visual--wide">
           <app-how-it-works-preview [active]="activeAct === 7"></app-how-it-works-preview>
         </div>
+        <a class="act-link" routerLink="/docs">Full documentation →</a>
       </div>
     </section>
 
@@ -199,31 +200,11 @@
         <span class="act-eyebrow">Open source</span>
         <h2 class="act-title">All of it is readable</h2>
         <p class="act-body act-body--centered">
-          Frontend, backend, iOS app and infrastructure are public. If you want to
-          know exactly what Xomify does with your Spotify data, the answer is in
-          the repository rather than in a policy page.
+          Frontend, backend, iOS app and infrastructure are public. If you want
+          to know exactly what Xomify does with your Spotify data, the answer is
+          in the repository rather than in a policy page.
         </p>
-        <!-- Link cards are filled in A4, which owns the repo + docs registry. -->
-        <div class="act-visual act-visual--wide">
-          <div class="doc-groups">
-            <div class="doc-group">
-              <h3 class="doc-group-title">Repositories</h3>
-              <ul class="doc-list">
-                <li *ngFor="let repo of repos">
-                  <a [href]="repo.url" target="_blank" rel="noopener noreferrer">{{ repo.name }}</a>
-                </li>
-              </ul>
-            </div>
-            <div class="doc-group">
-              <h3 class="doc-group-title">Documentation</h3>
-              <ul class="doc-list">
-                <li *ngFor="let doc of docs">
-                  <a [href]="doc.url" target="_blank" rel="noopener noreferrer">{{ doc.name }}</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <a class="act-link" routerLink="/docs">Read the docs →</a>
       </div>
     </section>
 

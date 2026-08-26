@@ -301,3 +301,24 @@
     border-color: var(--accent-purple);
   }
 }
+
+// Sends detail-seekers to the real docs page instead of repeating its content
+// in an act nobody can read at scroll speed.
+.act-link {
+  display: inline-block;
+  margin-top: $spacing-lg;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
+  color: var(--accent-purple-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 3px;
+    border-radius: $radius-sm;
+  }
+}
