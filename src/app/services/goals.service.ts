@@ -4,6 +4,7 @@ import { Observable, concat, of } from 'rxjs';
 import { catchError, map, switchMap, tap, toArray } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ListeningHistoryService, RecentlyPlayedItem } from './listening-history.service';
+import { ArtistService } from './artist.service';
 
 export type GoalMetric =
   | 'minutes_listened'
@@ -55,6 +56,9 @@ const LEGACY_HISTORY_KEY = 'xomify_goals_history';
  * streak and the history strip only ever read the recent end of the list. */
 const MIGRATE_HISTORY_WEEKS = 12;
 
+/** Spotify's per-request cap for `/artists?ids=`. */
+const SPOTIFY_ARTISTS_PER_REQUEST = 50;
+
 const DEFAULT_ICON = 'headphones';
 
 @Injectable({
@@ -73,7 +77,8 @@ export class GoalsService {
 
   constructor(
     private http: HttpClient,
-    private listeningHistory: ListeningHistoryService
+    private listeningHistory: ListeningHistoryService,
+    private artistService: ArtistService
   ) {}
 
   getGoals(): Observable<Goal[]> {
@@ -82,13 +87,21 @@ export class GoalsService {
       tap((res) => (this.history = res.history ?? [])),
       switchMap((res) =>
         this.listeningHistory.getRecentlyPlayed().pipe(
-          map((played) => {
+          switchMap((played) => {
             const thisWeekItems = this.getThisWeekItems(played.items);
-            return (res.goals ?? []).map((stored) => {
-              const goal = this.fromStored(stored);
-              const current = this.computeProgress(goal, thisWeekItems, played.items);
-              return { ...goal, current, completed: current >= goal.target };
-            });
+            const goals = res.goals ?? [];
+            // Only pay for the extra Spotify call when a goal actually counts
+            // genres — most sets do not.
+            const needsGenres = goals.some((g) => g.metric === 'genres_explored');
+            return (needsGenres ? this.fetchGenres(thisWeekItems) : of(new Set<string>())).pipe(
+              map((genres) =>
+                goals.map((stored) => {
+                  const goal = this.fromStored(stored);
+                  const current = this.computeProgress(goal, thisWeekItems, played.items, genres);
+                  return { ...goal, current, completed: current >= goal.target };
+                })
+              )
+            );
           })
         )
       )
@@ -98,7 +111,11 @@ export class GoalsService {
   computeProgress(
     goal: Pick<Goal, 'metric'>,
     thisWeekItems: RecentlyPlayedItem[],
-    allItems: RecentlyPlayedItem[]
+    allItems: RecentlyPlayedItem[],
+    /** Distinct genres across this week's artists — see {@link fetchGenres}.
+     * Empty when no goal needs them, which is why the `genres_explored`
+     * branch is the only reader. */
+    genres: Set<string> = new Set()
   ): number {
     switch (goal.metric) {
       case 'minutes_listened':
@@ -125,15 +142,10 @@ export class GoalsService {
         return count;
       }
 
-      case 'genres_explored': {
-        // Approximate via unique artist count (genres aren't in recently-played response)
-        const artists = new Set<string>();
-        thisWeekItems.forEach((item) =>
-          item.track.artists.forEach((a) => artists.add(a.name))
-        );
-        // Rough estimate: unique artists / 2 as genre proxy
-        return Math.min(artists.size, Math.ceil(artists.size / 2));
-      }
+      case 'genres_explored':
+        // Real genres, from `/artists`. This used to be `uniqueArtists / 2` —
+        // a number that was never a genre count, reported as one.
+        return genres.size;
 
       case 'songs_from_top_artist': {
         const artistCounts = new Map<string, number>();
@@ -370,6 +382,39 @@ export class GoalsService {
   private clearLegacyKeys(): void {
     localStorage.removeItem(LEGACY_GOALS_KEY);
     localStorage.removeItem(LEGACY_HISTORY_KEY);
+  }
+
+  /**
+   * Distinct genres across the artists played this week.
+   *
+   * Recently-played carries only artist stubs — no genres — so this is one
+   * extra `/artists?ids=` call. Spotify takes 50 ids per request, which a
+   * week of plays fits inside; anything beyond that is dropped rather than
+   * paged, since the 50-play window cannot hold more artists than that anyway.
+   *
+   * A failure yields an empty set (reported as zero genres) rather than
+   * failing the page — the other three metrics are still correct.
+   */
+  private fetchGenres(items: RecentlyPlayedItem[]): Observable<Set<string>> {
+    const ids = Array.from(
+      new Set(items.flatMap((item) => item.track.artists.map((a) => a.id).filter(Boolean)))
+    ).slice(0, SPOTIFY_ARTISTS_PER_REQUEST);
+
+    if (ids.length === 0) return of(new Set<string>());
+
+    return this.artistService.getArtistsByIds(ids.join(',')).pipe(
+      map((res) => {
+        const genres = new Set<string>();
+        for (const artist of res?.artists ?? []) {
+          for (const genre of artist?.genres ?? []) genres.add(genre);
+        }
+        return genres;
+      }),
+      catchError((err) => {
+        console.error('[Goals] Could not load artist genres:', err);
+        return of(new Set<string>());
+      })
+    );
   }
 
   private getThisWeekItems(items: RecentlyPlayedItem[]): RecentlyPlayedItem[] {
