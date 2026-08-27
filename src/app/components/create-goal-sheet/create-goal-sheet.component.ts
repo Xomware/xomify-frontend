@@ -19,6 +19,8 @@ export class CreateGoalSheetComponent {
 
   selectedMetric: GoalMetric = 'minutes_listened';
   target = 60;
+  saving = false;
+  error = '';
 
   constructor(private goalsService: GoalsService) {}
 
@@ -31,13 +33,27 @@ export class CreateGoalSheetComponent {
   }
 
   addGoal(): void {
-    this.goalsService.addGoal(
-      this.selectedMetric,
-      this.target,
-      this.goalsService.getMetricLabel(this.selectedMetric, this.target),
-      this.icon
-    );
-    this.closed.emit(true);
+    if (this.saving) return;
+    this.saving = true;
+    this.error = '';
+
+    this.goalsService
+      .addGoal(
+        this.selectedMetric,
+        this.target,
+        this.goalsService.getMetricLabel(this.selectedMetric, this.target),
+        this.icon
+      )
+      .subscribe({
+        // Only close on success. Closing optimistically would show the sheet
+        // dismissing while the goal quietly failed to save.
+        next: () => this.closed.emit(true),
+        error: (err) => {
+          console.error('[Goals] Add failed:', err);
+          this.error = 'Could not save that goal. Try again.';
+          this.saving = false;
+        },
+      });
   }
 
   close(): void {

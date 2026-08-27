@@ -47,11 +47,17 @@ export class GoalsComponent implements OnInit {
 
         // Record current week
         const metCount = goals.filter((g) => g.completed).length;
-        this.goalsService.recordWeekCompletion(
-          metCount === goals.length && goals.length > 0,
-          metCount,
-          goals.length
-        );
+        this.goalsService
+          .recordWeekCompletion(
+            metCount === goals.length && goals.length > 0,
+            metCount,
+            goals.length
+          )
+          // Refresh the strip and streak from the same cache the record wrote.
+          .subscribe(() => {
+            this.streak = this.goalsService.getWeeklyStreak();
+            this.history = this.goalsService.getHistory().slice(0, 8);
+          });
       },
       error: (err) => {
         console.error('[Goals] Error:', err);
@@ -76,12 +82,21 @@ export class GoalsComponent implements OnInit {
   }
 
   removeGoal(id: string): void {
-    this.goalsService.removeGoal(id);
-    this.loadGoals();
+    this.goalsService.removeGoal(id).subscribe({
+      next: () => this.loadGoals(),
+      error: (err) => {
+        console.error('[Goals] Remove failed:', err);
+        this.toastService.showNegativeToast('Could not remove that goal. Try again.');
+      },
+    });
   }
 
-  formatWeekLabel(isoDate: string): string {
-    const d = new Date(isoDate);
+  /** `weekStart` is a `YYYY-MM-DD` day, and `new Date('2026-08-24')` parses as
+   * UTC midnight — which formats as the 23rd anywhere west of Greenwich. Build
+   * the date from the parts so the label names the Monday it actually is. */
+  formatWeekLabel(weekStart: string): string {
+    const [year, month, day] = weekStart.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 

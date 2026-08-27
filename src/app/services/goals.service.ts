@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, concat, of } from 'rxjs';
+import { catchError, map, switchMap, tap, toArray } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { ListeningHistoryService, RecentlyPlayedItem } from './listening-history.service';
 
 export type GoalMetric =
@@ -22,38 +24,74 @@ export interface Goal {
 }
 
 export interface WeekHistoryEntry {
-  weekStart: string; // ISO date string of Monday
+  /** `YYYY-MM-DD` — the LOCAL Monday. Not an ISO timestamp; see `weekStartKey`. */
+  weekStart: string;
   allMet: boolean;
   metCount: number;
   totalCount: number;
 }
 
-const GOALS_KEY = 'xomify_goals';
-const HISTORY_KEY = 'xomify_goals_history';
+/** What `/goals/get` and `/goals/set` speak. The backend calls the id `goalId`
+ * and stores no progress — `current`/`completed` are derived here, per request,
+ * from listening history. */
+interface StoredGoal {
+  goalId: string;
+  metric: GoalMetric;
+  target: number;
+  label: string;
+  icon?: string;
+}
 
-const DEFAULT_GOALS: Omit<Goal, 'id' | 'current' | 'completed'>[] = [
-  { metric: 'minutes_listened', target: 300, label: 'Listen for 5 hours', icon: 'headphones' },
-  { metric: 'new_artists', target: 3, label: 'Discover 3 new artists', icon: 'mic' },
-  { metric: 'genres_explored', target: 4, label: 'Explore 4 genres', icon: 'music-note' },
-  { metric: 'unique_tracks', target: 50, label: '50 unique tracks', icon: 'trending-up' },
-];
+interface GoalsGetResponse {
+  goals: StoredGoal[];
+  history: WeekHistoryEntry[];
+}
+
+/** Pre-backend storage. Read once by {@link migrateLocalStorage}, then deleted. */
+const LEGACY_GOALS_KEY = 'xomify_goals';
+const LEGACY_HISTORY_KEY = 'xomify_goals_history';
+
+/** Migrating 52 weeks would be 52 sequential POSTs against a page load. The
+ * streak and the history strip only ever read the recent end of the list. */
+const MIGRATE_HISTORY_WEEKS = 12;
+
+const DEFAULT_ICON = 'headphones';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GoalsService {
-  constructor(private listeningHistory: ListeningHistoryService) {}
+  private readonly baseUrl = `${environment.xomifyApiUrl}/goals`;
+
+  /**
+   * Last history seen from the server. `getWeeklyStreak()` and `getHistory()`
+   * are called by the template synchronously right after `getGoals()` emits,
+   * which is why this is cached rather than re-fetched — one round trip per
+   * page load, and the strip can never disagree with the streak above it.
+   */
+  private history: WeekHistoryEntry[] = [];
+
+  constructor(
+    private http: HttpClient,
+    private listeningHistory: ListeningHistoryService
+  ) {}
 
   getGoals(): Observable<Goal[]> {
-    const saved = this.loadGoals();
-    return this.listeningHistory.getRecentlyPlayed().pipe(
-      map((response) => {
-        const thisWeekItems = this.getThisWeekItems(response.items);
-        return saved.map((goal) => {
-          const current = this.computeProgress(goal, thisWeekItems, response.items);
-          return { ...goal, current, completed: current >= goal.target };
-        });
-      })
+    return this.migrateLocalStorage().pipe(
+      switchMap(() => this.http.get<GoalsGetResponse>(`${this.baseUrl}/get`)),
+      tap((res) => (this.history = res.history ?? [])),
+      switchMap((res) =>
+        this.listeningHistory.getRecentlyPlayed().pipe(
+          map((played) => {
+            const thisWeekItems = this.getThisWeekItems(played.items);
+            return (res.goals ?? []).map((stored) => {
+              const goal = this.fromStored(stored);
+              const current = this.computeProgress(goal, thisWeekItems, played.items);
+              return { ...goal, current, completed: current >= goal.target };
+            });
+          })
+        )
+      )
     );
   }
 
@@ -123,69 +161,99 @@ export class GoalsService {
     }
   }
 
-  saveGoals(goals: Goal[]): void {
-    const toSave = goals.map(({ id, metric, target, label, icon }) => ({
-      id,
-      metric,
-      target,
-      label,
-      icon,
-    }));
-    localStorage.setItem(GOALS_KEY, JSON.stringify(toSave));
+  /** Replace the whole set. The backend treats a goal the client stops sending
+   * as a deletion, so callers pass the list they want to end up with. */
+  saveGoals(goals: Goal[]): Observable<Goal[]> {
+    return this.http
+      .put<{ goals: StoredGoal[] }>(`${this.baseUrl}/set`, {
+        goals: goals.map((g) => this.toStored(g)),
+      })
+      .pipe(map((res) => (res.goals ?? []).map((s) => this.fromStored(s))));
   }
 
-  addGoal(metric: GoalMetric, target: number, label: string, icon: string): void {
-    const goals = this.loadGoals();
-    goals.push({
-      id: crypto.randomUUID(),
-      metric,
-      target,
-      label,
-      icon,
-      current: 0,
-      completed: false,
-    });
-    this.saveGoals(goals);
+  addGoal(
+    metric: GoalMetric,
+    target: number,
+    label: string,
+    icon: string
+  ): Observable<Goal[]> {
+    return this.getStoredGoals().pipe(
+      switchMap((goals) =>
+        this.saveGoals([
+          ...goals,
+          { id: crypto.randomUUID(), metric, target, label, icon, current: 0, completed: false },
+        ])
+      )
+    );
   }
 
-  removeGoal(id: string): void {
-    const goals = this.loadGoals();
-    this.saveGoals(goals.filter((g) => g.id !== id));
+  removeGoal(id: string): Observable<Goal[]> {
+    return this.getStoredGoals().pipe(
+      switchMap((goals) => this.saveGoals(goals.filter((g) => g.id !== id)))
+    );
   }
 
+  /**
+   * Weeks fully met, counting back from the most recent.
+   *
+   * The week in progress is SKIPPED when it is not yet met, rather than
+   * breaking the count. It is recorded from the first page view on Monday, when
+   * nothing has been listened to yet — treating that as a miss would zero the
+   * streak every Monday and leave it there until the week was complete.
+   */
   getWeeklyStreak(): number {
-    const history = this.getHistory();
+    const thisWeek = this.weekStartKey(new Date());
     let streak = 0;
-    // History is sorted newest first
-    for (const entry of history) {
+    for (const entry of this.history) {
       if (entry.allMet) {
         streak++;
-      } else {
-        break;
+        continue;
       }
+      if (entry.weekStart === thisWeek) continue;
+      break;
     }
     return streak;
   }
 
-  recordWeekCompletion(allMet: boolean, metCount: number, totalCount: number): void {
-    const history = this.getHistory();
-    const weekStart = this.getWeekStart(new Date()).toISOString();
-    // Don't duplicate
-    if (history.length > 0 && history[0].weekStart === weekStart) {
-      history[0] = { weekStart, allMet, metCount, totalCount };
-    } else {
-      history.unshift({ weekStart, allMet, metCount, totalCount });
+  /**
+   * Upsert this week's outcome. Returns without a request when the server
+   * already holds these numbers — the page records on every load, and progress
+   * only changes when the user has listened to something since.
+   */
+  recordWeekCompletion(
+    allMet: boolean,
+    metCount: number,
+    totalCount: number
+  ): Observable<void> {
+    const weekStart = this.weekStartKey(new Date());
+    const entry: WeekHistoryEntry = { weekStart, allMet, metCount, totalCount };
+
+    const existing = this.history.find((e) => e.weekStart === weekStart);
+    if (
+      existing &&
+      existing.allMet === allMet &&
+      existing.metCount === metCount &&
+      existing.totalCount === totalCount
+    ) {
+      return of(undefined);
     }
-    // Keep last 52 weeks
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 52)));
+
+    this.history = [entry, ...this.history.filter((e) => e.weekStart !== weekStart)];
+
+    return this.http.post<unknown>(`${this.baseUrl}/history-set`, entry).pipe(
+      map(() => undefined),
+      // A failed record must not blank the page — the goals themselves loaded
+      // fine, and the next load rewrites this same week.
+      catchError((err) => {
+        console.error('[Goals] Failed to record week:', err);
+        return of(undefined);
+      })
+    );
   }
 
+  /** Newest first. Populated by the last {@link getGoals}. */
   getHistory(): WeekHistoryEntry[] {
-    try {
-      return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    } catch {
-      return [];
-    }
+    return this.history;
   }
 
   getMetricLabel(metric: GoalMetric, target: number): string {
@@ -215,24 +283,93 @@ export class GoalsService {
     return icons[metric];
   }
 
-  private loadGoals(): Goal[] {
+  private toStored(goal: Goal): StoredGoal {
+    return {
+      goalId: goal.id,
+      metric: goal.metric,
+      target: goal.target,
+      label: goal.label,
+      icon: goal.icon,
+    };
+  }
+
+  private fromStored(stored: StoredGoal): Goal {
+    return {
+      id: stored.goalId,
+      metric: stored.metric,
+      target: stored.target,
+      label: stored.label,
+      icon: stored.icon || this.getMetricIcon(stored.metric) || DEFAULT_ICON,
+      current: 0,
+      completed: false,
+    };
+  }
+
+  /** The saved set without progress — what add/remove edit before saving back.
+   * Deliberately skips the listening-history call that `getGoals` makes: an
+   * edit does not need progress it is about to discard. */
+  private getStoredGoals(): Observable<Goal[]> {
+    return this.http
+      .get<GoalsGetResponse>(`${this.baseUrl}/get`)
+      .pipe(map((res) => (res.goals ?? []).map((s) => this.fromStored(s))));
+  }
+
+  /**
+   * One-time lift of pre-backend goals into the account, so nobody logs in
+   * after this ships and finds their targets replaced by the defaults.
+   *
+   * Runs before the GET, and only while the legacy keys exist — they are
+   * deleted on success, which is what makes it once. A failure leaves them in
+   * place to retry on the next load, and does NOT block the page: the account
+   * still has the defaults to show.
+   */
+  private migrateLocalStorage(): Observable<void> {
+    const rawGoals = localStorage.getItem(LEGACY_GOALS_KEY);
+    if (!rawGoals) return of(undefined);
+
+    let legacyGoals: Goal[] = [];
+    let legacyHistory: WeekHistoryEntry[] = [];
     try {
-      const raw = localStorage.getItem(GOALS_KEY);
-      if (!raw) {
-        // Initialize with defaults
-        const defaults: Goal[] = DEFAULT_GOALS.map((g) => ({
-          ...g,
-          id: crypto.randomUUID(),
-          current: 0,
-          completed: false,
-        }));
-        this.saveGoals(defaults);
-        return defaults;
-      }
-      return JSON.parse(raw);
+      legacyGoals = JSON.parse(rawGoals) ?? [];
+      legacyHistory = JSON.parse(localStorage.getItem(LEGACY_HISTORY_KEY) || '[]') ?? [];
     } catch {
-      return [];
+      // Unparseable local state is not worth a retry on every page load.
+      this.clearLegacyKeys();
+      return of(undefined);
     }
+
+    if (legacyGoals.length === 0) {
+      this.clearLegacyKeys();
+      return of(undefined);
+    }
+
+    // History entries were stored as full ISO timestamps of local midnight; the
+    // backend keys on a `YYYY-MM-DD` day.
+    const weeks = legacyHistory.slice(0, MIGRATE_HISTORY_WEEKS).map((e) => ({
+      ...e,
+      weekStart: e.weekStart.slice(0, 10),
+    }));
+
+    return this.saveGoals(legacyGoals).pipe(
+      switchMap(() =>
+        weeks.length === 0
+          ? of(null)
+          : concat(
+              ...weeks.map((w) => this.http.post<unknown>(`${this.baseUrl}/history-set`, w))
+            ).pipe(toArray())
+      ),
+      tap(() => this.clearLegacyKeys()),
+      map(() => undefined),
+      catchError((err) => {
+        console.error('[Goals] Migration failed, keeping local copy to retry:', err);
+        return of(undefined);
+      })
+    );
+  }
+
+  private clearLegacyKeys(): void {
+    localStorage.removeItem(LEGACY_GOALS_KEY);
+    localStorage.removeItem(LEGACY_HISTORY_KEY);
   }
 
   private getThisWeekItems(items: RecentlyPlayedItem[]): RecentlyPlayedItem[] {
@@ -240,6 +377,20 @@ export class GoalsService {
     return items.filter(
       (item) => new Date(item.played_at).getTime() >= weekStart.getTime()
     );
+  }
+
+  /**
+   * The Monday of `date`'s week as `YYYY-MM-DD`, built from LOCAL parts.
+   *
+   * Not `toISOString().slice(0, 10)` — that converts to UTC first, so local
+   * Monday midnight east of Greenwich renders as the Sunday before, and the
+   * week silently keys to the wrong row.
+   */
+  private weekStartKey(date: Date): string {
+    const monday = this.getWeekStart(date);
+    const month = String(monday.getMonth() + 1).padStart(2, '0');
+    const day = String(monday.getDate()).padStart(2, '0');
+    return `${monday.getFullYear()}-${month}-${day}`;
   }
 
   private getWeekStart(date: Date): Date {

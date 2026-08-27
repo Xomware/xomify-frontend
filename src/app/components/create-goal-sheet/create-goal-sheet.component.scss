@@ -117,3 +117,14 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+
+.sheet-error {
+  margin: 0 24px 8px;
+  color: #ff6b6b;
+  font-size: $text-sm;
+}
+
+.add-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

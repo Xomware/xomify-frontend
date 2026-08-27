@@ -25,6 +25,10 @@
       </div>
     </div>
 
-    <button class="add-btn" (click)="addGoal()">Add Goal</button>
+    <p class="sheet-error" *ngIf="error" role="alert">{{ error }}</p>
+
+    <button class="add-btn" (click)="addGoal()" [disabled]="saving">
+      {{ saving ? 'Saving…' : 'Add Goal' }}
+    </button>
   </div>
 </div>
