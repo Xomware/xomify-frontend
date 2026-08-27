@@ -7,14 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
--
-
 ### Changed
--
+- Weekly Goals now sync through the account (`/goals/*`) instead of `localStorage`
 
 ### Fixed
--
+- Weekly streak no longer reset to zero every Monday by the week in progress
+- Week history labels named the day before the Monday they described
 
 ## [2.6.0] - 2026-08-25
 
