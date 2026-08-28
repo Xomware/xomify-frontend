@@ -42,7 +42,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
     "postcss-scss": "^4.0.9",
-    "stylelint": "^16.26.1",
+    "stylelint": "^17.14.1",
     "typescript": "~5.5.4"
   }
 }
