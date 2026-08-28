@@ -7,9 +7,6 @@ import { SharedModule } from '../../shared/shared.module';
 import { PlaylistAnalysisComponent } from '../playlist-analysis/playlist-analysis.component';
 import { MoodRecommendationsComponent } from '../mood-recommendations/mood-recommendations.component';
 import { MoodTimelineComponent } from '../mood-timeline/mood-timeline.component';
-import { GoalsComponent } from '../goals/goals.component';
-import { GoalProgressRingComponent } from '../../components/goal-progress-ring/goal-progress-ring.component';
-import { CreateGoalSheetComponent } from '../../components/create-goal-sheet/create-goal-sheet.component';
 import { WeeklyWrappedComponent } from '../weekly-wrapped/weekly-wrapped.component';
 import { ShareComponent } from '../share/share.component';
 
@@ -17,7 +14,6 @@ const routes: Routes = [
   { path: 'playlist-analysis', component: PlaylistAnalysisComponent },
   { path: 'mood-recommendations', component: MoodRecommendationsComponent },
   { path: 'mood-timeline', component: MoodTimelineComponent },
-  { path: 'goals', component: GoalsComponent },
   { path: 'weekly-wrapped', component: WeeklyWrappedComponent },
   { path: 'share', component: ShareComponent },
 ];
@@ -27,9 +23,6 @@ const routes: Routes = [
     PlaylistAnalysisComponent,
     MoodRecommendationsComponent,
     MoodTimelineComponent,
-    GoalsComponent,
-    GoalProgressRingComponent,
-    CreateGoalSheetComponent,
     WeeklyWrappedComponent,
     ShareComponent,
   ],
