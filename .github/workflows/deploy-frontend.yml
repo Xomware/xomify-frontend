@@ -16,11 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # required for `gh release create`
+      id-token: write # required to mint the OIDC token for AWS
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
+      # Keyless: mints a short-lived OIDC token and trades it for the deploy
+      # role. Credentials land in the environment for every later step, which is
+      # why the per-step key blocks below are gone.
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -60,10 +70,6 @@ jobs:
             echo "API_AUTH_TOKEN=$API_AUTH_TOKEN"
             echo "API_ID=$API_ID"
           } >> spotify_credentials.env
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
 
       - name: Load Environment Variables
         run: source spotify_credentials.env
@@ -99,27 +105,15 @@ jobs:
         run: npm run build:prod
 
       - name: Deploy to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "us-east-1"
         run: |
           aws s3 sync ./dist/xomify s3://xomify.xomware.com --delete
 
       - name: Make index.html non-cacheable
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "us-east-1"
         run: |
           aws s3 cp ./dist/xomify/index.html s3://xomify.xomware.com/index.html \
             --cache-control "no-cache, no-store, must-revalidate"
 
       - name: Fix AASA content-type for Universal Links
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "us-east-1"
         run: |
           aws s3 cp ./dist/xomify/.well-known/apple-app-site-association \
             s3://xomify.xomware.com/.well-known/apple-app-site-association \
@@ -128,10 +122,6 @@ jobs:
 
       - name: Invalidate CloudFront cache
         if: success() && inputs.skip_cache_invalidation != 'true'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "us-east-1"
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
