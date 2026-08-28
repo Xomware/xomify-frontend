@@ -15,9 +15,14 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "swiper"
         update-types: ["version-update:semver-major"]
-      # typescript majors must stay within the Angular peer range (Angular 18: >=5.4 <5.6)
+      # Angular 18's peer range is >=5.4 <5.6, so MINOR bumps are the ones that
+      # break the build -- 5.5.4 -> 5.9.3 is a minor, and it is what broke CI in
+      # #188. Ignoring only majors did nothing, because TypeScript has not
+      # shipped a major since 1.0. Patches within 5.5.x are still allowed.
       - dependency-name: "typescript"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
     groups:
       angular:
         patterns:
