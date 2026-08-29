@@ -32,13 +32,15 @@ describe('LikesService', () => {
         { trackId: 't2', addedAt: '2026-01-02T00:00:00Z' },
       ];
 
-      service.pushUserLikes('dom@example.com', tracks).subscribe(() => done());
+      service.pushUserLikes(tracks).subscribe(() => done());
 
       const req = httpMock.expectOne(`${API}/likes/push`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body.tracks.length).toBe(2);
       // Backend (`lambdas/likes_push`) requires email + total on every batch.
-      expect(req.request.body.email).toBe('dom@example.com');
+      // The caller is derived from the JWT now; sending it was the security
+      // gap the auth epic closes.
+      expect(req.request.body.email).toBeUndefined();
       expect(req.request.body.total).toBe(2);
       req.flush(null);
     });
@@ -51,13 +53,13 @@ describe('LikesService', () => {
         addedAt: '2026-01-01T00:00:00Z',
       }));
 
-      service.pushUserLikes('dom@example.com', tracks).subscribe(() => done());
+      service.pushUserLikes(tracks).subscribe(() => done());
 
       const req1 = httpMock.expectOne(`${API}/likes/push`);
       expect(req1.request.body.tracks.length).toBe(25);
       // `total` is the FULL library size — same on every batch, not the batch count.
       expect(req1.request.body.total).toBe(60);
-      expect(req1.request.body.email).toBe('dom@example.com');
+      expect(req1.request.body.email).toBeUndefined();
       req1.flush(null);
 
       const req2 = httpMock.expectOne(`${API}/likes/push`);
@@ -72,7 +74,7 @@ describe('LikesService', () => {
     });
 
     it('completes immediately with empty array when no tracks', (done) => {
-      service.pushUserLikes('dom@example.com', []).subscribe((result) => {
+      service.pushUserLikes([]).subscribe((result) => {
         expect(result).toEqual([]);
         done();
       });

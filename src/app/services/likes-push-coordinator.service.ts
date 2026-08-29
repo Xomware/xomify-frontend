@@ -29,14 +29,15 @@ export class LikesPushCoordinatorService {
       return EMPTY;
     }
 
-    const email = this.userService.getEmail();
-    if (!email) {
-      // No session yet — nothing to push for. Don't mark pushed.
+    // A session check, not a parameter — the backend derives the caller from
+    // the JWT. Without a session there is nobody to push for.
+    if (!this.userService.getEmail()) {
+      // Don't mark pushed.
       return EMPTY;
     }
 
     return this.fetchAllSavedTracks().pipe(
-      switchMap((tracks) => this.likesService.pushUserLikes(email, tracks)),
+      switchMap((tracks) => this.likesService.pushUserLikes(tracks)),
       map(() => {
         this.markPushed();
       }),
