@@ -62,7 +62,7 @@ export class LikesService {
    * `likes_count` permanently 0 for every web user (and made
    * /likes/by-user return empty for any friend who only used the web).
    */
-  pushUserLikes(email: string, tracks: LikePushItem[]): Observable<void[]> {
+  pushUserLikes(tracks: LikePushItem[]): Observable<void[]> {
     const total = tracks.length;
     const batches: LikePushItem[][] = [];
     for (let i = 0; i < tracks.length; i += BATCH_SIZE) {
@@ -74,7 +74,6 @@ export class LikesService {
     return from(batches).pipe(
       concatMap((batch) =>
         this.http.post<void>(`${this.apiUrl}/likes/push`, {
-          email,
           total,
           tracks: batch,
         }),
