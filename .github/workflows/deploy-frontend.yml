@@ -27,7 +27,7 @@ jobs:
       # role. Credentials land in the environment for every later step, which is
       # why the per-step key blocks below are gone.
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
