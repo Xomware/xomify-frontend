@@ -1,0 +1,44 @@
+<div class="scope">
+  <div class="scope__toggle" role="tablist" aria-label="Whose music to show">
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="!showingFriends"
+      [class.scope__tab--active]="!showingFriends"
+      class="scope__tab"
+      (click)="selectScope(false)"
+    >
+      Me
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="showingFriends"
+      [class.scope__tab--active]="showingFriends"
+      class="scope__tab"
+      (click)="selectScope(true)"
+    >
+      Friends
+    </button>
+  </div>
+
+  @if (showingFriends) {
+    @if (friends.length === 0) {
+      <!-- Not an error: you simply have nobody to look at yet. -->
+      <p class="scope__empty">Add a friend to see their music here.</p>
+    } @else {
+      <div class="scope__friends">
+        @for (friend of friends; track emailOf(friend)) {
+          <button
+            type="button"
+            class="scope__chip"
+            [class.scope__chip--active]="emailOf(friend) === selectedEmail"
+            (click)="selectFriend(friend)"
+          >
+            {{ displayName(friend) }}
+          </button>
+        }
+      </div>
+    }
+  }
+</div>

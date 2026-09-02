@@ -1,0 +1,61 @@
+@import 'tokens';
+
+.scope {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  &__toggle {
+    display: inline-flex;
+    align-self: flex-start;
+    background: rgb(255 255 255 / 6%);
+    border-radius: $radius-lg;
+    padding: 0.25rem;
+  }
+
+  &__tab {
+    background: none;
+    border: 0;
+    color: rgb(255 255 255 / 60%);
+    cursor: pointer;
+    font-size: $text-sm;
+    font-weight: $font-weight-semibold;
+    padding: 0.4rem 1.1rem;
+    border-radius: $radius-md;
+
+    &--active {
+      background: var(--xomify-purple, #9c0abf);
+      color: #fff;
+    }
+  }
+
+  &__empty {
+    color: rgb(255 255 255 / 50%);
+    font-size: $text-sm;
+    margin: 0;
+  }
+
+  &__friends {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  &__chip {
+    background: rgb(255 255 255 / 6%);
+    border: 0;
+    border-radius: 999px;
+    color: rgb(255 255 255 / 70%);
+    cursor: pointer;
+    font-size: $text-sm;
+    padding: 0.4rem 0.9rem;
+    white-space: nowrap;
+
+    &--active {
+      background: var(--xomify-purple, #9c0abf);
+      color: #fff;
+    }
+  }
+}

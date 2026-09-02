@@ -40,6 +40,7 @@ import { PlaylistDetailComponent } from './pages/playlist-detail/playlist-detail
 import { MyPlaylistsComponent } from './pages/my-playlists/my-playlists.component';
 import { FollowingComponent } from './pages/following/following.component';
 import { QueueBuilderComponent } from './pages/queue-builder/queue-builder.component';
+import { FriendScopePickerComponent } from './components/friend-scope-picker/friend-scope-picker.component';
 import { WrappedComponent } from './pages/wrapped/wrapped.component';
 import { ReleaseRadarComponent } from './pages/release-radar/release-radar.component';
 import { RatingsComponent } from './pages/ratings/ratings.component';
@@ -83,6 +84,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
   ],
   bootstrap: [AppComponent],
   imports: [
+    FriendScopePickerComponent,
     BrowserModule,
     AppRoutingModule,
     FormsModule,

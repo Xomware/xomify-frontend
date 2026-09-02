@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
+import { FriendDataService } from 'src/app/services/friend-data.service';
+import { FriendsService, type Friend } from 'src/app/services/friends.service';
 import { WrappedService } from 'src/app/services/wrapped.service';
 import { SongService } from 'src/app/services/song.service';
 import { ArtistService } from 'src/app/services/artist.service';
@@ -70,6 +72,13 @@ export class WrappedComponent implements OnInit {
   
   // Always use short_term (Last 4 Weeks) - no longer selectable
   private readonly selectedTerm: 'short_term' = 'short_term';
+
+  // Friend scope. `selectedFriendEmail` null means own data regardless of the
+  // toggle, so a half-made selection never renders someone else's header.
+  showingFriends = false;
+  selectedFriendEmail: string | null = null;
+  friends: Friend[] = [];
+  friendDataDenied = false;
   
   // Display data for selected month
   displayTracks: DisplayTrack[] = [];
@@ -87,6 +96,8 @@ export class WrappedComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private wrappedService: WrappedService,
+    private friendData: FriendDataService,
+    private friendsService: FriendsService,
     private songService: SongService,
     private artistService: ArtistService,
     private playerService: PlayerService,
@@ -109,6 +120,7 @@ export class WrappedComponent implements OnInit {
         next: () => {
           this.isEnrolled = this.userService.getWrappedEnrollment();
           this.loadWrappedData();
+          this.loadFriends();
         },
         error: (err) => {
           // ensureLoaded now surfaces a genuine enrollment-load failure
@@ -148,10 +160,80 @@ export class WrappedComponent implements OnInit {
       });
   }
 
+  /** Whose recap is on screen. */
+  get scopeLabel(): string {
+    if (!this.showingFriends || !this.selectedFriendEmail) return 'Your monthly recap';
+    const friend = this.friends.find(
+      (f) => (f.friendEmail ?? f.email) === this.selectedFriendEmail,
+    );
+    return `${friend?.displayName || this.selectedFriendEmail} · monthly recap`;
+  }
+
+  onScopeChange(showingFriends: boolean): void {
+    this.showingFriends = showingFriends;
+    this.loadWrappedData();
+  }
+
+  onFriendChange(email: string): void {
+    this.selectedFriendEmail = email;
+    this.loadWrappedData();
+  }
+
+  private loadFriends(): void {
+    const email = this.userService.getEmail();
+    if (!email) return;
+    this.friendsService
+      .getFriendsList(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.friends = response?.accepted ?? [];
+        },
+        error: () => {
+          // Not fatal — the Me side still works without a friend list.
+          this.friends = [];
+        },
+      });
+  }
+
+  /**
+   * A denial and "they have nothing" are ONE state on purpose: the backend
+   * returns the same error for "not your friend" and "set to private", and
+   * distinguishing them here would leak what that hides.
+   */
+  private loadFriendWrapped(email: string): void {
+    this.friendData
+      .getWrapped(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any) => {
+          const wraps = Array.isArray(data?.wraps) ? data.wraps : [];
+          this.availableWraps = this.parseWrapsData(wraps);
+          if (this.availableWraps.length > 0) {
+            this.selectWrap(this.availableWraps[0]);
+          } else {
+            this.friendDataDenied = true;
+          }
+          this.loading = false;
+        },
+        error: () => {
+          this.availableWraps = [];
+          this.friendDataDenied = true;
+          this.loading = false;
+        },
+      });
+  }
+
   loadWrappedData(): void {
     this.loading = true;
     this.error = null;
-    
+    this.friendDataDenied = false;
+
+    if (this.showingFriends && this.selectedFriendEmail) {
+      this.loadFriendWrapped(this.selectedFriendEmail);
+      return;
+    }
+
     const email = this.userService.getEmail();
     if (!email) {
       this.loading = false;
