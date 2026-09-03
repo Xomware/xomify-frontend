@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
+import { FriendDataService } from 'src/app/services/friend-data.service';
+import { FriendsService, type Friend } from 'src/app/services/friends.service';
 import { PlayerService } from 'src/app/services/player.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { QueueService, QueueTrack } from 'src/app/services/queue.service';
@@ -37,6 +39,12 @@ interface WeekOption {
 })
 export class ReleaseRadarComponent implements OnInit {
   // Data
+  // Friend scope.
+  showingFriends = false;
+  selectedFriendEmail: string | null = null;
+  friends: Friend[] = [];
+  friendDataDenied = false;
+
   history: ReleaseRadarHistoryResponse | null = null;
   releases: ReleaseRadarRelease[] = [];
   filteredReleases: ReleaseRadarRelease[] = [];
@@ -81,6 +89,8 @@ export class ReleaseRadarComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private releaseRadarService: ReleaseRadarService,
+    private friendData: FriendDataService,
+    private friendsService: FriendsService,
     private playerService: PlayerService,
     private toastService: ToastService,
     private queueService: QueueService,
@@ -88,6 +98,64 @@ export class ReleaseRadarComponent implements OnInit {
     private playlistService: PlaylistService,
     private shareService: ShareService
   ) {}
+
+  get scopeLabel(): string {
+    if (!this.showingFriends || !this.selectedFriendEmail) return 'Your new drops';
+    const friend = this.friends.find(
+      (f) => (f.friendEmail ?? f.email) === this.selectedFriendEmail,
+    );
+    return `${friend?.displayName || this.selectedFriendEmail}'s new drops`;
+  }
+
+  onScopeChange(showingFriends: boolean): void {
+    this.showingFriends = showingFriends;
+    this.loadReleases();
+  }
+
+  onFriendChange(email: string): void {
+    this.selectedFriendEmail = email;
+    this.loadReleases();
+  }
+
+  private loadFriends(): void {
+    const email = this.userService.getEmail();
+    if (!email) return;
+    this.friendsService
+      .getFriendsList(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => (this.friends = response?.accepted ?? []),
+        error: () => (this.friends = []),
+      });
+  }
+
+  /**
+   * A denial and "they have nothing" are one state: the backend returns the
+   * same error for "not your friend" and "set to private".
+   */
+  private loadFriendRadar(email: string): void {
+    this.loading = true;
+    this.friendData
+      .getReleaseRadar(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response: any) => {
+          this.history = response;
+          this.releases = this.releaseRadarService.getAllReleasesFromHistory(response);
+          this.weekOptions = this.releaseRadarService.buildWeekOptions(response);
+          this.selectedWeekKey = response?.weeks?.[0]?.weekKey ?? null;
+          this.friendDataDenied = (response?.weeks?.length ?? 0) === 0;
+          this.loading = false;
+        },
+        error: () => {
+          this.history = null;
+          this.releases = [];
+          this.weekOptions = [];
+          this.friendDataDenied = true;
+          this.loading = false;
+        },
+      });
+  }
 
   ngOnInit(): void {
     this.loading = true;
@@ -116,6 +184,13 @@ export class ReleaseRadarComponent implements OnInit {
   private loadUserAndReleases(): void {
     this.loading = true;
     this.userEmail = this.userService.getEmail();
+
+    this.friendDataDenied = false;
+
+    if (this.showingFriends && this.selectedFriendEmail) {
+      this.loadFriendRadar(this.selectedFriendEmail);
+      return;
+    }
 
     if (!this.userEmail) {
       this.error = 'User email not available.';

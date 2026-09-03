@@ -10,6 +10,10 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import {
+  FriendDataService,
+  type VisibilityKey,
+} from 'src/app/services/friend-data.service';
 import { UserService } from 'src/app/services/user.service';
 import { LikesService } from 'src/app/services/likes.service';
 import { SongService } from 'src/app/services/song.service';
@@ -83,6 +87,32 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   sharesCount = 0;
   likesPublic = false;
   likesPublicSaving = false;
+
+  // Friend visibility. Defaults true to match the backend, which treats an
+  // unset flag as `friends`; the real values arrive from /user/data.
+  visibility: Record<VisibilityKey, boolean> = {
+    wrapped: true,
+    releaseRadar: true,
+    topItems: true,
+  };
+  visibilitySaving = false;
+  readonly visibilityToggles: { key: VisibilityKey; title: string; detail: string }[] = [
+    {
+      key: 'wrapped',
+      title: 'Wrapped Visibility',
+      detail: 'When enabled, friends can open your monthly recap.',
+    },
+    {
+      key: 'releaseRadar',
+      title: 'Release Radar Visibility',
+      detail: 'When enabled, friends can see new releases from artists you follow.',
+    },
+    {
+      key: 'topItems',
+      title: 'Top Items Visibility',
+      detail: 'When enabled, friends can see your top songs, artists and genres.',
+    },
+  ];
   country = '';
   product = '';
   userId = '';
@@ -151,6 +181,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
     private shareFeedService: ShareFeedService,
     private listeningHistoryService: ListeningHistoryService,
     private toastService: ToastService,
+    private friendData: FriendDataService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -334,6 +365,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
     this.likesCount = this.userService.getLikesCount();
     this.likesPublic = this.userService.getLikesPublic();
+    this.loadVisibility();
 
     if (cachedPlaylistCount > 0) {
       this.playlistCount = cachedPlaylistCount;
@@ -755,6 +787,55 @@ export class MyProfileComponent implements OnInit, OnDestroy {
         },
         error: (err: unknown) => {
           console.error('Error Updating User Table', err);
+        },
+      });
+  }
+
+  /**
+   * Push ONE flag. The endpoint takes a partial body so this cannot reset the
+   * other two, and a failed write rolls the switch back — a toggle left on
+   * after the write failed is a lie about who can see your data.
+   */
+  /**
+   * Adopt the stored state. A failed READ leaves the toggles at their defaults
+   * rather than flipping them off — showing everything private when we could
+   * not check would misreport it just as badly as the reverse.
+   */
+  private loadVisibility(): void {
+    this.userService
+      .getUserTableData('')
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any) => {
+          const stored = data?.visibility;
+          if (!stored) return;
+          for (const { key } of this.visibilityToggles) {
+            this.visibility[key] = stored[key] !== 'private';
+          }
+        },
+        error: () => {
+          // Leave defaults in place.
+        },
+      });
+  }
+
+  toggleVisibility(key: VisibilityKey, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const previous = this.visibility[key];
+    this.visibility[key] = checked;
+    this.visibilitySaving = true;
+
+    this.friendData
+      .setVisibility({ [key]: checked ? 'friends' : 'private' })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.visibilitySaving = false;
+        },
+        error: () => {
+          this.visibility[key] = previous;
+          this.visibilitySaving = false;
+          this.toastService.showNegativeToast('Could not update visibility.');
         },
       });
   }

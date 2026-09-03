@@ -51,7 +51,22 @@ export class FriendDataService {
       params: new HttpParams().set('email', email),
     });
   }
+
+  /**
+   * POST /users/visibility — PARTIAL. Omitted keys are left alone, so setting
+   * one artefact never resets the other two.
+   */
+  setVisibility(
+    changes: Partial<Record<VisibilityKey, 'friends' | 'private'>>,
+  ): Observable<{ email?: string; visibility?: Record<string, string> }> {
+    return this.http.post<{ email?: string; visibility?: Record<string, string> }>(
+      `${this.apiUrl}/users/visibility`,
+      changes,
+    );
+  }
 }
+
+export type VisibilityKey = 'wrapped' | 'releaseRadar' | 'topItems';
 
 export interface FriendReleaseRadar {
   email?: string;
