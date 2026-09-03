@@ -99,6 +99,18 @@ export class ReleaseRadarComponent implements OnInit {
     private shareService: ShareService
   ) {}
 
+  /**
+   * The Spotify playlist for the week on screen, when one was built.
+   * Works the same for your own weeks and a friend's — the id travels with the
+   * week either way. Mirrors the iOS `selectedPlaylistURL`.
+   */
+  get selectedPlaylistUrl(): string | null {
+    const week =
+      this.history?.weeks?.find((w) => w.weekKey === this.selectedWeekKey) ??
+      this.history?.weeks?.[0];
+    return week?.playlistId ? `https://open.spotify.com/playlist/${week.playlistId}` : null;
+  }
+
   get scopeLabel(): string {
     if (!this.showingFriends || !this.selectedFriendEmail) return 'Your new drops';
     const friend = this.friends.find(
@@ -143,7 +155,7 @@ export class ReleaseRadarComponent implements OnInit {
           this.history = response;
           this.releases = this.releaseRadarService.getAllReleasesFromHistory(response);
           this.weekOptions = this.releaseRadarService.buildWeekOptions(response);
-          this.selectedWeekKey = response?.weeks?.[0]?.weekKey ?? null;
+          this.selectedWeekKey = response?.weeks?.[0]?.weekKey ?? '';
           this.friendDataDenied = (response?.weeks?.length ?? 0) === 0;
           this.loading = false;
         },

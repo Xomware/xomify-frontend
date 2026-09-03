@@ -1505,3 +1505,13 @@
     margin: 0;
   }
 }
+
+// Sits in the same row as refresh/share, so it inherits .refresh-btn. Only the
+// brand colour and the anchor's layout differ.
+.playlist-btn {
+  align-items: center;
+  color: #1db954;
+  display: inline-flex;
+  justify-content: center;
+  text-decoration: none;
+}
