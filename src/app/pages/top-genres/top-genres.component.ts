@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FriendDataService } from 'src/app/services/friend-data.service';
+import { FriendsService, type Friend } from 'src/app/services/friends.service';
+import { UserService } from 'src/app/services/user.service';
 import { take } from 'rxjs';
 import { ArtistService } from 'src/app/services/artist.service';
 import {
@@ -44,6 +47,9 @@ export class TopGenresComponent implements OnInit {
 
   constructor(
     private artistService: ArtistService,
+    private friendData: FriendDataService,
+    private friendsService: FriendsService,
+    private userService: UserService,
     private genreService: GenresService,
     private toastService: ToastService,
     private topItemsService: TopItemsService
@@ -54,6 +60,7 @@ export class TopGenresComponent implements OnInit {
 
     if (this.artistsShortTerm.length === 0) {
       this.loadTopArtists();
+      this.loadFriends();
     } else {
       this.artistsMedTerm = this.artistService.getMedTermTopArtists();
       this.artistsLongTerm = this.artistService.getLongTermTopArtists();
@@ -61,7 +68,70 @@ export class TopGenresComponent implements OnInit {
     }
   }
 
+  // Friend scope. Genres are derived from artists here, so a friend's genres
+  // come from their cached artists rather than a second call.
+  showingFriends = false;
+  selectedFriendEmail: string | null = null;
+  friends: Friend[] = [];
+  friendDataDenied = false;
+  friendCacheCold = false;
+
+  onScopeChange(showingFriends: boolean): void {
+    this.showingFriends = showingFriends;
+    this.loadTopArtists();
+  }
+
+  onFriendChange(email: string): void {
+    this.selectedFriendEmail = email;
+    this.loadTopArtists();
+  }
+
+  private loadFriends(): void {
+    const email = this.userService.getEmail();
+    if (!email) return;
+    this.friendsService
+      .getFriendsList(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => (this.friends = response?.accepted ?? []),
+        error: () => (this.friends = []),
+      });
+  }
+
+  private loadFriendItems(email: string): void {
+    this.loading = true;
+    this.friendData
+      .getTopItems(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          if (response?.cached !== true) {
+            this.friendCacheCold = true;
+            this.loading = false;
+            return;
+          }
+          const byRange = (response.artists ?? {}) as Record<string, any[]>;
+          this.artistsShortTerm = byRange['short_term'] ?? [];
+          this.artistsMedTerm = byRange['medium_term'] ?? [];
+          this.artistsLongTerm = byRange['long_term'] ?? [];
+          this.loading = false;
+        },
+        error: () => {
+          this.friendDataDenied = true;
+          this.loading = false;
+        },
+      });
+  }
+
   loadTopArtists(): void {
+    this.friendDataDenied = false;
+    this.friendCacheCold = false;
+
+    if (this.showingFriends && this.selectedFriendEmail) {
+      this.loadFriendItems(this.selectedFriendEmail);
+      return;
+    }
+
     this.loading = true;
     this.partialWarning = '';
 
