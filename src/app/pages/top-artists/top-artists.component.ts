@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FriendDataService } from 'src/app/services/friend-data.service';
+import { FriendsService, type Friend } from 'src/app/services/friends.service';
+import { UserService } from 'src/app/services/user.service';
 import { take } from 'rxjs';
 import { ArtistService } from 'src/app/services/artist.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -23,6 +26,9 @@ export class TopArtistsComponent implements OnInit {
 
   constructor(
     private artistService: ArtistService,
+    private friendData: FriendDataService,
+    private friendsService: FriendsService,
+    private userService: UserService,
     private toastService: ToastService,
     private topItemsService: TopItemsService
   ) {}
@@ -32,6 +38,7 @@ export class TopArtistsComponent implements OnInit {
 
     if (cached.length === 0) {
       this.loadTopArtists();
+      this.loadFriends();
     } else {
       this.topArtistsShortTerm = cached;
       this.topArtistsMedTerm = this.artistService.getMedTermTopArtists();
@@ -41,7 +48,76 @@ export class TopArtistsComponent implements OnInit {
     }
   }
 
+  // Friend scope. Friends' data comes from the backend's cached
+  // /friends/top-items, never from Spotify — the backend does not fetch on
+  // someone else's behalf, so viewing a friend cannot spend their quota.
+  showingFriends = false;
+  selectedFriendEmail: string | null = null;
+  friends: Friend[] = [];
+  friendDataDenied = false;
+  friendCacheCold = false;
+
+  onScopeChange(showingFriends: boolean): void {
+    this.showingFriends = showingFriends;
+    this.loadTopArtists();
+  }
+
+  onFriendChange(email: string): void {
+    this.selectedFriendEmail = email;
+    this.loadTopArtists();
+  }
+
+  private loadFriends(): void {
+    const email = this.userService.getEmail();
+    if (!email) return;
+    this.friendsService
+      .getFriendsList(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => (this.friends = response?.accepted ?? []),
+        error: () => (this.friends = []),
+      });
+  }
+
+  /**
+   * `cached: false` is NOT a refusal — it means they have not loaded their own
+   * top items yet. Kept separate from a denial so the copy can say so.
+   */
+  private loadFriendItems(email: string): void {
+    this.loading = true;
+    this.friendData
+      .getTopItems(email)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          if (response?.cached !== true) {
+            this.friendCacheCold = true;
+            this.loading = false;
+            return;
+          }
+          const byRange = (response.artists ?? {}) as Record<string, any[]>;
+          this.topArtistsShortTerm = byRange['short_term'] ?? [];
+          this.topArtistsMedTerm = byRange['medium_term'] ?? [];
+          this.topArtistsLongTerm = byRange['long_term'] ?? [];
+          this.displayedArtists = [...this.topArtistsShortTerm];
+          this.loading = false;
+        },
+        error: () => {
+          this.friendDataDenied = true;
+          this.loading = false;
+        },
+      });
+  }
+
   loadTopArtists(): void {
+    this.friendDataDenied = false;
+    this.friendCacheCold = false;
+
+    if (this.showingFriends && this.selectedFriendEmail) {
+      this.loadFriendItems(this.selectedFriendEmail);
+      return;
+    }
+
     this.loading = true;
     this.partialWarning = '';
 

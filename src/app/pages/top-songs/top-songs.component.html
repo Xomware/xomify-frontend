@@ -1,4 +1,25 @@
 <div class="page-container">
+  <app-friend-scope-picker
+    [showingFriends]="showingFriends"
+    [friends]="friends"
+    [selectedEmail]="selectedFriendEmail"
+    (showingFriendsChange)="onScopeChange($event)"
+    (selectedEmailChange)="onFriendChange($event)"
+  ></app-friend-scope-picker>
+
+  <!-- Denial and "nothing yet" are DIFFERENT here. The backend serves friends'
+       top items from cache only, so a cold cache is temporary, not a refusal. -->
+  <div class="friend-empty" *ngIf="friendDataDenied && !loading">
+    <p class="friend-empty__title">Nothing to show</p>
+    <p class="friend-empty__detail">This isn't shared with you.</p>
+  </div>
+  <div class="friend-empty" *ngIf="friendCacheCold && !loading">
+    <p class="friend-empty__title">Nothing yet</p>
+    <p class="friend-empty__detail">
+      They haven't opened their top items recently, so there's nothing cached to show.
+    </p>
+  </div>
+
   <div class="page-header">
     <h1 class="page-title">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">

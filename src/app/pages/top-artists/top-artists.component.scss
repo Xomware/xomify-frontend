@@ -238,3 +238,21 @@
     height: 100px;
   }
 }
+
+.friend-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+
+  &__title {
+    color: #fff;
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
+    margin: 0 0 0.25rem;
+  }
+
+  &__detail {
+    color: rgb(255 255 255 / 55%);
+    font-size: $text-sm;
+    margin: 0;
+  }
+}
