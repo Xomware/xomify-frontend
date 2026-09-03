@@ -1,4 +1,17 @@
 <div class="page-container">
+  <app-friend-scope-picker
+    [showingFriends]="showingFriends"
+    [friends]="friends"
+    [selectedEmail]="selectedFriendEmail"
+    (showingFriendsChange)="onScopeChange($event)"
+    (selectedEmailChange)="onFriendChange($event)"
+  ></app-friend-scope-picker>
+
+  <div class="friend-empty" *ngIf="friendDataDenied && !loading">
+    <p class="friend-empty__title">Nothing to show</p>
+    <p class="friend-empty__detail">{{ scopeLabel }} aren't shared with you.</p>
+  </div>
+
   <!-- Loading State -->
   <div class="loading-container" *ngIf="loading">
     <div class="loader">

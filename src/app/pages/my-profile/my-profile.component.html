@@ -412,6 +412,25 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
+
+        <!-- These default ON, matching the backend. This card is where someone
+             discovers that and turns it off. -->
+        <div class="settings-toggle-card" *ngFor="let item of visibilityToggles">
+          <div class="settings-toggle-body">
+            <p class="settings-cta-title">{{ item.title }}</p>
+            <p class="settings-cta-desc">{{ item.detail }}</p>
+          </div>
+          <label class="toggle-switch" [class.saving]="visibilitySaving">
+            <input
+              type="checkbox"
+              [checked]="visibility[item.key]"
+              [disabled]="visibilitySaving"
+              (change)="toggleVisibility(item.key, $event)"
+              [attr.aria-label]="item.title"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </section>
 
       <section class="section settings-section">

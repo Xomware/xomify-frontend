@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FriendScopePickerComponent } from 'src/app/components/friend-scope-picker/friend-scope-picker.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReleaseRadarComponent } from './release-radar.component';
@@ -129,7 +130,11 @@ describe('ReleaseRadarComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ReleaseRadarComponent],
-      imports: [HttpClientTestingModule, RouterTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule,
+        FriendScopePickerComponent,
+      ],
       providers: [
         { provide: ReleaseRadarService, useValue: releaseRadarSpy },
         { provide: UserService, useValue: userServiceSpy },
