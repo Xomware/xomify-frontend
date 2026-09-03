@@ -15,6 +15,15 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "swiper"
         update-types: ["version-update:semver-major"]
+      # jasmine 7 makes `describe`/`it` read-only. zone.js 0.14 -- what Angular
+      # 18 pins -- patches them by assignment, so the whole suite dies at
+      # bootstrap with "Cannot assign to read only property 'describe'". Not a
+      # config fix: it needs a zone.js that supports jasmine 7. Reverted in
+      # #358 after 7.0.2 was merged and killed every test.
+      - dependency-name: "jasmine-core"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/jasmine"
+        update-types: ["version-update:semver-major"]
       # Angular 18's peer range is >=5.4 <5.6, so MINOR bumps are the ones that
       # break the build -- 5.5.4 -> 5.9.3 is a minor, and it is what broke CI in
       # #188. Ignoring only majors did nothing, because TypeScript has not
