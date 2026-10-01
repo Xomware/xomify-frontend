@@ -68,8 +68,11 @@
         [style.--i]="card.slot"
         [style.--k]="card.slot < 0 ? -card.slot : card.slot"
       >
-        @if (card.art) {
-          <img class="card-art" [src]="card.art" alt="" width="250" height="250" />
+        @if (card.cover; as cover) {
+          <span class="card-art">
+            <img [src]="cover.src" alt="" width="400" height="400" />
+            <span class="card-art-title">{{ cover.title }}</span>
+          </span>
         } @else {
           <span class="card-art card-art--wrapped">
             <img src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />

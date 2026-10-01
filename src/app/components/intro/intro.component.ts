@@ -35,8 +35,9 @@ interface Card {
   label: string;
   value: string;
   note: string;
-  // Cover art; the hero card shows the Wrapped cover instead.
-  art: string | null;
+  // Original cover art made for the intro, never a real release's; the hero
+  // card shows the Wrapped cover instead.
+  cover: { src: string; title: string } | null;
   // Position in the fan, -2..2 left to right.
   slot: number;
 }
@@ -102,17 +103,17 @@ export const BARS: readonly Bar[] = Array.from({ length: BAR_COUNT }, (_, i) => 
   };
 });
 
-const ART = 'assets/img/landing';
+const ART = 'assets/img/intro';
 const month = new Date().toLocaleString('en-US', { month: 'long' });
 
 // Illustrative: a signed-out visitor has no listening history to show yet.
 // Short enough to read on the strip of each card the fan leaves showing.
 export const CARDS: readonly Card[] = [
-  { label: 'Top song', value: '#1', note: '312 plays', art: `${ART}/frank-blonde.jpg`, slot: -2 },
-  { label: 'Minutes', value: '18.2k', note: 'listened', art: `${ART}/radiohead-inrainbows.jpg`, slot: -1 },
-  { label: 'Genre', value: 'Indie', note: '38%', art: `${ART}/arctic-fwn.jpg`, slot: 1 },
-  { label: 'New finds', value: '47', note: 'artists', art: `${ART}/fontaines-dogrel.jpg`, slot: 2 },
-  { label: 'Monthly', value: 'Wrapped', note: month, art: null, slot: 0 },
+  { label: 'Top song', value: '#1', note: '312 plays', cover: { src: `${ART}/night-drive.jpg`, title: 'Night Drive' }, slot: -2 },
+  { label: 'Minutes', value: '18.2k', note: 'listened', cover: { src: `${ART}/untitled-07.jpg`, title: 'Untitled 07' }, slot: -1 },
+  { label: 'Genre', value: 'Indie', note: '38%', cover: { src: `${ART}/low-tide.jpg`, title: 'Low Tide' }, slot: 1 },
+  { label: 'New finds', value: '47', note: 'artists', cover: { src: `${ART}/static-bloom.jpg`, title: 'Static Bloom' }, slot: 2 },
+  { label: 'Monthly', value: 'Wrapped', note: month, cover: null, slot: 0 },
 ];
 
 /**
