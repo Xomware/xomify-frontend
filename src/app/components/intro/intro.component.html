@@ -1,7 +1,7 @@
 <div class="scene" aria-hidden="true">
-  <canvas #haze class="layer"></canvas>
+  <canvas class="layer haze"></canvas>
 
-  <div #deck class="deck">
+  <div class="deck">
     <div class="plinth">
       <span class="plinth-rim"></span>
       <span class="plinth-button plinth-button--start"></span>
@@ -16,17 +16,11 @@
       <div class="strobe"></div>
       <div class="disc"></div>
       <div class="label"></div>
-      <div class="print">
-        <img class="mark-print" src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
-        <svg class="ring" viewBox="0 0 100 100">
-          <defs>
-            <path id="intro-ring" d="M50 50m-39 0a39 39 0 1 1 78 0a39 39 0 1 1-78 0" />
-          </defs>
-          <text font-size="6.4" letter-spacing="1.1"><textPath href="#intro-ring">XOMIFY · SIDE A · 33⅓ RPM · STEREO ·</textPath></text>
-        </svg>
-      </div>
+      <span class="lift-shadow"></span>
+      <canvas class="print"></canvas>
       <span class="spindle"></span>
       <span class="sheen"></span>
+      <span class="sweep"><i></i></span>
     </div>
 
     <div class="arm arm--shadow">
@@ -46,14 +40,18 @@
     </div>
   </div>
 
-  <canvas #gear class="layer"></canvas>
-  <canvas #card class="now-playing"></canvas>
+  <canvas class="layer gear"></canvas>
+  <div class="scrim"></div>
+  <canvas class="now-playing"></canvas>
+  <canvas class="stats"></canvas>
+  <canvas class="lift"></canvas>
+  <canvas class="layer lens"></canvas>
   <div class="vignette"></div>
   <div class="grain"></div>
 </div>
 
 <div class="mark" aria-hidden="true">
-  <span #mark class="mark-logo">
+  <span class="mark-logo">
     <img
       class="logo"
       src="assets/img/banner-logo-x-rework.png"
@@ -65,8 +63,9 @@
       [style.--hs]="aim()?.scale ?? 1"
       [style.--ho]="aim() ? 1 : 0"
     />
+    <span class="glint"><i></i></span>
   </span>
-  <p #tagline class="tagline">Your Spotify year, all year.</p>
+  <p class="tagline">Your Spotify year, all year.</p>
 </div>
 
 <button type="button" class="skip" aria-label="Skip intro" (click)="done.emit()">Skip</button>
