@@ -2,155 +2,72 @@ name: Deploy Xomify Frontend
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   workflow_dispatch:
-    inputs:
-      skip_cache_invalidation:
-        description: "Skip CloudFront cache invalidation"
-        required: false
-        default: "false"
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  build-and-deploy:
+  deploy:
+    uses: Xomware/github-actions/.github/workflows/deploy-frontend-s3.yml@v1
+    with:
+      app: xomify
+      node-version: '18'
+      install-command: npm install
+      ssm: |
+        API_ID=/xomify/api/API_ID
+      build-command: |
+        f=src/environments/environment.ts
+        sed -i "s|spotifyClientId: '---'|spotifyClientId: '$CLIENT_ID'|" $f
+        sed -i "s|spotifyClientSecret: '---'|spotifyClientSecret: '$CLIENT_SECRET'|" $f
+        sed -i "s|apiAuthToken: '---'|apiAuthToken: '$API_ACCESS_TOKEN'|" $f
+        sed -i "s|apiId: '---'|apiId: '$API_ID'|" $f
+        if grep -nE "(spotifyClientId|spotifyClientSecret|apiAuthToken|apiId): *'(---)?'" $f; then
+          echo "::error::environment.ts still has placeholder credentials"
+          exit 1
+        fi
+        npm run build:prod
+      dist-dir: dist/xomify
+      bucket: xomify.xomware.com
+      domain: xomify.xomware.com
+
+  # S3 guesses a binary type for the extensionless AASA file. Universal Links need it served
+  # as JSON and never cached, so it's re-uploaded after the shared deploy.
+  aasa:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: Xomware/github-actions/actions/load-infisical-secrets@v1
+        with:
+          path: /xomify
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.AWS_FRONTEND_ROLE_ARN }}
+          aws-region: us-east-1
+      - run: |
+          set -euo pipefail
+          aws s3 cp src/.well-known/apple-app-site-association \
+            s3://xomify.xomware.com/.well-known/apple-app-site-association \
+            --content-type application/json --cache-control 'no-cache, no-store, must-revalidate'
+          id=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items && contains(Aliases.Items, 'xomify.xomware.com')].Id" --output text)
+          aws cloudfront create-invalidation --distribution-id "$id" --paths /.well-known/apple-app-site-association > /dev/null
+
+  release:
+    needs: deploy
     runs-on: ubuntu-latest
     permissions:
-      contents: write # required for `gh release create`
-      id-token: write # required to mint the OIDC token for AWS
+      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      # Keyless: mints a short-lived OIDC token and trades it for the deploy
-      # role. Credentials land in the environment for every later step, which is
-      # why the per-step key blocks below are gone.
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Get version from package.json
-        id: package-version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Retrieve SSM Parameters
-        run: |
-          set -euo pipefail
-          # Fetch a single SSM parameter and fail the job if it is empty or
-          # missing. The previous `echo "VAR=$(aws ...)"` form swallowed aws
-          # failures (echo exits 0), which shipped empty credentials to prod
-          # on a transient SSM timeout (#296). Capturing into a variable lets
-          # `set -e` abort on a hard aws failure, and the explicit check
-          # catches the aws-exits-0-but-empty case.
-          fetch() {
-            local name="$1" value
-            value="$(aws ssm get-parameter --name "$name" --with-decryption --query "Parameter.Value" --output text)"
-            if [ -z "$value" ] || [ "$value" = "None" ]; then
-              echo "::error::SSM parameter $name is empty or missing — aborting to avoid deploying broken credentials."
-              return 1
-            fi
-            printf '%s' "$value"
-          }
-          CLIENT_ID="$(fetch /xomify/spotify/CLIENT_ID)"
-          CLIENT_SECRET="$(fetch /xomify/spotify/CLIENT_SECRET)"
-          API_AUTH_TOKEN="$(fetch /xomify/api/API_AUTH_TOKEN)"
-          API_ID="$(fetch /xomify/api/API_ID)"
-          {
-            echo "SPOTIFY_CLIENT_ID=$CLIENT_ID"
-            echo "SPOTIFY_CLIENT_SECRET=$CLIENT_SECRET"
-            echo "API_AUTH_TOKEN=$API_AUTH_TOKEN"
-            echo "API_ID=$API_ID"
-          } >> spotify_credentials.env
-
-      - name: Load Environment Variables
-        run: source spotify_credentials.env
-
-      - name: Mask sensitive values
-        run: |
-          echo "::add-mask::$(grep 'SPOTIFY_CLIENT_ID' spotify_credentials.env | cut -d'=' -f2)"
-          echo "::add-mask::$(grep 'SPOTIFY_CLIENT_SECRET' spotify_credentials.env | cut -d'=' -f2)"
-          echo "::add-mask::$(grep 'API_AUTH_TOKEN' spotify_credentials.env | cut -d'=' -f2)"
-          echo "::add-mask::$(grep 'API_ID' spotify_credentials.env | cut -d'=' -f2)"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Inject environment variables into Angular
-        run: |
-          sed -i "s|spotifyClientId: '---'|spotifyClientId: '$(grep 'SPOTIFY_CLIENT_ID' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
-          sed -i "s|spotifyClientSecret: '---'|spotifyClientSecret: '$(grep 'SPOTIFY_CLIENT_SECRET' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
-          sed -i "s|apiAuthToken: '---'|apiAuthToken: '$(grep 'API_AUTH_TOKEN' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
-          sed -i "s|apiId: '---'|apiId: '$(grep 'API_ID' spotify_credentials.env | cut -d'=' -f2)'|g" src/environments/environment.ts
-
-      - name: Verify injected environment values
-        run: |
-          # Belt-and-suspenders: fail before building if any credential is
-          # still the '---' placeholder or empty after injection (#296).
-          if grep -nE "(spotifyClientId|spotifyClientSecret|apiAuthToken|apiId): *'(---)?'" src/environments/environment.ts; then
-            echo "::error::environment.ts still contains placeholder or empty credentials after injection — aborting build."
-            exit 1
-          fi
-          echo "Environment injection verified — no placeholder/empty credentials remain."
-
-      - name: Build the project
-        run: npm run build:prod
-
-      - name: Deploy to S3
-        run: |
-          aws s3 sync ./dist/xomify s3://xomify.xomware.com --delete
-
-      - name: Make index.html non-cacheable
-        run: |
-          aws s3 cp ./dist/xomify/index.html s3://xomify.xomware.com/index.html \
-            --cache-control "no-cache, no-store, must-revalidate"
-
-      - name: Fix AASA content-type for Universal Links
-        run: |
-          aws s3 cp ./dist/xomify/.well-known/apple-app-site-association \
-            s3://xomify.xomware.com/.well-known/apple-app-site-association \
-            --content-type "application/json" \
-            --cache-control "no-cache, no-store, must-revalidate"
-
-      - name: Invalidate CloudFront cache
-        if: success() && inputs.skip_cache_invalidation != 'true'
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/" "/index.html" "/.well-known/apple-app-site-association"
-
-      - name: Create GitHub Release
-        if: success()
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Create GitHub release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v${{ steps.package-version.outputs.version }}" \
-            --title "Release v${{ steps.package-version.outputs.version }}" \
-            --notes "## Xomify Frontend v${{ steps.package-version.outputs.version }}
-
-          Deployed to production from \`${{ github.sha }}\` on \`${{ github.ref_name }}\`.
-
-          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
-
-          - Commit: ${{ github.sha }}
-          - Workflow run: ${{ github.run_id }}" \
-            || echo "Release creation skipped (tag may already exist)."
-        continue-on-error: true
-
-      - name: Deployment Summary
-        if: success()
-        run: |
-          echo "## Deployment Successful ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** v${{ steps.package-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**S3 Bucket:** s3://xomify.xomware.com" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** https://xomify.xomware.com" >> $GITHUB_STEP_SUMMARY
+          v=$(node -p "require('./package.json').version")
+          gh release create "v$v" --title "Release v$v" \
+            --notes "Deployed to production from $GITHUB_SHA." \
+            || echo "Release v$v already exists, skipping."
