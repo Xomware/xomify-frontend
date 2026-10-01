@@ -1,39 +1,62 @@
 <div class="stage" aria-hidden="true">
   <div class="backdrop"></div>
-  <div class="glow"></div>
-  <span class="ripple"></span>
-  <span class="ripple ripple--late"></span>
 
-  <div class="eq">
-    @for (bar of bars; track bar.angle) {
-      <span class="eq-bar" [style.--a.deg]="bar.angle">
-        <span
-          class="eq-fill"
-          [style.--c]="bar.color"
-          [style.animation-duration.ms]="bar.duration"
-          [style.animation-delay.ms]="bar.delay"
-        ></span>
-      </span>
-    }
-  </div>
+  <div class="deck">
+    <div class="plinth">
+      <span class="plinth-button plinth-button--start"></span>
+      <span class="plinth-button plinth-button--speed"></span>
+      <span class="plinth-button plinth-button--speed plinth-button--alt"></span>
+      <span class="arm-rest"></span>
+      <span class="arm-base"></span>
+    </div>
 
-  <div class="record">
-    <div class="disc"></div>
-    <div class="label"></div>
-    <svg class="ring" viewBox="0 0 100 100">
-      <defs>
-        <path id="intro-ring" d="M50 50m-13.5 0a13.5 13.5 0 1 1 27 0a13.5 13.5 0 1 1-27 0" />
-      </defs>
-      <text font-size="3.4" letter-spacing="0.6"><textPath href="#intro-ring">XOMIFY · SIDE A · 33⅓ RPM ·</textPath></text>
-    </svg>
-    <span class="spindle"></span>
-    <span class="sheen"></span>
-  </div>
+    <div class="eq">
+      @for (bar of bars; track bar.angle) {
+        <span class="eq-bar" [style.--a.deg]="bar.angle">
+          <span
+            class="eq-fill"
+            [style.--c]="bar.color"
+            [style.--p]="bar.peak"
+            [style.animation-duration.ms]="bar.duration"
+            [style.animation-delay.ms]="bar.delay"
+          ></span>
+        </span>
+      }
+    </div>
 
-  <div class="arm">
-    <span class="arm-base"></span>
-    <span class="arm-tube"></span>
-    <span class="arm-head"></span>
+    <div class="record">
+      <div class="platter"></div>
+      <div class="strobe"></div>
+      <div class="disc"></div>
+      <div class="label"></div>
+      <div class="print">
+        <img class="mark" src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
+        <svg class="ring" viewBox="0 0 100 100">
+          <defs>
+            <path id="intro-ring" d="M50 50m-39 0a39 39 0 1 1 78 0a39 39 0 1 1-78 0" />
+          </defs>
+          <text font-size="6.4" letter-spacing="1.1"><textPath href="#intro-ring">XOMIFY · SIDE A · 33⅓ RPM · STEREO ·</textPath></text>
+        </svg>
+      </div>
+      <span class="spindle"></span>
+      <span class="sheen"></span>
+    </div>
+
+    <div class="arm arm--shadow">
+      <div class="arm-swing">
+        <span class="arm-weight"></span>
+        <span class="arm-tube"></span>
+        <span class="arm-head"></span>
+      </div>
+    </div>
+    <div class="arm">
+      <div class="arm-swing">
+        <span class="arm-weight"></span>
+        <span class="arm-tube"></span>
+        <span class="arm-head"><span class="arm-lift"></span></span>
+      </div>
+      <span class="arm-pivot"></span>
+    </div>
   </div>
 
   <div class="cards">
@@ -45,7 +68,13 @@
         [style.--i]="card.slot"
         [style.--k]="card.slot < 0 ? -card.slot : card.slot"
       >
-        <span class="card-art" [attr.data-art]="card.art"></span>
+        @if (card.art) {
+          <img class="card-art" [src]="card.art" alt="" width="250" height="250" />
+        } @else {
+          <span class="card-art card-art--wrapped">
+            <img src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
+          </span>
+        }
         <span class="card-label">{{ card.label }}</span>
         <span class="card-value">{{ card.value }}</span>
         <span class="card-note">{{ card.note }}</span>
@@ -65,6 +94,7 @@
     [style.--ho]="aim() ? 1 : 0"
   />
   <p class="tagline">Your Spotify year, all year.</p>
+  <div class="grain"></div>
 </div>
 
 <button type="button" class="skip" aria-label="Skip intro" (click)="done.emit()">Skip</button>

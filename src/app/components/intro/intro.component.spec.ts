@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-import { INTRO_LENGTH, IntroComponent } from './intro.component';
+import { AIM_AT, INTRO_LENGTH, IntroComponent } from './intro.component';
 
 describe('IntroComponent', () => {
   let fixture: ComponentFixture<IntroComponent>;
@@ -46,7 +46,7 @@ describe('IntroComponent', () => {
     expect(done).toBe(1);
   }));
 
-  it('flies the logo onto the landing hero logo', fakeAsync(() => {
+  it('holds the wordmark, then flies the logo onto the landing hero logo', fakeAsync(() => {
     fixture.destroy();
     const hero = document.createElement('img');
     hero.className = 'hero-logo';
@@ -54,14 +54,17 @@ describe('IntroComponent', () => {
     document.body.appendChild(hero);
     fixture = TestBed.createComponent(IntroComponent);
     fixture.detectChanges();
-
-    tick(INTRO_LENGTH - 500);
-    fixture.detectChanges();
-
     const logo: HTMLElement = fixture.nativeElement.querySelector('.logo');
+
+    tick(AIM_AT - 1);
+    fixture.detectChanges();
+    expect(logo.style.getPropertyValue('--ho')).toBe('0');
+
+    tick(1);
+    fixture.detectChanges();
     expect(logo.style.getPropertyValue('--ho')).toBe('1');
     expect(Number(logo.style.getPropertyValue('--hs'))).toBeGreaterThan(0);
-    tick(500);
+    tick(INTRO_LENGTH - AIM_AT);
   }));
 
   it('fades the logo out in place when there is no hero logo to land on', fakeAsync(() => {

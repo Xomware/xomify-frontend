@@ -1,23 +1,29 @@
 @import 'tokens';
 
-// Timeline against INTRO_LENGTH = 5300 ms, from the first frame:
-//   0.0 s        the record spins up
-//   0.35-1.05 s  the arm swings in; the needle drops at 1.05 s
-//   1.05-3.3 s   ripples, then the equalizer pulses round the record
-//   2.75-3.9 s   Wrapped cards fan out of the record and gather back in
-//   3.9-4.6 s    the record shrinks into the logo's circle; the logo wipes in
-//   4.7-5.15 s   the logo flies onto the landing's hero logo as the stage fades
+// Timeline against INTRO_LENGTH = 5800 ms, from the first frame:
+//   0.0 s        the record spins up on the platter
+//   0.2-1.4 s    the arm lifts off its rest, swings over, and lowers to the record
+//   1.3-3.3 s    a spectrum rings the record
+//   2.65-4.0 s   the deck falls out of focus as Wrapped cards fan towards the
+//                camera, then gather back into the record
+//   3.45-3.95 s  the arm lifts away; the turntable fades, leaving the record
+//   3.9-4.6 s    the record shrinks into the logo's circle; the wordmark wipes in
+//   4.6-5.2 s    the wordmark holds
+//   5.2-5.8 s    the logo flies onto the landing's hero logo as the stage fades
 //
-// The opening frame (record, label, arm parked) is duplicated as the poster in
-// src/index.html. Change one, change the other.
+// Most keyframes run over a 5300 ms track (percent = ms / 53); nothing on them
+// moves after 4.75 s. The opening frame (deck, record, arm on its rest) is
+// duplicated as the poster in src/index.html. Change one, change the other.
+//
+// The light is a softbox up and to the left: highlights sit top-left, shadows
+// fall down-right, and reflections on the vinyl and metal stay put while the
+// things under them turn.
 
 :host {
   // The logo's own colours, sampled from banner-logo-x-rework.png.
   --violet: #9402f3;
   --magenta: #f502c9;
-  --cyan: #01d2f4;
-  --green: #01ee9e;
-  --vinyl: #121216;
+  --vinyl: #111114;
 
   --rec: min(62vmin, 500px);
   --cy: 47%;
@@ -45,36 +51,126 @@
   margin-top: calc(var(--h, var(--w)) / -2);
 }
 
+// A pool of light on the table under the deck, falling off into the corners.
 .backdrop {
   position: absolute;
   inset: 0;
-  background: var(--bg);
-  animation: fade-out 450ms ease-in 4850ms forwards;
+  background:
+    radial-gradient(ellipse 60% 55% at 44% 38%, rgb(236 232 255 / 0.07), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 45%, transparent 50%, rgb(0 0 0 / 0.5)),
+    var(--bg);
+  animation: fade-out 450ms ease-in 5350ms forwards;
 }
 
-.glow {
-  @extend %on-record;
-  --w: calc(var(--rec) * 2.4);
-  background: radial-gradient(circle, rgb(148 2 243 / 0.32), rgb(148 2 243 / 0.08) 38%, transparent 62%);
-  opacity: 0.85;
-  animation: glow 5300ms ease-out both;
+// ── Deck ──────────────────────────────────────────────────────────────────
+
+// Everything on the turntable. Racks out of focus while the cards are up.
+.deck {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% var(--cy);
+  animation: deck 5300ms both;
 }
 
-.ripple {
-  @extend %on-record;
-  --w: var(--rec);
-  border: 2px solid var(--cyan);
+.plinth {
+  position: absolute;
+  left: calc(50% - var(--rec) * 0.62);
+  top: calc(var(--cy) - var(--rec) * 0.62);
+  width: calc(var(--rec) * 1.42);
+  height: calc(var(--rec) * 1.24);
+  border-radius: calc(var(--rec) * 0.03);
+  background: linear-gradient(155deg, #202026, #141418 45%, #0f0f12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 1px 0 0 rgb(255 255 255 / 0.03),
+    inset 0 -1px 0 rgb(0 0 0 / 0.6),
+    0 2px 3px rgb(0 0 0 / 0.5),
+    0 calc(var(--rec) * 0.06) calc(var(--rec) * 0.12) rgb(0 0 0 / 0.55),
+    0 calc(var(--rec) * 0.14) calc(var(--rec) * 0.3) rgb(0 0 0 / 0.4);
+  animation: fade-out 400ms cubic-bezier(0.4, 0, 1, 1) 3550ms forwards;
+}
+
+.plinth > span {
+  position: absolute;
+}
+
+// Start/stop and the 33/45 speed buttons, bottom left.
+.plinth-button {
+  bottom: calc(var(--rec) * 0.045);
   border-radius: 50%;
-  opacity: 0;
-  animation: ripple 800ms cubic-bezier(0.2, 0.6, 0.3, 1) 1050ms both;
+  background: radial-gradient(circle at 38% 32%, #4c4c54, #25252a 60%, #19191d);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 1px 2px rgb(0 0 0 / 0.7);
 }
 
-.ripple--late {
-  border-color: var(--magenta);
-  animation-delay: 1300ms;
+.plinth-button--start {
+  left: calc(var(--rec) * 0.045);
+  width: calc(var(--rec) * 0.11);
+  height: calc(var(--rec) * 0.07);
+  border-radius: calc(var(--rec) * 0.01);
+  background: linear-gradient(170deg, #3a3a41, #222227);
 }
 
-// ── Equalizer ─────────────────────────────────────────────────────────────
+.plinth-button--speed {
+  left: calc(var(--rec) * 0.19);
+  bottom: calc(var(--rec) * 0.06);
+  width: calc(var(--rec) * 0.04);
+  height: calc(var(--rec) * 0.04);
+}
+
+.plinth-button--alt {
+  left: calc(var(--rec) * 0.255);
+}
+
+// The 33 lamp, on.
+.plinth-button--speed:not(.plinth-button--alt)::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(var(--rec) * -0.022);
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  border-radius: 50%;
+  background: #ff8a3d;
+  box-shadow: 0 0 4px 1px rgb(255 138 61 / 0.55);
+}
+
+// Where the arm sits parked: straight down from the pivot.
+.arm-rest {
+  left: calc(var(--rec) * 1.22 - var(--rec) * 0.022);
+  top: calc(var(--rec) * 0.67);
+  width: calc(var(--rec) * 0.044);
+  height: calc(var(--rec) * 0.06);
+  border-radius: calc(var(--rec) * 0.008);
+  background: linear-gradient(90deg, #26262b, #3c3c43 50%, #222226);
+  box-shadow: 1px 2px 3px rgb(0 0 0 / 0.6);
+}
+
+.arm-base {
+  left: calc(var(--rec) * (1.22 - 0.09));
+  top: calc(var(--rec) * (0.17 - 0.09));
+  width: calc(var(--rec) * 0.18);
+  height: calc(var(--rec) * 0.18);
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      #2a2a30,
+      #3e3e46 40deg,
+      #26262b 110deg,
+      #1d1d21 200deg,
+      #34343b 300deg,
+      #2a2a30
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 calc(var(--rec) * 0.018) rgb(0 0 0 / 0.25),
+    2px 4px 8px rgb(0 0 0 / 0.55);
+}
+
+// ── Spectrum ──────────────────────────────────────────────────────────────
 
 .eq {
   position: absolute;
@@ -83,18 +179,19 @@
   animation: eq-ring 5300ms both;
 }
 
-// Each bar stands on the record's centre, then is pushed out past the rim
-// along its own angle.
+// Each bar stands on the record's centre, then is pushed out past the
+// platter's rim along its own angle.
 .eq-bar {
-  --len: calc(var(--rec) * 0.15);
+  --len: calc(var(--rec) * 0.06);
+  --bw: max(2px, calc(var(--rec) * 0.007));
   position: absolute;
   left: 50%;
   top: calc(var(--cy) - var(--len));
-  width: max(3px, calc(var(--rec) * 0.012));
+  width: var(--bw);
   height: var(--len);
-  margin-left: calc(max(3px, calc(var(--rec) * 0.012)) / -2);
+  margin-left: calc(var(--bw) / -2);
   transform-origin: 50% 100%;
-  transform: rotate(var(--a)) translateY(calc(var(--rec) * -0.53));
+  transform: rotate(var(--a)) translateY(calc(var(--rec) * -0.55));
 }
 
 .eq-fill {
@@ -103,9 +200,9 @@
   height: 100%;
   border-radius: $radius-pill;
   background: var(--c);
-  box-shadow: 0 0 8px var(--c);
+  opacity: 0.8;
   transform-origin: 50% 100%;
-  animation: eq 400ms ease-in-out infinite alternate;
+  animation: eq 480ms cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
 // ── Record ────────────────────────────────────────────────────────────────
@@ -121,15 +218,70 @@
   border-radius: 50%;
 }
 
+// The platter's aluminium rim shows just past the record.
+.platter {
+  inset: -3%;
+  background: conic-gradient(
+    from 0deg,
+    #3a3a40,
+    #2a2a2f 50deg,
+    #222226 100deg,
+    #4a4a52 140deg,
+    #2a2a2f 190deg,
+    #26262b 250deg,
+    #8a8a93 312deg,
+    #3a3a40
+  );
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.6),
+    calc(var(--rec) * 0.01) calc(var(--rec) * 0.025) calc(var(--rec) * 0.05) rgb(0 0 0 / 0.55);
+  animation: fade-out 250ms 4050ms forwards;
+}
+
+// Strobe dots round the platter's edge: the clearest sign it's turning.
+.strobe {
+  inset: -3%;
+  background: repeating-conic-gradient(rgb(225 225 232 / 0.55) 0 0.9deg, transparent 0.9deg 2.5deg);
+  mask-image: radial-gradient(circle closest-side, transparent 95.6%, #000 96% 98.6%, transparent 99%);
+  will-change: transform;
+  animation:
+    spin 5300ms both,
+    fade-out 250ms 4050ms forwards;
+}
+
+// Fine grooves broken by the gaps between tracks, a smooth run-out by the
+// label, a polished lead-in at the rim. The faint conic variation turns with
+// the record; the grooves alone are round and would look still.
 .disc {
   inset: 0;
   background:
-    radial-gradient(circle, transparent 47%, rgb(255 255 255 / 0.05) 48%, transparent 49.5%),
-    repeating-radial-gradient(circle, var(--vinyl) 0 1.5px, #1b1b21 1.5px 3px),
+    radial-gradient(circle closest-side, transparent 97%, rgb(255 255 255 / 0.09) 98%, rgb(255 255 255 / 0.02) 99.4%, transparent),
+    radial-gradient(
+      circle closest-side,
+      transparent 54.6%,
+      #0c0c0f 55% 55.8%,
+      transparent 56.2% 67.6%,
+      #0c0c0f 68% 68.6%,
+      transparent 69% 81.4%,
+      #0c0c0f 81.8% 82.4%,
+      transparent 82.8%
+    ),
+    radial-gradient(circle closest-side, #0d0d10 0 42.5%, transparent 43.5%),
+    conic-gradient(
+      from 10deg,
+      rgb(255 255 255 / 0.02),
+      transparent 40deg,
+      rgb(255 255 255 / 0.012) 95deg,
+      transparent 150deg,
+      rgb(255 255 255 / 0.024) 230deg,
+      transparent 300deg,
+      rgb(255 255 255 / 0.02)
+    ),
+    repeating-radial-gradient(circle, var(--vinyl) 0, #1a1a1f 1px, var(--vinyl) 2px),
     var(--vinyl);
   box-shadow:
-    0 0 0 calc(var(--rec) * 0.012) #0b0b0e,
-    0 24px 60px rgb(0 0 0 / 0.55);
+    0 0 0 1px #070709,
+    0 1px 3px rgb(0 0 0 / 0.6);
   will-change: transform;
   // Its rim would show round the label as a crescent once the record is all label.
   animation:
@@ -137,7 +289,7 @@
     fade-out 250ms 4050ms forwards;
 }
 
-// Static, like a printed label: the logo's circle is a vertical violet to
+// Static, under the printed layer: the logo's circle is a vertical violet to
 // magenta, and the record has to hand over to it without a seam.
 .label {
   inset: 32%;
@@ -145,87 +297,192 @@
   animation: label 5300ms both;
 }
 
-.ring {
+// The paper's sheen and its pressed edge; gone before the label becomes the
+// logo's flat circle.
+.label::after {
+  content: '';
+  position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  fill: rgb(255 255 255 / 0.78);
-  font-family: var(--font-sans);
-  font-weight: $font-weight-bold;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 80% 70% at 32% 26%, rgb(255 255 255 / 0.12), transparent 65%),
+    rgb(24 6 34 / 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgb(40 0 60 / 0.35),
+    inset 0 0 calc(var(--rec) * 0.02) rgb(40 0 60 / 0.3);
+  animation: fade-out 300ms 3900ms forwards;
+}
+
+// What's printed on the label, turning with the record.
+.print {
+  inset: 32%;
+  will-change: transform;
   animation:
     spin 5300ms both,
     fade-out 300ms 3900ms forwards;
 }
 
+// Its X reaches 1.24× its half-width from the centre, so at 58% of the label
+// the tips stay inside the lettering. 0.21 of the record is under the
+// 300 px source at 2× on desktop and 3× on a phone, so it never upscales.
+.mark {
+  position: absolute;
+  inset: 21%;
+  width: 58%;
+  height: 58%;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: rgb(255 246 252 / 0.82);
+  font-family: var(--font-sans);
+  font-weight: $font-weight-semibold;
+}
+
+// The steel spindle through the hole.
 .spindle {
-  inset: 48.6%;
-  background: var(--bg);
+  inset: 48.7%;
+  background: radial-gradient(circle at 36% 30%, #f4f4f7, #a3a3ab 38%, #4a4a51 72%, #2b2b30);
+  box-shadow: 1px 1px 2px rgb(0 0 0 / 0.6);
   animation: fade-out 300ms 3900ms forwards;
 }
 
-// The light on the vinyl stays put while the record turns under it.
+// The softbox reflected in the grooves: two soft wedges on the light's axis,
+// fixed while the record turns. A warp nudges them once a revolution.
 .sheen {
   inset: 0;
-  background: conic-gradient(
-    from 20deg,
-    transparent 0deg,
-    rgb(255 255 255 / 0.1) 18deg,
-    transparent 40deg 180deg,
-    rgb(255 255 255 / 0.07) 200deg,
-    transparent 222deg
-  );
-  mask-image: radial-gradient(circle, transparent 33%, #000 34%);
-  animation: fade-out 300ms 3900ms forwards;
+  background:
+    conic-gradient(
+      from 135deg,
+      rgb(255 255 255 / 0.12) 0deg,
+      rgb(255 255 255 / 0.03) 14deg,
+      transparent 26deg 154deg,
+      rgb(255 255 255 / 0.03) 166deg,
+      rgb(255 255 255 / 0.08) 180deg,
+      rgb(255 255 255 / 0.03) 194deg,
+      transparent 206deg 334deg,
+      rgb(255 255 255 / 0.03) 346deg,
+      rgb(255 255 255 / 0.12) 360deg
+    ),
+    conic-gradient(
+      from 143deg,
+      rgb(150 200 255 / 0.03),
+      transparent 14deg 346deg,
+      rgb(255 170 230 / 0.03)
+    );
+  mask-image: radial-gradient(circle closest-side, transparent 36.5%, #000 40% 95%, transparent 97%);
+  animation:
+    wobble 900ms cubic-bezier(0.45, 0, 0.55, 1) infinite alternate,
+    fade-out 300ms 3900ms forwards;
 }
 
 // ── Tonearm ───────────────────────────────────────────────────────────────
 
-// Pivots up and to the right of the record. Parked, it hangs straight down,
-// clear of the vinyl; at 21deg the stylus sits in the outer grooves.
+// Pivots up and to the right of the record. Parked, it hangs straight down
+// onto its rest; at ~21deg the stylus sits in the outer grooves.
 .arm {
   position: absolute;
   left: calc(50% + var(--rec) * 0.6);
   top: calc(var(--cy) - var(--rec) * 0.45);
   width: 0;
   height: 0;
+  animation: fade-out 350ms cubic-bezier(0.4, 0, 1, 1) 3600ms forwards;
+}
+
+.arm-swing {
+  position: absolute;
   animation: arm 5300ms both;
 }
 
-.arm-base {
+.arm-swing > span,
+.arm-lift,
+.arm-pivot {
   position: absolute;
-  left: calc(var(--rec) * -0.07);
-  top: calc(var(--rec) * -0.07);
-  width: calc(var(--rec) * 0.14);
-  height: calc(var(--rec) * 0.14);
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #4a4a52, #1e1e23 70%);
-  box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
+}
+
+.arm-weight {
+  left: calc(var(--rec) * -0.04);
+  top: calc(var(--rec) * -0.25);
+  width: calc(var(--rec) * 0.08);
+  height: calc(var(--rec) * 0.1);
+  border-radius: calc(var(--rec) * 0.012);
+  background:
+    repeating-linear-gradient(180deg, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #2b2b30, #8d8d95 28%, #dedee3 42%, #74747c 64%, #2b2b30);
 }
 
 .arm-tube {
-  position: absolute;
-  left: calc(var(--rec) * -0.011);
-  top: 0;
-  width: calc(var(--rec) * 0.022);
-  height: calc(var(--rec) * 0.7);
+  left: calc(var(--rec) * -0.0085);
+  top: calc(var(--rec) * -0.16);
+  width: calc(var(--rec) * 0.017);
+  height: calc(var(--rec) * 0.82);
   border-radius: $radius-pill;
-  background: linear-gradient(90deg, #6e6e78, #d6d6de 45%, #74747d);
+  background: linear-gradient(90deg, #55555c, #e6e6eb 36%, #a6a6ae 56%, #4e4e55);
 }
 
+// The headshell, angled in towards the record, lifted nearer the camera
+// whenever the stylus is off the vinyl.
 .arm-head {
-  position: absolute;
-  left: calc(var(--rec) * -0.035);
-  top: calc(var(--rec) * 0.68);
-  width: calc(var(--rec) * 0.07);
-  height: calc(var(--rec) * 0.11);
-  border-radius: $radius-sm;
-  background: linear-gradient(180deg, #2a2a30, #131316);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.12),
-    0 8px 14px rgb(0 0 0 / 0.55);
+  left: calc(var(--rec) * -0.032);
+  top: calc(var(--rec) * 0.645);
+  width: calc(var(--rec) * 0.064);
+  height: calc(var(--rec) * 0.12);
+  border-radius: calc(var(--rec) * 0.008);
+  background: linear-gradient(180deg, #2e2e34, #17171a);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
   transform-origin: 50% 0;
   animation: head 5300ms both;
+}
+
+// The cartridge under it.
+.arm:not(.arm--shadow) .arm-head::after {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 8%;
+  height: 42%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #0d0d10, #1c1c21);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.arm-lift {
+  left: 96%;
+  top: 22%;
+  width: calc(var(--rec) * 0.04);
+  height: max(2px, calc(var(--rec) * 0.008));
+  border-radius: $radius-pill;
+  background: linear-gradient(180deg, #d4d4da, #6a6a72);
+}
+
+.arm-pivot {
+  left: calc(var(--rec) * -0.035);
+  top: calc(var(--rec) * -0.035);
+  width: calc(var(--rec) * 0.07);
+  height: calc(var(--rec) * 0.07);
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #e9e9ee, #8c8c95 40%, #3b3b42 80%);
+  box-shadow: 1px 2px 4px rgb(0 0 0 / 0.6);
+}
+
+// The arm's shadow on whatever is under it: further off and softer the
+// higher the arm is lifted.
+.arm--shadow {
+  filter: blur(3px);
+  opacity: 0.55;
+  animation:
+    arm-shadow 5300ms both,
+    fade-out 350ms cubic-bezier(0.4, 0, 1, 1) 3600ms forwards;
+}
+
+.arm--shadow .arm-swing > span {
+  background: #000;
+  box-shadow: none;
 }
 
 // ── Cards ─────────────────────────────────────────────────────────────────
@@ -244,15 +501,19 @@
   margin-left: calc(var(--cw) / -2);
   margin-top: calc(var(--ch) / -2);
   padding: calc(var(--card) * 0.07);
-  border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(180deg, #24242a, #1a1a1f 55%, #17171b);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.09),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    0 1px 2px rgb(0 0 0 / 0.45),
+    0 calc(var(--card) * 0.06) calc(var(--card) * 0.12) rgb(0 0 0 / 0.35),
+    0 calc(var(--card) * 0.18) calc(var(--card) * 0.36) rgb(0 0 0 / 0.45);
   z-index: calc(3 - var(--k));
   opacity: 0;
   animation:
-    fan 650ms cubic-bezier(0.2, 0.9, 0.3, 1.12) calc(2750ms + var(--k) * 90ms) both,
-    gather 380ms cubic-bezier(0.5, 0, 0.8, 0.4) calc(3780ms - var(--k) * 40ms) forwards;
+    fan 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(2750ms + var(--k) * 70ms) both,
+    gather 420ms cubic-bezier(0.55, 0, 0.8, 0.3) calc(3780ms - var(--k) * 40ms) forwards;
 }
 
 // The fan covers each card's inner edge, so the right-hand cards read from
@@ -270,54 +531,35 @@
 .card--hero {
   --cw: calc(var(--card) * 1.06);
   --ch: calc(var(--card) * 1.5);
-  border-color: rgb(148 2 243 / 0.6);
-  background: linear-gradient(180deg, #24152f, var(--surface-raised) 60%);
 }
 
 .card-art {
+  display: block;
   flex: none;
   align-self: stretch;
-  aspect-ratio: 5 / 4;
-  margin-bottom: calc(var(--card) * 0.04);
+  aspect-ratio: 1;
+  width: 100%;
+  height: auto;
+  margin-bottom: calc(var(--card) * 0.05);
   border-radius: var(--radius-md);
-  background:
-    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
-    linear-gradient(135deg, var(--violet), var(--magenta));
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 
-.card-art[data-art='cyan'] {
+// The cover Xomify puts on a generated Wrapped playlist (WrappedCoverComponent).
+.card-art--wrapped {
+  position: relative;
   background:
-    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
-    linear-gradient(135deg, var(--cyan), var(--violet));
+    radial-gradient(circle at 22% 18%, rgb(156 10 191 / 0.7), transparent 58%),
+    radial-gradient(circle at 82% 86%, rgb(27 220 111 / 0.45), transparent 60%),
+    linear-gradient(145deg, #2a0b38, #0a0a14 60%, #06120c);
 }
 
-.card-art[data-art='green'] {
-  background:
-    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
-    linear-gradient(135deg, var(--green), var(--cyan));
-}
-
-.card-art[data-art='magenta'] {
-  background:
-    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
-    linear-gradient(135deg, var(--magenta), #ff7a59);
-}
-
-// A tiny record on the hero card's art, the one the cards came out of.
-.card-art[data-art='hero'] {
-  background:
-    radial-gradient(
-      circle closest-side,
-      var(--bg) 0 4%,
-      var(--magenta) 5% 30%,
-      var(--vinyl) 31% 44%,
-      #24242b 45%,
-      var(--vinyl) 46% 60%,
-      #24242b 61%,
-      var(--vinyl) 62% 78%,
-      transparent 79%
-    ),
-    linear-gradient(135deg, var(--violet), var(--magenta) 55%, var(--cyan));
+.card-art--wrapped img {
+  position: absolute;
+  inset: 24%;
+  width: 52%;
+  height: 52%;
 }
 
 .card-label {
@@ -337,13 +579,6 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: $tracking-tight;
   line-height: 1.1;
-}
-
-.card--hero .card-value {
-  background: linear-gradient(90deg, var(--cyan), var(--green));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .card-note {
@@ -367,7 +602,7 @@
   clip-path: inset(0 100% 0 0);
   animation:
     wipe 450ms cubic-bezier(0.4, 0, 0.2, 1) 4150ms both,
-    handoff 450ms cubic-bezier(0.5, 0, 0.2, 1) 4700ms forwards;
+    handoff 450ms cubic-bezier(0.5, 0, 0.2, 1) 5200ms forwards;
 }
 
 .tagline {
@@ -387,8 +622,20 @@
   background-clip: text;
   color: transparent;
   animation:
-    rise 400ms cubic-bezier(0.2, 0.7, 0.2, 1) 4350ms both,
-    fade-out 250ms 4700ms forwards;
+    rise 500ms cubic-bezier(0.16, 1, 0.3, 1) 4350ms both,
+    fade-out 250ms 5200ms forwards;
+}
+
+// Film grain over the whole frame, re-seeded every few frames.
+.grain {
+  position: absolute;
+  inset: -50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  pointer-events: none;
+  animation:
+    grain 400ms steps(1) infinite,
+    fade-out 450ms ease-in 5350ms forwards;
 }
 
 // ── Skip ──────────────────────────────────────────────────────────────────
@@ -406,7 +653,7 @@
   font-size: $text-sm;
   font-weight: $font-weight-medium;
   backdrop-filter: blur(8px);
-  animation: fade-out 300ms 4850ms forwards;
+  animation: fade-out 300ms 5350ms forwards;
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);
@@ -428,70 +675,72 @@
 
 // ── Keyframes ─────────────────────────────────────────────────────────────
 
-// Eases up to ~33 rpm over 0.8 s, then holds it. The first segment's curve
-// ends at twice its average speed, which is the speed of the second.
+// Eases up to 33⅓ rpm (200deg/s) over 0.8 s, then holds it. The first
+// segment's curve ends at twice its average speed, which is the speed of the
+// second.
 @keyframes spin {
   0% {
     transform: rotate(0deg);
     animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0.33);
   }
   15% {
-    transform: rotate(78deg);
+    transform: rotate(80deg);
     animation-timing-function: linear;
   }
   100% {
-    transform: rotate(962deg);
+    transform: rotate(980deg);
   }
 }
 
-@keyframes glow {
-  0%,
-  19.5% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  23% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-  50%,
-  73% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
-  86% {
-    opacity: 1;
-    transform: scale(0.8);
-  }
-}
-
-@keyframes ripple {
+@keyframes wobble {
   from {
-    opacity: 0.9;
-    transform: scale(1);
+    transform: rotate(-1.2deg);
   }
   to {
-    opacity: 0;
-    transform: scale(1.75);
+    transform: rotate(1.2deg);
   }
 }
 
-// 1.05-1.35 s up from nothing; 2.9-3.3 s sucked back into the record.
+// 2.65-3.15 s out of focus and into shadow behind the cards; sharp again by
+// 4 s, when the cards are back in the record.
+@keyframes deck {
+  0%,
+  50% {
+    filter: blur(0) brightness(1);
+    transform: none;
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  59.4%,
+  69.8% {
+    filter: blur(5px) brightness(0.5);
+    transform: scale(0.96);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  75.5%,
+  100% {
+    filter: blur(0) brightness(1);
+    transform: none;
+  }
+}
+
+// 1.3-1.6 s up once the needle is down; 2.9-3.3 s back into the record.
 @keyframes eq-ring {
   0%,
-  19.8% {
+  24.5% {
     opacity: 0;
-    transform: scale(0.7);
+    transform: scale(0.94);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  25.5%,
+  30.2%,
   54.7% {
     opacity: 1;
     transform: scale(1);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
   }
   62.3%,
   100% {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(0.9);
   }
 }
 
@@ -500,23 +749,24 @@
     transform: scaleY(0.12);
   }
   to {
-    transform: scaleY(1);
+    transform: scaleY(var(--p));
   }
 }
 
-// 2.7-3.2 s steps back behind the cards; 3.9-4.35 s shrinks into the logo's
-// circle; gone under the logo by 4.75 s.
+// 2.7-3.2 s eases back a touch behind the cards; 3.9-4.35 s shrinks into the
+// logo's circle; gone under the logo by 4.75 s.
 @keyframes record {
   0%,
   50.9% {
     opacity: 1;
     transform: none;
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
   }
   60.4%,
   73.6% {
-    opacity: 0.45;
-    transform: scale(0.78);
-    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+    opacity: 1;
+    transform: scale(0.94);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.2, 1);
   }
   82.1%,
   86.8% {
@@ -535,7 +785,7 @@
   0%,
   73.6% {
     transform: scale(1);
-    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.2, 1);
   }
   82.1%,
   100% {
@@ -543,65 +793,100 @@
   }
 }
 
-// 0.35-0.9 s swing in, lifted; 1.05 s down. 3.55-3.9 s swing away.
+// Swings over with the weight of a real arm: slow to start, settling without
+// overshoot. Then creeps inward as the record plays, lifts at 3.45 s, and
+// heads home.
 @keyframes arm {
   0%,
   6.6% {
-    opacity: 1;
     transform: rotate(0deg);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
   }
-  17% {
-    transform: rotate(22deg);
+  18.9%,
+  26.4% {
+    transform: rotate(20.5deg);
+    animation-timing-function: linear;
   }
-  19.8%,
-  67% {
-    opacity: 1;
-    transform: rotate(21deg);
-    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  65.1%,
+  67.9% {
+    transform: rotate(21.6deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.6, 1);
   }
-  73.6%,
+  75.5%,
   100% {
-    opacity: 0;
-    transform: rotate(-8deg);
+    transform: rotate(6deg);
   }
 }
 
-// Lifted (bigger, nearer the camera) on the swing, then set down.
+// Lifted off the rest at 0.2 s, lowered on the cue's damped fall at
+// 1.05-1.4 s, lifted again at 3.45 s.
 @keyframes head {
   0%,
-  6.6% {
-    transform: scale(1);
+  3.8% {
+    transform: rotate(16deg) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
   }
-  12%,
-  17% {
-    transform: scale(1.16);
+  6.6%,
+  19.8% {
+    transform: rotate(16deg) scale(1.05);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
   }
-  19.8%,
+  26.4%,
+  65.1% {
+    transform: rotate(16deg) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  67.9%,
   100% {
-    transform: scale(1);
+    transform: rotate(16deg) scale(1.05);
+  }
+}
+
+@keyframes arm-shadow {
+  0%,
+  3.8% {
+    transform: translate(calc(var(--rec) * 0.012), calc(var(--rec) * 0.02));
+    opacity: 0.6;
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  6.6%,
+  19.8% {
+    transform: translate(calc(var(--rec) * 0.03), calc(var(--rec) * 0.05));
+    opacity: 0.4;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  26.4%,
+  65.1% {
+    transform: translate(calc(var(--rec) * 0.01), calc(var(--rec) * 0.016));
+    opacity: 0.6;
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  67.9%,
+  100% {
+    transform: translate(calc(var(--rec) * 0.03), calc(var(--rec) * 0.05));
+    opacity: 0.4;
   }
 }
 
 @keyframes fan {
   from {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.4);
   }
-  30% {
+  25% {
     opacity: 1;
   }
   to {
     opacity: 1;
     transform: translate(calc(var(--i) * var(--card) * 0.7), calc(var(--k) * var(--k) * var(--card) * 0.05 - var(--card) * 0.08))
-      rotate(calc(var(--i) * 5deg));
+      rotate(calc(var(--i) * 4deg));
   }
 }
 
 @keyframes gather {
   to {
     opacity: 0;
-    transform: scale(0.2);
+    transform: scale(0.25);
   }
 }
 
@@ -623,7 +908,22 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
+  }
+}
+
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-7%, 4%);
+  }
+  50% {
+    transform: translate(5%, -6%);
+  }
+  75% {
+    transform: translate(-3%, -8%);
   }
 }
 
