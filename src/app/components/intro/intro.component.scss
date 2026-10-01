@@ -1,9 +1,9 @@
 @import 'tokens';
 
-// intro-scene.ts draws the scene as a function of time: the canvases, and the turntable
-// through --spin, --arm, --lift and --rim on .deck. This file builds the turntable, positions
-// the layers, and owns the exit: the logo flies onto the landing's at 4.9 s while the rest
-// fades, gone by INTRO_LENGTH = 5.5 s.
+// intro-scene.ts draws the scene as a function of time: the canvases, the camera transform on
+// .deck, and the turntable through --spin, --arm, --lift and --rim. This file builds the
+// turntable, positions the layers, and owns the exit: the logo flies onto the landing's at
+// HANDOFF = 6.25 s while the rest fades, gone by INTRO_LENGTH = 6.85 s.
 //
 // The light is a skylight up and to the left: highlights sit top-left, shadows fall
 // down-right, reflections on the vinyl and metal stay put while the things under them turn.
@@ -32,7 +32,7 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
   position: absolute;
   inset: 0;
   background: $room;
-  animation: fade-out 450ms ease-in 5050ms forwards;
+  animation: fade-out 450ms ease-in 6400ms forwards;
 }
 
 .layer {
@@ -42,14 +42,45 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
   height: 100%;
 }
 
-// The focal plane with the record, so drawn sharp at device resolution.
-.now-playing {
+// Dims the room under the stats panel.
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(4 5 6);
+  opacity: 0;
+  will-change: opacity;
+}
+
+// The UI panels sit in the focal plane, so they are drawn sharp at device resolution.
+.now-playing,
+.stats {
   position: absolute;
   left: 50%;
-  top: calc(var(--cy) + var(--rec) * 0.68);
-  border-radius: 10px;
   box-shadow: 0 24px 60px rgb(0 0 0 / 0.5);
   opacity: 0;
+  will-change: transform, opacity;
+}
+
+.now-playing {
+  top: calc(var(--cy) + var(--rec) * 0.68);
+  border-radius: 10px;
+}
+
+// Centred on the record by a negative margin from intro-scene.ts.
+.stats {
+  top: var(--cy);
+  border-radius: 14px;
+}
+
+// The label's mark once it leaves the record; intro-scene.ts sizes it to the wordmark's disc.
+.lift {
+  position: absolute;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.lens {
+  pointer-events: none;
 }
 
 .vignette {
@@ -284,31 +315,21 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
     inset 0 0 calc(var(--rec) * 0.02) rgb(40 0 60 / 0.3);
 }
 
-// What's printed on the label, turning with the record.
+// What's printed on the label, the lettering and the mark, turning with the record. A canvas
+// so it can motion-blur when the record spins up.
 .print {
   inset: 32%;
+  width: 36%;
+  height: 36%;
   will-change: transform;
-  transform: rotate(var(--spin));
 }
 
-// Its X reaches 1.24x its half-width from the centre, so at 58% of the label the tips stay
-// inside the lettering. That is 0.2 of the record, under the 300 px source at 2x.
-.mark-print {
-  position: absolute;
-  inset: 21%;
-  width: 58%;
-  height: 58%;
-}
-
-.ring {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  fill: rgb(255 246 252 / 0.82);
-  font-family: var(--font-sans);
-  font-weight: $font-weight-semibold;
+// The mark's shadow on the label paper as it lifts away.
+.lift-shadow {
+  inset: 40%;
+  background: radial-gradient(closest-side, rgb(8 0 14 / 0.75), rgb(8 0 14 / 0.4) 70%, transparent);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 // The steel spindle through the hole.
@@ -338,6 +359,21 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
     conic-gradient(from 143deg, rgb(120 240 185 / 0.04), transparent 14deg 346deg, rgb(150 200 255 / 0.03));
   mask-image: radial-gradient(circle closest-side, transparent 36.5%, #000 40% 95%, transparent 97%);
   animation: wobble 900ms cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+// A band of light crossing the vinyl on the beat, kept off the label.
+.sweep {
+  inset: 0;
+  overflow: hidden;
+  mask-image: radial-gradient(circle closest-side, transparent 37%, #000 40% 96%, transparent 98%);
+}
+
+.sweep i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 38%, rgb(255 250 240 / 0.13) 50%, transparent 62%);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 // ── Tonearm ───────────────────────────────────────────────────────────────
@@ -463,6 +499,7 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
 }
 
 .mark-logo {
+  position: relative;
   display: block;
   opacity: 0;
 }
@@ -471,7 +508,23 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
   display: block;
   width: min(560px, 84vw);
   height: auto;
-  animation: handoff 450ms cubic-bezier(0.5, 0, 0.2, 1) 4900ms forwards;
+  animation: handoff 450ms cubic-bezier(0.5, 0, 0.2, 1) 6250ms forwards;
+}
+
+// Light running across the painted wordmark, and only the wordmark.
+.glint {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mask: url('/assets/img/banner-logo-x-rework.png') center / 100% 100% no-repeat;
+}
+
+.glint i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.4) 50%, transparent 62%);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .tagline {
@@ -486,7 +539,7 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
   background-clip: text;
   color: transparent;
   opacity: 0;
-  animation: fade-out 250ms 4900ms forwards;
+  animation: fade-out 250ms 6250ms forwards;
 }
 
 // ── Skip ──────────────────────────────────────────────────────────────────
@@ -504,7 +557,7 @@ $room: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
   font-size: $text-sm;
   font-weight: $font-weight-medium;
   backdrop-filter: blur(8px);
-  animation: fade-out 300ms 5050ms forwards;
+  animation: fade-out 300ms 6400ms forwards;
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);

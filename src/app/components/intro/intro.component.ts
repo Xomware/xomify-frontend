@@ -8,14 +8,13 @@ import {
   inject,
   output,
   signal,
-  viewChild,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import { HANDOFF, createScene } from './intro-scene';
 
 // Matches the scene's fade at the end of intro.component.scss.
-export const INTRO_LENGTH = 5500;
+export const INTRO_LENGTH = 6850;
 // Just before the logo starts its flight onto the landing's, late enough that the lazy
 // landing route has rendered.
 export const AIM_AT = HANDOFF - 150;
@@ -27,11 +26,12 @@ interface Aim {
 }
 
 /**
- * The ~5.5 s landing intro: a record spins up on a turntable in a hazy listening room, the
- * needle drops, the track builds, holds its breath for a beat, and drops into the Xomify
- * wordmark, which flies onto the landing's own logo. Drawn by intro-scene.ts as a pure
- * function of time, outside Angular's zone. `index.html` paints the opening frame (the empty
- * room) before any JS; keep the two in step.
+ * The ~6.8 s landing intro: a record on a turntable in a hazy listening room, cut to a track.
+ * The needle drops in close-up, the camera orbits while the now-playing card skips tracks,
+ * sample stats build, the camera dives at the label, and on the drop the label's X lifts off
+ * and becomes the Xomify wordmark, which flies onto the landing's own logo. Drawn by
+ * intro-scene.ts as a pure function of time, outside Angular's zone. `index.html` paints the
+ * opening frame (the empty room) before any JS; keep the two in step.
  */
 @Component({
   selector: 'app-intro',
@@ -49,12 +49,6 @@ export class IntroComponent {
 
   private readonly doc = inject(DOCUMENT);
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;
-  private readonly haze = viewChild.required<ElementRef<HTMLCanvasElement>>('haze');
-  private readonly gear = viewChild.required<ElementRef<HTMLCanvasElement>>('gear');
-  private readonly card = viewChild.required<ElementRef<HTMLCanvasElement>>('card');
-  private readonly deck = viewChild.required<ElementRef<HTMLElement>>('deck');
-  private readonly mark = viewChild.required<ElementRef<HTMLElement>>('mark');
-  private readonly tagline = viewChild.required<ElementRef<HTMLElement>>('tagline');
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -68,14 +62,7 @@ export class IntroComponent {
       ];
       let frame = 0;
       zone.runOutsideAngular(() => {
-        const draw = createScene({
-          haze: this.haze().nativeElement,
-          gear: this.gear().nativeElement,
-          card: this.card().nativeElement,
-          deck: this.deck().nativeElement,
-          logo: this.mark().nativeElement,
-          tagline: this.tagline().nativeElement,
-        });
+        const draw = createScene(this.host);
         const start = performance.now();
         const tick = (): void => {
           const t = performance.now() - start;

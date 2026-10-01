@@ -11,7 +11,8 @@ export interface HazeFrame {
   flare: number;
   // 0..1, the drop's shock wave clearing the haze outward from the record.
   blast: number;
-  shake: number;
+  // The camera's orbit, which swings the skylight across the frame.
+  yaw: number;
   // The record's centre, as a fraction of the viewport.
   cx: number;
   cy: number;
@@ -38,7 +39,7 @@ uniform float uLight;
 uniform float uEnter;
 uniform float uFlare;
 uniform float uBlast;
-uniform float uShake;
+uniform float uYaw;
 uniform vec2 uCenter;
 uniform vec3 uTop;
 uniform vec3 uBottom;
@@ -76,12 +77,11 @@ void main() {
   vec3 room = mix(uTop, uBottom, uv.y);
   // y grows downward, as on the page.
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
-  p.y += uShake;
   vec2 c = (uCenter - 0.5) * vec2(aspect, 1.0);
 
   // A skylight up and to the left of frame. Its beams are rays broken up by noise in angle,
   // so they fan out from the source the way light through a dusty window does.
-  vec2 src = vec2(-0.32 * aspect, -0.95);
+  vec2 src = vec2((-0.32 + 0.3 * uYaw) * aspect, -0.95);
   vec2 v = p - src;
   float dist = length(v);
   float ang = atan(v.x, v.y);
@@ -150,7 +150,7 @@ export function createHaze(canvas: HTMLCanvasElement): ((f: HazeFrame) => void) 
   const enter = u('uEnter');
   const flare = u('uFlare');
   const blast = u('uBlast');
-  const shake = u('uShake');
+  const yaw = u('uYaw');
   const center = u('uCenter');
 
   return (f) => {
@@ -161,7 +161,7 @@ export function createHaze(canvas: HTMLCanvasElement): ((f: HazeFrame) => void) 
     gl.uniform1f(enter, f.enter);
     gl.uniform1f(flare, f.flare);
     gl.uniform1f(blast, f.blast);
-    gl.uniform1f(shake, f.shake);
+    gl.uniform1f(yaw, f.yaw);
     gl.uniform2f(center, f.cx, f.cy);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
