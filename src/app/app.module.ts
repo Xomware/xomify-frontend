@@ -21,6 +21,7 @@ import { ToastComponent } from './components/toast/toast.component';
 import { CallbackComponent } from './components/callback/callback.component';
 import { SpaceBackgroundComponent } from './components/space-background/space-background.component';
 import { ImpersonationBannerComponent } from './components/impersonation-banner/impersonation-banner.component';
+import { IntroGateComponent } from './components/intro/intro-gate.component';
 
 // Eagerly-loaded pages (core navigation)
 import { HomeComponent } from './pages/home/home.component';
@@ -85,6 +86,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
   bootstrap: [AppComponent],
   imports: [
     FriendScopePickerComponent,
+    IntroGateComponent,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
