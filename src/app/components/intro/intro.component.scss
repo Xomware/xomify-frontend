@@ -1,0 +1,634 @@
+@import 'tokens';
+
+// Timeline against INTRO_LENGTH = 5300 ms, from the first frame:
+//   0.0 s        the record spins up
+//   0.35-1.05 s  the arm swings in; the needle drops at 1.05 s
+//   1.05-3.3 s   ripples, then the equalizer pulses round the record
+//   2.75-3.9 s   Wrapped cards fan out of the record and gather back in
+//   3.9-4.6 s    the record shrinks into the logo's circle; the logo wipes in
+//   4.7-5.15 s   the logo flies onto the landing's hero logo as the stage fades
+//
+// The opening frame (record, label, arm parked) is duplicated as the poster in
+// src/index.html. Change one, change the other.
+
+:host {
+  // The logo's own colours, sampled from banner-logo-x-rework.png.
+  --violet: #9402f3;
+  --magenta: #f502c9;
+  --cyan: #01d2f4;
+  --green: #01ee9e;
+  --vinyl: #121216;
+
+  --rec: min(62vmin, 500px);
+  --cy: 47%;
+  --card: min(24vmin, 170px);
+
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+// Centres an element of size --w × --h on the record.
+%on-record {
+  position: absolute;
+  left: 50%;
+  top: var(--cy);
+  width: var(--w);
+  height: var(--h, var(--w));
+  margin-left: calc(var(--w) / -2);
+  margin-top: calc(var(--h, var(--w)) / -2);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  animation: fade-out 450ms ease-in 4850ms forwards;
+}
+
+.glow {
+  @extend %on-record;
+  --w: calc(var(--rec) * 2.4);
+  background: radial-gradient(circle, rgb(148 2 243 / 0.32), rgb(148 2 243 / 0.08) 38%, transparent 62%);
+  opacity: 0.85;
+  animation: glow 5300ms ease-out both;
+}
+
+.ripple {
+  @extend %on-record;
+  --w: var(--rec);
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 800ms cubic-bezier(0.2, 0.6, 0.3, 1) 1050ms both;
+}
+
+.ripple--late {
+  border-color: var(--magenta);
+  animation-delay: 1300ms;
+}
+
+// ── Equalizer ─────────────────────────────────────────────────────────────
+
+.eq {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% var(--cy);
+  animation: eq-ring 5300ms both;
+}
+
+// Each bar stands on the record's centre, then is pushed out past the rim
+// along its own angle.
+.eq-bar {
+  --len: calc(var(--rec) * 0.15);
+  position: absolute;
+  left: 50%;
+  top: calc(var(--cy) - var(--len));
+  width: max(3px, calc(var(--rec) * 0.012));
+  height: var(--len);
+  margin-left: calc(max(3px, calc(var(--rec) * 0.012)) / -2);
+  transform-origin: 50% 100%;
+  transform: rotate(var(--a)) translateY(calc(var(--rec) * -0.53));
+}
+
+.eq-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-pill;
+  background: var(--c);
+  box-shadow: 0 0 8px var(--c);
+  transform-origin: 50% 100%;
+  animation: eq 400ms ease-in-out infinite alternate;
+}
+
+// ── Record ────────────────────────────────────────────────────────────────
+
+.record {
+  @extend %on-record;
+  --w: var(--rec);
+  animation: record 5300ms both;
+}
+
+.record > * {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.disc {
+  inset: 0;
+  background:
+    radial-gradient(circle, transparent 47%, rgb(255 255 255 / 0.05) 48%, transparent 49.5%),
+    repeating-radial-gradient(circle, var(--vinyl) 0 1.5px, #1b1b21 1.5px 3px),
+    var(--vinyl);
+  box-shadow:
+    0 0 0 calc(var(--rec) * 0.012) #0b0b0e,
+    0 24px 60px rgb(0 0 0 / 0.55);
+  will-change: transform;
+  // Its rim would show round the label as a crescent once the record is all label.
+  animation:
+    spin 5300ms both,
+    fade-out 250ms 4050ms forwards;
+}
+
+// Static, like a printed label: the logo's circle is a vertical violet to
+// magenta, and the record has to hand over to it without a seam.
+.label {
+  inset: 32%;
+  background: linear-gradient(180deg, var(--violet), var(--magenta));
+  animation: label 5300ms both;
+}
+
+.ring {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: rgb(255 255 255 / 0.78);
+  font-family: var(--font-sans);
+  font-weight: $font-weight-bold;
+  animation:
+    spin 5300ms both,
+    fade-out 300ms 3900ms forwards;
+}
+
+.spindle {
+  inset: 48.6%;
+  background: var(--bg);
+  animation: fade-out 300ms 3900ms forwards;
+}
+
+// The light on the vinyl stays put while the record turns under it.
+.sheen {
+  inset: 0;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0deg,
+    rgb(255 255 255 / 0.1) 18deg,
+    transparent 40deg 180deg,
+    rgb(255 255 255 / 0.07) 200deg,
+    transparent 222deg
+  );
+  mask-image: radial-gradient(circle, transparent 33%, #000 34%);
+  animation: fade-out 300ms 3900ms forwards;
+}
+
+// ── Tonearm ───────────────────────────────────────────────────────────────
+
+// Pivots up and to the right of the record. Parked, it hangs straight down,
+// clear of the vinyl; at 21deg the stylus sits in the outer grooves.
+.arm {
+  position: absolute;
+  left: calc(50% + var(--rec) * 0.6);
+  top: calc(var(--cy) - var(--rec) * 0.45);
+  width: 0;
+  height: 0;
+  animation: arm 5300ms both;
+}
+
+.arm-base {
+  position: absolute;
+  left: calc(var(--rec) * -0.07);
+  top: calc(var(--rec) * -0.07);
+  width: calc(var(--rec) * 0.14);
+  height: calc(var(--rec) * 0.14);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #4a4a52, #1e1e23 70%);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
+}
+
+.arm-tube {
+  position: absolute;
+  left: calc(var(--rec) * -0.011);
+  top: 0;
+  width: calc(var(--rec) * 0.022);
+  height: calc(var(--rec) * 0.7);
+  border-radius: $radius-pill;
+  background: linear-gradient(90deg, #6e6e78, #d6d6de 45%, #74747d);
+}
+
+.arm-head {
+  position: absolute;
+  left: calc(var(--rec) * -0.035);
+  top: calc(var(--rec) * 0.68);
+  width: calc(var(--rec) * 0.07);
+  height: calc(var(--rec) * 0.11);
+  border-radius: $radius-sm;
+  background: linear-gradient(180deg, #2a2a30, #131316);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    0 8px 14px rgb(0 0 0 / 0.55);
+  transform-origin: 50% 0;
+  animation: head 5300ms both;
+}
+
+// ── Cards ─────────────────────────────────────────────────────────────────
+
+.card {
+  --cw: var(--card);
+  --ch: calc(var(--card) * 1.42);
+  position: absolute;
+  left: 50%;
+  top: var(--cy);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: var(--cw);
+  height: var(--ch);
+  margin-left: calc(var(--cw) / -2);
+  margin-top: calc(var(--ch) / -2);
+  padding: calc(var(--card) * 0.07);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  z-index: calc(3 - var(--k));
+  opacity: 0;
+  animation:
+    fan 650ms cubic-bezier(0.2, 0.9, 0.3, 1.12) calc(2750ms + var(--k) * 90ms) both,
+    gather 380ms cubic-bezier(0.5, 0, 0.8, 0.4) calc(3780ms - var(--k) * 40ms) forwards;
+}
+
+// The fan covers each card's inner edge, so the right-hand cards read from
+// their right.
+.card--right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.card-label,
+.card-note {
+  max-width: 100%;
+}
+
+.card--hero {
+  --cw: calc(var(--card) * 1.06);
+  --ch: calc(var(--card) * 1.5);
+  border-color: rgb(148 2 243 / 0.6);
+  background: linear-gradient(180deg, #24152f, var(--surface-raised) 60%);
+}
+
+.card-art {
+  flex: none;
+  align-self: stretch;
+  aspect-ratio: 5 / 4;
+  margin-bottom: calc(var(--card) * 0.04);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
+    linear-gradient(135deg, var(--violet), var(--magenta));
+}
+
+.card-art[data-art='cyan'] {
+  background:
+    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
+    linear-gradient(135deg, var(--cyan), var(--violet));
+}
+
+.card-art[data-art='green'] {
+  background:
+    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
+    linear-gradient(135deg, var(--green), var(--cyan));
+}
+
+.card-art[data-art='magenta'] {
+  background:
+    radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 45%),
+    linear-gradient(135deg, var(--magenta), #ff7a59);
+}
+
+// A tiny record on the hero card's art, the one the cards came out of.
+.card-art[data-art='hero'] {
+  background:
+    radial-gradient(
+      circle closest-side,
+      var(--bg) 0 4%,
+      var(--magenta) 5% 30%,
+      var(--vinyl) 31% 44%,
+      #24242b 45%,
+      var(--vinyl) 46% 60%,
+      #24242b 61%,
+      var(--vinyl) 62% 78%,
+      transparent 79%
+    ),
+    linear-gradient(135deg, var(--violet), var(--magenta) 55%, var(--cyan));
+}
+
+.card-label {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: $text-2xs;
+  font-weight: $font-weight-semibold;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-value {
+  color: var(--text-primary);
+  font-size: clamp(1rem, calc(var(--card) * 0.15), 1.625rem);
+  font-weight: $font-weight-extrabold;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: $tracking-tight;
+  line-height: 1.1;
+}
+
+.card--hero .card-value {
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-note {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: $text-2xs;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Logo and tagline ──────────────────────────────────────────────────────
+
+// Sized off the record so its circle (37.1% of the width, centred 20.96% in
+// and 46.22% down) lands exactly where the record ends up.
+.logo {
+  @extend %on-record;
+  --w: calc(var(--rec) * 1.1);
+  --h: calc(var(--rec) * 1.1 * 278 / 582);
+  max-width: none;
+  clip-path: inset(0 100% 0 0);
+  animation:
+    wipe 450ms cubic-bezier(0.4, 0, 0.2, 1) 4150ms both,
+    handoff 450ms cubic-bezier(0.5, 0, 0.2, 1) 4700ms forwards;
+}
+
+.tagline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--cy) + var(--rec) * 0.38);
+  margin: 0;
+  padding: 0 $spacing-lg;
+  font-size: clamp(1.125rem, 3.2vmin, 1.75rem);
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
+  line-height: 1.2;
+  text-align: center;
+  background: linear-gradient(100deg, var(--text-primary) 30%, var(--accent-purple-text) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    rise 400ms cubic-bezier(0.2, 0.7, 0.2, 1) 4350ms both,
+    fade-out 250ms 4700ms forwards;
+}
+
+// ── Skip ──────────────────────────────────────────────────────────────────
+
+.skip {
+  position: absolute;
+  right: calc(#{$spacing-md} + env(safe-area-inset-right));
+  bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  min-height: 44px;
+  padding: 0 $spacing-lg;
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-pill;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--text-secondary);
+  font-size: $text-sm;
+  font-weight: $font-weight-medium;
+  backdrop-filter: blur(8px);
+  animation: fade-out 300ms 4850ms forwards;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover {
+    background: rgb(255 255 255 / 0.12);
+    color: var(--text-primary);
+  }
+
+  &:active {
+    background: rgb(255 255 255 / 0.18);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-purple-text);
+    outline-offset: 2px;
+  }
+}
+
+// ── Keyframes ─────────────────────────────────────────────────────────────
+
+// Eases up to ~33 rpm over 0.8 s, then holds it. The first segment's curve
+// ends at twice its average speed, which is the speed of the second.
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0.33);
+  }
+  15% {
+    transform: rotate(78deg);
+    animation-timing-function: linear;
+  }
+  100% {
+    transform: rotate(962deg);
+  }
+}
+
+@keyframes glow {
+  0%,
+  19.5% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  23% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  50%,
+  73% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  86% {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+// 1.05-1.35 s up from nothing; 2.9-3.3 s sucked back into the record.
+@keyframes eq-ring {
+  0%,
+  19.8% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  25.5%,
+  54.7% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  62.3%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes eq {
+  from {
+    transform: scaleY(0.12);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+// 2.7-3.2 s steps back behind the cards; 3.9-4.35 s shrinks into the logo's
+// circle; gone under the logo by 4.75 s.
+@keyframes record {
+  0%,
+  50.9% {
+    opacity: 1;
+    transform: none;
+  }
+  60.4%,
+  73.6% {
+    opacity: 0.45;
+    transform: scale(0.78);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+  }
+  82.1%,
+  86.8% {
+    opacity: 1;
+    transform: translate(calc(var(--rec) * -0.3195), calc(var(--rec) * -0.0199)) scale(0.408);
+  }
+  89.6%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--rec) * -0.3195), calc(var(--rec) * -0.0199)) scale(0.408);
+  }
+}
+
+// Grows over the grooves until the record is all label: the logo's circle.
+@keyframes label {
+  0%,
+  73.6% {
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+  }
+  82.1%,
+  100% {
+    transform: scale(2.78);
+  }
+}
+
+// 0.35-0.9 s swing in, lifted; 1.05 s down. 3.55-3.9 s swing away.
+@keyframes arm {
+  0%,
+  6.6% {
+    opacity: 1;
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  17% {
+    transform: rotate(22deg);
+  }
+  19.8%,
+  67% {
+    opacity: 1;
+    transform: rotate(21deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+  73.6%,
+  100% {
+    opacity: 0;
+    transform: rotate(-8deg);
+  }
+}
+
+// Lifted (bigger, nearer the camera) on the swing, then set down.
+@keyframes head {
+  0%,
+  6.6% {
+    transform: scale(1);
+  }
+  12%,
+  17% {
+    transform: scale(1.16);
+  }
+  19.8%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fan {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate(calc(var(--i) * var(--card) * 0.7), calc(var(--k) * var(--k) * var(--card) * 0.05 - var(--card) * 0.08))
+      rotate(calc(var(--i) * 5deg));
+  }
+}
+
+@keyframes gather {
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+// Onto the landing's hero logo, set in IntroComponent.aimAtLanding; with no
+// hero logo to land on, --ho is 0 and it fades where it is.
+@keyframes handoff {
+  to {
+    opacity: var(--ho);
+    transform: translate(var(--hx), var(--hy)) scale(var(--hs));
+  }
+}
+
+@keyframes wipe {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}

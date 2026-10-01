@@ -1,0 +1,70 @@
+<div class="stage" aria-hidden="true">
+  <div class="backdrop"></div>
+  <div class="glow"></div>
+  <span class="ripple"></span>
+  <span class="ripple ripple--late"></span>
+
+  <div class="eq">
+    @for (bar of bars; track bar.angle) {
+      <span class="eq-bar" [style.--a.deg]="bar.angle">
+        <span
+          class="eq-fill"
+          [style.--c]="bar.color"
+          [style.animation-duration.ms]="bar.duration"
+          [style.animation-delay.ms]="bar.delay"
+        ></span>
+      </span>
+    }
+  </div>
+
+  <div class="record">
+    <div class="disc"></div>
+    <div class="label"></div>
+    <svg class="ring" viewBox="0 0 100 100">
+      <defs>
+        <path id="intro-ring" d="M50 50m-13.5 0a13.5 13.5 0 1 1 27 0a13.5 13.5 0 1 1-27 0" />
+      </defs>
+      <text font-size="3.4" letter-spacing="0.6"><textPath href="#intro-ring">XOMIFY · SIDE A · 33⅓ RPM ·</textPath></text>
+    </svg>
+    <span class="spindle"></span>
+    <span class="sheen"></span>
+  </div>
+
+  <div class="arm">
+    <span class="arm-base"></span>
+    <span class="arm-tube"></span>
+    <span class="arm-head"></span>
+  </div>
+
+  <div class="cards">
+    @for (card of cards; track card.label) {
+      <div
+        class="card"
+        [class.card--hero]="card.slot === 0"
+        [class.card--right]="card.slot > 0"
+        [style.--i]="card.slot"
+        [style.--k]="card.slot < 0 ? -card.slot : card.slot"
+      >
+        <span class="card-art" [attr.data-art]="card.art"></span>
+        <span class="card-label">{{ card.label }}</span>
+        <span class="card-value">{{ card.value }}</span>
+        <span class="card-note">{{ card.note }}</span>
+      </div>
+    }
+  </div>
+
+  <img
+    class="logo"
+    src="assets/img/banner-logo-x-rework.png"
+    alt=""
+    width="582"
+    height="278"
+    [style.--hx.px]="aim()?.x ?? 0"
+    [style.--hy.px]="aim()?.y ?? 0"
+    [style.--hs]="aim()?.scale ?? 1"
+    [style.--ho]="aim() ? 1 : 0"
+  />
+  <p class="tagline">Your Spotify year, all year.</p>
+</div>
+
+<button type="button" class="skip" aria-label="Skip intro" (click)="done.emit()">Skip</button>
