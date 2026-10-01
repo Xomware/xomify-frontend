@@ -10,11 +10,10 @@
 .act {
   display: flex;
   align-items: center;
-  // `min-height`, never `height` — an act whose content is taller than the
-  // viewport must grow rather than clip. On a short laptop window several of
-  // these overflow a viewport comfortably.
-  min-height: 100vh;
-  padding: $spacing-3xl $spacing-lg;
+  // Sized by content, not the viewport: a full-height act centred a
+  // 400px block in 900px of nothing, and the page read as separate slides.
+  // 64px between acts on a phone, 96px from 992px up.
+  padding: $spacing-xl $spacing-lg;
   width: 100%;
   position: relative;
 }
@@ -22,8 +21,14 @@
 // Desktop reserves the rail's column so long headings never run underneath it.
 @media (min-width: $breakpoint-lg) {
   .act {
-    padding-left: $spacing-4xl;
+    padding: $spacing-2xl $spacing-lg $spacing-2xl $spacing-4xl;
   }
+}
+
+// The hero sits a little lower so it isn't jammed under the toolbar; the first
+// act still peeks above the fold.
+.act--hero {
+  padding-top: $spacing-4xl;
 }
 
 .act-inner {
