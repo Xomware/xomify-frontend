@@ -34,6 +34,12 @@ describe('IntroComponent', () => {
     expect(done).toBe(1);
   });
 
+  it('ends when Escape is pressed', () => {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(done).toBe(1);
+  });
+
   it('ends on its own after the scene has played', fakeAsync(() => {
     fixture.destroy();
     fixture = TestBed.createComponent(IntroComponent);

@@ -22,9 +22,9 @@
       })();
     </script>
     <style>
-      /* The intro's first frame (src/app/components/intro), painted before any
-         JS so the landing never opens on a blank screen. Keep it in step with
-         intro.component.scss. */
+      /* The intro's first frame (src/app/components/intro): the empty room, painted
+         before any JS so the landing never opens on a blank screen. Keep it in step
+         with $room in intro.component.scss. */
       html[data-intro] {
         overflow: hidden;
       }
@@ -38,9 +38,7 @@
         inset: 0;
         z-index: 3999;
         overflow: hidden;
-        background: #0a0a0d;
-        --rec: min(62vmin, 500px);
-        --cy: 47%;
+        background: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
       }
       html[data-intro='poster'] .xi-poster {
         display: block;
@@ -50,289 +48,24 @@
           display: none;
         }
       }
-      .xi-poster > div,
-      .xi-poster span {
+      .xi-poster > div {
         position: absolute;
       }
-      .xi-light {
+      .xi-vignette {
         inset: 0;
-        background:
-          radial-gradient(ellipse 60% 55% at 44% 38%, rgb(236 232 255 / 0.07), transparent 70%),
-          radial-gradient(ellipse 120% 90% at 50% 45%, transparent 50%, rgb(0 0 0 / 0.5));
-      }
-      .xi-plinth {
-        left: calc(50% - var(--rec) * 0.62);
-        top: calc(var(--cy) - var(--rec) * 0.62);
-        width: calc(var(--rec) * 1.42);
-        height: calc(var(--rec) * 1.24);
-        border-radius: calc(var(--rec) * 0.03);
-        background: linear-gradient(155deg, #202026, #141418 45%, #0f0f12);
-        box-shadow:
-          inset 0 1px 0 rgb(255 255 255 / 0.08),
-          inset 1px 0 0 rgb(255 255 255 / 0.03),
-          inset 0 -1px 0 rgb(0 0 0 / 0.6),
-          0 2px 3px rgb(0 0 0 / 0.5),
-          0 calc(var(--rec) * 0.06) calc(var(--rec) * 0.12) rgb(0 0 0 / 0.55),
-          0 calc(var(--rec) * 0.14) calc(var(--rec) * 0.3) rgb(0 0 0 / 0.4);
-      }
-      .xi-btn {
-        bottom: calc(var(--rec) * 0.06);
-        left: calc(var(--rec) * 0.19);
-        width: calc(var(--rec) * 0.04);
-        height: calc(var(--rec) * 0.04);
-        border-radius: 50%;
-        background: radial-gradient(circle at 38% 32%, #4c4c54, #25252a 60%, #19191d);
-        box-shadow:
-          inset 0 1px 0 rgb(255 255 255 / 0.1),
-          0 1px 2px rgb(0 0 0 / 0.7);
-      }
-      .xi-poster .xi-btn-start {
-        left: calc(var(--rec) * 0.045);
-        bottom: calc(var(--rec) * 0.045);
-        width: calc(var(--rec) * 0.11);
-        height: calc(var(--rec) * 0.07);
-        border-radius: calc(var(--rec) * 0.01);
-        background: linear-gradient(170deg, #3a3a41, #222227);
-      }
-      .xi-poster .xi-btn-alt {
-        left: calc(var(--rec) * 0.255);
-      }
-      .xi-btn-lamp::after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: calc(var(--rec) * -0.022);
-        width: 3px;
-        height: 3px;
-        margin-left: -1.5px;
-        border-radius: 50%;
-        background: #ff8a3d;
-        box-shadow: 0 0 4px 1px rgb(255 138 61 / 0.55);
-      }
-      .xi-rest {
-        left: calc(var(--rec) * 1.198);
-        top: calc(var(--rec) * 0.67);
-        width: calc(var(--rec) * 0.044);
-        height: calc(var(--rec) * 0.06);
-        border-radius: calc(var(--rec) * 0.008);
-        background: linear-gradient(90deg, #26262b, #3c3c43 50%, #222226);
-        box-shadow: 1px 2px 3px rgb(0 0 0 / 0.6);
-      }
-      .xi-base {
-        left: calc(var(--rec) * 1.13);
-        top: calc(var(--rec) * 0.08);
-        width: calc(var(--rec) * 0.18);
-        height: calc(var(--rec) * 0.18);
-        border-radius: 50%;
-        background: conic-gradient(#2a2a30, #3e3e46 40deg, #26262b 110deg, #1d1d21 200deg, #34343b 300deg, #2a2a30);
-        box-shadow:
-          inset 0 1px 0 rgb(255 255 255 / 0.1),
-          inset 0 0 0 calc(var(--rec) * 0.018) rgb(0 0 0 / 0.25),
-          2px 4px 8px rgb(0 0 0 / 0.55);
-      }
-      .xi-record {
-        left: 50%;
-        top: var(--cy);
-        width: var(--rec);
-        height: var(--rec);
-        margin-left: calc(var(--rec) / -2);
-        margin-top: calc(var(--rec) / -2);
-      }
-      .xi-record > * {
-        border-radius: 50%;
-      }
-      .xi-platter {
-        inset: -3%;
-        background: conic-gradient(#3a3a40, #2a2a2f 50deg, #222226 100deg, #4a4a52 140deg, #2a2a2f 190deg, #26262b 250deg, #8a8a93 312deg, #3a3a40);
-        box-shadow:
-          0 1px 2px rgb(0 0 0 / 0.6),
-          calc(var(--rec) * 0.01) calc(var(--rec) * 0.025) calc(var(--rec) * 0.05) rgb(0 0 0 / 0.55);
-      }
-      .xi-strobe {
-        inset: -3%;
-        background: repeating-conic-gradient(rgb(225 225 232 / 0.55) 0 0.9deg, transparent 0.9deg 2.5deg);
-        -webkit-mask-image: radial-gradient(circle closest-side, transparent 95.6%, #000 96% 98.6%, transparent 99%);
-        mask-image: radial-gradient(circle closest-side, transparent 95.6%, #000 96% 98.6%, transparent 99%);
-      }
-      .xi-disc {
-        inset: 0;
-        background:
-          radial-gradient(circle closest-side, transparent 97%, rgb(255 255 255 / 0.09) 98%, rgb(255 255 255 / 0.02) 99.4%, transparent),
-          radial-gradient(circle closest-side, transparent 54.6%, #0c0c0f 55% 55.8%, transparent 56.2% 67.6%, #0c0c0f 68% 68.6%, transparent 69% 81.4%, #0c0c0f 81.8% 82.4%, transparent 82.8%),
-          radial-gradient(circle closest-side, #0d0d10 0 42.5%, transparent 43.5%),
-          conic-gradient(from 10deg, rgb(255 255 255 / 0.02), transparent 40deg, rgb(255 255 255 / 0.012) 95deg, transparent 150deg, rgb(255 255 255 / 0.024) 230deg, transparent 300deg, rgb(255 255 255 / 0.02)),
-          repeating-radial-gradient(circle, #111114 0, #1a1a1f 1px, #111114 2px),
-          #111114;
-        box-shadow:
-          0 0 0 1px #070709,
-          0 1px 3px rgb(0 0 0 / 0.6);
-      }
-      .xi-label {
-        inset: 32%;
-        background: linear-gradient(180deg, #9402f3, #f502c9);
-      }
-      .xi-label::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background:
-          radial-gradient(ellipse 80% 70% at 32% 26%, rgb(255 255 255 / 0.12), transparent 65%),
-          rgb(24 6 34 / 0.28);
-        box-shadow:
-          inset 0 0 0 1px rgb(40 0 60 / 0.35),
-          inset 0 0 calc(var(--rec) * 0.02) rgb(40 0 60 / 0.3);
-      }
-      .xi-print {
-        inset: 32%;
-      }
-      .xi-mark {
-        position: absolute;
-        inset: 21%;
-        width: 58%;
-        height: 58%;
-      }
-      .xi-ring {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-        fill: rgb(255 246 252 / 0.82);
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-weight: 600;
-      }
-      .xi-spindle {
-        inset: 48.7%;
-        background: radial-gradient(circle at 36% 30%, #f4f4f7, #a3a3ab 38%, #4a4a51 72%, #2b2b30);
-        box-shadow: 1px 1px 2px rgb(0 0 0 / 0.6);
-      }
-      .xi-sheen {
-        inset: 0;
-        background:
-          conic-gradient(from 135deg, rgb(255 255 255 / 0.12) 0deg, rgb(255 255 255 / 0.03) 14deg, transparent 26deg 154deg, rgb(255 255 255 / 0.03) 166deg, rgb(255 255 255 / 0.08) 180deg, rgb(255 255 255 / 0.03) 194deg, transparent 206deg 334deg, rgb(255 255 255 / 0.03) 346deg, rgb(255 255 255 / 0.12) 360deg),
-          conic-gradient(from 143deg, rgb(150 200 255 / 0.03), transparent 14deg 346deg, rgb(255 170 230 / 0.03));
-        -webkit-mask-image: radial-gradient(circle closest-side, transparent 36.5%, #000 40% 95%, transparent 97%);
-        mask-image: radial-gradient(circle closest-side, transparent 36.5%, #000 40% 95%, transparent 97%);
-        transform: rotate(-1.2deg);
-      }
-      .xi-poster .xi-arm {
-        left: calc(50% + var(--rec) * 0.6);
-        top: calc(var(--cy) - var(--rec) * 0.45);
-        width: 0;
-        height: 0;
-      }
-      .xi-poster .xi-arm-shadow {
-        filter: blur(3px);
-        opacity: 0.33;
-        transform: translate(calc(var(--rec) * 0.012), calc(var(--rec) * 0.02));
-      }
-      .xi-weight {
-        left: calc(var(--rec) * -0.04);
-        top: calc(var(--rec) * -0.25);
-        width: calc(var(--rec) * 0.08);
-        height: calc(var(--rec) * 0.1);
-        border-radius: calc(var(--rec) * 0.012);
-        background:
-          repeating-linear-gradient(180deg, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 3px),
-          linear-gradient(90deg, #2b2b30, #8d8d95 28%, #dedee3 42%, #74747c 64%, #2b2b30);
-      }
-      .xi-tube {
-        left: calc(var(--rec) * -0.0085);
-        top: calc(var(--rec) * -0.16);
-        width: calc(var(--rec) * 0.017);
-        height: calc(var(--rec) * 0.82);
-        border-radius: 100px;
-        background: linear-gradient(90deg, #55555c, #e6e6eb 36%, #a6a6ae 56%, #4e4e55);
-      }
-      .xi-head {
-        left: calc(var(--rec) * -0.032);
-        top: calc(var(--rec) * 0.645);
-        width: calc(var(--rec) * 0.064);
-        height: calc(var(--rec) * 0.12);
-        border-radius: calc(var(--rec) * 0.008);
-        background: linear-gradient(180deg, #2e2e34, #17171a);
-        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
-        transform-origin: 50% 0;
-        transform: rotate(16deg);
-      }
-      .xi-arm:not(.xi-arm-shadow) .xi-head::after {
-        content: '';
-        position: absolute;
-        left: 18%;
-        right: 18%;
-        bottom: 8%;
-        height: 42%;
-        border-radius: 2px;
-        background: linear-gradient(180deg, #0d0d10, #1c1c21);
-      }
-      .xi-lift {
-        left: 96%;
-        top: 22%;
-        width: calc(var(--rec) * 0.04);
-        height: max(2px, calc(var(--rec) * 0.008));
-        border-radius: 100px;
-        background: linear-gradient(180deg, #d4d4da, #6a6a72);
-      }
-      .xi-poster .xi-arm-shadow span {
-        background: #000;
-        box-shadow: none;
+        background: radial-gradient(130% 95% at 50% 45%, transparent 55%, rgb(2 3 3 / 0.7) 100%);
       }
       .xi-grain {
         inset: -50%;
         background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         opacity: 0.06;
       }
-      .xi-pivot {
-        left: calc(var(--rec) * -0.035);
-        top: calc(var(--rec) * -0.035);
-        width: calc(var(--rec) * 0.07);
-        height: calc(var(--rec) * 0.07);
-        border-radius: 50%;
-        background: radial-gradient(circle at 36% 30%, #e9e9ee, #8c8c95 40%, #3b3b42 80%);
-        box-shadow: 1px 2px 4px rgb(0 0 0 / 0.6);
-      }
     </style>
   </head>
   <body>
     <a class="skip-link sr-only" href="#main-content">Skip to main content</a>
     <div class="xi-poster" aria-hidden="true">
-      <div class="xi-light"></div>
-      <div class="xi-plinth">
-        <span class="xi-btn xi-btn-start"></span>
-        <span class="xi-btn xi-btn-lamp"></span>
-        <span class="xi-btn xi-btn-alt"></span>
-        <span class="xi-rest"></span>
-        <span class="xi-base"></span>
-      </div>
-      <div class="xi-record">
-        <span class="xi-platter"></span>
-        <span class="xi-strobe"></span>
-        <span class="xi-disc"></span>
-        <span class="xi-label"></span>
-        <span class="xi-print">
-          <img class="xi-mark" src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
-          <svg class="xi-ring" viewBox="0 0 100 100">
-            <defs>
-              <path id="xi-ring" d="M50 50m-39 0a39 39 0 1 1 78 0a39 39 0 1 1-78 0" />
-            </defs>
-            <text font-size="6.4" letter-spacing="1.1"><textPath href="#xi-ring">XOMIFY · SIDE A · 33⅓ RPM · STEREO ·</textPath></text>
-          </svg>
-        </span>
-        <span class="xi-spindle"></span>
-        <span class="xi-sheen"></span>
-      </div>
-      <div class="xi-arm xi-arm-shadow">
-        <span class="xi-weight"></span>
-        <span class="xi-tube"></span>
-        <span class="xi-head"></span>
-      </div>
-      <div class="xi-arm">
-        <span class="xi-weight"></span>
-        <span class="xi-tube"></span>
-        <span class="xi-head"><span class="xi-lift"></span></span>
-        <span class="xi-pivot"></span>
-      </div>
+      <div class="xi-vignette"></div>
       <div class="xi-grain"></div>
     </div>
     <app-root></app-root>

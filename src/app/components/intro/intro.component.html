@@ -1,27 +1,14 @@
-<div class="stage" aria-hidden="true">
-  <div class="backdrop"></div>
+<div class="scene" aria-hidden="true">
+  <canvas #haze class="layer"></canvas>
 
-  <div class="deck">
+  <div #deck class="deck">
     <div class="plinth">
+      <span class="plinth-rim"></span>
       <span class="plinth-button plinth-button--start"></span>
       <span class="plinth-button plinth-button--speed"></span>
       <span class="plinth-button plinth-button--speed plinth-button--alt"></span>
       <span class="arm-rest"></span>
       <span class="arm-base"></span>
-    </div>
-
-    <div class="eq">
-      @for (bar of bars; track bar.angle) {
-        <span class="eq-bar" [style.--a.deg]="bar.angle">
-          <span
-            class="eq-fill"
-            [style.--c]="bar.color"
-            [style.--p]="bar.peak"
-            [style.animation-duration.ms]="bar.duration"
-            [style.animation-delay.ms]="bar.delay"
-          ></span>
-        </span>
-      }
     </div>
 
     <div class="record">
@@ -30,7 +17,7 @@
       <div class="disc"></div>
       <div class="label"></div>
       <div class="print">
-        <img class="mark" src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
+        <img class="mark-print" src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
         <svg class="ring" viewBox="0 0 100 100">
           <defs>
             <path id="intro-ring" d="M50 50m-39 0a39 39 0 1 1 78 0a39 39 0 1 1-78 0" />
@@ -59,45 +46,27 @@
     </div>
   </div>
 
-  <div class="cards">
-    @for (card of cards; track card.label) {
-      <div
-        class="card"
-        [class.card--hero]="card.slot === 0"
-        [class.card--right]="card.slot > 0"
-        [style.--i]="card.slot"
-        [style.--k]="card.slot < 0 ? -card.slot : card.slot"
-      >
-        @if (card.cover; as cover) {
-          <span class="card-art">
-            <img [src]="cover.src" alt="" width="400" height="400" />
-            <span class="card-art-title">{{ cover.title }}</span>
-          </span>
-        } @else {
-          <span class="card-art card-art--wrapped">
-            <img src="assets/img/logo-x-rework.png" alt="" width="300" height="300" />
-          </span>
-        }
-        <span class="card-label">{{ card.label }}</span>
-        <span class="card-value">{{ card.value }}</span>
-        <span class="card-note">{{ card.note }}</span>
-      </div>
-    }
-  </div>
-
-  <img
-    class="logo"
-    src="assets/img/banner-logo-x-rework.png"
-    alt=""
-    width="582"
-    height="278"
-    [style.--hx.px]="aim()?.x ?? 0"
-    [style.--hy.px]="aim()?.y ?? 0"
-    [style.--hs]="aim()?.scale ?? 1"
-    [style.--ho]="aim() ? 1 : 0"
-  />
-  <p class="tagline">Your Spotify year, all year.</p>
+  <canvas #gear class="layer"></canvas>
+  <canvas #card class="now-playing"></canvas>
+  <div class="vignette"></div>
   <div class="grain"></div>
+</div>
+
+<div class="mark" aria-hidden="true">
+  <span #mark class="mark-logo">
+    <img
+      class="logo"
+      src="assets/img/banner-logo-x-rework.png"
+      alt=""
+      width="582"
+      height="278"
+      [style.--hx.px]="aim()?.x ?? 0"
+      [style.--hy.px]="aim()?.y ?? 0"
+      [style.--hs]="aim()?.scale ?? 1"
+      [style.--ho]="aim() ? 1 : 0"
+    />
+  </span>
+  <p #tagline class="tagline">Your Spotify year, all year.</p>
 </div>
 
 <button type="button" class="skip" aria-label="Skip intro" (click)="done.emit()">Skip</button>
