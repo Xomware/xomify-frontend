@@ -36,7 +36,11 @@
 }
 
 .docs-section {
-  margin-top: $spacing-4xl;
+  margin-top: $spacing-3xl;
+
+  @media (min-width: $breakpoint-lg) {
+    margin-top: $spacing-4xl;
+  }
 }
 
 .section-title {
@@ -206,12 +210,16 @@
 
 // ── CTA ─────────────────────────────────────────────────────────────────
 .docs-cta {
-  margin-top: $spacing-4xl;
+  margin-top: $spacing-3xl;
   padding: $spacing-2xl;
   border: 1px solid var(--border);
   border-radius: $radius-2xl;
   background: var(--surface);
   text-align: center;
+
+  @media (min-width: $breakpoint-lg) {
+    margin-top: $spacing-4xl;
+  }
 }
 
 .cta-title {
