@@ -22,9 +22,9 @@
       })();
     </script>
     <style>
-      /* The intro's first frame (src/app/components/intro), painted before any
-         JS so the landing never opens on a blank screen. Keep it in step with
-         intro.component.scss. */
+      /* The intro's first frame (src/app/components/intro): the empty room, painted
+         before any JS so the landing never opens on a blank screen. Keep it in step
+         with $room in intro.component.scss. */
       html[data-intro] {
         overflow: hidden;
       }
@@ -38,9 +38,7 @@
         inset: 0;
         z-index: 3999;
         overflow: hidden;
-        background: #0a0a0d;
-        --rec: min(62vmin, 500px);
-        --cy: 47%;
+        background: linear-gradient(180deg, rgb(6 8 9), rgb(11 13 13));
       }
       html[data-intro='poster'] .xi-poster {
         display: block;
@@ -52,132 +50,23 @@
       }
       .xi-poster > div {
         position: absolute;
-        left: 50%;
-        top: var(--cy);
-        width: var(--w);
-        height: var(--w);
-        margin-left: calc(var(--w) / -2);
-        margin-top: calc(var(--w) / -2);
       }
-      .xi-glow {
-        --w: calc(var(--rec) * 2.4);
-        background: radial-gradient(circle, rgb(148 2 243 / 0.32), rgb(148 2 243 / 0.08) 38%, transparent 62%);
-        opacity: 0.85;
-        animation: xi-breathe 1.6s ease-in-out infinite alternate;
-      }
-      .xi-record {
-        --w: var(--rec);
-      }
-      .xi-record > * {
-        position: absolute;
-        border-radius: 50%;
-      }
-      .xi-disc {
+      .xi-vignette {
         inset: 0;
-        background:
-          radial-gradient(circle, transparent 47%, rgb(255 255 255 / 0.05) 48%, transparent 49.5%),
-          repeating-radial-gradient(circle, #121216 0 1.5px, #1b1b21 1.5px 3px),
-          #121216;
-        box-shadow:
-          0 0 0 calc(var(--rec) * 0.012) #0b0b0e,
-          0 24px 60px rgb(0 0 0 / 0.55);
+        background: radial-gradient(130% 95% at 50% 45%, transparent 55%, rgb(2 3 3 / 0.7) 100%);
       }
-      .xi-label {
-        inset: 32%;
-        background: linear-gradient(180deg, #9402f3, #f502c9);
-      }
-      .xi-ring {
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-        fill: rgb(255 255 255 / 0.78);
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-weight: 700;
-      }
-      .xi-spindle {
-        inset: 48.6%;
-        background: #0a0a0d;
-      }
-      .xi-sheen {
-        inset: 0;
-        background: conic-gradient(
-          from 20deg,
-          transparent 0deg,
-          rgb(255 255 255 / 0.1) 18deg,
-          transparent 40deg 180deg,
-          rgb(255 255 255 / 0.07) 200deg,
-          transparent 222deg
-        );
-        -webkit-mask-image: radial-gradient(circle, transparent 33%, #000 34%);
-        mask-image: radial-gradient(circle, transparent 33%, #000 34%);
-      }
-      .xi-poster .xi-arm {
-        left: calc(50% + var(--rec) * 0.6);
-        top: calc(var(--cy) - var(--rec) * 0.45);
-        width: 0;
-        height: 0;
-        margin: 0;
-      }
-      .xi-arm > span {
-        position: absolute;
-      }
-      .xi-arm-base {
-        left: calc(var(--rec) * -0.07);
-        top: calc(var(--rec) * -0.07);
-        width: calc(var(--rec) * 0.14);
-        height: calc(var(--rec) * 0.14);
-        border-radius: 50%;
-        background: radial-gradient(circle at 40% 35%, #4a4a52, #1e1e23 70%);
-        box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
-      }
-      .xi-arm-tube {
-        left: calc(var(--rec) * -0.011);
-        top: 0;
-        width: calc(var(--rec) * 0.022);
-        height: calc(var(--rec) * 0.7);
-        border-radius: 100px;
-        background: linear-gradient(90deg, #6e6e78, #d6d6de 45%, #74747d);
-      }
-      .xi-arm-head {
-        left: calc(var(--rec) * -0.035);
-        top: calc(var(--rec) * 0.68);
-        width: calc(var(--rec) * 0.07);
-        height: calc(var(--rec) * 0.11);
-        border-radius: 3px;
-        background: linear-gradient(180deg, #2a2a30, #131316);
-        box-shadow:
-          inset 0 0 0 1px rgb(255 255 255 / 0.12),
-          0 8px 14px rgb(0 0 0 / 0.55);
-      }
-      @keyframes xi-breathe {
-        to {
-          opacity: 0.6;
-        }
+      .xi-grain {
+        inset: -50%;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.06;
       }
     </style>
   </head>
   <body>
     <a class="skip-link sr-only" href="#main-content">Skip to main content</a>
     <div class="xi-poster" aria-hidden="true">
-      <div class="xi-glow"></div>
-      <div class="xi-record">
-        <span class="xi-disc"></span>
-        <span class="xi-label"></span>
-        <svg class="xi-ring" viewBox="0 0 100 100">
-          <defs>
-            <path id="xi-ring" d="M50 50m-13.5 0a13.5 13.5 0 1 1 27 0a13.5 13.5 0 1 1-27 0" />
-          </defs>
-          <text font-size="3.4" letter-spacing="0.6"><textPath href="#xi-ring">XOMIFY · SIDE A · 33⅓ RPM ·</textPath></text>
-        </svg>
-        <span class="xi-spindle"></span>
-        <span class="xi-sheen"></span>
-      </div>
-      <div class="xi-arm">
-        <span class="xi-arm-base"></span>
-        <span class="xi-arm-tube"></span>
-        <span class="xi-arm-head"></span>
-      </div>
+      <div class="xi-vignette"></div>
+      <div class="xi-grain"></div>
     </div>
     <app-root></app-root>
     <!-- Spotify Web Playback SDK intentionally NOT loaded: it requires
