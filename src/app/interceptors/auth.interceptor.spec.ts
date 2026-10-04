@@ -138,6 +138,21 @@ describe('AuthInterceptor', () => {
     req.flush({ data: { token: 'x', expiresAt: 'y' }, error: null, meta: {} });
   });
 
+  it('does not retry a 401 from /auth/spotify-refresh, which would recurse', () => {
+    const refreshUrl = `${xomifyBase}/auth/spotify-refresh`;
+    let status = 0;
+
+    httpClient.post(refreshUrl, { refreshToken: 'revoked' }).subscribe({
+      error: (err) => (status = err.status),
+    });
+
+    const req = httpMock.expectOne(refreshUrl);
+    expect(req.request.headers.get('Authorization')).toBeNull();
+    req.flush({}, { status: 401, statusText: 'Unauthorized' });
+    expect(status).toBe(401);
+    expect(authServiceMock.refreshSpotifyAccessToken).not.toHaveBeenCalled();
+  });
+
   it('leaves non-Xomify, non-Spotify requests (accounts.spotify.com) untouched', () => {
     localStorage.setItem(XOMIFY_JWT_STORAGE_KEY, 'jwt-from-storage');
     const accountsUrl = 'https://accounts.spotify.com/api/token';

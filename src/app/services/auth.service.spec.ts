@@ -9,6 +9,9 @@ import { AuthService } from './auth.service';
 import { XomifyAuthService } from './xomify-auth.service';
 import { ToastService } from './toast.service';
 import { of } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
+const REFRESH_URL = `${environment.xomifyApiUrl}/auth/spotify-refresh`;
 
 describe('AuthService.ensureXomifyJwt', () => {
   let service: AuthService;
@@ -67,10 +70,10 @@ describe('AuthService.ensureXomifyJwt', () => {
       done();
     });
 
-    const tokenReq = httpMock.expectOne(
-      'https://accounts.spotify.com/api/token',
-    );
+    const tokenReq = httpMock.expectOne(REFRESH_URL);
     expect(tokenReq.request.method).toBe('POST');
+    // The secret lives on the backend; the browser sends only the refresh token.
+    expect(tokenReq.request.body).toEqual({ refreshToken: 'spotify-refresh-token' });
     tokenReq.flush({
       access_token: 'fresh-access-token',
       token_type: 'Bearer',
@@ -100,12 +103,10 @@ describe('AuthService.ensureXomifyJwt', () => {
       done();
     });
 
-    const tokenReq = httpMock.expectOne(
-      'https://accounts.spotify.com/api/token',
-    );
+    const tokenReq = httpMock.expectOne(REFRESH_URL);
     tokenReq.flush(
-      { error: 'invalid_grant' },
-      { status: 400, statusText: 'Bad Request' },
+      { error: { message: 'Spotify rejected the code or refresh token.', status: 401 } },
+      { status: 401, statusText: 'Unauthorized' },
     );
   });
 });
@@ -182,7 +183,7 @@ describe('AuthService.isAccessTokenExpired / getValidAccessToken', () => {
       done();
     });
 
-    httpMock.expectNone('https://accounts.spotify.com/api/token');
+    httpMock.expectNone(REFRESH_URL);
   });
 
   it('getValidAccessToken refreshes when the token is expired', (done) => {
@@ -195,9 +196,7 @@ describe('AuthService.isAccessTokenExpired / getValidAccessToken', () => {
       done();
     });
 
-    const tokenReq = httpMock.expectOne(
-      'https://accounts.spotify.com/api/token',
-    );
+    const tokenReq = httpMock.expectOne(REFRESH_URL);
     tokenReq.flush({
       access_token: 'refreshed-token',
       token_type: 'Bearer',
@@ -215,7 +214,7 @@ describe('AuthService.isAccessTokenExpired / getValidAccessToken', () => {
       done();
     });
 
-    httpMock.expectNone('https://accounts.spotify.com/api/token');
+    httpMock.expectNone(REFRESH_URL);
   });
 
   it('refreshSpotifyAccessToken updates isAccessTokenExpired() to false via the returned expires_in', (done) => {
@@ -227,9 +226,7 @@ describe('AuthService.isAccessTokenExpired / getValidAccessToken', () => {
       done();
     });
 
-    const tokenReq = httpMock.expectOne(
-      'https://accounts.spotify.com/api/token',
-    );
+    const tokenReq = httpMock.expectOne(REFRESH_URL);
     tokenReq.flush({
       access_token: 'refreshed-token',
       token_type: 'Bearer',

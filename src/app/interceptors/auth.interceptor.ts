@@ -83,8 +83,10 @@ const IMPERSONATE_PARAM = 'impersonate';
 
 /** Header name used by every Xomify API call. */
 const AUTH_HEADER = 'Authorization';
-/** Path suffix of the public mint endpoint — never gets an Authorization header. */
-const AUTH_LOGIN_PATH = '/auth/login';
+/** Path suffixes of the public auth endpoints — never get an Authorization header.
+ * The Spotify token routes must also skip the 401 retry: it refreshes through
+ * `/auth/spotify-refresh` itself, so a 401 there would recurse. */
+const PUBLIC_AUTH_PATHS = ['/auth/login', '/auth/spotify-token', '/auth/spotify-refresh'];
 /** Path suffix of the admin-only endpoint that mints the TARGET's Spotify
  * access token (see `ImpersonationService`). It already takes its own
  * `email` query param — never gets `?impersonate=` appended too, which would
@@ -121,7 +123,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // The `/auth/login` endpoint is public — never attach a token.
+    // Public auth endpoints — never attach a token or retry.
     if (this.isAuthLoginRequest(req)) {
       return next.handle(req);
     }
@@ -171,7 +173,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private isAuthLoginRequest(req: HttpRequest<unknown>): boolean {
     // Match by path suffix to avoid coupling to the full base URL.
-    return req.url.endsWith(AUTH_LOGIN_PATH);
+    return PUBLIC_AUTH_PATHS.some((p) => req.url.endsWith(p));
   }
 
   private isXomtracksApiRequest(req: HttpRequest<unknown>): boolean {
