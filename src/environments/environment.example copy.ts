@@ -6,7 +6,6 @@ export const environment = {
   production: false,
   baseCallbackUrl: 'http://localhost:4200',
   spotifyClientId: 'YOUR_SPOTIFY_CLIENT_ID',
-  spotifyClientSecret: 'YOUR_SPOTIFY_CLIENT_SECRET',
   apiAuthToken: 'YOUR_API_AUTH_TOKEN',
   apiId: 'YOUR_API_GATEWAY_ID',
   get xomifyApiUrl(): string {

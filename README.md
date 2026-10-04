@@ -213,7 +213,6 @@ Before deploying to production:
 The deployment workflow automatically injects these from AWS SSM:
 
 - `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
 - `API_AUTH_TOKEN`
 - `API_ID`
 

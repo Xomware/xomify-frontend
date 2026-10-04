@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -32,11 +32,12 @@ const EXPIRY_BUFFER_MS = 60_000;
 })
 export class AuthService {
   private readonly clientId = environment.spotifyClientId;
-  private readonly clientSecret = environment.spotifyClientSecret;
   private readonly redirectUri = `${environment.baseCallbackUrl}/callback`;
   private readonly scope =
     'user-read-private user-read-email user-library-read user-top-read playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-playback-state user-read-recently-played streaming';
-  private readonly spotifyTokenUrl = 'https://accounts.spotify.com/api/token';
+  // The backend adds the client secret, which must never ship to the browser.
+  private readonly tokenUrl = `${environment.xomifyApiUrl}/auth/spotify-token`;
+  private readonly refreshUrl = `${environment.xomifyApiUrl}/auth/spotify-refresh`;
   accessToken: string = '';
   refreshToken: string = '';
   /**
@@ -146,20 +147,8 @@ export class AuthService {
   }
 
   private exchangeCodeForToken(code: string): void {
-    const body = new URLSearchParams();
-
-    body.set('grant_type', 'authorization_code');
-    body.set('code', code);
-    body.set('redirect_uri', this.redirectUri);
-    body.set('client_id', this.clientId);
-    body.set('client_secret', this.clientSecret);
-
     this.http
-      .post<TokenResponse>(this.spotifyTokenUrl, body.toString(), {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded',
-        }),
-      })
+      .post<TokenResponse>(this.tokenUrl, { code, redirectUri: this.redirectUri })
       .subscribe({
         next: (response: TokenResponse) => {
           this.accessToken = response.access_token;
@@ -202,18 +191,8 @@ export class AuthService {
       return of(null);
     }
 
-    const body = new URLSearchParams();
-    body.set('grant_type', 'refresh_token');
-    body.set('refresh_token', this.refreshToken);
-    body.set('client_id', this.clientId);
-    body.set('client_secret', this.clientSecret);
-
     return this.http
-      .post<TokenResponse>(this.spotifyTokenUrl, body.toString(), {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded',
-        }),
-      })
+      .post<TokenResponse>(this.refreshUrl, { refreshToken: this.refreshToken })
       .pipe(
         map((response) => {
           this.accessToken = response.access_token;

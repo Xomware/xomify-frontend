@@ -21,10 +21,9 @@ jobs:
       build-command: |
         f=src/environments/environment.ts
         sed -i "s|spotifyClientId: '---'|spotifyClientId: '$CLIENT_ID'|" $f
-        sed -i "s|spotifyClientSecret: '---'|spotifyClientSecret: '$CLIENT_SECRET'|" $f
         sed -i "s|apiAuthToken: '---'|apiAuthToken: '$API_ACCESS_TOKEN'|" $f
         sed -i "s|apiId: '---'|apiId: '$API_ID'|" $f
-        if grep -nE "(spotifyClientId|spotifyClientSecret|apiAuthToken|apiId): *'(---)?'" $f; then
+        if grep -nE "(spotifyClientId|apiAuthToken|apiId): *'(---)?'" $f; then
           echo "::error::environment.ts still has placeholder credentials"
           exit 1
         fi
